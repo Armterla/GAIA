@@ -42,8 +42,15 @@ namespace GAIA
 			GINL ~Lock()
 			{
 			#ifdef GAIA_DEBUG_SELFCHECKROUTINE
+			#	if GAIA_OS == GAIA_OS_WINDOWS
+			#		pragma warning(push)
+			#		pragma warning(disable : 4297)
+			#	endif
 				GAST(m_owner_tid == (GAIA::UM)GINVALID);
 				GAST(m_owner_entertimes == 0);
+			#	if GAIA_OS == GAIA_OS_WINDOWS
+			#		pragma warning(pop)
+			#	endif
 			#endif
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				::DeleteCriticalSection(&m_cs);

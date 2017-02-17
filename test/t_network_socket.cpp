@@ -59,6 +59,7 @@ namespace TEST
 			}
 			GCATCH(Network)
 			{
+				e.SetDispatched(GAIA::True);
 			}
 
 			sock1.Close();
@@ -70,6 +71,7 @@ namespace TEST
 		}
 		GCATCHBASE
 		{
+			e.SetDispatched(GAIA::True);
 			TERROR;
 		}
 	}

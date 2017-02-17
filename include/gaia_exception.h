@@ -173,6 +173,8 @@ namespace GAIA
 			GINL const GAIA::WCH* GetErrorTextW() const{return GAIA::ECT::GetErrorTextW((GAIA::ECT::GERROR)m_nError);}
 			GINL const GAIA::TCH* GetErrorText() const{return GAIA::ECT::GetErrorText((GAIA::ECT::GERROR)m_nError);}
 			GINL GAIA::N32 GetOSError() const{return m_nOSError;}
+			GINL GAIA::GVOID SetDispatched(GAIA::BL bDispatched){m_bDispatched = bDispatched;}
+			GINL GAIA::BL GetDispatched() const{return m_bDispatched;}
 		private:
 			GINL GAIA::GVOID init()
 			{
@@ -181,6 +183,7 @@ namespace GAIA
 				m_nError = 0;
 				m_nOSError = 0;
 				m_pszMsg = GNIL;
+				m_bDispatched = GAIA::False;
 			}
 		private:
 			const GAIA::CH* m_pszFile;
@@ -188,6 +191,7 @@ namespace GAIA
 			GAIA::N32 m_nError;
 			GAIA::N32 m_nOSError;
 			const GAIA::CH* m_pszMsg;
+			GAIA::BL m_bDispatched;
 		};
 
 		/*!

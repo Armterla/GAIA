@@ -517,6 +517,7 @@ namespace TEST
 		}
 		GCATCHBASE
 		{
+			e.SetDispatched(GAIA::True);
 			TERROR;
 		}
 	}

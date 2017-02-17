@@ -348,7 +348,7 @@ CreatePallet (HPDF_Dict    image,
         return image->error->error_no;
 
     p = ppallet;
-    for (i = 0; i < num_pl; i++, src_pl++) {
+    for (i = 0; i < (HPDF_UINT)num_pl; i++, src_pl++) {
         *p++ = src_pl->red;
         *p++ = src_pl->green;
         *p++ = src_pl->blue;

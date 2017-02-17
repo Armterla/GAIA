@@ -294,7 +294,16 @@ namespace GAIA
 			GINL ~DBRemoteAutoTransaction()
 			{
 				if(!m_pDBRemote->EndTransaction(m_bRollBack))
-					GTHROW(Illegal);
+				{
+				#if GAIA_OS == GAIA_OS_WINDOWS
+				#	pragma warning(push)
+				#	pragma warning(disable : 4297)
+				#endif
+					GASTFALSE;
+				#if GAIA_OS == GAIA_OS_WINDOWS
+				#	pragma warning(pop)
+				#endif
+				}
 			}
 
 			/*!

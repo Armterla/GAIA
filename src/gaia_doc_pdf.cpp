@@ -587,7 +587,7 @@ namespace GAIA
 			HPDF_DashMode m = HPDF_Page_GetDash(m_ctx->page);
 			uCount = m.num_ptn;
 			uPhase = m.phase;
-			for(GAIA::NUM x = 0; x < m.num_ptn; ++x)
+			for(GAIA::U32 x = 0; x < m.num_ptn; ++x)
 				pPattern[x] = m.ptn[x];
 		}
 		GAIA::GVOID PDFWriter::MoveTo(GAIA::REAL x, GAIA::REAL y)

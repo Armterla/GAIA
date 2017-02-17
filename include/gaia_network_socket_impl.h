@@ -208,6 +208,7 @@ namespace GAIA
 			}
 			GCATCH(Network)
 			{
+				e.SetDispatched(GAIA::True);
 			}
 		}
 

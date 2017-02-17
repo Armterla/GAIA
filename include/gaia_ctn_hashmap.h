@@ -261,7 +261,7 @@ namespace GAIA
 			GINL BasicHashMap(){this->init();}
 			GINL BasicHashMap(const __MyType& src){this->init(); this->operator = (src);}
 			GINL GAIA::BL empty() const{return this->size() == 0;}
-			GINL const _SizeType& size() const{return m_nodepool.size();}
+			GINL _SizeType size() const{return m_nodepool.size();}
 			GINL const _SizeType& capacity() const{return m_nodepool.capacity();}
 			GINL GAIA::GVOID clear()
 			{

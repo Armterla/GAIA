@@ -22,11 +22,377 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\adler32.c">
-      <Filter>GAIA\src</Filter>
+    <ClCompile Include="..\test\t_log_log.cpp">
+      <Filter>GAIA\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\bignum.c">
-      <Filter>GAIA\src</Filter>
+    <ClCompile Include="..\test\t_math_aabb.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_aabr.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_argb.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_basic.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_lerp.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_lint.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_mtx22.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_mtx32.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_mtx33.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_mtx43.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_mtx44.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_nrgb.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_qua.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_random.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_vec2.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_vec3.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_vec4.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_misc_cmdline.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_misc_cmdparam.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_namespace.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_network_asyncsocket.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_network_base.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_network_http.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_network_httpbase.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_network_httpserver.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_network_socket.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_network_sudpsocket.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_stream_stringstream.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_sync_atomic.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_sync_event.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_sync_lock.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_sync_mutex.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_test.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_thread_thread.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_thread_threadpool.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_time_time.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_time_timer.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_type.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_xml_xml.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tp_compiler.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tp_objstatus.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tperf_ctn.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tperf_ctn_avltree.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tperf_ctn_dmpgraph.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\preheader.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_base.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_compare.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_hash.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_memory.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_replace.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_search.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_set.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_sort.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_string.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_unique.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_accesser.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_array.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_arrayvector.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_avltree.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_bitset.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_book.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_buffer.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_bufferfl.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_bufferpool.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_bufferrw.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_chars.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_charsstring.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_cooperate.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_dmpgraph.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_doublelist.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_graph.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_hashmap.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_hashset.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_list.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_map.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_msg.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_orderless.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_pool.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_ptr.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_queue.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_ref.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_secset.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_set.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_singlelist.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_stack.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_stackbitset.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_stackbuffer.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_stackqueue.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_stackstack.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_staticbufferpool.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_staticstringpool.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_staticstringptrpool.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_storage.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_string.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_stringpool.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_stringptrpool.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_stringref.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_tree.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_trietree.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_vari.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_vector.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_db_local.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_db_remote.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_dbg_perfcollector.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_base64.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_diff.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_md5.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_rc4.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_regexp.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_rsa.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_sha1.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_zip.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_doc_pdf.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_fsys_dir.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_fsys_file.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_fsys_memfile.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_html_html.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_img_image.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_img_jpeg.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_img_png.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_iterator.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_json_json.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_locale.cpp">
+      <Filter>GAIA\test</Filter>
     </ClCompile>
     <ClCompile Include="..\src\compress.c">
       <Filter>GAIA\src</Filter>
@@ -74,6 +440,9 @@
       <Filter>GAIA\src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gaia_network_http.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_network_httpbase.cpp">
       <Filter>GAIA\src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\gaia_network_httpserver.cpp">
@@ -550,391 +919,43 @@
     <ClCompile Include="..\src\zutil.c">
       <Filter>GAIA\src</Filter>
     </ClCompile>
-    <ClCompile Include="..\test\t_log_log.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_aabb.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_aabr.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_argb.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_basic.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_lerp.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_lint.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_mtx22.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_mtx32.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_mtx33.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_mtx43.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_mtx44.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_nrgb.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_qua.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_random.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_vec2.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_vec3.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_math_vec4.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_misc_cmdline.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_misc_cmdparam.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_namespace.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_network_asyncsocket.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_network_base.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_network_http.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_network_httpbase.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_network_httpserver.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_network_socket.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_network_sudpsocket.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_stream_stringstream.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_sync_atomic.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_sync_event.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_sync_lock.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_sync_mutex.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_test.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_thread_thread.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_thread_threadpool.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_time_time.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_time_timer.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_type.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_xml_xml.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\tp_compiler.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\tp_objstatus.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\tperf_ctn.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\tperf_ctn_avltree.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\tperf_ctn_dmpgraph.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\preheader.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_algo_base.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_algo_compare.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_algo_hash.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_algo_memory.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_algo_replace.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_algo_search.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_algo_set.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_algo_sort.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_algo_string.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_algo_unique.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_accesser.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_array.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_arrayvector.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_avltree.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_bitset.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_book.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_buffer.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_bufferfl.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_bufferpool.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_bufferrw.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_chars.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_charsstring.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_cooperate.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_dmpgraph.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_doublelist.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_graph.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_hashmap.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_hashset.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_list.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_map.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_msg.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_orderless.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_pool.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_ptr.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_queue.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_ref.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_secset.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_set.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_singlelist.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_stack.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_stackbitset.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_stackbuffer.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_stackqueue.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_stackstack.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_staticbufferpool.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_staticstringpool.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_staticstringptrpool.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_storage.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_string.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_stringpool.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_stringptrpool.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_stringref.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_tree.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_trietree.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_vari.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_ctn_vector.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_db_local.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_db_remote.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_dbg_perfcollector.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_digit_base64.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_digit_diff.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_digit_md5.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_digit_rc4.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_digit_regexp.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_digit_rsa.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_digit_sha1.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_digit_zip.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_doc_pdf.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_fsys_dir.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_fsys_file.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_fsys_memfile.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_html_html.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_img_image.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_img_jpeg.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_img_png.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_iterator.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_json_json.cpp">
-      <Filter>GAIA\test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\test\t_locale.cpp">
-      <Filter>GAIA\test</Filter>
+    <ClCompile Include="..\src\adler32.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bignum.c">
+      <Filter>GAIA\src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\bignum.h">
-      <Filter>GAIA\include</Filter>
+    <ClInclude Include="..\test\preheader.h">
+      <Filter>GAIA\test</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\bn_mul.h">
-      <Filter>GAIA\include</Filter>
+    <ClInclude Include="..\test\t_common.h">
+      <Filter>GAIA\test</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\config.h">
-      <Filter>GAIA\include</Filter>
+    <ClInclude Include="..\test\t_header.h">
+      <Filter>GAIA\test</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\crc32.h">
-      <Filter>GAIA\include</Filter>
+    <ClInclude Include="..\src\png.h">
+      <Filter>GAIA\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pngconf.h">
+      <Filter>GAIA\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pngdebug.h">
+      <Filter>GAIA\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pnginfo.h">
+      <Filter>GAIA\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pngpriv.h">
+      <Filter>GAIA\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pngstruct.h">
+      <Filter>GAIA\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\t4.h">
+      <Filter>GAIA\src</Filter>
     </ClInclude>
     <ClInclude Include="..\include\deflate.h">
       <Filter>GAIA\include</Filter>
@@ -1875,35 +1896,17 @@
     <ClInclude Include="..\include\zutil.h">
       <Filter>GAIA\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\png.h">
-      <Filter>GAIA\src</Filter>
+    <ClInclude Include="..\include\bignum.h">
+      <Filter>GAIA\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\pngconf.h">
-      <Filter>GAIA\src</Filter>
+    <ClInclude Include="..\include\bn_mul.h">
+      <Filter>GAIA\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\pngdebug.h">
-      <Filter>GAIA\src</Filter>
+    <ClInclude Include="..\include\config.h">
+      <Filter>GAIA\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\pnginfo.h">
-      <Filter>GAIA\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\pngpriv.h">
-      <Filter>GAIA\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\pngstruct.h">
-      <Filter>GAIA\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\t4.h">
-      <Filter>GAIA\src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\test\preheader.h">
-      <Filter>GAIA\test</Filter>
-    </ClInclude>
-    <ClInclude Include="..\test\t_common.h">
-      <Filter>GAIA\test</Filter>
-    </ClInclude>
-    <ClInclude Include="..\test\t_header.h">
-      <Filter>GAIA\test</Filter>
+    <ClInclude Include="..\include\crc32.h">
+      <Filter>GAIA\include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

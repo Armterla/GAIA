@@ -118,7 +118,7 @@ namespace TEST
 					pdf.SetTextRenderMode(GAIA::DOC::PDF_TEXT_RENDER_MODE_FILL);
 					pdf.SetFontSize(12);
 
-					GAIA::REAL radian1 = 48.0 / 180.0 * 3.141592;
+					GAIA::REAL radian1 = (GAIA::REAL)(48.0 / 180.0 * 3.141592);
 					pdf.SetTextMatrix(100, 300, cos(radian1), sin(radian1), -sin(radian1), cos(radian1));
 					pdf.SetFont("Helvetica-Oblique");
 					pdf.Text("Rotate text with 45 degree!");
@@ -133,7 +133,7 @@ namespace TEST
 
 				pdf.SetLineCap(GAIA::DOC::PDF_LINE_CAP_ROUND);
 				pdf.SetLineJoin(GAIA::DOC::PDF_LINE_JOIN_ROUND);
-				pdf.SetStrokeRGB(0.6, 0.2, 0.0);
+				pdf.SetStrokeRGB(R(0.6), R(0.2), R(0.0));
 				pdf.SetLineWidth(1.0);
 				pdf.MoveTo(rTextPosX, rTextPosY - 1.0);
 				pdf.LineTo(rTextPosX + rTextWidth, rTextPosY - 1.0);
@@ -149,22 +149,22 @@ namespace TEST
 				pdf.SetLineCap(GAIA::DOC::PDF_LINE_CAP_ROUND);
 				pdf.SetLineJoin(GAIA::DOC::PDF_LINE_JOIN_ROUND);
 
-				pdf.SetStrokeRGB(0.2, 0.2, 0.6);
+				pdf.SetStrokeRGB(R(0.2), R(0.2), R(0.6));
 				pdf.MoveTo(24, rPageHeight - 32);
 				pdf.LineTo(rPageWidth - 24, rPageHeight - 32);
 				pdf.Stroke();
 
 				pdf.SetLineWidth(4);
-				pdf.SetFillRGB(0.4, 0.2, 0.2);
+				pdf.SetFillRGB(R(0.4), R(0.2), R(0.2));
 				pdf.Circle(rPageWidth * 0.5 - 100, rPageHeight * 0.5, 128);
 				pdf.Fill();
 				pdf.Circle(rPageWidth * 0.5 - 100, rPageHeight * 0.5, 128);
 				pdf.Stroke();
 
-				pdf.SetFillRGB(0.3, 0.7, 0.2);
+				pdf.SetFillRGB(R(0.3), R(0.7), R(0.2));
 				pdf.Circle(rPageWidth * 0.5 + 100, rPageHeight * 0.5 - 100, 80);
 				pdf.Fill();
-				pdf.SetStrokeRGB(0.2, 0.2, 0.2);
+				pdf.SetStrokeRGB(R(0.2), R(0.2), R(0.2));
 				pdf.Circle(rPageWidth * 0.5 + 100, rPageHeight * 0.5 - 100, 80);
 				pdf.Stroke();
 

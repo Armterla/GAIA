@@ -2763,7 +2763,7 @@ HPDF_CMapEncoder_AddCMap  (HPDF_Encoder             encoder,
 	    HPDF_UINT16 cid = range->cid;
 
 	    while (code <= range->to) {
-		HPDF_BYTE l = code;
+		HPDF_BYTE l = (HPDF_BYTE)code;
 		HPDF_BYTE h = code >> 8;
 
 		attr->cid_map[l][h] = cid;
