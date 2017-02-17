@@ -227,6 +227,31 @@ namespace GAIA
 			*pDst = '\0';
 			return ret;
 		}
+		template<typename _DataType1, typename _DataType2> _DataType1 gstradd(_DataType1 pDst, _DataType2 pSrc)
+		{
+			GAST(!!pDst);
+			GAST(!!pSrc);
+			while(*pSrc != '\0')
+			{
+				*pDst = *pSrc;
+				++pDst;
+				++pSrc;
+			}
+			*pDst = '\0';
+			return pDst;
+		}
+		template<typename _DataType1, typename _DataType2> _DataType1 gstradd_notend(_DataType1 pDst, _DataType2 pSrc)
+		{
+			GAST(!!pDst);
+			GAST(!!pSrc);
+			while(*pSrc != '\0')
+			{
+				*pDst = *pSrc;
+				++pDst;
+				++pSrc;
+			}
+			return pDst;
+		}
 		template<typename _DataType> _DataType* gstrnew(const _DataType* p)
 		{
 			_DataType* ret = gnew _DataType[GAIA::ALGO::gstrlen(p) + 1];
