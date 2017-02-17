@@ -146,5 +146,10 @@ namespace GAIA
 		{
 
 		}
+
+		GAIA::GVOID test()
+		{
+			
+		}
 	}
 }
