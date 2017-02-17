@@ -1,0 +1,1909 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="GAIA">
+      <UniqueIdentifier>{d49012bc-24e2-4046-8293-5cb2cd12b3c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GAIA\src">
+      <UniqueIdentifier>{baf6ab6e-0ed7-4306-a882-cfe11fed39bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GAIA\include">
+      <UniqueIdentifier>{ded3ce31-7d56-4699-9017-4a3c24f1b623}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GAIA\test">
+      <UniqueIdentifier>{87eabddd-eeb7-4d4f-bbfb-d018b47a0e8f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\adler32.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bignum.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\compress.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\crc32.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\deflate.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_db_dblocal.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_db_dbremote.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_digit_diff.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_digit_regexp.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_digit_zip.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_doc_pdf.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_img_base.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_img_jpeg.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_img_png.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_network_asyncdispatcher.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_network_asyncsocket.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_network_client.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_network_http.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_network_httpserver.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_network_server.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_network_sudpsocket.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_stream_stdstream.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gaia_type.cpp">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gzclose.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gzlib.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gzread.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gzwrite.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_3dmeasure.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_annotation.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_array.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_binary.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_boolean.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_catalog.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_destination.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_dict.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_doc.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_doc_png.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_encoder.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_encoder_cns.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_encoder_cnt.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_encoder_jp.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_encoder_kr.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_encoder_utf.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_encrypt.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_encryptdict.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_error.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_exdata.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_ext_gstate.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_font.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_font_cid.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_font_tt.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_font_type1.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_fontdef.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_fontdef_base14.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_fontdef_cid.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_fontdef_cns.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_fontdef_cnt.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_fontdef_jp.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_fontdef_kr.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_fontdef_tt.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_fontdef_type1.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_gstate.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_image.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_image_ccitt.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_image_png.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_info.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_list.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_mmgr.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_name.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_namedict.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_null.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_number.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_objects.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_outline.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_page_label.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_page_operator.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_pages.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_pdfa.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_real.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_streams.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_string.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_u3d.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_utils.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hpdf_xref.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\infback.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\inffast.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\inflate.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\inftrees.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_byte_order.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_chartables.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_compile.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_config.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_dfa_exec.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_exec.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_fullinfo.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_get.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_globals.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_jit_compile.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_maketables.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_newline.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_ord2utf8.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_printint.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_refcount.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_string_utils.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_study.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_tables.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_ucd.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_valid_utf8.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_version.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre_xclass.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_byte_order.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_chartables.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_compile.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_config.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_dfa_exec.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_exec.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_fullinfo.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_get.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_globals.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_jit_compile.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_maketables.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_newline.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_ord2utf16.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_printint.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_refcount.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_string_utils.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_study.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_tables.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_ucd.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_utf16_utils.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_valid_utf16.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_version.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre16_xclass.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_byte_order.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_chartables.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_compile.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_config.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_dfa_exec.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_exec.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_fullinfo.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_get.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_globals.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_jit_compile.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_maketables.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_newline.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_ord2utf32.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_printint.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_refcount.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_string_utils.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_study.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_tables.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_ucd.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_utf32_utils.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_valid_utf32.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_version.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pcre32_xclass.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\png.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pngerror.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pngget.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pngmem.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pngpread.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pngread.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pngrio.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pngrtran.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pngrutil.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pngset.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pngtrans.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pngwio.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pngwrite.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pngwtran.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\pngwutil.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\rsa.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sqlite3.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\trees.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\uncompr.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\zutil.c">
+      <Filter>GAIA\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_log_log.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_aabb.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_aabr.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_argb.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_basic.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_lerp.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_lint.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_mtx22.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_mtx32.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_mtx33.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_mtx43.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_mtx44.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_nrgb.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_qua.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_random.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_vec2.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_vec3.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_math_vec4.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_misc_cmdline.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_misc_cmdparam.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_namespace.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_network_asyncsocket.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_network_base.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_network_http.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_network_httpbase.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_network_httpserver.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_network_socket.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_network_sudpsocket.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_stream_stringstream.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_sync_atomic.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_sync_event.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_sync_lock.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_sync_mutex.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_test.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_thread_thread.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_thread_threadpool.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_time_time.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_time_timer.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_type.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_xml_xml.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tp_compiler.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tp_objstatus.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tperf_ctn.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tperf_ctn_avltree.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\tperf_ctn_dmpgraph.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\preheader.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_base.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_compare.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_hash.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_memory.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_replace.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_search.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_set.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_sort.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_string.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_algo_unique.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_accesser.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_array.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_arrayvector.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_avltree.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_bitset.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_book.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_buffer.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_bufferfl.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_bufferpool.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_bufferrw.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_chars.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_charsstring.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_cooperate.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_dmpgraph.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_doublelist.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_graph.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_hashmap.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_hashset.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_list.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_map.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_msg.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_orderless.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_pool.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_ptr.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_queue.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_ref.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_secset.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_set.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_singlelist.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_stack.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_stackbitset.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_stackbuffer.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_stackqueue.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_stackstack.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_staticbufferpool.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_staticstringpool.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_staticstringptrpool.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_storage.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_string.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_stringpool.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_stringptrpool.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_stringref.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_tree.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_trietree.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_vari.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_ctn_vector.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_db_local.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_db_remote.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_dbg_perfcollector.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_base64.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_diff.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_md5.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_rc4.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_regexp.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_rsa.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_sha1.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_zip.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_doc_pdf.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_fsys_dir.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_fsys_file.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_fsys_memfile.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_html_html.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_img_image.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_img_jpeg.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_img_png.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_iterator.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_json_json.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_locale.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\bignum.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\bn_mul.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\config.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\crc32.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\deflate.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_algo_base.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_algo_compare.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_algo_extend.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_algo_hash.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_algo_hashlcg.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_algo_memory.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_algo_replace.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_algo_search.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_algo_set.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_algo_sort.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_algo_string.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_algo_unique.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_assert.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_assert_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_accesser.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_array.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_arrayvector.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_avltree.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_bitset.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_book.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_buffer.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_bufferfl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_bufferpool.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_bufferrw.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_chars.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_charsstring.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_cooperation.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_datarecord.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_dictionary.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_dmpgraph.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_doublelist.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_graph.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_hashmap.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_hashset.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_heap.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_huffmantree.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_kdtree.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_ksvdtree.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_list.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_map.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_msg.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_net.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_orderless.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_pair.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_pool.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_priqueue.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_ptr.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_queue.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_ref.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_secset.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_set.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_singlelist.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_stack.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_stackbitset.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_stackbuffer.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_stackqueue.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_stackstack.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_staticbufferpool.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_staticstringpool.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_staticstringptrpool.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_storage.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_string.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_stringpool.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_stringptrpool.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_stringref.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_tree.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_triegraph.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_trietree.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_vari.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_ctn_vector.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_db_dblocal.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_db_dbremote.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_dbg_perf.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_digit_base64.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_digit_crc.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_digit_crypt.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_digit_des.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_digit_diff.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_digit_md5.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_digit_rc4.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_digit_regexp.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_digit_rsa.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_digit_sha1.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_digit_zip.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_doc_pdf.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_exception.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_fsys_dir.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_fsys_dirbase.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_fsys_file.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_fsys_filebase.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_fsys_memfile.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_global_decl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_global_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_html_html.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_html_html_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_html_htmlbase.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_html_htmlfactory.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_html_htmlfactory_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_html_htmlfactorydesc.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_html_htmlnode.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_html_htmlnode_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_img_base.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_img_image.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_img_jpeg.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_img_png.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_internal.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_iterator.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_json_json.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_json_json_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_json_jsonbase.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_json_jsonfactory.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_json_jsonfactory_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_json_jsonfactorydesc.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_json_jsonnode.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_json_jsonnode_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_locale.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_log.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_macrohelper.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_aabb.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_aabr.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_argb.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_barycentric.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_base.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_cal.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_constant.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_convert.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_cooperation.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_coord.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_cull.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_distance.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_geo.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_intersection.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_lcomplex.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_lerp.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_limit.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_linearalgebra.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_lint.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_lreal.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_mtx22.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_mtx32.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_mtx33.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_mtx43.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_mtx44.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_noise.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_nrgb.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_plane.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_projection.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_qua.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_random.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_random_lcg.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_rid.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_rid_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_spline.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_transform.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_vec2.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_vec3.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_math_vec4.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_misc_cmdline.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_misc_cmdparam.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_msys_base.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_msys_heapcrt.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_msys_heapesg.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_msys_leakdetector.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_network_addr.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_network_asyncdispatcher.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_network_asyncsocket.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_network_base.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_network_base_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_network_client.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_network_http.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_network_httpbase.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_network_httpserver.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_network_ip.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_network_server.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_network_socket.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_network_socket_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_network_sudpsocket.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_physics_constant.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_platform.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_predecl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_process.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_stream_format.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_stream_stdstream.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_stream_streambase.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_stream_stringstream.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_sync_atomic.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_sync_autolock.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_sync_autolockfree.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_sync_autolockr.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_sync_autolockw.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_sync_base.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_sync_event.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_sync_lock.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_sync_lockfree.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_sync_lockrw.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_sync_mutex.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_sysconfig.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_system.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_test_case.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_test_case_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_test_context.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_test_controller.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_test_unit.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_test_unit_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_thread.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_thread_base.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_thread_base_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_thread_pool.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_time.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_timer_realtimer.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_timer_timer.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_timer_timer_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_type.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_type_auto.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_type_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_type_traits2.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_using_namespace.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_version.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_xml_xml.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_xml_xml_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_xml_xmlbase.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_xml_xmlfactory.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_xml_xmlfactory_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_xml_xmlfactorydesc.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_xml_xmlnode.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gaia_xml_xmlnode_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gzguts.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_3dmeasure.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_annotation.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_catalog.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_conf.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_config.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_consts.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_destination.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_doc.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_encoder.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_encrypt.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_encryptdict.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_error.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_exdata.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_ext_gstate.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_font.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_fontdef.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_gstate.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_image.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_info.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_list.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_mmgr.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_namedict.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_objects.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_outline.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_page_label.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_pages.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_pdfa.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_streams.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_types.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_u3d.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_utils.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\hpdf_version.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inffast.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inffixed.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inflate.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\inftrees.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_byte_order_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_chartables_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_compile_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_config_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_dfa_exec_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_exec_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_fullinfo_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_get_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_globals_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_internal.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_jit_compile_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_maketables_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_newline_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_printint_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_refcount_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_string_utils_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_study_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_tables_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_ucd_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_version_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pcre_xclass_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\png.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pngconf.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pngdebug.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pnginfo.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pnglibconf.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pngpriv.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\pngstruct.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\polarssl_config.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\rsa.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sqlite3.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sqlite3ext.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\trees.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\ucp.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdelta3.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdelta3_impl.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdelta3-cfgs.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdelta3-decode.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdelta3-hash.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdelta3-internal.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\xdelta3-list.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zconf.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zconf_internal.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zlib.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\zutil.h">
+      <Filter>GAIA\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\png.h">
+      <Filter>GAIA\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pngconf.h">
+      <Filter>GAIA\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pngdebug.h">
+      <Filter>GAIA\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pnginfo.h">
+      <Filter>GAIA\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pngpriv.h">
+      <Filter>GAIA\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\pngstruct.h">
+      <Filter>GAIA\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\t4.h">
+      <Filter>GAIA\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\preheader.h">
+      <Filter>GAIA\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\t_common.h">
+      <Filter>GAIA\test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\test\t_header.h">
+      <Filter>GAIA\test</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

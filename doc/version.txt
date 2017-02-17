@@ -1,0 +1,5 @@
+zlib 		= 1.2.8
+freetype 	= 2.5.4
+xdelta3 	= 3.0.10
+pcre 		= 8.37
+sqlite3		= 3.17.0

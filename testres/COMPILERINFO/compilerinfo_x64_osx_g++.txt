@@ -1,0 +1,31 @@
+[TYPE SIZE]
+bool size = 1
+wchar_t size = 4
+char size = 1
+short size = 2
+int size = 4
+long size = 8
+long int size = 8
+long long int size = 8
+float size = 4
+double size = 8
+size_t size = 8
+
+[TYPE NAME]
+bool type name = b
+wchar_t type name = w
+char type name = c
+short type name = s
+int type name = i
+long type name = l
+long int type name = l
+long long int type name = x
+unsigned char type name = h
+unsigned short type name = t
+unsigned int type name = j
+unsigned long type name = m
+unsigned long int type name = m
+unsigned long long int type name = y
+float type name = f
+double type name = d
+size_t type name = m

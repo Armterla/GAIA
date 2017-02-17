@@ -1,0 +1,27 @@
+[BASE OBJECT SIZE]
+GAIA::Base size = 1
+GAIA::Entity size = 8
+GAIA::Object size = 8
+GAIA::RefObject size = 16
+GAIA::FWORK::Instance size = 32
+
+[CONTAINER SIZE]
+GAIA::CTN::Array<GAIA::CH, 1> size = 16
+GAIA::CTN::Vector<GAIA::CH> size = 24
+GAIA::CTN::TString size = 24
+
+[MATH SIZE]
+GAIA::MATH::VEC2<GAIA::F32> size = 8
+GAIA::MATH::VEC3<GAIA::F32> size = 12
+GAIA::MATH::VEC4<GAIA::F32> size = 16
+GAIA::MATH::ARGB<GAIA::F32> size = 16
+GAIA::MATH::NRGB<GAIA::F32> size = 12
+GAIA::MATH::AABR<GAIA::F32> size = 20
+GAIA::MATH::AABB<GAIA::F32> size = 28
+GAIA::MATH::MTX44<GAIA::F32> size = 64
+GAIA::MATH::MTX43<GAIA::F32> size = 48
+GAIA::MATH::MTX33<GAIA::F32> size = 36
+GAIA::MATH::MTX32<GAIA::F32> size = 24
+GAIA::MATH::MTX22<GAIA::F32> size = 16
+GAIA::MATH::QUA<GAIA::F32> size = 16
+GAIA::MATH::PLANE<GAIA::F32> size = 16

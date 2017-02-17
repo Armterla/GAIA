@@ -1,0 +1,139 @@
+﻿#include "preheader.h"
+#include "t_common.h"
+
+namespace TEST
+{
+	static GAIA::GVOID SaveLoadXML(GAIA::LOG::Log& logobj, GAIA::XML::XML& xml)
+	{
+		GAIA::CTN::TChars strTemp, strTemp1, strTemp2;
+
+		static const GAIA::NUM NODE_COUNT = 3;
+		static const GAIA::NUM VALUE_COUNT = 3;
+
+		GAIA::XML::XML::Cursor cur;
+
+		xml.BeginWriteNode(cur, GAIA::XML::XML_NODE_MULTICONTAINER, _T("Root"));
+
+		for(GAIA::NUM v = 0; v < VALUE_COUNT; ++v)
+		{
+			strTemp1 = "Name";
+			strTemp1 += v;
+			xml.BeginWriteNode(cur, GAIA::XML::XML_NODE_NAME, strTemp1);
+
+			strTemp2 = "Value";
+			strTemp2 += v;
+			xml.WriteNode(cur, GAIA::XML::XML_NODE_VALUE, strTemp2);
+
+			xml.EndWriteNode(cur);
+		}
+
+		xml.WriteNode(cur, GAIA::XML::XML_NODE_COMMENT, _T("Comment0"));
+
+		for(GAIA::NUM x = 0; x < NODE_COUNT; ++x)
+		{
+			strTemp = "Node";
+			strTemp += x;
+			xml.BeginWriteNode(cur, GAIA::XML::XML_NODE_MULTICONTAINER, strTemp);
+			xml.WriteNode(cur, GAIA::XML::XML_NODE_COMMENT, _T("Comment1"));
+			for(GAIA::NUM v = 0; v < VALUE_COUNT; ++v)
+			{
+				strTemp1 = strTemp + "_Name";
+				strTemp1 += v;
+				xml.BeginWriteNode(cur, GAIA::XML::XML_NODE_NAME, strTemp1);
+
+				strTemp2 = strTemp + "_Value";
+				strTemp2 += v;
+				xml.WriteNode(cur, GAIA::XML::XML_NODE_VALUE, strTemp2);
+
+				xml.EndWriteNode(cur);
+			}
+			for(GAIA::NUM y = 0; y < NODE_COUNT; ++y)
+			{
+				strTemp = "Node";
+				strTemp += x;
+				strTemp += "_";
+				strTemp += y;
+				xml.BeginWriteNode(cur, GAIA::XML::XML_NODE_MULTICONTAINER, strTemp);
+				xml.WriteNode(cur, GAIA::XML::XML_NODE_COMMENT, _T("Comment2"));
+				for(GAIA::NUM v = 0; v < VALUE_COUNT; ++v)
+				{
+					strTemp1 = strTemp + "_Name";
+					strTemp1 += v;
+					xml.BeginWriteNode(cur, GAIA::XML::XML_NODE_NAME, strTemp1);
+
+					strTemp2 = strTemp + "_Value";
+					strTemp2 += v;
+					xml.WriteNode(cur, GAIA::XML::XML_NODE_VALUE, strTemp2);
+
+					xml.EndWriteNode(cur);
+				}
+				for(GAIA::NUM z = 0; z < NODE_COUNT; ++z)
+				{
+					strTemp = "Node";
+					strTemp += x;
+					strTemp += "_";
+					strTemp += y;
+					strTemp += "_";
+					strTemp += z;
+					xml.BeginWriteNode(cur, GAIA::XML::XML_NODE_MULTICONTAINER, strTemp);
+					xml.WriteNode(cur, GAIA::XML::XML_NODE_COMMENT, _T("Comment3"));
+					for(GAIA::NUM v = 0; v < VALUE_COUNT; ++v)
+					{
+						strTemp1 = strTemp + "_Name";
+						strTemp1 += v;
+						xml.BeginWriteNode(cur, GAIA::XML::XML_NODE_NAME, strTemp1);
+
+						strTemp2 = strTemp + "_Value";
+						strTemp2 += v;
+						xml.WriteNode(cur, GAIA::XML::XML_NODE_VALUE, strTemp2);
+
+						xml.EndWriteNode(cur);
+					}
+					xml.EndWriteNode(cur);
+				}
+				xml.EndWriteNode(cur);
+			}
+			xml.EndWriteNode(cur);
+		}
+
+		xml.EndWriteNode(cur);
+		
+		GAIA::TCH szFileName[GAIA::MAXPL];
+		GAIA::ALGO::gstrcpy(szFileName, g_gaia_appdocdir);
+		GAIA::ALGO::gstrcat(szFileName, "test.xml");
+
+		if(!xml.SaveToFile(szFileName, GAIA::XML::XML_SAVE_BESTREAD))
+			TERROR;
+		if(!xml.LoadFromFile(szFileName))
+			TERROR;
+		if(!xml.SaveToFile(szFileName, GAIA::XML::XML_SAVE_BESTREAD))
+			TERROR;
+		if(!xml.LoadFromFile(szFileName))
+			TERROR;
+		if(!xml.SaveToFile(szFileName, GAIA::XML::XML_SAVE_BESTREAD))
+			TERROR;
+		GAIA::FSYS::Dir dir;
+		dir.RemoveFile(szFileName);
+	}
+	extern GAIA::GVOID t_xml_xml(GAIA::LOG::Log& logobj)
+	{
+		GAIA::XML::XMLFactory fac;
+		GAIA::XML::XMLFactoryDesc desc;
+		desc.reset();
+		fac.Create(desc);
+		{
+			GAIA::XML::XML& xml = fac.CreateXML();
+			{
+				SaveLoadXML(logobj, xml);
+			}
+			fac.ReleaseXML(xml);
+		}
+		fac.Destroy();
+
+		GAIA::XML::XML* pXML = gnew GAIA::XML::XML;
+		{
+			SaveLoadXML(logobj, *pXML);
+		}
+		gdel pXML;
+	}
+}
