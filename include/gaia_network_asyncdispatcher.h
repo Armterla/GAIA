@@ -13,9 +13,17 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		/*!
+			@brief Used for dispatch AsyncSocket.
+
+			@see GAIA::NETWORK::AsyncSocket
+		*/
 		class AsyncDispatcher : public GAIA::Base
 		{
 		public:
+			/*!
+				@brief 
+			*/
 			class CallBack : public GAIA::Base
 			{
 			public:
