@@ -21,6 +21,9 @@ namespace GAIA
 		class AsyncDispatcher : public GAIA::Base
 		{
 		public:
+			/*!
+				@brief 
+			*/
 			class CallBack : public GAIA::Base
 			{
 			public:
