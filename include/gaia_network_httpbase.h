@@ -284,7 +284,44 @@ namespace GAIA
 
 				// Full query analyze to list.
 				{
+					// Analyze support "a=b&c=d", "a=&c=d", "=b&c=d", "a=", "=b", "a=b&", "=", "=&=".
+					GAST(m_queries.empty());
+					if(m_fullquery.psz != GNIL)
+					{
+						const GAIA::CH* p = m_fullquery.psz;
+						const GAIA::CH* pLast = p;
+						while(p - m_fullquery.psz < m_fullquery.sLen)
+						{
+							if(*p == '=' || *p == '&')
+							{
+								Node n;
+								if(p - pLast == 0)
+									n.reset();
+								else
+								{
+									n.psz = pLast;
+									n.sLen = p - pLast;
+								}
+								m_queries.push_back(n);
+								if(*p == '&' && m_queries.size() % 2 != 0)
+									m_queries.push_back(n);
+								pLast = p + 1;
+							}
+							++p;
+						}
 
+						// Last name or value.
+						if(p != pLast)
+						{
+							Node n;
+							n.psz = pLast;
+							n.sLen = p - pLast;
+							m_queries.push_back(n);
+							if(m_queries.size() % 2 != 0)
+								m_queries.push_back(n);
+						}
+					}
+					GAST(m_queries.size() % == 0);
 				}
 
 				m_bAnalyzed = GAIA::True;
