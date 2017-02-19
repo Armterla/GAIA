@@ -152,11 +152,6 @@ extern GAIA::BL gaia_release_buffer(const GAIA::GVOID* p, GAIA::NUM sSize);
 extern GAIA::DBG::PerfCollector g_gaia_perf;
 
 /* Global variable management. */
-inline GAIA::GVOID gaia_reset_global_variables()
-{
-	g_gaia_log.Destroy();
-	g_gaia_log_callback.reset();
-	g_gaia_perf.Reset();
-}
+extern GAIA::GVOID gaia_reset_global_variables();
 
 #endif
