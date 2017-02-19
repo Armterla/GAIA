@@ -18,7 +18,7 @@ namespace TEST
 				break;
 			}
 
-			pFinded = GAIA::ALGO::golderless_search(list, list + sizeofarray(list) - 1, x2);
+			pFinded = GAIA::ALGO::glinear_search(list, list + sizeofarray(list) - 1, x2);
 			if(pFinded == GNIL || *pFinded != x2)
 			{
 				TERROR;

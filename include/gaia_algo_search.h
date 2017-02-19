@@ -16,6 +16,8 @@ namespace GAIA
 		template<typename _DataType1, typename _DataType2, typename _SizeType>
 		GAIA::BL equal(_DataType1 p1, _DataType2 p2, const _SizeType& size)
 		{
+			GAST(!!p1);
+			GAST(!!p2);
 			for(_SizeType x = 0; x < size; ++x)
 			{
 				if(p1[x] != p2[x])
@@ -26,6 +28,9 @@ namespace GAIA
 		template<typename _DataType, typename _KeyType>
 		_DataType find(_DataType pBegin, _DataType pEnd, const _KeyType& key)
 		{
+			GAST(!!pBegin);
+			GAST(!!pEnd);
+			GAST(pBegin <= pEnd);
 			while(pBegin <= pEnd)
 			{
 				if(*pBegin == key)
@@ -37,6 +42,9 @@ namespace GAIA
 		template<typename _DataType, typename _KeyType>
 		_DataType* findp(const _DataType** ppBegin, const _DataType** ppEnd, const _KeyType& key)
 		{
+			GAST(!!ppBegin);
+			GAST(!!ppEnd);
+			GAST(ppBegin <= ppEnd);
 			while(ppBegin <= ppEnd)
 			{
 				if(**ppBegin == key)
@@ -63,6 +71,9 @@ namespace GAIA
 		template<typename _DataType, typename _KeyType>
 		_DataType rfind(_DataType pBegin, _DataType pEnd, const _KeyType& key)
 		{
+			GAST(!!pBegin);
+			GAST(!!pEnd);
+			GAST(pBegin <= pEnd);
 			while(pBegin <= pEnd)
 			{
 				if(*pEnd == key)
@@ -74,6 +85,9 @@ namespace GAIA
 		template<typename _DataType, typename _KeyType>
 		_DataType* rfindp(const _DataType** ppBegin, const _DataType** ppEnd, const _KeyType& key)
 		{
+			GAST(!!ppBegin);
+			GAST(!!ppEnd);
+			GAST(ppBegin <= ppEnd);
 			while(ppBegin <= ppEnd)
 			{
 				if(**ppEnd == key)
@@ -98,15 +112,20 @@ namespace GAIA
 			return GNIL;
 		}
 		template<typename _DataType, typename _KeyType>
-		_DataType golderless_search(_DataType pBegin, _DataType pEnd, const _KeyType& key)
+		_DataType glinear_search(_DataType pBegin, _DataType pEnd, const _KeyType& key)
 		{
 			GAST(!!pBegin);
 			GAST(!!pEnd);
 			GAST(pBegin <= pEnd);
 			while(pBegin <= pEnd)
 			{
-				if(*pBegin == key)
-					return pBegin;
+				if(*pBegin >= key)
+				{
+					if(*pBegin == key)
+						return pBegin;
+					else
+						break;
+				}
 				++pBegin;
 			}
 			return GNIL;
@@ -126,7 +145,7 @@ namespace GAIA
 			else
 			{
 				if(pEnd - pBegin <= 16)
-					return GAIA::ALGO::golderless_search(pBegin, pEnd, key);
+					return GAIA::ALGO::glinear_search(pBegin, pEnd, key);
 			}
 			_DataType pMid = pBegin + (pEnd - pBegin) / 2;
 			if(key <= *pMid)
@@ -197,6 +216,8 @@ namespace GAIA
 		template<typename _DataType, typename _KeyType, typename _SizeType>
 		GAIA::GVOID count(_DataType pBegin, _DataType pEnd, const _KeyType& key, _SizeType& result)
 		{
+			GAST(!!pBegin);
+			GAST(!!pEnd);
 			GAST(pBegin <= pEnd);
 			while(pBegin != pEnd)
 			{
@@ -210,6 +231,8 @@ namespace GAIA
 		template<typename _DataType, typename _KeyType, typename _SizeType>
 		GAIA::GVOID count_order(_DataType pBegin, _DataType pEnd, const _KeyType& key, _SizeType& result)
 		{
+			GAST(!!pBegin);
+			GAST(!!pEnd);
 			GAST(pBegin <= pEnd);
 			pBegin = GAIA::ALGO::lower_equal(pBegin, pEnd, key);
 			if(pBegin == GNIL || *pBegin != key)
@@ -222,6 +245,10 @@ namespace GAIA
 		template<typename _DataType, typename _KeyType, typename _SizeType>
 		GAIA::GVOID counts(_DataType pBegin, _DataType pEnd, _KeyType pKeyBegin, _KeyType pKeyEnd, _SizeType& result)
 		{
+			GAST(!!pBegin);
+			GAST(!!pEnd);
+			GAST(!!pKeyBegin);
+			GAST(!!pKeyEnd);
 			GAST(pKeyBegin <= pKeyEnd);
 			while(pKeyBegin != pKeyEnd)
 			{
@@ -233,6 +260,10 @@ namespace GAIA
 		template<typename _DataType, typename _KeyType, typename _SizeType>
 		GAIA::GVOID counts_order(_DataType pBegin, _DataType pEnd, _KeyType pKeyBegin, _KeyType pKeyEnd, _SizeType& result)
 		{
+			GAST(!!pBegin);
+			GAST(!!pEnd);
+			GAST(!!pKeyBegin);
+			GAST(!!pKeyEnd);
 			GAST(pKeyBegin <= pKeyEnd);
 			while(pKeyBegin <= pKeyEnd)
 			{
@@ -243,6 +274,8 @@ namespace GAIA
 		template<typename _DataType, typename _KeyType, typename _SizeType>
 		GAIA::GVOID prevcount(_DataType pBegin, _DataType pEnd, const _KeyType& key, _SizeType& result)
 		{
+			GAST(!!pBegin);
+			GAST(!!pEnd);
 			GAST(pBegin <= pEnd);
 			while(pBegin != pEnd)
 			{
@@ -257,6 +290,8 @@ namespace GAIA
 		template<typename _DataType, typename _KeyType, typename _SizeType>
 		GAIA::GVOID nextcount(_DataType pBegin, _DataType pEnd, const _KeyType& key, _SizeType& result)
 		{
+			GAST(!!pBegin);
+			GAST(!!pEnd);
 			GAST(pBegin <= pEnd);
 			while(pBegin != pEnd)
 			{
@@ -271,6 +306,8 @@ namespace GAIA
 		template<typename _DataType, typename _KeyType, typename _SizeType>
 		GAIA::GVOID lower_equal_count(_DataType pBegin, _DataType pEnd, const _KeyType& key, _SizeType& result)
 		{
+			GAST(!!pBegin);
+			GAST(!!pEnd);
 			GAST(pBegin <= pEnd);
 			while(pBegin <= pEnd)
 			{
@@ -282,6 +319,8 @@ namespace GAIA
 		template<typename _DataType, typename _KeyType, typename _SizeType>
 		GAIA::GVOID upper_equal_count(_DataType pBegin, _DataType pEnd, const _KeyType& key, _SizeType& result)
 		{
+			GAST(!!pBegin);
+			GAST(!!pEnd);
 			GAST(pBegin <= pEnd);
 			while(pBegin <= pEnd)
 			{
@@ -293,6 +332,8 @@ namespace GAIA
 		template<typename _DataType, typename _KeyType, typename _SizeType>
 		GAIA::GVOID lower_count(_DataType pBegin, _DataType pEnd, const _KeyType& key, _SizeType& result)
 		{
+			GAST(!!pBegin);
+			GAST(!!pEnd);
 			GAST(pBegin <= pEnd);
 			while(pBegin <= pEnd)
 			{
@@ -304,6 +345,8 @@ namespace GAIA
 		template<typename _DataType, typename _KeyType, typename _SizeType>
 		GAIA::GVOID upper_count(_DataType pBegin, _DataType pEnd, const _KeyType& key, _SizeType& result)
 		{
+			GAST(!!pBegin);
+			GAST(!!pEnd);
 			GAST(pBegin <= pEnd);
 			while(pBegin <= pEnd)
 			{
