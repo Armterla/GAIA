@@ -321,7 +321,7 @@ namespace GAIA
 								m_queries.push_back(n);
 						}
 					}
-					GAST(m_queries.size() % == 0);
+					GAST(m_queries.size() % 2 == 0);
 				}
 
 				m_bAnalyzed = GAIA::True;
