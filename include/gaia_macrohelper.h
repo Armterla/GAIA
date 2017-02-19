@@ -31,6 +31,14 @@
 			GINL GAIA::BL operator > (const type& src) const{return this->compare(src) > 0;}\
 			GINL GAIA::BL operator < (const type& src) const{return this->compare(src) < 0;}
 
+#define GCLASS_COMPARE_BYCOMPAREPTR(type) \
+			GINL GAIA::BL operator == (const type* src) const{return this->compare(src) == 0;}\
+			GINL GAIA::BL operator != (const type* src) const{return this->compare(src) != 0;}\
+			GINL GAIA::BL operator >= (const type* src) const{return this->compare(src) >= 0;}\
+			GINL GAIA::BL operator <= (const type* src) const{return this->compare(src) <= 0;}\
+			GINL GAIA::BL operator > (const type* src) const{return this->compare(src) > 0;}\
+			GINL GAIA::BL operator < (const type* src) const{return this->compare(src) < 0;}
+
 #define GCLASS_COMPAREEX(t, k, type) \
 			GINL GAIA::BL operator == (const type& src) const{return (t) == (src.k);}\
 			GINL GAIA::BL operator != (const type& src) const{return (t) != (src.k);}\
