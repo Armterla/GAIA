@@ -66,6 +66,7 @@ namespace GAIA
 			GINL HttpURL(const HttpURL& src){this->init(); this->operator = (src);}
 			GINL HttpURL(const GAIA::CH* psz){this->init(); this->operator = (psz);}
 			GINL ~HttpURL(){}
+			GINL GAIA::BL Empty() const{return m_url.empty();}
 			GINL GAIA::GVOID Reset(){m_url.clear(); this->clear_analyzed();}
 			GINL GAIA::BL FromString(const GAIA::CH* psz){m_url = psz; this->clear_analyzed(); return GAIA::True;}
 			GINL const GAIA::CH* ToString() const{return m_url.fptr();}
@@ -93,11 +94,59 @@ namespace GAIA
 					return GNIL;
 				return this->get_analyzed_node(m_path, psz, sMaxSize, pResultSize);
 			}
+			GINL GAIA::CH* GetFullParam(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
+			{
+				if(!GCCAST(HttpURL*)(this)->analyze())
+					return GNIL;
+				return this->get_analyzed_node(m_fullparam, psz, sMaxSize, pResultSize);
+			}
 			GINL GAIA::CH* GetFullQuery(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
 					return GNIL;
 				return this->get_analyzed_node(m_fullquery, psz, sMaxSize, pResultSize);
+			}
+			GINL GAIA::CH* GetFragment(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
+			{
+				if(!GCCAST(HttpURL*)(this)->analyze())
+					return GNIL;
+				return this->get_analyzed_node(m_fragment, psz, sMaxSize, pResultSize);
+			}
+			GINL GAIA::NUM GetParamCount() const
+			{
+				if(!GCCAST(HttpURL*)(this)->analyze())
+					return 0;
+				return m_params.size();
+			}
+			GINL GAIA::BL GetParam(GAIA::NUM sIndex, GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
+			{
+				if(!GCCAST(HttpURL*)(this)->analyze())
+					return GAIA::False;
+				if(sIndex < 0 || sIndex >= m_params.size())
+					return GAIA::False;
+				const Node& n = m_params[sIndex];
+				GAIA::CH* pszResult = this->get_analyzed_node(n, psz, sMaxSize, pResultSize);
+				if(pszResult == GNIL)
+					return GAIA::False;
+				return GAIA::True;
+			}
+			GINL GAIA::BL ExistParam(const GAIA::CH* psz) const
+			{
+				if(!GCCAST(HttpURL*)(this)->analyze())
+					return GAIA::False;
+				for(GAIA::NUM x = 0; x < m_params.size(); ++x)
+				{
+					const Node& n = m_params[x];
+					if(GAIA::ALGO::gstrcmp(n.psz, psz, n.sLen) == 0)
+						return GAIA::True;
+				}
+				return GAIA::False;
+			}
+			GINL GAIA::NUM GetQueryCount() const
+			{
+				if(!GCCAST(HttpURL*)(this)->analyze())
+					return 0;
+				return m_queries.size() / 2;
 			}
 			GINL GAIA::BL GetQuery(GAIA::NUM sIndex, GAIA::CH* pszName, GAIA::CH* pszValue, GAIA::NUM sMaxNameSize = GINVALID, GAIA::NUM sMaxValueSize = GINVALID, GAIA::NUM* pNameResultSize = GNIL, GAIA::NUM* pValueResultSize = GNIL) const
 			{
@@ -105,11 +154,12 @@ namespace GAIA
 					return GAIA::False;
 				if(sIndex < 0 || sIndex >= m_queries.size())
 					return GAIA::False;
-				const Node& n = m_queries[sIndex];
-				GAIA::CH* pszResultName = this->get_analyzed_node(n, pszName, sMaxNameSize, pNameResultSize);
+				const Node& nname = m_queries[sIndex * 2];
+				GAIA::CH* pszResultName = this->get_analyzed_node(nname, pszName, sMaxNameSize, pNameResultSize);
 				if(pszResultName == GNIL)
 					return GAIA::False;
-				GAIA::CH* pszResultValue = this->get_analyzed_node(n, pszValue, sMaxValueSize, pValueResultSize);
+				const Node& nvalue = m_queries[sIndex * 2 + 1];
+				GAIA::CH* pszResultValue = this->get_analyzed_node(nvalue, pszValue, sMaxValueSize, pValueResultSize);
 				return GAIA::True;
 			}
 			GINL GAIA::CH* GetQueryByName(const GAIA::CH* pszName, GAIA::CH* pszValue, GAIA::NUM sMaxValueSize, GAIA::NUM* pValueResultSize = GNIL) const
@@ -119,20 +169,26 @@ namespace GAIA
 				GAST(m_queries.size() % 2 == 0);
 				for(GAIA::NUM x = 0; x < m_queries.size(); x += 2)
 				{
-					const Node& nname = m_queries[x + 0];
+					const Node& nname = m_queries[x];
 					if(GAIA::ALGO::gstrcmp(nname.psz, pszName, nname.sLen) == 0)
 					{
-						const Node& nvalue = m_queries[x + 1];	
+						const Node& nvalue = m_queries[x + 1];
 						return this->get_analyzed_node(nvalue, pszValue, sMaxValueSize, pValueResultSize);
 					}
 				}
 				return GNIL;
 			}
-			GINL GAIA::CH* GetFragment(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
+			GINL GAIA::BL ExistQuery(const GAIA::CH* pszName) const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
-					return GNIL;
-				return this->get_analyzed_node(m_fragment, psz, sMaxSize, pResultSize);
+					return GAIA::False;
+				for(GAIA::NUM x = 0; x < m_queries.size(); x += 2)
+				{
+					const Node& nname = m_queries[x];
+					if(GAIA::ALGO::gstrcmp(nname.psz, pszName, nname.sLen) == 0)
+						return GAIA::True;
+				}
+				return GAIA::False;
 			}
 			GINL HttpURL& operator = (const HttpURL& src)
 			{
@@ -152,6 +208,7 @@ namespace GAIA
 			GINL operator const GAIA::CH*(){return m_url.fptr();}
 			GINL GAIA::N32 compare(const GAIA::CH* psz) const{return m_url.compare(psz);}
 			GINL GAIA::N32 compare(const HttpURL& src) const{return m_url.compare(src.m_url);}
+			GCLASS_COMPARE_BYCOMPAREPTR(GAIA::CH)
 			GCLASS_COMPARE_BYCOMPARE(HttpURL)
 
 		private:
@@ -172,8 +229,10 @@ namespace GAIA
 				m_hostname.reset();
 				m_port.reset();
 				m_path.reset();
+				m_fullparam.reset();
 				m_fullquery.reset();
 				m_fragment.reset();
+				m_params.clear();
 				m_queries.clear();
 				m_bAnalyzed = GAIA::False;
 			}
@@ -189,8 +248,9 @@ namespace GAIA
 				GAIA::NUM sHostNameBegin, sHostNameEnd;
 				GAIA::NUM sPortBegin, sPortEnd;
 				GAIA::NUM sPathBegin, sPathEnd;
+				GAIA::NUM sFullParamBegin, sFullParamEnd;
 				GAIA::NUM sFullQueryBegin, sFullQueryEnd;
-				GAIA::NUM sFragBegin, sFragEnd;
+				GAIA::NUM sFragmentBegin, sFragmentEnd;
 
 				GAIA::NUM sUrlSize = m_url.size();
 
@@ -228,57 +288,105 @@ namespace GAIA
 
 					// Path.
 					sPathBegin = ((sPortEnd != GINVALID) ? sPortEnd : sHostNameEnd);
-					sPathEnd = m_url.rfind('/', sPathBegin + 1);
-					if(sPathEnd == GINVALID)
+					sPathEnd = m_url.rfind('/');
+					if(sPathEnd == GINVALID || sPathEnd <= sPathBegin)
 						sPathEnd = sUrlSize;
+					else
+						sPathEnd = sPathEnd + 1;
+
+					// Full param.
+					sFullParamBegin = sPathEnd;
+					sFullParamEnd = m_url.find('?', sFullParamBegin);
+					if(sFullParamEnd == GINVALID)
+						sFullParamEnd = sUrlSize;
 
 					// Full query.
-					sFullQueryBegin = sPathEnd + 1;
-					sFullQueryEnd = m_url.rfind('#', sFullQueryBegin + 1);
-					if(sFullQueryEnd == GINVALID)
+					sFullQueryBegin = sFullParamEnd + 1;
+					sFullQueryEnd = m_url.rfind('#');
+					if(sFullQueryEnd == GINVALID || sFullQueryEnd <= sFullQueryBegin)
 						sFullQueryEnd = sUrlSize;
 
 					// Fragment.
-					sFragBegin = sFullQueryEnd + 1;
-					sFragEnd = sUrlSize;
+					sFragmentBegin = sFullQueryEnd + 1;
+					sFragmentEnd = sUrlSize;
 				}
 
 				// Checkup.
 				{
-					if(sProtocalBegin >= 0 && sProtocalEnd < sUrlSize && sProtocalBegin < sProtocalEnd)
+					if(sProtocalBegin >= 0 && sProtocalEnd <= sUrlSize && sProtocalBegin < sProtocalEnd)
 					{
 						m_protocal.psz = m_url.fptr() + sProtocalBegin;
 						m_protocal.sLen = sProtocalEnd - sProtocalBegin;
 					}
 
-					if(sHostNameBegin >= 0 && sHostNameEnd < sUrlSize && sHostNameBegin < sHostNameEnd)
+					if(sHostNameBegin >= 0 && sHostNameEnd <= sUrlSize && sHostNameBegin < sHostNameEnd)
 					{
 						m_hostname.psz = m_url.fptr() + sHostNameBegin;
 						m_hostname.sLen = sHostNameEnd - sHostNameBegin;
 					}
 
-					if(sPortBegin >= 0 && sPortEnd < sUrlSize && sPortBegin < sPortEnd)
+					if(sPortBegin >= 0 && sPortEnd <= sUrlSize && sPortBegin < sPortEnd)
 					{
 						m_port.psz = m_url.fptr() + sPortBegin;
 						m_port.sLen = sPortEnd - sPortBegin;
 					}
 
-					if(sPathBegin >= 0 && sPathEnd < sUrlSize && sPathBegin < sPathEnd)
+					if(sPathBegin >= 0 && sPathEnd <= sUrlSize && sPathBegin < sPathEnd)
 					{
 						m_path.psz = m_url.fptr() + sPathBegin;
 						m_path.sLen = sPathEnd - sPathBegin;
 					}
 
-					if(sFullQueryBegin >= 0 && sFullQueryEnd < sUrlSize && sFullQueryBegin < sFullQueryEnd)
+					if(sFullParamBegin >= 0 && sFullParamEnd <= sUrlSize && sFullParamBegin < sFullParamEnd)
+					{
+						m_fullparam.psz = m_url.fptr() + sFullParamBegin;
+						m_fullparam.sLen = sFullParamEnd - sFullParamBegin;
+					}
+
+					if(sFullQueryBegin >= 0 && sFullQueryEnd <= sUrlSize && sFullQueryBegin < sFullQueryEnd)
 					{
 						m_fullquery.psz = m_url.fptr() + sFullQueryBegin;
 						m_fullquery.sLen = sFullQueryEnd - sFullQueryBegin;
 					}
 
-					if(sFragBegin >= 0 && sFragEnd < sUrlSize && sFragBegin < sFragEnd)
+					if(sFragmentBegin >= 0 && sFragmentEnd <= sUrlSize && sFragmentBegin < sFragmentEnd)
 					{
-						m_fragment.psz = m_url.fptr() + sFragBegin;
-						m_fragment.sLen = sFragEnd - sFragBegin;
+						m_fragment.psz = m_url.fptr() + sFragmentBegin;
+						m_fragment.sLen = sFragmentEnd - sFragmentBegin;
+					}
+				}
+
+				// Full param analyze to list.
+				{
+					GAST(m_params.empty());
+					if(m_fullparam.psz != GNIL)
+					{
+						const GAIA::CH* p = m_fullparam.psz;
+						const GAIA::CH* pLast = p;
+						while(p - m_fullparam.psz < m_fullparam.sLen)
+						{
+							if(*p == ';')
+							{
+								Node n;
+								if(p - pLast == 0)
+									n.reset();
+								else
+								{
+									n.psz = pLast;
+									n.sLen = p - pLast;
+								}
+								m_params.push_back(n);
+								pLast = p + 1;
+							}
+							++p;
+						}
+						if(p != pLast)
+						{
+							Node n;
+							n.psz = pLast;
+							n.sLen = p - pLast;
+							m_params.push_back(n);
+						}
 					}
 				}
 
@@ -332,7 +440,7 @@ namespace GAIA
 				if(psz == GNIL)
 				{
 					GAST(sMaxSize == GINVALID);
-					if(*pResultSize != GNIL)
+					if(pResultSize != GNIL)
 						*pResultSize = n.sLen;
 					return (GAIA::CH*)n.psz;
 				}
@@ -340,7 +448,7 @@ namespace GAIA
 				{
 					if(n.sLen >= sMaxSize)
 						return GNIL;
-					if(*pResultSize != GNIL)
+					if(pResultSize != GNIL)
 						*pResultSize = n.sLen;
 					GAIA::ALGO::gstrcpy(psz, n.psz, n.sLen);
 					return psz;
@@ -353,8 +461,10 @@ namespace GAIA
 			Node m_hostname;
 			Node m_port;
 			Node m_path;
+			Node m_fullparam;
 			Node m_fullquery;
 			Node m_fragment;
+			GAIA::CTN::Vector<Node> m_params;
 			GAIA::CTN::Vector<Node> m_queries;
 			GAIA::BL m_bAnalyzed;
 		};
@@ -369,6 +479,7 @@ namespace GAIA
 			GINL HttpHead(const HttpHead& src){this->init(); this->operator = (src);}
 			GINL HttpHead(const GAIA::CH* psz){this->init(); this->operator = (psz);}
 			GINL ~HttpHead(){this->Reset();}
+			GINL GAIA::BL Empty() const{return this->Size() == 0;}
 			GINL GAIA::BL FromString(const GAIA::CH* psz)
 			{
 				this->Reset();
@@ -499,7 +610,7 @@ namespace GAIA
 				GAIA::NUM sFinded = m_nodes.binary_search(finder);
 				if(sFinded == GINVALID)
 					return GNIL;
-				return m_nodes[sFinded].pszName;
+				return m_nodes[sFinded].pszValue;
 			}
 			GINL GAIA::BL Exist(const GAIA::CH* pszName) const
 			{
@@ -543,7 +654,7 @@ namespace GAIA
 				m_nodes.clear();
 				m_bSorted = GAIA::True;
 			}
-			GINL GAIA::NUM Count() const{return m_nodes.size();}
+			GINL GAIA::NUM Size() const{return m_nodes.size();}
 			GINL const GAIA::CH* GetName(GAIA::NUM sIndex) const
 			{
 				GAST(sIndex >= 0 && sIndex < m_nodes.size());
@@ -610,6 +721,7 @@ namespace GAIA
 				}
 				return 0;
 			}
+			GCLASS_COMPARE_BYCOMPAREPTR(GAIA::CH)
 			GCLASS_COMPARE_BYCOMPARE(HttpHead)
 
 		private:
@@ -632,9 +744,9 @@ namespace GAIA
 				m_nodes.sort();
 				m_bSorted = GAIA::True;
 			}
-			GINL const GAIA::CH* requestname(const GAIA::CH* pszName);
-			GINL const GAIA::CH* requestvalue(const GAIA::CH* pszValue);
-			GINL GAIA::BL releasevalue(const GAIA::CH* pszValue);
+			const GAIA::CH* requestname(const GAIA::CH* pszName);
+			const GAIA::CH* requestvalue(const GAIA::CH* pszValue);
+			GAIA::BL releasevalue(const GAIA::CH* pszValue);
 
 		private:
 			GAIA::CTN::Vector<Node> m_nodes;

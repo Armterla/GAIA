@@ -10,9 +10,9 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
-		GINL const GAIA::CH* HttpHead::requestname(const GAIA::CH* pszName)
+		const GAIA::CH* HttpHead::requestname(const GAIA::CH* pszName)
 		{
-			GAST(GAIA::ALGO::gstremp(pszName));
+			GAST(!GAIA::ALGO::gstremp(pszName));
 
 			// Allocate from statiac name list.
 			for(GAIA::NUM x = 0; x < sizeofarray(HTTP_HEADNAME_LIST); ++x)
@@ -24,14 +24,14 @@ namespace GAIA
 			// Allocate from global static pool.
 			return gaia_alloc_staticstring(pszName);
 		}
-		GINL const GAIA::CH* requestvalue(const GAIA::CH* pszValue)
+		const GAIA::CH* HttpHead::requestvalue(const GAIA::CH* pszValue)
 		{
 			GAST(pszValue != GNIL);
 
 			// Allocate from global pool.
 			return gaia_alloc_string(pszValue);
 		}
-		GINL GAIA::BL releasevalue(const GAIA::CH* pszValue)
+		GAIA::BL HttpHead::releasevalue(const GAIA::CH* pszValue)
 		{
 			GAST(pszValue != GNIL);
 
