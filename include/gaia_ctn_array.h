@@ -277,12 +277,14 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_data);
 			}
-			GINL _SizeType rfind(const _DataType& t, const _SizeType& index = 0) const
+			GINL _SizeType rfind(const _DataType& t, _SizeType index = GINVALID) const
 			{
 				if(this->empty())
 					return (_SizeType)GINVALID;
 				if(index >= this->size())
 					return (_SizeType)GINVALID;
+				else if(index == GINVALID)
+					index = this->size() - 1;
 				const _DataType* pFinded = GAIA::ALGO::rfind(this->fptr(), this->fptr() + index, t);
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;

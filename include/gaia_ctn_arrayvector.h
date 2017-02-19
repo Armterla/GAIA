@@ -448,7 +448,7 @@ namespace GAIA
 				else
 					return m_arr.find(t, index);
 			}
-			GINL _SizeType rfind(const _DataType& t, const _SizeType& index = 0) const
+			GINL _SizeType rfind(const _DataType& t, _SizeType index = GINVALID) const
 			{
 				if(m_vec.capacity() != 0)
 					return m_vec.rfind(t, index);

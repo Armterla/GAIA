@@ -508,19 +508,19 @@ namespace GAIA
 					return m_string.find(src, index);
 				return m_chars.find(src, index);
 			}
-			template<typename _ParamDataType> _SizeType rfind(const _ParamDataType& t, const _SizeType& index = 0) const
+			template<typename _ParamDataType> _SizeType rfind(const _ParamDataType& t, _SizeType index = GINVALID) const
 			{
 				if(m_string.capacity() != 0)
 					return m_string.rfind(t, index);
 				return m_chars.rfind(t, index);
 			}
-			template<typename _ParamDataType> _SizeType rfind(const _ParamDataType* p, const _SizeType& index = 0) const
+			template<typename _ParamDataType> _SizeType rfind(const _ParamDataType* p, _SizeType index = GINVALID) const
 			{
 				if(m_string.capacity() != 0)
 					return m_string.rfind(p, index);
 				return m_chars.rfind(p, index);
 			}
-			GINL _SizeType rfind(const __MyType& src, const _SizeType& index = 0) const
+			GINL _SizeType rfind(const __MyType& src, _SizeType index = GINVALID) const
 			{
 				if(m_string.capacity() != 0)
 					return m_string.rfind(src.fptr(), index);
