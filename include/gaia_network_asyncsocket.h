@@ -108,7 +108,7 @@ namespace GAIA
 
 				@return If the socket is bound, return GAIA::True, or return GAIA::False.
 			*/
-			GAIA::BL IsBind() const;
+			GAIA::BL IsBinded() const;
 
 			/*!
 				@brief Connect async socket to a network address, include IP and port.
@@ -140,25 +140,9 @@ namespace GAIA
 			GAIA::GVOID Send(const GAIA::GVOID* pData, GAIA::NUM sSize);
 
 			/*!
-				@brief Recv data from peer.
-
-				@remarks
-					This function is async call.
-			*/
-			GAIA::GVOID Recv();
-
-			/*!
-				@brief Flush send buffer.
-
-				@remarks
-					This function is async call.
-			*/
-			GAIA::GVOID Flush();
-
-			/*!
 				@brief Get socket file descriptor.
 			*/
-			GAIA::N32 GetFileDescriptor() const;
+			GAIA::N32 GetFD() const;
 
 			/*!
 				@brief Get socket's global address.
@@ -214,11 +198,6 @@ namespace GAIA
 			virtual GAIA::GVOID OnRecved(const GAIA::GVOID* pData, GAIA::NUM sSize){}
 
 			/*!
-				@brief On async socket flush callback.
-			*/
-			virtual GAIA::GVOID OnFlushed(){}
-
-			/*!
 				@brief On async socket shutdown callback.
 			*/
 			virtual GAIA::GVOID OnShutdowned(GAIA::N32 nShutdownFlag){}
@@ -230,6 +209,7 @@ namespace GAIA
 
 		private:
 			GAIA::GVOID init();
+			GAIA::GVOID Recv();
 
 		private:
 			GAIA::NETWORK::AsyncDispatcher* m_pDispatcher;

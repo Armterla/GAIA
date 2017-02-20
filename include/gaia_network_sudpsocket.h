@@ -310,7 +310,7 @@ namespace GAIA
 
 				@return Return the socket file descriptor.
 			*/
-			GAIA::N32 GetFileDescriptor() const;
+			GAIA::N32 GetFD() const;
 
 			/*!
 				@brief Get socket global address.

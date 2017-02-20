@@ -64,7 +64,7 @@ namespace GAIA
 			{
 			public:
 				virtual GAIA::BL OnCollectListenSocket(GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::AsyncSocket& sock){return GAIA::False;}
-				virtual GAIA::BL OnCollectRecvSocket(GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::AsyncSocket& sock){return GAIA::False;}
+				virtual GAIA::BL OnCollectAcceptedSocket(GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::AsyncSocket& sock){return GAIA::False;}
 			};
 		public:
 			AsyncDispatcher();
@@ -86,12 +86,9 @@ namespace GAIA
 			GAIA::NUM GetListenSocketCount() const;
 			GAIA::BL CollectListenSocket(CallBack& cb) const;
 
-			GAIA::BL AddRecvSocket(GAIA::NETWORK::AsyncSocket& sock);
-			GAIA::BL RemoveRecvSocket(GAIA::NETWORK::AsyncSocket& sock);
-			GAIA::BL RemoveRecvSocketAll();
-			GAIA::BL IsExistRecvSocket(GAIA::NETWORK::AsyncSocket& sock) const;
-			GAIA::NUM GetRecvSocketCount() const;
-			GAIA::BL CollectRecvSocket(CallBack& cb) const;
+			GAIA::BL IsExistAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock) const;
+			GAIA::NUM GetAcceptedSocketCount() const;
+			GAIA::BL CollectAcceptedSocket(CallBack& cb) const;
 
 		private:
 			class Node : public GAIA::Base
@@ -121,11 +118,14 @@ namespace GAIA
 
 		private:
 			GAIA::GVOID init();
+			GAIA::BL AddAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock);
+			GAIA::BL RemoveAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock);
+			GAIA::BL RemoveAcceptedSocketAll();
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			GAIA::NETWORK::IOCPOverlapped* alloc_iocpoverlapped();
-			GAIA::GVOID release_iocpoverlapped(GAIA::NETWORK::IOCPOverlapped* pIOCPOverlapped);
-			GAIA::BL attach_socket(GAIA::NETWORK::AsyncSocket& sock);
+			GAIA::NETWORK::IOCPOverlapped* alloc_iocpol();
+			GAIA::GVOID release_iocpol(GAIA::NETWORK::IOCPOverlapped* pIOCPOverlapped);
+			GAIA::BL attach_socket_iocp(GAIA::NETWORK::AsyncSocket& sock);
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
@@ -138,15 +138,15 @@ namespace GAIA
 
 			GAIA::SYNC::LockRW m_rwListenSockets;
 			GAIA::CTN::Set<Node> m_listen_sockets;
-			GAIA::SYNC::LockRW m_rwRecvSockets;
-			GAIA::CTN::Set<Node> m_recv_sockets;
+			GAIA::SYNC::LockRW m_rwAcceptedSockets;
+			GAIA::CTN::Set<Node> m_accepted_sockets;
 
 			GAIA::CTN::Vector<GAIA::THREAD::Thread*> m_threads;
 			
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::GVOID* m_pIOCP;
-			GAIA::CTN::Pool<GAIA::NETWORK::IOCPOverlapped> m_IOCPPool;
-			GAIA::SYNC::Lock m_lrIOCPPool;
+			GAIA::CTN::Pool<GAIA::NETWORK::IOCPOverlapped> m_IOCPOLPool;
+			GAIA::SYNC::Lock m_lrIOCPOLPool;
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 			GAIA::N32 m_kqueue;
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID

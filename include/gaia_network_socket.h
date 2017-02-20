@@ -16,6 +16,8 @@ namespace GAIA
 		*/
 		class Socket : public GAIA::Base
 		{
+			friend class AsyncSocket;
+
 		public:
 			/*!
 				@brief Socket type.
@@ -34,6 +36,8 @@ namespace GAIA
 				SOCKET_OPTION_NOBLOCK,
 				SOCKET_OPTION_REUSEADDR,
 				SOCKET_OPTION_REUSEPORT,
+				SOCKET_OPTION_TCPNODELAY,
+				SOCKET_OPTION_KEEPALIVE,
 			GAIA_ENUM_END(SOCKET_OPTION)
 
 			/*!
@@ -251,14 +255,9 @@ namespace GAIA
 			GINL GAIA::N32 RecvFrom(GAIA::NETWORK::Addr& addr, GAIA::GVOID* p, GAIA::N32 nSize, GAIA::N32 nRecvFlag = GAIA::NETWORK::Socket::SRF_DEFAULT);
 
 			/*!
-				@brief Set socket file descriptor.
-			*/
-			GINL GAIA::BL SetFileDescriptor(GAIA::N32 nFD);
-
-			/*!
 				@brief Get socket file descriptor.
 			*/
-			GINL GAIA::N32 GetFileDescriptor() const;
+			GINL GAIA::N32 GetFD() const;
 
 			/*!
 				@brief Get socket's global address.
@@ -278,6 +277,7 @@ namespace GAIA
 
 		private:
 			GINL GAIA::GVOID init();
+			GINL GAIA::BL SetFD(GAIA::N32 nFD);
 			GINL Socket(const Socket& src){}
 			GINL Socket& operator = (const Socket& src){return *this;}
 
@@ -291,6 +291,8 @@ namespace GAIA
 			GAIA::BL m_bNotBlock : 1;
 			GAIA::BL m_bReuseAddr : 1;
 			GAIA::BL m_bReusePort : 1;
+			GAIA::BL m_bTCPNoDelay : 1;
+			GAIA::BL m_bKeepAlive : 1;
 		};
 	}
 }

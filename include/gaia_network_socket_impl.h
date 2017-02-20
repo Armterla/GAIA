@@ -23,6 +23,7 @@
 #	include <sys/types.h>
 #	include <sys/socket.h>
 #	include <netinet/in.h>
+#	include <netinet/tcp.h>
 #	include <netdb.h>
 #endif
 
@@ -396,6 +397,26 @@ namespace GAIA
 				#endif
 				}
 				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY:
+				{
+					if(m_bTCPNoDelay == (GAIA::BL)v)
+						return;
+					m_bTCPNoDelay = (GAIA::BL)v;
+					GAIA::N32 nOption = m_bTCPNoDelay;
+					if(setsockopt(m_nSocket, IPPROTO_TCP, TCP_NODELAY, (GAIA::CH*)&nOption, sizeof(nOption)) != 0)
+						THROW_LASTERROR;
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_KEEPALIVE:
+				{
+					if(m_bKeepAlive == (GAIA::BL)v)
+						return;
+					m_bKeepAlive = (GAIA::BL)v;
+					GAIA::N32 nOption = m_bKeepAlive;
+					if(setsockopt(m_nSocket, SOL_SOCKET, SO_KEEPALIVE, (GAIA::CH*)&nOption, sizeof(nOption)) != 0)
+						THROW_LASTERROR;
+				}
+				break;
 			case GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEADDR:
 				{
 					if(m_bReuseAddr == (GAIA::BL)v)
@@ -455,6 +476,16 @@ namespace GAIA
 			case GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEPORT:
 				{
 					v = (GAIA::BL)m_bReusePort;
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY:
+				{
+					v = (GAIA::BL)m_bTCPNoDelay;
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_KEEPALIVE:
+				{
+					v = (GAIA::BL)m_bKeepAlive;
 				}
 				break;
 			default:
@@ -694,15 +725,7 @@ namespace GAIA
 			return nRecved;
 		}
 
-		GINL GAIA::BL Socket::SetFileDescriptor(GAIA::N32 nFD)
-		{
-			if(m_nSocket != GINVALID)
-				return GAIA::False;
-			m_nSocket = nFD;
-			return GAIA::True;
-		}
-
-		GINL GAIA::N32 Socket::GetFileDescriptor() const
+		GINL GAIA::N32 Socket::GetFD() const
 		{
 			return m_nSocket;
 		}
@@ -750,6 +773,16 @@ namespace GAIA
 			m_bNotBlock = GAIA::False;
 			m_bReuseAddr = GAIA::False;
 			m_bReusePort = GAIA::False;
+			m_bTCPNoDelay = GAIA::False;
+			m_bKeepAlive = GAIA::False;
+		}
+
+		GINL GAIA::BL Socket::SetFD(GAIA::N32 nFD)
+		{
+			if(m_nSocket != GINVALID)
+				return GAIA::False;
+			m_nSocket = nFD;
+			return GAIA::True;
 		}
 	}
 }

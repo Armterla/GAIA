@@ -266,9 +266,9 @@ namespace GAIA
 
 			return buf.write_size();
 		}
-		GAIA::N32 SUDPSocket::GetFileDescriptor() const
+		GAIA::N32 SUDPSocket::GetFD() const
 		{
-			return m_sock.GetFileDescriptor();
+			return m_sock.GetFD();
 		}
 		GAIA::BL SUDPSocket::GetGlobalAddress(GAIA::NETWORK::Addr& addr)
 		{
