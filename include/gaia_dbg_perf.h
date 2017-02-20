@@ -394,6 +394,26 @@ namespace GAIA
 			GAIA::CTN::Pool<Node> m_nodepool;
 			GAIA::CTN::StaticStringPtrPool<GAIA::CH> m_strpool;
 		};
+
+		class PerfCollectorAuto : public GAIA::Base
+		{
+		public:
+			GINL PerfCollectorAuto(GAIA::DBG::PerfCollector& perf, const GAIA::CH* pszItemName, const GAIA::N64& nInstanceID)
+			{
+				m_pPerfCollector = &perf;
+				m_pszItemName = pszItemName;
+				m_nInstanceID = nInstanceID;
+				m_pPerfCollector->Begin(m_pszItemName, m_nInstanceID);
+			}
+			GINL ~PerfCollectorAuto()
+			{
+				m_pPerfCollector->End(m_pszItemName, m_nInstanceID);
+			}
+		private:
+			GAIA::DBG::PerfCollector* m_pPerfCollector;
+			const GAIA::CH* m_pszItemName;
+			GAIA::N64 m_nInstanceID;
+		};
 	}
 }
 

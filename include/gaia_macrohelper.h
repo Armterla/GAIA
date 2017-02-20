@@ -339,6 +339,22 @@
 #	define GEND g_gaia_invalidlog
 #endif
 
+#ifdef GAIA_DEBUG_PERF
+#	define GPERF(name) GAIA::DBG::PerfCollectorAuto pca(g_gaia_perf, name, GINVALID)
+#	define GPERFBEGIN(name) g_gaia_perf.Begin(name)
+#	define GPERFEND(name) g_gaia_perf.End(name)
+#	define GPERFEX(name, instanceid) GAIA::DBG::PerfCollectorAuto pca(g_gaia_perf, name, instanceid)
+#	define GPERFBEGINEX(name, instanceid) g_gaia_perf.Begin(name, instanceid)
+#	define GPERFENDEX(name, instanceid) g_gaia_perf.End(name, instanceid)
+#else
+#	define GPERF(name)
+#	define GPERFBEGIN(name)
+#	define GPERFEND(name)
+#	define GPERFEX(name, instanceid)
+#	define GPERFBEGINEX(name, instanceid)
+#	define GPERFENDEX(name, instanceid)
+#endif
+
 #define GAIA_EXCEPTION(name) \
 	class Ect##name : public GAIA::ECT::Ect\
 	{\

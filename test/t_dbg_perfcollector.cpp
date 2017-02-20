@@ -12,7 +12,9 @@ namespace TEST
 			GAIA::LOG::Log& logobj = *m_pLogObj;
 			TAST(!GAIA::ALGO::gstremp(pszItemName));
 			TAST(uTotalCount > 0);
-			if(!GAIA::ALGO::gstrequal(pszItemName, "TestPerf") && !GAIA::ALGO::gstrequal(pszItemName, "TestPerfMulti"))
+			if(!GAIA::ALGO::gstrequal(pszItemName, "TestPerf") &&
+			   !GAIA::ALGO::gstrequal(pszItemName, "TestPerfMulti") &&
+			   !GAIA::ALGO::gstrequal(pszItemName, "TestPerfAuto"))
 				TERROR;
 			TAST(uMinTime <= uMaxTime);
 			return GAIA::True;
@@ -36,7 +38,8 @@ namespace TEST
 		TAST(!perf.IsBegin("TestPerf"));
 		{
 			GAIA::U64 uTotalTime, uMinTime, uMaxTime, uTotalCount;
-			perf.Get("TestPerf", &uTotalTime, &uMinTime, &uMaxTime, &uTotalCount);
+			if(!perf.Get("TestPerf", &uTotalTime, &uMinTime, &uMaxTime, &uTotalCount))
+				TERROR;
 			GAIA::CTN::Vector<const GAIA::CH*> listResult;
 			perf.Collect(listResult);
 			perf.Collect(cb);
@@ -48,7 +51,7 @@ namespace TEST
 		perf.Reset();
 
 		// Multi.
-		for(GAIA::NUM x = 0; x < 1000; ++x)
+		for(GAIA::NUM x = 0; x < 100; ++x)
 		{
 			GAIA::N64 nInstanceID = x;
 			perf.Begin("TestPerfMulti", nInstanceID);
@@ -67,13 +70,34 @@ namespace TEST
 		}
 		{
 			GAIA::U64 uTotalTime, uMinTime, uMaxTime, uTotalCount;
-			perf.Get("TestPerfMulti", &uTotalTime, &uMinTime, &uMaxTime, &uTotalCount);
+			if(!perf.Get("TestPerfMulti", &uTotalTime, &uMinTime, &uMaxTime, &uTotalCount))
+				TERROR;
 			GAIA::CTN::Vector<const GAIA::CH*> listResult;
 			perf.Collect(listResult);
 			perf.Collect(cb);
 			TAST(listResult.size() == 1);
 			TAST(listResult.front() != GNIL);
 			TAST(GAIA::ALGO::gstrequal(listResult.front(), "TestPerfMulti"));
+			perf.DumpToLog();
+		}
+		perf.Reset();
+
+		// Auto.
+		for(GAIA::NUM x = 0; x < 100; ++x)
+		{
+			GAIA::DBG::PerfCollectorAuto pca(perf, "TestPerfAuto", GINVALID);
+			GAIA::SYNC::gsleep(1);
+		}
+		{
+			GAIA::U64 uTotalTime, uMinTime, uMaxTime, uTotalCount;
+			if(!perf.Get("TestPerfAuto", &uTotalTime, &uMinTime, &uMaxTime, &uTotalCount))
+				TERROR;
+			GAIA::CTN::Vector<const GAIA::CH*> listResult;
+			perf.Collect(listResult);
+			perf.Collect(cb);
+			TAST(listResult.size() == 1);
+			TAST(listResult.front() != GNIL);
+			TAST(GAIA::ALGO::gstrequal(listResult.front(), "TestPerfAuto"));
 			perf.DumpToLog();
 		}
 		perf.Reset();
