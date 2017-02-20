@@ -268,7 +268,7 @@ namespace GAIA
 			Node nfinder;
 			nfinder.addrLocal = addr;
 			nfinder.pSock = GNIL;
-			Node* pFinded = m_listen_sockets.find(nfinder);
+			const Node* pFinded = m_listen_sockets.find(nfinder);
 			if(pFinded == GNIL)
 				return GAIA::False;
 
@@ -302,7 +302,7 @@ namespace GAIA
 			Node nfinder;
 			nfinder.addrLocal = addr;
 			nfinder.pSock = GNIL;
-			Node* pFinded  = m_accepted_sockets.find(nfinder);
+			const Node* pFinded  = m_accepted_sockets.find(nfinder);
 			if(pFinded == GNIL)
 				return GAIA::False;
 
