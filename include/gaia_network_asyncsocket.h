@@ -17,6 +17,7 @@ namespace GAIA
 			GAIA_ENUM_BEGIN(IOCP_OVERLAPPED_TYPE)
 				IOCP_OVERLAPPED_TYPE_STOP,
 				IOCP_OVERLAPPED_TYPE_CONNECT,
+				IOCP_OVERLAPPED_TYPE_DISCONNECT,
 				IOCP_OVERLAPPED_TYPE_ACCEPT,
 				IOCP_OVERLAPPED_TYPE_SEND,
 				IOCP_OVERLAPPED_TYPE_RECV,
@@ -26,8 +27,8 @@ namespace GAIA
 			public:
 				OVERLAPPED _ovlp;
 				IOCP_OVERLAPPED_TYPE type;
-				GAIA::N32 listen_fd;
-				GAIA::N32 recv_fd;
+				AsyncSocket* pListenSocket;
+				AsyncSocket* pRecvSocket;
 				WSABUF _buf;
 				GAIA::U8 data[IODATA_MAXLEN];
 			};
@@ -43,7 +44,7 @@ namespace GAIA
 
 				This async socket class support stream socket only(TCP).
 		*/
-		class AsyncSocket : public GAIA::Base
+		class AsyncSocket : public GAIA::RefObject
 		{
 			friend class AsyncDispatcher;
 
@@ -52,7 +53,7 @@ namespace GAIA
 			/*!
 				@brief Constructor.
 			*/
-			AsyncSocket();
+			AsyncSocket(GAIA::NETWORK::AsyncDispatcher& disp);
 
 			/*!
 				@brief Destructor.
@@ -88,6 +89,11 @@ namespace GAIA
 					This function is async call.
 			*/
 			GAIA::GVOID Shutdown(GAIA::N32 nShutdownFlag = GAIA::NETWORK::Socket::SSDF_RECV | GAIA::NETWORK::Socket::SSDF_SEND);
+
+			/*!
+				@brief Check current socket is create or not.
+			*/
+			GAIA::BL IsCreated() const;
 
 			/*!
 				@brief Bind async socket to a network address, include IP and port.
@@ -139,7 +145,7 @@ namespace GAIA
 				@remarks
 					This function is async call.
 			*/
-			GAIA::GVOID Recv(GAIA::GVOID* pData, GAIA::NUM sSize);
+			GAIA::GVOID Recv();
 
 			/*!
 				@brief Flush send buffer.
@@ -226,7 +232,14 @@ namespace GAIA
 			GAIA::GVOID init();
 
 		private:
+			GAIA::NETWORK::AsyncDispatcher* m_pDispatcher;
 			GAIA::NETWORK::Socket m_sock;
+
+		#if GAIA_OS == GAIA_OS_WINDOWS
+			GAIA::GVOID* m_pfnAcceptEx;
+			GAIA::GVOID* m_pfnConnectEx;
+			GAIA::GVOID* m_pfnDisconnectEx;
+		#endif
 		};
 	}
 }

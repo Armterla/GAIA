@@ -694,6 +694,14 @@ namespace GAIA
 			return nRecved;
 		}
 
+		GINL GAIA::BL Socket::SetFileDescriptor(GAIA::N32 nFD)
+		{
+			if(m_nSocket != GINVALID)
+				return GAIA::False;
+			m_nSocket = nFD;
+			return GAIA::True;
+		}
+
 		GINL GAIA::N32 Socket::GetFileDescriptor() const
 		{
 			return m_nSocket;
