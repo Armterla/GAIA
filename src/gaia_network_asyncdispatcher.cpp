@@ -261,7 +261,7 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		GAIA::BL AsyncDispatcher::IsExistListenSocket(GAIA::NETWORK::Addr& addr)
+		GAIA::BL AsyncDispatcher::IsExistListenSocket(const GAIA::NETWORK::Addr& addr) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwListenSockets);
 
@@ -278,7 +278,6 @@ namespace GAIA
 		GAIA::NUM AsyncDispatcher::GetListenSocketCount() const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwListenSockets);
-
 			return m_listen_sockets.size();
 		}
 
@@ -296,9 +295,16 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		GAIA::BL AsyncDispatcher::IsExistAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock) const
+		GAIA::BL AsyncDispatcher::IsExistAcceptedSocket(const GAIA::NETWORK::Addr& addr) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwAcceptedSockets);
+
+			Node nfinder;
+			nfinder.addrLocal = addr;
+			nfinder.pSock = GNIL;
+			Node* pFinded  = m_accepted_sockets.find(nfinder);
+			if(pFinded == GNIL)
+				return GAIA::False;
 
 			return GAIA::True;
 		}
@@ -307,6 +313,20 @@ namespace GAIA
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwAcceptedSockets);
 			return m_accepted_sockets.size();
+		}
+
+		GAIA::BL AsyncDispatcher::CollectAcceptedSocket(CallBack& cb) const
+		{
+			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwAcceptedSockets);
+
+			for(GAIA::CTN::Set<Node>::const_it it = m_accepted_sockets.const_frontit(); !it.empty(); ++it)
+			{
+				const Node& n = *it;
+				if(!cb.OnCollectAcceptedSocket(*GCCAST(AsyncDispatcher*)(this), *n.pSock))
+					return GAIA::False;
+			}
+
+			return GAIA::True;
 		}
 
 		GAIA::GVOID AsyncDispatcher::init()

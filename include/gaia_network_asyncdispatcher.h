@@ -82,11 +82,11 @@ namespace GAIA
 			GAIA::BL AddListenSocket(const GAIA::NETWORK::Addr& addr);
 			GAIA::BL RemoveListenSocket(const GAIA::NETWORK::Addr& addr);
 			GAIA::BL RemoveListenSocketAll();
-			GAIA::BL IsExistListenSocket(GAIA::NETWORK::Addr& addr);
+			GAIA::BL IsExistListenSocket(const GAIA::NETWORK::Addr& addr) const;
 			GAIA::NUM GetListenSocketCount() const;
 			GAIA::BL CollectListenSocket(CallBack& cb) const;
 
-			GAIA::BL IsExistAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock) const;
+			GAIA::BL IsExistAcceptedSocket(const GAIA::NETWORK::Addr& addr) const;
 			GAIA::NUM GetAcceptedSocketCount() const;
 			GAIA::BL CollectAcceptedSocket(CallBack& cb) const;
 
