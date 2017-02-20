@@ -142,11 +142,13 @@ namespace GAIA
 
 		GAIA::GVOID AsyncSocket::Send(const GAIA::GVOID* pData, GAIA::NUM sSize)
 		{
+			GAIA::SYNC::Autolock al(m_lrSend);
+
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			IOCPOverlapped* pIOCPOverlapped = m_pDispatcher->alloc_iocpol();
 			pIOCPOverlapped->type = IOCP_OVERLAPPED_TYPE_SEND;
 			pIOCPOverlapped->pRecvSocket = this;
-			pIOCPOverlapped->_buf.len = IODATA_MAXLEN;
+			pIOCPOverlapped->_buf.len = sizeof(pIOCPOverlapped->data);
 			this->rise_ref();
 
 			DWORD dwTrans = 0;
@@ -203,7 +205,7 @@ namespace GAIA
 			IOCPOverlapped* pIOCPOverlapped = m_pDispatcher->alloc_iocpol();
 			pIOCPOverlapped->type = IOCP_OVERLAPPED_TYPE_RECV;
 			pIOCPOverlapped->pRecvSocket = this;
-			pIOCPOverlapped->_buf.len = IODATA_MAXLEN;
+			pIOCPOverlapped->_buf.len = sizeof(pIOCPOverlapped->data);
 			this->rise_ref();
 
 			DWORD dwTrans = 0;

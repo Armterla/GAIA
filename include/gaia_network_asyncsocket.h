@@ -3,6 +3,8 @@
 
 #include "gaia_type.h"
 #include "gaia_assert.h"
+#include "gaia_sync_lock.h"
+#include "gaia_sync_autolock.h"
 #include "gaia_network_ip.h"
 #include "gaia_network_addr.h"
 #include "gaia_network_base.h"
@@ -214,6 +216,8 @@ namespace GAIA
 		private:
 			GAIA::NETWORK::AsyncDispatcher* m_pDispatcher;
 			GAIA::NETWORK::Socket m_sock;
+			GAIA::SYNC::Lock m_lrSend;
+			GAIA::SYNC::Lock m_lrRecv;
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::GVOID* m_pfnAcceptEx;
