@@ -12,12 +12,39 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		#if GAIA_OS == GAIA_OS_WINDOWS
+			#define IODATA_MAXLEN 2000 // SO_MAX_MSG_SIZE
+			GAIA_ENUM_BEGIN(IOCP_OVERLAPPED_TYPE)
+				IOCP_OVERLAPPED_TYPE_STOP,
+				IOCP_OVERLAPPED_TYPE_CONNECT,
+				IOCP_OVERLAPPED_TYPE_DISCONNECT,
+				IOCP_OVERLAPPED_TYPE_ACCEPT,
+				IOCP_OVERLAPPED_TYPE_SEND,
+				IOCP_OVERLAPPED_TYPE_RECV,
+			GAIA_ENUM_END(IOCP_OVERLAPPED_TYPE)
+			class IOCPOverlapped : public GAIA::Base
+			{
+			public:
+				OVERLAPPED _ovlp;
+				IOCP_OVERLAPPED_TYPE type;
+				AsyncSocket* pListenSocket;
+				AsyncSocket* pRecvSocket;
+				WSABUF _buf;
+				GAIA::U8 data[IODATA_MAXLEN];
+			};
+		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
+
+		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
+
+		#endif
+
+
 		/*!
 			@brief Async socket.
 
 				This async socket class support stream socket only(TCP).
 		*/
-		class AsyncSocket : public GAIA::Base
+		class AsyncSocket : public GAIA::RefObject
 		{
 			friend class AsyncDispatcher;
 
@@ -26,7 +53,7 @@ namespace GAIA
 			/*!
 				@brief Constructor.
 			*/
-			AsyncSocket();
+			AsyncSocket(GAIA::NETWORK::AsyncDispatcher& disp);
 
 			/*!
 				@brief Destructor.
@@ -62,6 +89,11 @@ namespace GAIA
 					This function is async call.
 			*/
 			GAIA::GVOID Shutdown(GAIA::N32 nShutdownFlag = GAIA::NETWORK::Socket::SSDF_RECV | GAIA::NETWORK::Socket::SSDF_SEND);
+
+			/*!
+				@brief Check current socket is create or not.
+			*/
+			GAIA::BL IsCreated() const;
 
 			/*!
 				@brief Bind async socket to a network address, include IP and port.
@@ -113,7 +145,7 @@ namespace GAIA
 				@remarks
 					This function is async call.
 			*/
-			GAIA::GVOID Recv(GAIA::GVOID* pData, GAIA::NUM sSize);
+			GAIA::GVOID Recv();
 
 			/*!
 				@brief Flush send buffer.
@@ -200,7 +232,14 @@ namespace GAIA
 			GAIA::GVOID init();
 
 		private:
+			GAIA::NETWORK::AsyncDispatcher* m_pDispatcher;
 			GAIA::NETWORK::Socket m_sock;
+
+		#if GAIA_OS == GAIA_OS_WINDOWS
+			GAIA::GVOID* m_pfnAcceptEx;
+			GAIA::GVOID* m_pfnConnectEx;
+			GAIA::GVOID* m_pfnDisconnectEx;
+		#endif
 		};
 	}
 }

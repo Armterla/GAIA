@@ -251,6 +251,11 @@ namespace GAIA
 			GINL GAIA::N32 RecvFrom(GAIA::NETWORK::Addr& addr, GAIA::GVOID* p, GAIA::N32 nSize, GAIA::N32 nRecvFlag = GAIA::NETWORK::Socket::SRF_DEFAULT);
 
 			/*!
+				@brief Set socket file descriptor.
+			*/
+			GINL GAIA::BL SetFileDescriptor(GAIA::N32 nFD);
+
+			/*!
 				@brief Get socket file descriptor.
 			*/
 			GINL GAIA::N32 GetFileDescriptor() const;

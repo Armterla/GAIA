@@ -20,7 +20,8 @@ namespace TEST
 
 		// Simple AsyncSocket.
 		{
-			GAIA::NETWORK::AsyncSocket sock;
+			GAIA::NETWORK::AsyncDispatcher disp;
+			GAIA::NETWORK::AsyncSocket sock(disp);
 		}
 
 		// Multi connect, send, receive, close.
