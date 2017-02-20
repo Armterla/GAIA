@@ -12,6 +12,32 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		#if GAIA_OS == GAIA_OS_WINDOWS
+			#define IODATA_MAXLEN 2000 // SO_MAX_MSG_SIZE
+			GAIA_ENUM_BEGIN(IOCP_OVERLAPPED_TYPE)
+				IOCP_OVERLAPPED_TYPE_STOP,
+				IOCP_OVERLAPPED_TYPE_CONNECT,
+				IOCP_OVERLAPPED_TYPE_ACCEPT,
+				IOCP_OVERLAPPED_TYPE_SEND,
+				IOCP_OVERLAPPED_TYPE_RECV,
+			GAIA_ENUM_END(IOCP_OVERLAPPED_TYPE)
+			class IOCPOverlapped : public GAIA::Base
+			{
+			public:
+				OVERLAPPED _ovlp;
+				IOCP_OVERLAPPED_TYPE type;
+				GAIA::N32 listen_fd;
+				GAIA::N32 recv_fd;
+				WSABUF _buf;
+				GAIA::U8 data[IODATA_MAXLEN];
+			};
+		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
+
+		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
+
+		#endif
+
+
 		/*!
 			@brief Async socket.
 
