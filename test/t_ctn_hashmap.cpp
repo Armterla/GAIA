@@ -98,18 +98,18 @@ namespace TEST
 		TAST(hm.empty());
 		TAST(hm1.empty());
 
-		GAIA::CTN::HashMap<CustomKey, CustomKey> hs_userdecl;
+		GAIA::CTN::HashMap<CustomKey, CustomKey> hm_userdecl;
 		for(__HashMapType::_datatype x = 0; x < ELEMENT_COUNT; ++x)
 		{
 			CustomKey ck;
 			ck.m_v = x;
-			hs_userdecl.insert(ck, ck);
+			hm_userdecl.insert(ck, ck);
 		}
 		for(__HashMapType::_datatype x = 0; x < ELEMENT_COUNT; ++x)
 		{
 			CustomKey cd;
 			cd.m_v = x;
-			CustomKey* pFinded = hs_userdecl.find(cd);
+			CustomKey* pFinded = hm_userdecl.find(cd);
 			if(pFinded == GNIL)
 			{
 				TERROR;
@@ -121,5 +121,28 @@ namespace TEST
 				break;
 			}
 		}
+
+		GAIA::CTN::HashMap<const GAIA::CH*, GAIA::N32> hmbystr;
+		if(!hmbystr.insert("HelloWorld", 0))
+			TERROR;
+		if(!hmbystr.insert("HelloKitty", 1))
+			TERROR;
+		if(!hmbystr.insert("HelloGAIA", 2))
+			TERROR;
+		GAIA::N32* pFinded = hmbystr.find("HelloWorld");
+		if(pFinded == GNIL)
+			TERROR;
+		else if(*pFinded != 0)
+			TERROR;
+		pFinded = hmbystr.find("HelloKitty");
+		if(pFinded == GNIL)
+			TERROR;
+		else if(*pFinded != 1)
+			TERROR;
+		pFinded = hmbystr.find("HelloGAIA");
+		if(pFinded == GNIL)
+			TERROR;
+		else if(*pFinded != 2)
+			TERROR;
 	}
 }

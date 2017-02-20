@@ -124,5 +124,28 @@ namespace TEST
 				break;
 			}
 		}
+
+		GAIA::CTN::HashSet<const GAIA::CH*> hsbystr;
+		if(!hsbystr.insert("HelloWorld"))
+			TERROR;
+		if(!hsbystr.insert("HelloKitty"))
+			TERROR;
+		if(!hsbystr.insert("HelloGAIA"))
+			TERROR;
+		const GAIA::CH** ppFinded = hsbystr.find("HelloWorld");
+		if(ppFinded == GNIL)
+			TERROR;
+		else if(!GAIA::ALGO::gstrequal(*ppFinded, "HelloWorld"))
+			TERROR;
+		ppFinded = hsbystr.find("HelloKitty");
+		if(ppFinded == GNIL)
+			TERROR;
+		else if(!GAIA::ALGO::gstrequal(*ppFinded, "HelloKitty"))
+			TERROR;
+		ppFinded = hsbystr.find("HelloGAIA");
+		if(ppFinded == GNIL)
+			TERROR;
+		else if(!GAIA::ALGO::gstrequal(*ppFinded, "HelloGAIA"))
+			TERROR;
 	}
 }
