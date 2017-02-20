@@ -143,8 +143,6 @@
 #include	"gaia_timer_timer.h"
 #include	"gaia_timer_realtimer.h"
 
-#include	"gaia_dbg_perf.h"
-
 #include	"gaia_thread.h"
 #include	"gaia_thread_pool.h"
 #include	"gaia_process.h"
@@ -175,6 +173,8 @@
 #include	"gaia_fsys_dir.h"
 
 #include	"gaia_log.h"
+
+#include	"gaia_dbg_perf.h"
 
 #include	"gaia_ctn_accesser.h"
 

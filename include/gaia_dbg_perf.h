@@ -15,6 +15,10 @@
 #include "gaia_ctn_set.h"
 #include "gaia_ctn_staticstringptrpool.h"
 #include "gaia_time.h"
+#include "gaia_log.h"
+
+extern GAIA::LOG::Log g_gaia_log;
+extern GAIA::LOG::InvalidLog g_gaia_invalidlog;
 
 namespace GAIA
 {
@@ -45,6 +49,40 @@ namespace GAIA
 					@return If the moduler user return GAIA::True, the collect procedule will continued, return GAIA::False, the collect procedule will breaked.
 				*/
 				virtual GAIA::BL OnCollect(const GAIA::CH* pszItemName, GAIA::UM uThreadID, const GAIA::U64& uTotalTime, const GAIA::U64& uMinTime, const GAIA::U64& uMaxTime, const GAIA::U64& uTotalCount) = 0;
+			};
+
+		private:
+			class CallBackForLog : public CallBack
+			{
+				friend class PerfCollector;
+			public:
+				GINL CallBackForLog(GAIA::LOG::Log& gaialog, GAIA::LOG::Log::TYPE logtype, GAIA::U32 uLogFilter)
+				{
+					m_pGAIALog = &gaialog;
+					m_logtype = logtype;
+					m_uLogFilter = uLogFilter;
+				}
+				virtual GAIA::BL OnCollect(const GAIA::CH* pszItemName, GAIA::UM uThreadID, const GAIA::U64& uTotalTime, const GAIA::U64& uMinTime, const GAIA::U64& uMaxTime, const GAIA::U64& uTotalCount)
+				{
+					if(uThreadID == GINVALID)
+					{
+						GAIA::LOG::Log& gaialog = *m_pGAIALog;
+						gaialog << gaialog.Type(m_logtype) << gaialog.UserFilter(m_uLogFilter) <<
+									  "\t" <<
+									  pszItemName <<
+									  " Count=" << uTotalCount <<
+									  " Total=" << uTotalTime <<
+									  " Avg=" << uTotalTime / uTotalCount <<
+									  " Min=" << uMinTime <<
+									  " Max=" << uMaxTime <<
+									  gaialog.End();
+					}
+					return GAIA::True;
+				}
+			private:
+				GAIA::LOG::Log* m_pGAIALog;
+				GAIA::LOG::Log::TYPE m_logtype;
+				GAIA::U32 m_uLogFilter;
 			};
 
 		public:
@@ -250,6 +288,21 @@ namespace GAIA
 					if(!cb.OnCollect(pszLastItemName, GINVALID, uTotalTime, uMinTime, uMaxTime, uTotalCount))
 						return GAIA::False;
 				}
+				return GAIA::True;
+			}
+
+			GINL GAIA::BL DumpToLog(GAIA::LOG::Log* pLog = GNIL, GAIA::LOG::Log::TYPE logtype = GAIA::LOG::Log::TYPE_LOG, GAIA::U32 uLogFilter = 0xFFFFFFFF)
+			{
+				if(pLog == GNIL)
+				{
+				#ifdef GAIA_DEBUG_LOG
+					pLog = &g_gaia_log;
+				#else
+					pLog = &g_gaia_invalidlog;
+				#endif
+				}
+				CallBackForLog cb(*pLog, logtype, uLogFilter);
+				this->Collect(cb);
 				return GAIA::True;
 			}
 
