@@ -26,9 +26,7 @@ namespace GAIA
 
 		public:
 			static const GAIA::NUM DEFAULT_THREAD_COUNT = 4;
-			static const GAIA::NUM DEFAULT_CONNECT_EVENT_COUNT = 4;
 			static const GAIA::NUM DEFAULT_ACCEPT_EVENT_COUNT = 4;
-			static const GAIA::NUM DEFAULT_SEND_EVENT_COUNT = 100;
 			static const GAIA::NUM DEFAULT_RECV_EVENT_COUNT = 100;
 			class Desc : public GAIA::Base
 			{
@@ -36,20 +34,14 @@ namespace GAIA
 				GINL GAIA::GVOID reset()
 				{
 					sThreadCount = DEFAULT_THREAD_COUNT;
-					sConnectEventCount = DEFAULT_CONNECT_EVENT_COUNT;
 					sAcceptEventCount = DEFAULT_ACCEPT_EVENT_COUNT;
-					sSendEventCount = DEFAULT_SEND_EVENT_COUNT;
 					sRecvEventCount = DEFAULT_RECV_EVENT_COUNT;
 				}
 				GINL GAIA::BL check() const
 				{
 					if(sThreadCount <= 0)
 						return GAIA::False;
-					if(sConnectEventCount <= 0)
-						return GAIA::False;
 					if(sAcceptEventCount <= 0)
-						return GAIA::False;
-					if(sSendEventCount <= 0)
 						return GAIA::False;
 					if(sRecvEventCount <= 0)
 						return GAIA::False;
@@ -57,9 +49,7 @@ namespace GAIA
 				}
 			public:
 				GAIA::NUM sThreadCount;
-				GAIA::NUM sConnectEventCount;
 				GAIA::NUM sAcceptEventCount;
-				GAIA::NUM sSendEventCount;
 				GAIA::NUM sRecvEventCount;
 			};
 			class CallBack : public GAIA::Base
