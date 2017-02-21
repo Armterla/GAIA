@@ -203,6 +203,11 @@ namespace GAIA
 			return m_sock.GetFD();
 		}
 
+		GAIA::BL AsyncSocket::GetBindedAddress(GAIA::NETWORK::Addr& addr)
+		{
+			return m_sock.GetBindedAddress(addr);
+		}
+
 		GAIA::BL AsyncSocket::GetGlobalAddress(GAIA::NETWORK::Addr& addr)
 		{
 			return m_sock.GetGlobalAddress(addr);
@@ -261,7 +266,7 @@ namespace GAIA
 		#endif
 		}
 
-		GAIA::GVOID AsyncSocket::SetPeerAddress(GAIA::NETWORK::Addr& addr)
+		GAIA::GVOID AsyncSocket::SetPeerAddress(const GAIA::NETWORK::Addr& addr)
 		{
 			m_sock.SetPeerAddress(addr);
 		}

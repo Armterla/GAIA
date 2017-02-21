@@ -25,10 +25,10 @@ namespace GAIA
 	#if GAIA_OS == GAIA_OS_WINDOWS
 		GINL GAIA::BL IsIOCPDisconnected(DWORD dwError)
 		{
-			return dwError == dwErrorOR_SUCCESS || 
-				dwError == dwErrorOR_NETNAME_DELETED || 
-				dwError == dwErrorOR_OPERATION_ABORTED || 
-				dwError == dwErrorOR_CONNECTION_ABORTED || 
+			return dwError == ERROR_SUCCESS || 
+				dwError == ERROR_NETNAME_DELETED || 
+				dwError == ERROR_OPERATION_ABORTED || 
+				dwError == ERROR_CONNECTION_ABORTED || 
 				dwError == WAIT_TIMEOUT || 
 				dwError == WSAECONNABORTED || 
 				dwError == WSAENETRESET || 
@@ -528,7 +528,7 @@ namespace GAIA
 					else if(pOverlapped->type == GAIA::NETWORK::IOCP_OVERLAPPED_TYPE_ACCEPT)
 					{
 						GAIA::NETWORK::Addr addrBinded;
-						pOverlapped->pListenSocket->GetBindedAddr(addrBinded);
+						pOverlapped->pListenSocket->GetBindedAddress(addrBinded);
 						pOverlapped->pAcceptedSocket->OnAccepted(GAIA::False, addrBinded);
 					}
 				}

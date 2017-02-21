@@ -770,7 +770,7 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		GINL GAIA::BL GetPeerAddress(GAIA::NETWORK::Addr& addr)
+		GINL GAIA::BL Socket::GetPeerAddress(GAIA::NETWORK::Addr& addr)
 		{
 			if(!m_addrPeer.check())
 				return GAIA::False;
@@ -803,7 +803,7 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		GINL GAIA::GVOID Socket::SetPeerAddress(GAIA::NETWORK::Addr& addr)
+		GINL GAIA::GVOID Socket::SetPeerAddress(const GAIA::NETWORK::Addr& addr)
 		{
 			GAST(addr.check());
 			m_addrPeer = addr;

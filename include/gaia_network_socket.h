@@ -294,7 +294,7 @@ namespace GAIA
 		private:
 			GINL GAIA::GVOID init();
 			GINL GAIA::BL SetFD(GAIA::N32 nFD);
-			GINL GAIA::GVOID SetPeerAddress(GAIA::NETWORK::Addr& addr);
+			GINL GAIA::GVOID SetPeerAddress(const GAIA::NETWORK::Addr& addr);
 			GINL Socket(const Socket& src){}
 			GINL Socket& operator = (const Socket& src){return *this;}
 

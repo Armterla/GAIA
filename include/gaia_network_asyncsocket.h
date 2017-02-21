@@ -159,6 +159,14 @@ namespace GAIA
 			GAIA::N32 GetFD() const;
 
 			/*!
+				@brief Get socket's bind address.
+
+				@return
+					If success return GAIA::True, or return GAIA::False;
+			*/
+			GAIA::BL GetBindedAddress(GAIA::NETWORK::Addr& addr);
+
+			/*!
 				@brief Get socket's global address.
 
 				@return
@@ -237,7 +245,7 @@ namespace GAIA
 		private:
 			GAIA::GVOID init();
 			GAIA::GVOID Recv();
-			GAIA::GVOID SetPeerAddress(GAIA::NETWORK::Addr& addr);
+			GAIA::GVOID SetPeerAddress(const GAIA::NETWORK::Addr& addr);
 
 		private:
 			GAIA::NETWORK::AsyncDispatcher* m_pDispatcher;
