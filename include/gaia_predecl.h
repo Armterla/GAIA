@@ -29,6 +29,8 @@ namespace GAIA
 		class HttpRequest;
 		class HttpResponse;
 		class Http;
+		class HttpServerLink;
+		class HttpServerCallBack;
 		class HttpServer;
 		class Client;
 		class Server;

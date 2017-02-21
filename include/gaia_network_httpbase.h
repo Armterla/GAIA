@@ -12,6 +12,15 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		// Http method.
+		GAIA_ENUM_BEGIN(HTTP_METHOD)
+			HTTP_METHOD_PUT,
+			HTTP_METHOD_POST,
+			HTTP_METHOD_GET,
+			HTTP_METHOD_HEAD,
+			HTTP_METHOD_DELETE,
+		GAIA_ENUM_END(HTTP_METHOD)
+
 		// Http code declaration here.
 		static const GAIA::N32 HTTP_CODE_OK 					= 200;
 		static const GAIA::N32 HTTP_CODE_BADREQUEST 			= 400;
