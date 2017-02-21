@@ -188,22 +188,22 @@ namespace GAIA
 				return GAIA::False;
 
 			//
-			AsyncSocket* pSock = this->OnCreateListenSocket();
-			pSock->Create();
-			pSock->Bind(addr);
+			AsyncSocket* pListenSocket = this->OnCreateListenSocket();
+			pListenSocket->Create();
+			pListenSocket->Bind(addr);
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			this->attach_socket_iocp(*pSock);
+			this->attach_socket_iocp(*pListenSocket);
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
 
 		#endif
 
-			nfinder.pSock = pSock;
+			nfinder.pSock = pListenSocket;
 			m_listen_sockets.insert(nfinder);
 
-			pSock->m_sock.Listen();
+			pListenSocket->m_sock.Listen();
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			for(GAIA::NUM x = 0; x < m_desc.sAcceptEventCount; ++x)
@@ -213,22 +213,22 @@ namespace GAIA
 
 				GAIA::NETWORK::IOCPOverlapped* pIOCPOverlapped = this->alloc_iocpol();
 				pIOCPOverlapped->type = IOCP_OVERLAPPED_TYPE_ACCEPT;
-				pIOCPOverlapped->pListenSocket = pSock;
+				pIOCPOverlapped->pListenSocket = pListenSocket;
 				pIOCPOverlapped->pAcceptedSocket = pAcceptedSocket;
-				pSock->rise_ref();
+				pListenSocket->rise_ref();
 				pAcceptedSocket->rise_ref();
 
 				GAIA::N32 nAddrLen = sizeof(SOCKADDR_IN) + 16;
 				DWORD dwRecved = 0;
-				if(!((LPFN_ACCEPTEX)pSock->m_pfnAcceptEx)(
-					pSock->GetFD(), pAcceptedSocket->GetFD(),
+				if(!((LPFN_ACCEPTEX)pListenSocket->m_pfnAcceptEx)(
+					pListenSocket->GetFD(), pAcceptedSocket->GetFD(),
 					pIOCPOverlapped->data, sizeof(pIOCPOverlapped->data) - nAddrLen - nAddrLen,
 					nAddrLen, nAddrLen, &dwRecved, (OVERLAPPED*)pIOCPOverlapped))
 				{
 					DWORD err = WSAGetLastError();
 					if(err != ERROR_IO_PENDING)
 					{
-						pSock->drop_ref();
+						pListenSocket->drop_ref();
 						pAcceptedSocket->drop_ref();
 						pAcceptedSocket->drop_ref();
 						this->release_iocpol(pIOCPOverlapped);
