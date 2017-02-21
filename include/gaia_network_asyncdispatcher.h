@@ -89,9 +89,14 @@ namespace GAIA
 			GAIA::NUM GetAcceptedSocketCount() const;
 			GAIA::BL CollectAcceptedSocket(CallBack& cb) const;
 
-		public:
+			GAIA::BL IsExistConnectedSocket(const GAIA::NETWORK::Addr& addr) const;
+			GAIA::NUM GetConnectedSocketCount() const;
+			GAIA::BL CollectConnectedSocket(CallBack& cb) const;
+
+		protected:
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket();
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptedSocket();
+			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen);
 
 		private:
 			class Node : public GAIA::Base
@@ -123,6 +128,8 @@ namespace GAIA
 			GAIA::GVOID init();
 			GAIA::BL AddAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock);
 			GAIA::BL RemoveAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock);
+			GAIA::BL AddConnectedSocket(GAIA::NETWORK::AsyncSocket& sock);
+			GAIA::BL RemoveConnectedSocket(GAIA::NETWORK::AsyncSocket& sock);
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::NETWORK::IOCPOverlapped* alloc_iocpol();
@@ -142,6 +149,8 @@ namespace GAIA
 			GAIA::CTN::Set<Node> m_listen_sockets;
 			GAIA::SYNC::LockRW m_rwAcceptedSockets;
 			GAIA::CTN::Set<Node> m_accepted_sockets;
+			GAIA::SYNC::LockRW m_rwConnectedSockets;
+			GAIA::CTN::Set<Node> m_connected_sockets;
 
 			GAIA::CTN::Vector<GAIA::THREAD::Thread*> m_threads;
 			

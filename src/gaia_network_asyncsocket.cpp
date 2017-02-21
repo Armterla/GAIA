@@ -24,16 +24,29 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
-		AsyncSocket::AsyncSocket(GAIA::NETWORK::AsyncDispatcher& disp)
+		AsyncSocket::AsyncSocket(GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE socktype)
 		{
 			this->init();
 			m_pDispatcher = &disp;
-			m_pDispatcher->AddAcceptedSocket(*this);
+			m_socktype = socktype;
+
+			if(m_socktype == GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE_ACCEPTED)
+				m_pDispatcher->AddAcceptedSocket(*this);
+			else if(m_socktype == m_socktype == GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE_CONNECTED)
+				m_pDispatcher->AddConnectedSocket(*this);
 		}
 
 		AsyncSocket::~AsyncSocket()
 		{
-			m_pDispatcher->RemoveAcceptedSocket(*this);
+			if(m_socktype == GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE_ACCEPTED)
+				m_pDispatcher->RemoveAcceptedSocket(*this);
+			else if(m_socktype == m_socktype == GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE_CONNECTED)
+				m_pDispatcher->RemoveConnectedSocket(*this);
+		}
+
+		GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE AsyncSocket::GetAsyncSocketType() const
+		{
+			return m_socktype;
 		}
 
 		GAIA::GVOID AsyncSocket::Create()
@@ -187,6 +200,7 @@ namespace GAIA
 		GAIA::GVOID AsyncSocket::init()
 		{
 			m_pDispatcher = GNIL;
+			m_socktype = GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE_CONNECTED;
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			m_pfnAcceptEx = GNIL;
