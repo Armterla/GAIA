@@ -18,9 +18,11 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		class AsyncDispatcherThread;
 		class AsyncDispatcher : public GAIA::Base
 		{
 			friend class AsyncSocket;
+			friend class AsyncDispatcherThread;
 
 		public:
 			static const GAIA::NUM DEFAULT_THREAD_COUNT = 4;
@@ -130,6 +132,7 @@ namespace GAIA
 			GAIA::BL RemoveAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock);
 			GAIA::BL AddConnectedSocket(GAIA::NETWORK::AsyncSocket& sock);
 			GAIA::BL RemoveConnectedSocket(GAIA::NETWORK::AsyncSocket& sock);
+			GAIA::BL Execute();
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::NETWORK::IOCPOverlapped* alloc_iocpol();

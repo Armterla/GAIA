@@ -730,6 +730,14 @@ namespace GAIA
 			return m_nSocket;
 		}
 
+		GINL GAIA::BL Socket::GetBindedAddress(GAIA::NETWORK::Addr& addr)
+		{
+			if(!m_addrBinded.check())
+				return GAIA::False;
+			addr = m_addrBinded;
+			return GAIA::True;
+		}
+
 		GINL GAIA::BL Socket::GetGlobalAddress(GAIA::NETWORK::Addr& addr)
 		{
 			if(m_nSocket == GINVALID)
@@ -762,12 +770,22 @@ namespace GAIA
 			return GAIA::True;
 		}
 
+		GINL GAIA::BL Socket::GetPeerAddress(GAIA::NETWORK::Addr& addr)
+		{
+			if(!m_addrPeer.check())
+				return GAIA::False;
+			addr = m_addrPeer;
+			return GAIA::True;
+		}
+
 		GINL GAIA::GVOID Socket::init()
 		{
 			m_nSocket = GINVALID;
 			m_SockType = SOCKET_TYPE_INVALID;
 			m_nSendBufferSize = 1024 * 2;
 			m_nRecvBufferSize = 1024 * 2;
+			m_addrBinded.reset();
+			m_addrPeer.reset();
 			m_bBinded = GAIA::False;
 			m_bConnected = GAIA::False;
 			m_bNotBlock = GAIA::False;
@@ -783,6 +801,12 @@ namespace GAIA
 				return GAIA::False;
 			m_nSocket = nFD;
 			return GAIA::True;
+		}
+
+		GINL GAIA::GVOID Socket::SetPeerAddress(const GAIA::NETWORK::Addr& addr)
+		{
+			GAST(addr.check());
+			m_addrPeer = addr;
 		}
 	}
 }

@@ -159,6 +159,14 @@ namespace GAIA
 			GAIA::N32 GetFD() const;
 
 			/*!
+				@brief Get socket's bind address.
+
+				@return
+					If success return GAIA::True, or return GAIA::False;
+			*/
+			GAIA::BL GetBindedAddress(GAIA::NETWORK::Addr& addr);
+
+			/*!
 				@brief Get socket's global address.
 
 				@return
@@ -174,66 +182,70 @@ namespace GAIA
 			*/
 			GAIA::BL GetLocalAddress(GAIA::NETWORK::Addr& addr);
 
+			/*!
+				@brief Get socket's peer address.
+
+				@return
+					If success return GAIA::True, or return GAIA::False.
+			*/
+			GAIA::BL GetPeerAddress(GAIA::NETWORK::Addr& addr);
+
 		protected:
 
 			/*!
 				@brief On async socket create callback.
 			*/
-			virtual GAIA::GVOID OnCreated(){}
+			virtual GAIA::GVOID OnCreated(GAIA::BL bResult){}
 
 			/*!
 				@brief On async socket close callback.
 			*/
-			virtual GAIA::GVOID OnClosed(){}
+			virtual GAIA::GVOID OnClosed(GAIA::BL bResult){}
 
 			/*!
 				@brief On async socket binded callback.
 			*/
-			virtual GAIA::GVOID OnBound(const GAIA::NETWORK::Addr& addr){}
+			virtual GAIA::GVOID OnBound(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
 
 			/*!
 				@brief On async socket connected callback.
 			*/
-			virtual GAIA::GVOID OnConnected(const GAIA::NETWORK::Addr& addr){}
+			virtual GAIA::GVOID OnConnected(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
 
 			/*!
 				@brief On async socket disconnected callback.
 			*/
-			virtual GAIA::GVOID OnDisconnected(){}
+			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult){}
 
 			/*!
 				@brief On async socket started listen.
 			*/
-			virtual GAIA::GVOID OnListened(){}
+			virtual GAIA::GVOID OnListened(GAIA::BL bResult){}
 
 			/*!
 				@brief On async socket be accepted by a listen socket.
 			*/
-			virtual GAIA::GVOID OnAccepted(const GAIA::NETWORK::Addr& addrListen){}
+			virtual GAIA::GVOID OnAccepted(GAIA::BL bResult, const GAIA::NETWORK::Addr& addrListen){}
 
 			/*!
 				@brief On async socket sent callback.
 			*/
-			virtual GAIA::GVOID OnSent(const GAIA::GVOID* pData, GAIA::NUM sSize){}
+			virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::NUM sPracticeSize, GAIA::NUM sSize){}
 
 			/*!
 				@brief On async socket recv callback.
 			*/
-			virtual GAIA::GVOID OnRecved(const GAIA::GVOID* pData, GAIA::NUM sSize){}
+			virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::NUM sSize){}
 
 			/*!
 				@brief On async socket shutdown callback.
 			*/
-			virtual GAIA::GVOID OnShutdowned(GAIA::N32 nShutdownFlag){}
-
-			/*!
-				@brief On async socket error callback.
-			*/
-			virtual GAIA::GVOID OnError(){}
+			virtual GAIA::GVOID OnShutdowned(GAIA::BL bResult, GAIA::N32 nShutdownFlag){}
 
 		private:
 			GAIA::GVOID init();
 			GAIA::GVOID Recv();
+			GAIA::GVOID SetPeerAddress(const GAIA::NETWORK::Addr& addr);
 
 		private:
 			GAIA::NETWORK::AsyncDispatcher* m_pDispatcher;
