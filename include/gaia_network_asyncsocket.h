@@ -3,6 +3,7 @@
 
 #include "gaia_type.h"
 #include "gaia_assert.h"
+#include "gaia_sync_atomic.h"
 #include "gaia_sync_lock.h"
 #include "gaia_sync_autolock.h"
 #include "gaia_network_ip.h"
@@ -246,6 +247,7 @@ namespace GAIA
 			GAIA::GVOID init();
 			GAIA::GVOID Recv();
 			GAIA::GVOID SetPeerAddress(const GAIA::NETWORK::Addr& addr);
+			GAIA::BL SwapBrokenState();
 
 		private:
 			GAIA::NETWORK::AsyncDispatcher* m_pDispatcher;
@@ -253,6 +255,7 @@ namespace GAIA
 			GAIA::NETWORK::Socket m_sock;
 			GAIA::SYNC::Lock m_lrSend;
 			GAIA::SYNC::Lock m_lrRecv;
+			GAIA::SYNC::Atomic m_atomBrokenTimes;
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::GVOID* m_pfnAcceptEx;

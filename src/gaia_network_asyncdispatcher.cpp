@@ -142,6 +142,7 @@ namespace GAIA
 				return GAIA::False;
 
 			// Notify the thread exit.
+			// TODO:
 
 			// End thread.
 			for(GAIA::NUM x = 0; x < m_threads.size(); ++x)
@@ -227,7 +228,7 @@ namespace GAIA
 					DWORD err = WSAGetLastError();
 					if(err != ERROR_IO_PENDING)
 					{
-						pSock->rise_ref();
+						pSock->drop_ref();
 						pAcceptedSocket->drop_ref();
 						pAcceptedSocket->drop_ref();
 						this->release_iocpol(pIOCPOverlapped);
@@ -489,7 +490,7 @@ namespace GAIA
 			}
 			else
 			{
-				if(pOverlapped != GNIL)
+				if(pOverlapped != GNIL && pOverlapped->pAcceptedSocket->SwapBrokenState())
 				{
 					if(pOverlapped->type == GAIA::NETWORK::IOCP_OVERLAPPED_TYPE_RECV)
 					{
@@ -504,9 +505,7 @@ namespace GAIA
 									dwError = WSAGetLastError();
 
 								if(IsIOCPDisconnected(dwError))
-								{
 									pOverlapped->pAcceptedSocket->OnDisconnected(GAIA::True);
-								}
 							}
 						}
 					}
@@ -531,10 +530,12 @@ namespace GAIA
 						pOverlapped->pListenSocket->GetBindedAddress(addrBinded);
 						pOverlapped->pAcceptedSocket->OnAccepted(GAIA::False, addrBinded);
 					}
+					else
+						GASTFALSE;
 				}
 				else
 				{
-
+					// TODO:
 				}
 			}
 			if(pOverlapped != GNIL)

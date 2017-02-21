@@ -270,5 +270,13 @@ namespace GAIA
 		{
 			m_sock.SetPeerAddress(addr);
 		}
+
+		GAIA::BL AsyncSocket::SwapBrokenState()
+		{
+			GAST(this->IsCreated());
+			GAIA::N64 lNewValue = m_atomBrokenTimes.Increase();
+			GAST(lNewValue > 0);
+			return lNewValue == 1;
+		}
 	}
 }
