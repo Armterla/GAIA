@@ -105,16 +105,6 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		GAIA::BL AsyncDispatcher::IsCreated() const
-		{
-			return m_bCreated;
-		}
-
-		const GAIA::NETWORK::AsyncDispatcher::Desc& AsyncDispatcher::GetDesc() const
-		{
-			return m_desc;
-		}
-
 		GAIA::BL AsyncDispatcher::Begin()
 		{
 			if(this->IsBegin())
@@ -411,23 +401,6 @@ namespace GAIA
 					return GAIA::False;
 			}
 			return GAIA::True;
-		}
-
-		GAIA::NETWORK::AsyncSocket* AsyncDispatcher::OnCreateListenSocket()
-		{
-			GAIA::NETWORK::AsyncSocket* pListenSocket = gnew GAIA::NETWORK::AsyncSocket(*this, GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE_LISTEN);
-			return pListenSocket;
-		}
-
-		GAIA::NETWORK::AsyncSocket* AsyncDispatcher::OnCreateAcceptedSocket()
-		{
-			GAIA::NETWORK::AsyncSocket* pAcceptedSocket = gnew GAIA::NETWORK::AsyncSocket(*this, GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE_ACCEPTED);
-			return pAcceptedSocket;
-		}
-
-		GAIA::BL AsyncDispatcher::OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen)
-		{
-			return GAIA::False;
 		}
 
 		GAIA::GVOID AsyncDispatcher::init()

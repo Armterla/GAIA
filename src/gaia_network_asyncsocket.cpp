@@ -44,11 +44,6 @@ namespace GAIA
 				m_pDispatcher->RemoveConnectedSocket(*this);
 		}
 
-		GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE AsyncSocket::GetAsyncSocketType() const
-		{
-			return m_socktype;
-		}
-
 		GAIA::GVOID AsyncSocket::Create()
 		{
 		#if GAIA_OS == GAIA_OS_WINDOWS
@@ -95,20 +90,10 @@ namespace GAIA
 			this->OnShutdowned(GAIA::True, nShutdownFlag);
 		}
 
-		GAIA::BL AsyncSocket::IsCreated() const
-		{
-			return m_sock.IsCreated();
-		}
-
 		GAIA::GVOID AsyncSocket::Bind(const GAIA::NETWORK::Addr& addr)
 		{
 			m_sock.Bind(addr);
 			this->OnBound(GAIA::True, addr);
-		}
-
-		GAIA::BL AsyncSocket::IsBinded() const
-		{
-			return m_sock.IsBinded();
 		}
 
 		GAIA::GVOID AsyncSocket::Connect(const GAIA::NETWORK::Addr& addr)
@@ -164,11 +149,6 @@ namespace GAIA
 		#endif
 		}
 
-		GAIA::BL AsyncSocket::IsConnected() const
-		{
-			return m_sock.IsConnected();
-		}
-
 		GAIA::GVOID AsyncSocket::Send(const GAIA::GVOID* pData, GAIA::NUM sSize)
 		{
 			GAIA::SYNC::Autolock al(m_lrSend);
@@ -196,31 +176,6 @@ namespace GAIA
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
 
 		#endif
-		}
-
-		GAIA::N32 AsyncSocket::GetFD() const
-		{
-			return m_sock.GetFD();
-		}
-
-		GAIA::BL AsyncSocket::GetBindedAddress(GAIA::NETWORK::Addr& addr)
-		{
-			return m_sock.GetBindedAddress(addr);
-		}
-
-		GAIA::BL AsyncSocket::GetGlobalAddress(GAIA::NETWORK::Addr& addr)
-		{
-			return m_sock.GetGlobalAddress(addr);
-		}
-
-		GAIA::BL AsyncSocket::GetLocalAddress(GAIA::NETWORK::Addr& addr)
-		{
-			return m_sock.GetLocalAddress(addr);
-		}
-
-		GAIA::BL AsyncSocket::GetPeerAddress(GAIA::NETWORK::Addr& addr)
-		{
-			return m_sock.GetPeerAddress(addr);
 		}
 
 		GAIA::GVOID AsyncSocket::init()
@@ -264,19 +219,6 @@ namespace GAIA
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
 
 		#endif
-		}
-
-		GAIA::GVOID AsyncSocket::SetPeerAddress(const GAIA::NETWORK::Addr& addr)
-		{
-			m_sock.SetPeerAddress(addr);
-		}
-
-		GAIA::BL AsyncSocket::SwapBrokenState()
-		{
-			GAST(this->IsCreated());
-			GAIA::N64 lNewValue = m_atomBrokenTimes.Increase();
-			GAST(lNewValue > 0);
-			return lNewValue == 1;
 		}
 	}
 }

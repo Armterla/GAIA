@@ -63,8 +63,8 @@ namespace GAIA
 
 			GAIA::BL Create(const GAIA::NETWORK::AsyncDispatcher::Desc& desc);
 			GAIA::BL Destroy();
-			GAIA::BL IsCreated() const;
-			const GAIA::NETWORK::AsyncDispatcher::Desc& GetDesc() const;
+			GAIA::BL IsCreated() const{return m_bCreated;}
+			const GAIA::NETWORK::AsyncDispatcher::Desc& GetDesc() const{return m_desc;}
 
 			GAIA::BL Begin();
 			GAIA::BL End();
@@ -86,9 +86,17 @@ namespace GAIA
 			GAIA::BL CollectConnectedSocket(CallBack& cb) const;
 
 		protected:
-			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket();
-			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptedSocket();
-			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen);
+			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket()
+			{
+				GAIA::NETWORK::AsyncSocket* pListenSocket = gnew GAIA::NETWORK::AsyncSocket(*this, GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE_LISTEN);
+				return pListenSocket;
+			}
+			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptedSocket()
+			{
+				GAIA::NETWORK::AsyncSocket* pAcceptedSocket = gnew GAIA::NETWORK::AsyncSocket(*this, GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE_ACCEPTED);
+				return pAcceptedSocket;
+			}
+			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen){return GAIA::False;}
 
 		private:
 			class Node : public GAIA::Base

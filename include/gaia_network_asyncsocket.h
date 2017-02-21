@@ -83,7 +83,7 @@ namespace GAIA
 			/*!
 				@brief Get socket type.
 			*/
-			GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE GetAsyncSocketType() const;
+			GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE GetAsyncSocketType() const{return m_socktype;}
 
 			/*!
 				@brief Create async socket.
@@ -115,7 +115,7 @@ namespace GAIA
 			/*!
 				@brief Check current socket is create or not.
 			*/
-			GAIA::BL IsCreated() const;
+			GAIA::BL IsCreated() const{return m_sock.IsCreated();}
 
 			/*!
 				@brief Bind async socket to a network address, include IP and port.
@@ -130,7 +130,7 @@ namespace GAIA
 
 				@return If the socket is bound, return GAIA::True, or return GAIA::False.
 			*/
-			GAIA::BL IsBinded() const;
+			GAIA::BL IsBinded() const{return m_sock.IsBinded();}
 
 			/*!
 				@brief Connect async socket to a network address, include IP and port.
@@ -151,7 +151,7 @@ namespace GAIA
 			/*!
 				@brief Check current async socket is connected or not.
 			*/
-			GAIA::BL IsConnected() const;
+			GAIA::BL IsConnected() const{return m_sock.IsConnected();}
 
 			/*!
 				@brief Send data to peer.
@@ -164,7 +164,7 @@ namespace GAIA
 			/*!
 				@brief Get socket file descriptor.
 			*/
-			GAIA::N32 GetFD() const;
+			GAIA::N32 GetFD() const{return m_sock.GetFD();}
 
 			/*!
 				@brief Get socket's bind address.
@@ -172,7 +172,7 @@ namespace GAIA
 				@return
 					If success return GAIA::True, or return GAIA::False;
 			*/
-			GAIA::BL GetBindedAddress(GAIA::NETWORK::Addr& addr);
+			GAIA::BL GetBindedAddress(GAIA::NETWORK::Addr& addr){return m_sock.GetBindedAddress(addr);}
 
 			/*!
 				@brief Get socket's global address.
@@ -180,7 +180,7 @@ namespace GAIA
 				@return
 					If success return GAIA::True, or return GAIA::False.
 			*/
-			GAIA::BL GetGlobalAddress(GAIA::NETWORK::Addr& addr);
+			GAIA::BL GetGlobalAddress(GAIA::NETWORK::Addr& addr){return m_sock.GetGlobalAddress(addr);}
 
 			/*!
 				@brief Get socket's local address.
@@ -188,7 +188,7 @@ namespace GAIA
 				@return
 					If success return GAIA::True, or return GAIA::False.
 			*/
-			GAIA::BL GetLocalAddress(GAIA::NETWORK::Addr& addr);
+			GAIA::BL GetLocalAddress(GAIA::NETWORK::Addr& addr){return m_sock.GetLocalAddress(addr);}
 
 			/*!
 				@brief Get socket's peer address.
@@ -196,7 +196,7 @@ namespace GAIA
 				@return
 					If success return GAIA::True, or return GAIA::False.
 			*/
-			GAIA::BL GetPeerAddress(GAIA::NETWORK::Addr& addr);
+			GAIA::BL GetPeerAddress(GAIA::NETWORK::Addr& addr){return m_sock.GetPeerAddress(addr);}
 
 		protected:
 
@@ -253,8 +253,14 @@ namespace GAIA
 		private:
 			GAIA::GVOID init();
 			GAIA::GVOID Recv();
-			GAIA::GVOID SetPeerAddress(const GAIA::NETWORK::Addr& addr);
-			GAIA::BL SwapBrokenState();
+			GAIA::GVOID SetPeerAddress(const GAIA::NETWORK::Addr& addr){m_sock.SetPeerAddress(addr);}
+			GAIA::BL SwapBrokenState()
+			{
+				GAST(this->IsCreated());
+				GAIA::N64 lNewValue = m_atomBrokenTimes.Increase();
+				GAST(lNewValue > 0);
+				return lNewValue == 1;
+			}
 
 		private:
 			GAIA::NETWORK::AsyncDispatcher* m_pDispatcher;
