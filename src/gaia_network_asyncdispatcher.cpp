@@ -543,7 +543,7 @@ namespace GAIA
 									(WSAOVERLAPPED*)pOverlapped, &dwTrans, GAIA::False, &dwFlags))
 									dwError = WSAGetLastError();
 
-								if(IsIOCPDisconnected(dwError))
+								if(IsIOCPDisconnected(dwError)) // TODO: Another place to call IsIOCPDisconnected.
 									pOverlapped->pAcceptedSocket->OnDisconnected(GAIA::True);
 							}
 							else
