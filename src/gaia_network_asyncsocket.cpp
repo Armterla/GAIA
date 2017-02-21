@@ -98,7 +98,7 @@ namespace GAIA
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			IOCPOverlapped* pIOCPOverlapped = m_pDispatcher->alloc_iocpol();
 			pIOCPOverlapped->type = IOCP_OVERLAPPED_TYPE_CONNECT;
-			pIOCPOverlapped->pRecvSocket = this;
+			pIOCPOverlapped->pAcceptedSocket = this;
 			this->rise_ref();
 
 			sockaddr_in saddr_in;
@@ -121,7 +121,7 @@ namespace GAIA
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			IOCPOverlapped* pIOCPOverlapped = m_pDispatcher->alloc_iocpol();
 			pIOCPOverlapped->type = IOCP_OVERLAPPED_TYPE_DISCONNECT;
-			pIOCPOverlapped->pRecvSocket = this;
+			pIOCPOverlapped->pAcceptedSocket = this;
 			this->rise_ref();
 
 			if(!((LPFN_DISCONNECTEX)m_pfnDisconnectEx)(this->GetFD(), (OVERLAPPED*)pIOCPOverlapped, 0, 0))
@@ -147,7 +147,7 @@ namespace GAIA
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			IOCPOverlapped* pIOCPOverlapped = m_pDispatcher->alloc_iocpol();
 			pIOCPOverlapped->type = IOCP_OVERLAPPED_TYPE_SEND;
-			pIOCPOverlapped->pRecvSocket = this;
+			pIOCPOverlapped->pAcceptedSocket = this;
 			pIOCPOverlapped->_buf.len = sizeof(pIOCPOverlapped->data);
 			this->rise_ref();
 
@@ -204,7 +204,7 @@ namespace GAIA
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			IOCPOverlapped* pIOCPOverlapped = m_pDispatcher->alloc_iocpol();
 			pIOCPOverlapped->type = IOCP_OVERLAPPED_TYPE_RECV;
-			pIOCPOverlapped->pRecvSocket = this;
+			pIOCPOverlapped->pAcceptedSocket = this;
 			pIOCPOverlapped->_buf.len = sizeof(pIOCPOverlapped->data);
 			this->rise_ref();
 

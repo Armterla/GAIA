@@ -30,7 +30,7 @@ namespace GAIA
 				OVERLAPPED _ovlp;
 				IOCP_OVERLAPPED_TYPE type;
 				AsyncSocket* pListenSocket;
-				AsyncSocket* pRecvSocket;
+				AsyncSocket* pAcceptedSocket;
 				WSABUF _buf;
 				GAIA::U8 data[IODATA_MAXLEN];
 			};
@@ -188,6 +188,16 @@ namespace GAIA
 				@brief On async socket disconnected callback.
 			*/
 			virtual GAIA::GVOID OnDisconnected(){}
+
+			/*!
+				@brief On async socket started listen.
+			*/
+			virtual GAIA::GVOID OnListened(){}
+
+			/*!
+				@brief On async socket be accepted by a listen socket.
+			*/
+			virtual GAIA::GVOID OnAccepted(const GAIA::NETWORK::Addr& addrListen){}
 
 			/*!
 				@brief On async socket sent callback.

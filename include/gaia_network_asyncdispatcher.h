@@ -63,8 +63,7 @@ namespace GAIA
 			class CallBack : public GAIA::Base
 			{
 			public:
-				virtual GAIA::BL OnCollectListenSocket(GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::AsyncSocket& sock){return GAIA::False;}
-				virtual GAIA::BL OnCollectAcceptedSocket(GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::AsyncSocket& sock){return GAIA::False;}
+				virtual GAIA::BL OnCollectAsyncSocket(GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::AsyncSocket& sock){return GAIA::False;}
 			};
 		public:
 			AsyncDispatcher();
@@ -89,6 +88,10 @@ namespace GAIA
 			GAIA::BL IsExistAcceptedSocket(const GAIA::NETWORK::Addr& addr) const;
 			GAIA::NUM GetAcceptedSocketCount() const;
 			GAIA::BL CollectAcceptedSocket(CallBack& cb) const;
+
+		public:
+			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket();
+			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptedSocket();
 
 		private:
 			class Node : public GAIA::Base
@@ -120,7 +123,6 @@ namespace GAIA
 			GAIA::GVOID init();
 			GAIA::BL AddAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock);
 			GAIA::BL RemoveAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock);
-			GAIA::BL RemoveAcceptedSocketAll();
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::NETWORK::IOCPOverlapped* alloc_iocpol();
