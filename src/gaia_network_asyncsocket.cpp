@@ -53,6 +53,11 @@ namespace GAIA
 		{
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::N32 nSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+			if(nSocket == INVALID_SOCKET)
+			{
+				this->OnCreated(GAIA::False);
+				return;
+			}
 			m_sock.SetFD(nSocket);
 			DWORD dwBytes;
 			GUID GuidAcceptEx = WSAID_ACCEPTEX;
@@ -75,19 +80,19 @@ namespace GAIA
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
 			m_sock.Create(GAIA::NETWORK::Socket::SOCKET_TYPE_STREAM);
 		#endif
-			this->OnCreated();
+			this->OnCreated(GAIA::True);
 		}
 
 		GAIA::GVOID AsyncSocket::Close()
 		{
 			m_sock.Close();
-			this->OnClosed();
+			this->OnClosed(GAIA::True);
 		}
 
 		GAIA::GVOID AsyncSocket::Shutdown(GAIA::N32 nShutdownFlag)
 		{
 			m_sock.Shutdown(nShutdownFlag);
-			this->OnShutdowned(nShutdownFlag);
+			this->OnShutdowned(GAIA::True, nShutdownFlag);
 		}
 
 		GAIA::BL AsyncSocket::IsCreated() const
@@ -98,7 +103,7 @@ namespace GAIA
 		GAIA::GVOID AsyncSocket::Bind(const GAIA::NETWORK::Addr& addr)
 		{
 			m_sock.Bind(addr);
-			this->OnBound(addr);
+			this->OnBound(GAIA::True, addr);
 		}
 
 		GAIA::BL AsyncSocket::IsBinded() const
@@ -108,6 +113,17 @@ namespace GAIA
 
 		GAIA::GVOID AsyncSocket::Connect(const GAIA::NETWORK::Addr& addr)
 		{
+			GAST(addr.check());
+			if(!addr.check())
+				return;
+			GAIA::NETWORK::Addr addrPeer;
+			addrPeer.reset();
+			this->GetPeerAddress(addrPeer);
+			if(addrPeer.check())
+				return;
+
+			this->SetPeerAddress(addr);
+
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			IOCPOverlapped* pIOCPOverlapped = m_pDispatcher->alloc_iocpol();
 			pIOCPOverlapped->type = IOCP_OVERLAPPED_TYPE_CONNECT;
@@ -197,6 +213,11 @@ namespace GAIA
 			return m_sock.GetLocalAddress(addr);
 		}
 
+		GAIA::BL AsyncSocket::GetPeerAddress(GAIA::NETWORK::Addr& addr)
+		{
+			return m_sock.GetPeerAddress(addr);
+		}
+
 		GAIA::GVOID AsyncSocket::init()
 		{
 			m_pDispatcher = GNIL;
@@ -238,6 +259,11 @@ namespace GAIA
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
 
 		#endif
+		}
+
+		GAIA::GVOID AsyncSocket::SetPeerAddress(GAIA::NETWORK::Addr& addr)
+		{
+			m_sock.SetPeerAddress(addr);
 		}
 	}
 }

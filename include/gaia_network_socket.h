@@ -260,6 +260,14 @@ namespace GAIA
 			GINL GAIA::N32 GetFD() const;
 
 			/*!
+				@brief Get socket's bind address.
+
+				@return
+					If success return GAIA::True, or return GAIA::False;
+			*/
+			GINL GAIA::BL GetBindedAddress(GAIA::NETWORK::Addr& addr);
+
+			/*!
 				@brief Get socket's global address.
 
 				@return
@@ -275,9 +283,18 @@ namespace GAIA
 			*/
 			GINL GAIA::BL GetLocalAddress(GAIA::NETWORK::Addr& addr);
 
+			/*!
+				@brief Get socket's peer address.
+
+				@return
+					If success return GAIA::True, or return GAIA::False.
+			*/
+			GINL GAIA::BL GetPeerAddress(GAIA::NETWORK::Addr& addr);
+
 		private:
 			GINL GAIA::GVOID init();
 			GINL GAIA::BL SetFD(GAIA::N32 nFD);
+			GINL GAIA::GVOID SetPeerAddress(GAIA::NETWORK::Addr& addr);
 			GINL Socket(const Socket& src){}
 			GINL Socket& operator = (const Socket& src){return *this;}
 
@@ -286,6 +303,8 @@ namespace GAIA
 			GAIA::NETWORK::Socket::SOCKET_TYPE m_SockType;
 			GAIA::N32 m_nSendBufferSize;
 			GAIA::N32 m_nRecvBufferSize;
+			GAIA::NETWORK::Addr m_addrBinded;
+			GAIA::NETWORK::Addr m_addrPeer;
 			GAIA::BL m_bBinded : 1;
 			GAIA::BL m_bConnected : 1;
 			GAIA::BL m_bNotBlock : 1;
