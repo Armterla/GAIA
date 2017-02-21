@@ -3,6 +3,8 @@
 
 #include "gaia_type.h"
 #include "gaia_assert.h"
+#include "gaia_sync_lock.h"
+#include "gaia_sync_autolock.h"
 #include "gaia_network_ip.h"
 #include "gaia_network_addr.h"
 #include "gaia_network_base.h"
@@ -12,12 +14,39 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		#if GAIA_OS == GAIA_OS_WINDOWS
+			#define IODATA_MAXLEN 2000 // SO_MAX_MSG_SIZE
+			GAIA_ENUM_BEGIN(IOCP_OVERLAPPED_TYPE)
+				IOCP_OVERLAPPED_TYPE_STOP,
+				IOCP_OVERLAPPED_TYPE_CONNECT,
+				IOCP_OVERLAPPED_TYPE_DISCONNECT,
+				IOCP_OVERLAPPED_TYPE_ACCEPT,
+				IOCP_OVERLAPPED_TYPE_SEND,
+				IOCP_OVERLAPPED_TYPE_RECV,
+			GAIA_ENUM_END(IOCP_OVERLAPPED_TYPE)
+			class IOCPOverlapped : public GAIA::Base
+			{
+			public:
+				OVERLAPPED _ovlp;
+				IOCP_OVERLAPPED_TYPE type;
+				AsyncSocket* pListenSocket;
+				AsyncSocket* pRecvSocket;
+				WSABUF _buf;
+				GAIA::U8 data[IODATA_MAXLEN];
+			};
+		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
+
+		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
+
+		#endif
+
+
 		/*!
 			@brief Async socket.
 
 				This async socket class support stream socket only(TCP).
 		*/
-		class AsyncSocket : public GAIA::Base
+		class AsyncSocket : public GAIA::RefObject
 		{
 			friend class AsyncDispatcher;
 
@@ -26,7 +55,7 @@ namespace GAIA
 			/*!
 				@brief Constructor.
 			*/
-			AsyncSocket();
+			AsyncSocket(GAIA::NETWORK::AsyncDispatcher& disp);
 
 			/*!
 				@brief Destructor.
@@ -64,6 +93,11 @@ namespace GAIA
 			GAIA::GVOID Shutdown(GAIA::N32 nShutdownFlag = GAIA::NETWORK::Socket::SSDF_RECV | GAIA::NETWORK::Socket::SSDF_SEND);
 
 			/*!
+				@brief Check current socket is create or not.
+			*/
+			GAIA::BL IsCreated() const;
+
+			/*!
 				@brief Bind async socket to a network address, include IP and port.
 
 				@remarks
@@ -76,7 +110,7 @@ namespace GAIA
 
 				@return If the socket is bound, return GAIA::True, or return GAIA::False.
 			*/
-			GAIA::BL IsBind() const;
+			GAIA::BL IsBinded() const;
 
 			/*!
 				@brief Connect async socket to a network address, include IP and port.
@@ -108,25 +142,9 @@ namespace GAIA
 			GAIA::GVOID Send(const GAIA::GVOID* pData, GAIA::NUM sSize);
 
 			/*!
-				@brief Recv data from peer.
-
-				@remarks
-					This function is async call.
-			*/
-			GAIA::GVOID Recv(GAIA::GVOID* pData, GAIA::NUM sSize);
-
-			/*!
-				@brief Flush send buffer.
-
-				@remarks
-					This function is async call.
-			*/
-			GAIA::GVOID Flush();
-
-			/*!
 				@brief Get socket file descriptor.
 			*/
-			GAIA::N32 GetFileDescriptor() const;
+			GAIA::N32 GetFD() const;
 
 			/*!
 				@brief Get socket's global address.
@@ -182,11 +200,6 @@ namespace GAIA
 			virtual GAIA::GVOID OnRecved(const GAIA::GVOID* pData, GAIA::NUM sSize){}
 
 			/*!
-				@brief On async socket flush callback.
-			*/
-			virtual GAIA::GVOID OnFlushed(){}
-
-			/*!
 				@brief On async socket shutdown callback.
 			*/
 			virtual GAIA::GVOID OnShutdowned(GAIA::N32 nShutdownFlag){}
@@ -198,9 +211,19 @@ namespace GAIA
 
 		private:
 			GAIA::GVOID init();
+			GAIA::GVOID Recv();
 
 		private:
+			GAIA::NETWORK::AsyncDispatcher* m_pDispatcher;
 			GAIA::NETWORK::Socket m_sock;
+			GAIA::SYNC::Lock m_lrSend;
+			GAIA::SYNC::Lock m_lrRecv;
+
+		#if GAIA_OS == GAIA_OS_WINDOWS
+			GAIA::GVOID* m_pfnAcceptEx;
+			GAIA::GVOID* m_pfnConnectEx;
+			GAIA::GVOID* m_pfnDisconnectEx;
+		#endif
 		};
 	}
 }
