@@ -242,10 +242,10 @@ namespace GAIA
 				pAcceptedSocket->Create();
 				// TODO: Need attach to IOCP?
 
-				GAIA::NETWORK::IOCPOverlapped* pIOCPOverlapped = this->alloc_iocpol();
-				pIOCPOverlapped->type = IOCP_OVERLAPPED_TYPE_ACCEPT;
-				pIOCPOverlapped->pListenSocket = pListenSocket;
-				pIOCPOverlapped->pAcceptedSocket = pAcceptedSocket;
+				GAIA::NETWORK::IOCPOverlapped* pOverlapped = this->alloc_iocpol();
+				pOverlapped->type = IOCP_OVERLAPPED_TYPE_ACCEPT;
+				pOverlapped->pListenSocket = pListenSocket;
+				pOverlapped->pAcceptedSocket = pAcceptedSocket;
 				pListenSocket->rise_ref();
 				pAcceptedSocket->rise_ref();
 
@@ -253,8 +253,8 @@ namespace GAIA
 				DWORD dwRecved = 0;
 				if(!((LPFN_ACCEPTEX)pListenSocket->m_pfnAcceptEx)(
 					pListenSocket->GetFD(), pAcceptedSocket->GetFD(),
-					pIOCPOverlapped->data, sizeof(pIOCPOverlapped->data) - nAddrLen - nAddrLen,
-					nAddrLen, nAddrLen, &dwRecved, (OVERLAPPED*)pIOCPOverlapped))
+					pOverlapped->data, sizeof(pOverlapped->data) - nAddrLen - nAddrLen,
+					nAddrLen, nAddrLen, &dwRecved, (OVERLAPPED*)pOverlapped))
 				{
 					DWORD err = WSAGetLastError();
 					if(err != ERROR_IO_PENDING)
@@ -262,7 +262,7 @@ namespace GAIA
 						pListenSocket->drop_ref();
 						pAcceptedSocket->drop_ref();
 						pAcceptedSocket->drop_ref();
-						this->release_iocpol(pIOCPOverlapped);
+						this->release_iocpol(pOverlapped);
 						GERR << "GAIA AsyncDispatcher IOCP error, cannot AcceptEx, ErrorCode = " << ::WSAGetLastError() << GEND;
 					}
 				}
@@ -617,11 +617,11 @@ namespace GAIA
 			return pRet;
 		}
 
-		GAIA::GVOID AsyncDispatcher::release_iocpol(GAIA::NETWORK::IOCPOverlapped* pIOCPOverlapped)
+		GAIA::GVOID AsyncDispatcher::release_iocpol(GAIA::NETWORK::IOCPOverlapped* pOverlapped)
 		{
-			GAST(pIOCPOverlapped != GNIL);
+			GAST(pOverlapped != GNIL);
 			GAIA::SYNC::Autolock al(m_lrIOCPOLPool);
-			return m_IOCPOLPool.release(pIOCPOverlapped);
+			return m_IOCPOLPool.release(pOverlapped);
 		}
 
 		GAIA::BL AsyncDispatcher::attach_socket_iocp(GAIA::NETWORK::AsyncSocket& sock)

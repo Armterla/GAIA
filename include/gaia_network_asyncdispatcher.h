@@ -28,6 +28,8 @@ namespace GAIA
 			static const GAIA::NUM DEFAULT_THREAD_COUNT = 4;
 			static const GAIA::NUM DEFAULT_ACCEPT_EVENT_COUNT = 4;
 			static const GAIA::NUM DEFAULT_RECV_EVENT_COUNT = 100;
+
+		public:
 			class Desc : public GAIA::Base
 			{
 			public:
@@ -134,7 +136,7 @@ namespace GAIA
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::NETWORK::IOCPOverlapped* alloc_iocpol();
-			GAIA::GVOID release_iocpol(GAIA::NETWORK::IOCPOverlapped* pIOCPOverlapped);
+			GAIA::GVOID release_iocpol(GAIA::NETWORK::IOCPOverlapped* pOverlapped);
 			GAIA::BL attach_socket_iocp(GAIA::NETWORK::AsyncSocket& sock);
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 

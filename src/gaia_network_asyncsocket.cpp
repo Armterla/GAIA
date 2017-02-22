@@ -110,16 +110,18 @@ namespace GAIA
 			this->SetPeerAddress(addr);
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			IOCPOverlapped* pIOCPOverlapped = m_pDispatcher->alloc_iocpol();
-			pIOCPOverlapped->type = IOCP_OVERLAPPED_TYPE_CONNECT;
-			pIOCPOverlapped->pAcceptedSocket = this;
+			m_pDispatcher->attach_socket_iocp(*this);
+
+			IOCPOverlapped* pOverlapped = m_pDispatcher->alloc_iocpol();
+			pOverlapped->type = IOCP_OVERLAPPED_TYPE_CONNECT;
+			pOverlapped->pAcceptedSocket = this;
 			this->rise_ref();
 
 			sockaddr_in saddr_in;
 			GAIA::NETWORK::addr2saddr(addr, &saddr_in);
 			GAIA::N32 nAddrLen = sizeof(SOCKADDR_IN) + 16;
 			DWORD dwSent;
-			if(!((LPFN_CONNECTEX)m_pfnConnectEx)(this->GetFD(), (sockaddr*)&saddr_in, nAddrLen, GNIL, 0, &dwSent, (OVERLAPPED*)pIOCPOverlapped))
+			if(!((LPFN_CONNECTEX)m_pfnConnectEx)(this->GetFD(), (sockaddr*)&saddr_in, nAddrLen, GNIL, 0, &dwSent, (OVERLAPPED*)pOverlapped))
 			{
 				// TODO:
 			}
@@ -133,12 +135,12 @@ namespace GAIA
 		GAIA::GVOID AsyncSocket::Disconnect()
 		{
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			IOCPOverlapped* pIOCPOverlapped = m_pDispatcher->alloc_iocpol();
-			pIOCPOverlapped->type = IOCP_OVERLAPPED_TYPE_DISCONNECT;
-			pIOCPOverlapped->pAcceptedSocket = this;
+			IOCPOverlapped* pOverlapped = m_pDispatcher->alloc_iocpol();
+			pOverlapped->type = IOCP_OVERLAPPED_TYPE_DISCONNECT;
+			pOverlapped->pAcceptedSocket = this;
 			this->rise_ref();
 
-			if(!((LPFN_DISCONNECTEX)m_pfnDisconnectEx)(this->GetFD(), (OVERLAPPED*)pIOCPOverlapped, 0, 0))
+			if(!((LPFN_DISCONNECTEX)m_pfnDisconnectEx)(this->GetFD(), (OVERLAPPED*)pOverlapped, 0, 0))
 			{
 				// TODO:
 			}
@@ -154,20 +156,20 @@ namespace GAIA
 			GAIA::SYNC::Autolock al(m_lrSend);
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			IOCPOverlapped* pIOCPOverlapped = m_pDispatcher->alloc_iocpol();
-			pIOCPOverlapped->type = IOCP_OVERLAPPED_TYPE_SEND;
-			pIOCPOverlapped->pAcceptedSocket = this;
-			pIOCPOverlapped->_buf.len = sizeof(pIOCPOverlapped->data);
+			IOCPOverlapped* pOverlapped = m_pDispatcher->alloc_iocpol();
+			pOverlapped->type = IOCP_OVERLAPPED_TYPE_SEND;
+			pOverlapped->pAcceptedSocket = this;
+			pOverlapped->_buf.len = sizeof(pOverlapped->data);
 			this->rise_ref();
 
 			DWORD dwTrans = 0;
 			DWORD dwFlag = 0;
-			if(!::WSASend(this->GetFD(), &pIOCPOverlapped->_buf, 1, &dwTrans, &dwFlag, (OVERLAPPED*)pIOCPOverlapped, GNIL))
+			if(!::WSASend(this->GetFD(), &pOverlapped->_buf, 1, &dwTrans, &dwFlag, (OVERLAPPED*)pOverlapped, GNIL))
 			{
 				DWORD err = WSAGetLastError();
 				if(err != ERROR_IO_PENDING)
 				{
-					m_pDispatcher->release_iocpol(pIOCPOverlapped);
+					m_pDispatcher->release_iocpol(pOverlapped);
 					this->drop_ref();
 				}
 			}
@@ -197,20 +199,20 @@ namespace GAIA
 		GAIA::GVOID AsyncSocket::Recv()
 		{
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			IOCPOverlapped* pIOCPOverlapped = m_pDispatcher->alloc_iocpol();
-			pIOCPOverlapped->type = IOCP_OVERLAPPED_TYPE_RECV;
-			pIOCPOverlapped->pAcceptedSocket = this;
-			pIOCPOverlapped->_buf.len = sizeof(pIOCPOverlapped->data);
+			IOCPOverlapped* pOverlapped = m_pDispatcher->alloc_iocpol();
+			pOverlapped->type = IOCP_OVERLAPPED_TYPE_RECV;
+			pOverlapped->pAcceptedSocket = this;
+			pOverlapped->_buf.len = sizeof(pOverlapped->data);
 			this->rise_ref();
 
 			DWORD dwTrans = 0;
 			DWORD dwFlag = 0;
-			if(!::WSARecv(this->GetFD(), &pIOCPOverlapped->_buf, 1, &dwTrans, &dwFlag, (OVERLAPPED*)pIOCPOverlapped, GNIL))
+			if(!::WSARecv(this->GetFD(), &pOverlapped->_buf, 1, &dwTrans, &dwFlag, (OVERLAPPED*)pOverlapped, GNIL))
 			{
 				DWORD err = WSAGetLastError();
 				if(err != ERROR_IO_PENDING)
 				{
-					m_pDispatcher->release_iocpol(pIOCPOverlapped);
+					m_pDispatcher->release_iocpol(pOverlapped);
 					this->drop_ref();
 				}
 			}

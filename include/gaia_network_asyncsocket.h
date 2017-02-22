@@ -16,7 +16,6 @@ namespace GAIA
 	namespace NETWORK
 	{
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			#define IODATA_MAXLEN 2000 // SO_MAX_MSG_SIZE
 			GAIA_ENUM_BEGIN(IOCP_OVERLAPPED_TYPE)
 				IOCP_OVERLAPPED_TYPE_STOP,
 				IOCP_OVERLAPPED_TYPE_CONNECT,
@@ -33,7 +32,7 @@ namespace GAIA
 				AsyncSocket* pListenSocket;
 				AsyncSocket* pAcceptedSocket;
 				WSABUF _buf;
-				GAIA::U8 data[IODATA_MAXLEN];
+				GAIA::U8 data[2000];
 			};
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 
