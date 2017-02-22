@@ -75,6 +75,7 @@ namespace GAIA
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
 			m_sock.Create(GAIA::NETWORK::Socket::SOCKET_TYPE_STREAM);
 		#endif
+
 			this->OnCreated(GAIA::True);
 		}
 

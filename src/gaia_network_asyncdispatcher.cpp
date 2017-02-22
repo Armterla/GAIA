@@ -137,10 +137,10 @@ namespace GAIA
 				// Listen sockets.
 				{
 					GAIA::SYNC::AutolockW al(m_rwListenSockets);
-					for(GAIA::CTN::Set<Node>::it it = m_listen_sockets.frontit(); !it.empty(); ++it)
+					for(GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*>::it it = m_listen_sockets.frontit(); !it.empty(); ++it)
 					{
-						Node& n = *it;
-						n.pSock->m_sock.Close();
+						GAIA::NETWORK::AsyncSocket* pSock = *it;
+						pSock->m_sock.Close();
 					}
 					m_listen_sockets.clear();
 				}
@@ -148,10 +148,10 @@ namespace GAIA
 				// Accepted sockets.
 				{
 					GAIA::SYNC::AutolockW al(m_rwAcceptedSockets);
-					for(GAIA::CTN::Set<Node>::it it = m_accepted_sockets.frontit(); !it.empty(); ++it)
+					for(GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*>::it it = m_accepted_sockets.frontit(); !it.empty(); ++it)
 					{
-						Node& n = *it;
-						n.pSock->m_sock.Close();
+						GAIA::NETWORK::AsyncSocket* pSock = *it;
+						pSock->m_sock.Close();
 					}
 					m_accepted_sockets.clear();
 				}
@@ -159,10 +159,10 @@ namespace GAIA
 				// Connected sockets.
 				{
 					GAIA::SYNC::AutolockW al(m_rwConnectedSockets);
-					for(GAIA::CTN::Set<Node>::it it = m_connected_sockets.frontit(); !it.empty(); ++it)
+					for(GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*>::it it = m_connected_sockets.frontit(); !it.empty(); ++it)
 					{
-						Node& n = *it;
-						n.pSock->m_sock.Close();
+						GAIA::NETWORK::AsyncSocket* pSock = *it;
+						pSock->m_sock.Close();
 					}
 					m_connected_sockets.clear();
 				}
@@ -189,6 +189,7 @@ namespace GAIA
 			// Close async controller in OS.
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			::CloseHandle(m_pIOCP);
+			m_pIOCP = GNIL;
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 			close(m_kqueue);
 			m_kqueue = GINVALID;
@@ -215,20 +216,17 @@ namespace GAIA
 			return GAIA::False;
 		}
 
-		GAIA::BL AsyncDispatcher::AddListenSocket(const GAIA::NETWORK::Addr& addr)
+		GAIA::BL AsyncDispatcher::AddListenSocket(const GAIA::NETWORK::Addr& addrListen)
 		{
 			GAIA::SYNC::AutolockW al(m_rwListenSockets);
 
-			Node nfinder;
-			nfinder.addrLocal = addr;
-			nfinder.pSock = GNIL;
-			if(m_listen_sockets.find(nfinder) != GNIL)
+			if(m_listen_sockets.find(addrListen) != GNIL)
 				return GAIA::False;
 
 			//
-			GAIA::NETWORK::AsyncSocket* pListenSocket = this->OnCreateListenSocket();
+			GAIA::NETWORK::AsyncSocket* pListenSocket = this->OnCreateListenSocket(addrListen);
 			pListenSocket->Create();
-			pListenSocket->Bind(addr);
+			pListenSocket->Bind(addrListen);
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			this->attach_socket_iocp(*pListenSocket);
@@ -238,14 +236,13 @@ namespace GAIA
 
 		#endif
 
-			nfinder.pSock = pListenSocket;
-			m_listen_sockets.insert(nfinder);
+			m_listen_sockets.insert(addrListen, pListenSocket);
 
 			pListenSocket->m_sock.Listen();
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			for(GAIA::NUM x = 0; x < m_desc.sAcceptEventCount; ++x)
-				this->request_accept(*pListenSocket);
+				this->request_accept(*pListenSocket, addrListen);
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
@@ -255,24 +252,10 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		GAIA::BL AsyncDispatcher::RemoveListenSocket(const GAIA::NETWORK::Addr& addr)
+		GAIA::BL AsyncDispatcher::RemoveListenSocket(const GAIA::NETWORK::Addr& addrListen)
 		{
 			GAIA::SYNC::AutolockW al(m_rwListenSockets);
-
-			Node nfinder;
-			nfinder.addrLocal = addr;
-			nfinder.pSock = GNIL;
-			Node* pFinded = m_listen_sockets.find(nfinder);
-			if(pFinded == GNIL)
-				return GAIA::False;
-
-			pFinded->pSock->Shutdown();
-			pFinded->pSock->Close();
-			pFinded->pSock->drop_ref();
-
-			m_listen_sockets.erase(nfinder);
-
-			return GAIA::True;
+			return m_listen_sockets.erase(addrListen);
 		}
 
 		GAIA::BL AsyncDispatcher::RemoveListenSocketAll()
@@ -281,26 +264,23 @@ namespace GAIA
 			if(m_listen_sockets.empty())
 				return GAIA::False;
 
-			for(GAIA::CTN::Set<Node>::it it = m_listen_sockets.frontit(); !it.empty(); ++it)
+			for(GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*>::it it = m_listen_sockets.frontit(); !it.empty(); ++it)
 			{
-				Node& n = *it;
-				n.pSock->Shutdown();
-				n.pSock->Close();
-				n.pSock->drop_ref();
+				GAIA::NETWORK::AsyncSocket* pSock = *it;
+				pSock->Shutdown();
+				pSock->Close();
+				pSock->drop_ref();
 			}
 			m_listen_sockets.clear();
 
 			return GAIA::True;
 		}
 
-		GAIA::BL AsyncDispatcher::IsExistListenSocket(const GAIA::NETWORK::Addr& addr) const
+		GAIA::BL AsyncDispatcher::IsExistListenSocket(const GAIA::NETWORK::Addr& addrListen) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwListenSockets);
-			Node nfinder;
-			nfinder.addrLocal = addr;
-			nfinder.pSock = GNIL;
-			const Node* pFinded = m_listen_sockets.find(nfinder);
-			if(pFinded == GNIL)
+			const GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*>::_datatype* ppFinded = m_listen_sockets.find(addrListen);
+			if(ppFinded == GNIL)
 				return GAIA::False;
 			return GAIA::True;
 		}
@@ -314,25 +294,19 @@ namespace GAIA
 		GAIA::BL AsyncDispatcher::CollectListenSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwListenSockets);
-			for(GAIA::CTN::Set<Node>::const_it it = m_listen_sockets.const_frontit(); !it.empty(); ++it)
+			for(GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*>::const_it it = m_listen_sockets.const_frontit(); !it.empty(); ++it)
 			{
-				const Node& n = *it;
-				if(!cb.OnCollectAsyncSocket(*GCCAST(AsyncDispatcher*)(this), *n.pSock))
+				GAIA::NETWORK::AsyncSocket* pSock = *it;
+				if(!cb.OnCollectAsyncSocket(*GCCAST(AsyncDispatcher*)(this), *pSock))
 					return GAIA::False;
 			}
 			return GAIA::True;
 		}
 
-		GAIA::BL AsyncDispatcher::IsExistAcceptedSocket(const GAIA::NETWORK::Addr& addr) const
+		GAIA::BL AsyncDispatcher::IsExistAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwAcceptedSockets);
-			Node nfinder;
-			nfinder.addrLocal = addr;
-			nfinder.pSock = GNIL;
-			const Node* pFinded  = m_accepted_sockets.find(nfinder);
-			if(pFinded == GNIL)
-				return GAIA::False;
-			return GAIA::True;
+			return m_accepted_sockets.find(&sock) != GNIL;
 		}
 
 		GAIA::NUM AsyncDispatcher::GetAcceptedSocketCount() const
@@ -344,25 +318,20 @@ namespace GAIA
 		GAIA::BL AsyncDispatcher::CollectAcceptedSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwAcceptedSockets);
-			for(GAIA::CTN::Set<Node>::const_it it = m_accepted_sockets.const_frontit(); !it.empty(); ++it)
+			for(GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*>::const_it it = m_accepted_sockets.const_frontit(); !it.empty(); ++it)
 			{
-				const Node& n = *it;
-				if(!cb.OnCollectAsyncSocket(*GCCAST(AsyncDispatcher*)(this), *n.pSock))
+				GAIA::NETWORK::AsyncSocket* pSock = *it;
+				GAST(pSock != GNIL);
+				if(!cb.OnCollectAsyncSocket(*GCCAST(AsyncDispatcher*)(this), *pSock))
 					return GAIA::False;
 			}
 			return GAIA::True;
 		}
 
-		GAIA::BL AsyncDispatcher::IsExistConnectedSocket(const GAIA::NETWORK::Addr& addr) const
+		GAIA::BL AsyncDispatcher::IsExistConnectedSocket(GAIA::NETWORK::AsyncSocket& sock) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwConnectedSockets);
-			Node nfinder;
-			nfinder.addrLocal = addr;
-			nfinder.pSock = GNIL;
-			const Node* pFinded  = m_connected_sockets.find(nfinder);
-			if(pFinded == GNIL)
-				return GAIA::False;
-			return GAIA::True;
+			return m_connected_sockets.find(&sock) != GNIL;
 		}
 
 		GAIA::NUM AsyncDispatcher::GetConnectedSocketCount() const
@@ -374,10 +343,11 @@ namespace GAIA
 		GAIA::BL AsyncDispatcher::CollectConnectedSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwConnectedSockets);
-			for(GAIA::CTN::Set<Node>::const_it it = m_connected_sockets.const_frontit(); !it.empty(); ++it)
+			for(GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*>::const_it it = m_connected_sockets.const_frontit(); !it.empty(); ++it)
 			{
-				const Node& n = *it;
-				if(!cb.OnCollectAsyncSocket(*GCCAST(AsyncDispatcher*)(this), *n.pSock))
+				GAIA::NETWORK::AsyncSocket* pSock = *it;
+				GAST(pSock != GNIL);
+				if(!cb.OnCollectAsyncSocket(*GCCAST(AsyncDispatcher*)(this), *pSock))
 					return GAIA::False;
 			}
 			return GAIA::True;
@@ -399,51 +369,31 @@ namespace GAIA
 		GAIA::BL AsyncDispatcher::AddAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock)
 		{
 			GAIA::SYNC::AutolockW al(m_rwAcceptedSockets);
-			Node nfinder;
-			GAIA::BL bResult = sock.GetLocalAddress(nfinder.addrLocal);
-			GAST(bResult);
-			nfinder.pSock = &sock;
-			if(m_accepted_sockets.find(nfinder) != GNIL)
+			if(m_accepted_sockets.find(&sock) != GNIL)
 				return GAIA::False;
-			m_accepted_sockets.insert(nfinder);
+			m_accepted_sockets.insert(&sock);
 			return GAIA::True;
 		}
 
 		GAIA::BL AsyncDispatcher::RemoveAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock)
 		{
 			GAIA::SYNC::AutolockW al(m_rwAcceptedSockets);
-			Node nfinder;
-			GAIA::BL bResult = sock.GetLocalAddress(nfinder.addrLocal);
-			GAST(bResult);
-			nfinder.pSock = &sock;
-			if(!m_accepted_sockets.erase(nfinder))
-				return GAIA::False;
-			return GAIA::True;
+			return m_accepted_sockets.erase(&sock) != GNIL;
 		}
 
 		GAIA::BL AsyncDispatcher::AddConnectedSocket(GAIA::NETWORK::AsyncSocket& sock)
 		{
 			GAIA::SYNC::AutolockW al(m_rwConnectedSockets);
-			Node nfinder;
-			GAIA::BL bResult = sock.GetLocalAddress(nfinder.addrLocal);
-			GAST(bResult);
-			nfinder.pSock = &sock;
-			if(m_connected_sockets.find(nfinder) != GNIL)
+			if(m_connected_sockets.find(&sock) != GNIL)
 				return GAIA::False;
-			m_connected_sockets.insert(nfinder);
+			m_connected_sockets.insert(&sock);
 			return GAIA::True;
 		}
 
 		GAIA::BL AsyncDispatcher::RemoveConnectedSocket(GAIA::NETWORK::AsyncSocket& sock)
 		{
 			GAIA::SYNC::AutolockW al(m_rwConnectedSockets);
-			Node nfinder;
-			GAIA::BL bResult = sock.GetLocalAddress(nfinder.addrLocal);
-			GAST(bResult);
-			nfinder.pSock = &sock;
-			if(!m_connected_sockets.erase(nfinder))
-				return GAIA::False;
-			return GAIA::True;
+			return m_connected_sockets.erase(&sock) != GNIL;
 		}
 
 		GAIA::BL AsyncDispatcher::Execute()
@@ -473,7 +423,7 @@ namespace GAIA
 						this->request_recv(*pOverlapped->pDataSocket);
 
 					// Re-request.
-					this->request_accept(*pOverlapped->pListenSocket);
+					this->request_accept(*pOverlapped->pListenSocket, addrListen);
 				}
 				else if(pOverlapped->type == GAIA::NETWORK::IOCP_OVERLAPPED_TYPE_CONNECT)
 				{
@@ -633,9 +583,9 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		GAIA::GVOID AsyncDispatcher::request_accept(GAIA::NETWORK::AsyncSocket& listensock)
+		GAIA::GVOID AsyncDispatcher::request_accept(GAIA::NETWORK::AsyncSocket& listensock, const GAIA::NETWORK::Addr& addrListen)
 		{
-			GAIA::NETWORK::AsyncSocket* pAcceptedSocket = this->OnCreateAcceptedSocket();
+			GAIA::NETWORK::AsyncSocket* pAcceptedSocket = this->OnCreateAcceptedSocket(addrListen);
 			pAcceptedSocket->Create();
 
 			GAIA::NETWORK::IOCPOverlapped* pOverlapped = this->alloc_iocpol();
