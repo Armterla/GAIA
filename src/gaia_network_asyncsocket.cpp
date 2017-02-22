@@ -164,7 +164,7 @@ namespace GAIA
 
 			DWORD dwTrans = 0;
 			DWORD dwFlag = 0;
-			if(!::WSASend(this->GetFD(), &pOverlapped->_buf, 1, &dwTrans, &dwFlag, (OVERLAPPED*)pOverlapped, GNIL))
+			if(!::WSASend(this->GetFD(), &pOverlapped->_buf, 1, &dwTrans, dwFlag, (OVERLAPPED*)pOverlapped, GNIL))
 			{
 				DWORD err = WSAGetLastError();
 				if(err != ERROR_IO_PENDING)
