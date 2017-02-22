@@ -191,6 +191,8 @@
 #include	"gaia_digit_diff.h"
 
 #include 	"gaia_xml_xmlbase.h"
+#include	"gaia_xml_xmlreader.h"
+#include	"gaia_xml_xmlwriter.h"
 #include 	"gaia_xml_xmlfactorydesc.h"
 #include 	"gaia_xml_xmlnode.h"
 #include 	"gaia_xml_xml.h"
@@ -203,6 +205,8 @@
 #include 	"gaia_html_htmlfactory.h"
 
 #include	"gaia_json_jsonbase.h"
+#include	"gaia_json_jsonreader.h"
+#include	"gaia_json_jsonwriter.h"
 #include	"gaia_json_jsonfactorydesc.h"
 #include	"gaia_json_jsonnode.h"
 #include	"gaia_json_json.h"

@@ -38,6 +38,8 @@ namespace GAIA
 
 	namespace XML
 	{
+		class XMLReader;
+		class XMLWriter;
 		class XMLFactoryDesc;
 		class XMLFmt;
 		class XMLProp;
@@ -58,6 +60,8 @@ namespace GAIA
 
 	namespace JSON
 	{
+		class JsonReader;
+		class JsonWriter;
 		class JsonFactoryDesc;
 		class JsonProp;
 		class JsonNode;
