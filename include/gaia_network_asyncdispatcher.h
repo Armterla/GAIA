@@ -11,6 +11,7 @@
 #include "gaia_algo_memory.h"
 #include "gaia_ctn_vector.h"
 #include "gaia_ctn_set.h"
+#include "gaia_ctn_map.h"
 #include "gaia_thread.h"
 #include "gaia_network_asyncsocket.h"
 
@@ -22,8 +23,8 @@ namespace GAIA
 		{
 		public:
 			static const GAIA::NUM DEFAULT_THREAD_COUNT = 4;
-			static const GAIA::NUM DEFAULT_ACCEPT_EVENT_COUNT = 4;
-			static const GAIA::NUM DEFAULT_RECV_EVENT_COUNT = 100;
+			static const GAIA::NUM DEFAULT_ACCEPT_EVENT_COUNT = 10;
+			static const GAIA::NUM DEFAULT_RECV_EVENT_COUNT = 1;
 
 		public:
 			GINL GAIA::GVOID reset()
@@ -73,62 +74,42 @@ namespace GAIA
 			GAIA::BL End();
 			GAIA::BL IsBegin() const;
 
-			GAIA::BL AddListenSocket(const GAIA::NETWORK::Addr& addr);
-			GAIA::BL RemoveListenSocket(const GAIA::NETWORK::Addr& addr);
+			GAIA::BL AddListenSocket(const GAIA::NETWORK::Addr& addrListen);
+			GAIA::BL RemoveListenSocket(const GAIA::NETWORK::Addr& addrListen);
 			GAIA::BL RemoveListenSocketAll();
-			GAIA::BL IsExistListenSocket(const GAIA::NETWORK::Addr& addr) const;
+			GAIA::BL IsExistListenSocket(const GAIA::NETWORK::Addr& addrListen) const;
 			GAIA::NUM GetListenSocketCount() const;
 			GAIA::BL CollectListenSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const;
 
-			GAIA::BL IsExistAcceptedSocket(const GAIA::NETWORK::Addr& addr) const;
+			GAIA::BL IsExistAcceptingSocket(GAIA::NETWORK::AsyncSocket& sock) const;
+			GAIA::NUM GetAcceptingSocketCount() const;
+			GAIA::BL CollectAcceptingSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const;
+
+			GAIA::BL IsExistAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock) const;
 			GAIA::NUM GetAcceptedSocketCount() const;
 			GAIA::BL CollectAcceptedSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const;
 
-			GAIA::BL IsExistConnectedSocket(const GAIA::NETWORK::Addr& addr) const;
+			GAIA::BL IsExistConnectedSocket(GAIA::NETWORK::AsyncSocket& sock) const;
 			GAIA::NUM GetConnectedSocketCount() const;
 			GAIA::BL CollectConnectedSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const;
 
 		protected:
-			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket()
+			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
 				GAIA::NETWORK::AsyncSocket* pListenSocket = gnew GAIA::NETWORK::AsyncSocket(*this, ASYNC_SOCKET_TYPE_LISTEN);
 				return pListenSocket;
 			}
-			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptedSocket()
+			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptingSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
-				GAIA::NETWORK::AsyncSocket* pAcceptedSocket = gnew GAIA::NETWORK::AsyncSocket(*this, ASYNC_SOCKET_TYPE_ACCEPTED);
-				return pAcceptedSocket;
+				GAIA::NETWORK::AsyncSocket* pAcceptingSocket = gnew GAIA::NETWORK::AsyncSocket(*this, ASYNC_SOCKET_TYPE_ACCEPTING);
+				return pAcceptingSocket;
 			}
 			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen){return GAIA::False;}
 
 		private:
-			class Node : public GAIA::Base
-			{
-			public:
-				GINL GAIA::GVOID reset()
-				{
-					addrLocal.reset();
-					pSock = GNIL;
-				}
-				GINL GAIA::N32 compare(const Node& src) const
-				{
-					GAIA::N32 nCmp = addrLocal.compare(src.addrLocal);
-					if(nCmp != 0)
-						return nCmp;
-					if(pSock < src.pSock)
-						return -1;
-					else if(pSock > src.pSock)
-						return +1;
-					return 0;
-				}
-				GCLASS_COMPARE_BYCOMPARE(Node)
-			public:
-				GAIA::NETWORK::Addr addrLocal;
-				GAIA::NETWORK::AsyncSocket* pSock;
-			};
-
-		private:
 			GAIA::GVOID init();
+			GAIA::BL AddAcceptingSocket(GAIA::NETWORK::AsyncSocket& sock);
+			GAIA::BL RemoveAcceptingSocket(GAIA::NETWORK::AsyncSocket& sock);
 			GAIA::BL AddAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock);
 			GAIA::BL RemoveAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock);
 			GAIA::BL AddConnectedSocket(GAIA::NETWORK::AsyncSocket& sock);
@@ -139,6 +120,8 @@ namespace GAIA
 			GAIA::NETWORK::IOCPOverlapped* alloc_iocpol();
 			GAIA::GVOID release_iocpol(GAIA::NETWORK::IOCPOverlapped* pOverlapped);
 			GAIA::BL attach_socket_iocp(GAIA::NETWORK::AsyncSocket& sock);
+			GAIA::GVOID request_accept(GAIA::NETWORK::AsyncSocket& listensock, const GAIA::NETWORK::Addr& addrListen);
+			GAIA::GVOID request_recv(GAIA::NETWORK::AsyncSocket& datasock);
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
@@ -150,11 +133,13 @@ namespace GAIA
 			GAIA::NETWORK::AsyncDispatcherDesc m_desc;
 
 			GAIA::SYNC::LockRW m_rwListenSockets;
-			GAIA::CTN::Set<Node> m_listen_sockets;
+			GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*> m_listen_sockets;
+			GAIA::SYNC::LockRW m_rwAcceptingSockets;
+			GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*> m_accepting_sockets;
 			GAIA::SYNC::LockRW m_rwAcceptedSockets;
-			GAIA::CTN::Set<Node> m_accepted_sockets;
+			GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*> m_accepted_sockets;
 			GAIA::SYNC::LockRW m_rwConnectedSockets;
-			GAIA::CTN::Set<Node> m_connected_sockets;
+			GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*> m_connected_sockets;
 
 			GAIA::CTN::Vector<GAIA::THREAD::Thread*> m_threads;
 			
@@ -162,6 +147,8 @@ namespace GAIA
 			GAIA::GVOID* m_pIOCP;
 			GAIA::CTN::Pool<GAIA::NETWORK::IOCPOverlapped> m_IOCPOLPool;
 			GAIA::SYNC::Lock m_lrIOCPOLPool;
+			GAIA::SYNC::LockRW m_rwPostAcceptAble;
+			GAIA::BL m_bPostAcceptAble;
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 			GAIA::N32 m_kqueue;
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
