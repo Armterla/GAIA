@@ -5,7 +5,7 @@ namespace TEST
 {
 	static const GAIA::NUM LISTEN_SOCKET_COUNT = 10;
 	static const GAIA::NUM DATA_SOCKET_COUNT = 1000;
-	static const GAIA::NUM DATA_TRANSFER_COUNT = 1000;
+	static const GAIA::NUM DATA_TRANSFER_COUNT = 100;
 	static const GAIA::NUM START_PORT = 10000;
 
 	class AsyncSocketEx;
@@ -163,10 +163,10 @@ namespace TEST
 			m_ctx->listListenSockets[sIndex] = pr;
 			return pListenSocket;
 		}
-		virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptedSocket(const GAIA::NETWORK::Addr& addrListen)
+		virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptingSocket(const GAIA::NETWORK::Addr& addrListen)
 		{
-			AsyncSocketEx* pAcceptedSocket = gnew AsyncSocketEx(*m_ctx, *this, GAIA::NETWORK::ASYNC_SOCKET_TYPE_ACCEPTED);
-			return pAcceptedSocket;
+			AsyncSocketEx* pAcceptingSocket = gnew AsyncSocketEx(*m_ctx, *this, GAIA::NETWORK::ASYNC_SOCKET_TYPE_ACCEPTING);
+			return pAcceptingSocket;
 		}
 		virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen)
 		{
@@ -261,6 +261,7 @@ namespace TEST
 		}
 
 		// Multi connect, send, receive, close.
+		if(false)
 		{
 			AsyncCtx ctx;
 			ctx.listListenSockets.reserve(LISTEN_SOCKET_COUNT);
@@ -281,10 +282,12 @@ namespace TEST
 					addrListen.ip.fromstring("127.0.0.1");
 					addrListen.uPort = START_PORT;
 					for(GAIA::NUM x = 0; x < LISTEN_SOCKET_COUNT; ++x)
+						ctx.listListenSockets.push_back(GAIA::CTN::Pair<GAIA::NETWORK::Addr, AsyncSocketEx*>(addrListen, GNIL));
+
+					for(GAIA::NUM x = 0; x < LISTEN_SOCKET_COUNT; ++x)
 					{
 						disp.AddListenSocket(addrListen);
 						addrListen.uPort++;
-						ctx.listListenSockets.push_back(GAIA::CTN::Pair<GAIA::NETWORK::Addr, AsyncSocketEx*>(addrListen, GNIL));
 					}
 
 					// Create connected socket.
@@ -349,15 +352,45 @@ namespace TEST
 						}
 					}
 
+					// Wait no more callback.
+					{
+						GAIA::SYNC::gsleep(2000);
+					}
+
 					// Check receive.
 					for(GAIA::NUM x = 0; x < ctx.listAcceptedSockets.size(); ++x)
 					{
-
 					}
 
 					// Check callback workflow result.
 					{
+						// Listen.
+						{
+							GAIA::SYNC::Autolock al(ctx.lrListenSocket);
+							for(GAIA::NUM x = 0; x < ctx.listListenSockets.size(); ++x)
+							{
+								AsyncSocketEx* pSock = ctx.listListenSockets[x].back();
+							}
+						}
 
+						// Connected.
+						{
+							GAIA::SYNC::Autolock al(ctx.lrConnectedSocket);
+							for(GAIA::NUM x = 0; x < ctx.listConnectedSockets.size(); ++x)
+							{
+								AsyncSocketEx* pSock = ctx.listConnectedSockets[x];
+							}
+						}
+
+						// Accepted.
+						{
+							GAIA::SYNC::Autolock al(ctx.lrAcceptedSocket);
+							for(GAIA::NUM x = 0; x < ctx.listAcceptedSockets.size(); ++x)
+							{
+								AsyncSocketEx* pSock = ctx.listAcceptedSockets[x];
+								TAST((GAIA::N64)pSock->m_nRecvCount[1] > 0);
+							}
+						}
 					}
 
 					// Shutdown.
