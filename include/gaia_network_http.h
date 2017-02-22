@@ -95,13 +95,33 @@ namespace GAIA
 		class HttpDesc : public GAIA::Base
 		{
 		public:
-			GAIA::GVOID reset(){}
+			static const GAIA::NUM DEFAULT_THREAD_COUNT = 4;
+			static const GAIA::NUM DEFAULT_MAX_PARALLEL_COUNT = 1000;
+			static const GAIA::NUM DEFAULT_MAX_COOKIC_COUNT = 10000;
+			static const GAIA::NUM DEFAULT_MAX_COOKIC_SIZE = 10000;
+
+		public:
+			GAIA::GVOID reset()
+			{
+				sThreadCount = DEFAULT_THREAD_COUNT;
+				sMaxParallelCount = DEFAULT_MAX_PARALLEL_COUNT;
+				sMaxCookicCount = DEFAULT_MAX_COOKIC_COUNT;
+				sMaxCookicSize = DEFAULT_MAX_COOKIC_SIZE;
+			}
 			GAIA::BL check() const
 			{
+				if(sThreadCount <= 0)
+					return GAIA::False;
+				if(sMaxParallelCount <= 0)
+					return GAIA::False;
+				if(sMaxCookicCount < 0)
+					return GAIA::False;
+				if(sMaxCookicSize < 0)
+					return GAIA::False;
 				return GAIA::True;
 			}
 		public:
-			GAIA::NUM sMaxThreadCount;
+			GAIA::NUM sThreadCount;
 			GAIA::NUM sMaxParallelCount;
 			GAIA::NUM sMaxCookicCount;
 			GAIA::NUM sMaxCookicSize;
