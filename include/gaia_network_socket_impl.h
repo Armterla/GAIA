@@ -6,6 +6,7 @@
 #include "gaia_algo_memory.h"
 #include "gaia_network_ip.h"
 #include "gaia_network_addr.h"
+#include "gaia_network_base.h"
 #include "gaia_network_socket.h"
 
 #if GAIA_OS == GAIA_OS_WINDOWS
@@ -330,13 +331,13 @@ namespace GAIA
 			if(!addr.ip.check())
 				saddr.sin_addr.s_addr = 0;
 			else
-				addr2saddr(addr, &saddr);
+				GAIA::NETWORK::addr2saddr(addr, &saddr);
 
 			// Construct network port.
 			if(addr.uPort == 0)
 				saddr.sin_port = 0;
 			else
-				saddr.sin_port = port2sport((GAIA::U16)addr.uPort);
+				saddr.sin_port = GAIA::NETWORK::port2sport((GAIA::U16)addr.uPort);
 
 			//
 			if(bind(m_nSocket, (sockaddr*)&saddr, sizeof(saddr)) == GINVALID)
@@ -533,7 +534,7 @@ namespace GAIA
 			sockaddr_in saddr;
 			zeromem(&saddr);
 			saddr.sin_family = AF_INET;
-			addr2saddr(addr, &saddr);
+			GAIA::NETWORK::addr2saddr(addr, &saddr);
 
 			if(connect(m_nSocket, (sockaddr*)&saddr, sizeof(saddr)) == GINVALID)
 			{
@@ -654,7 +655,7 @@ namespace GAIA
 			sockaddr_in saddr;
 			zeromem(&saddr);
 			saddr.sin_family = AF_INET;
-			addr2saddr(addr, &saddr);
+			GAIA::NETWORK::addr2saddr(addr, &saddr);
 
 		#if GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_UNIX
 			GAIA::N32 nSended = sendto(m_nSocket, (const GAIA::CH*)p, nSize, nFlag | MSG_NOSIGNAL, (sockaddr*)&saddr, sizeof(saddr));
@@ -700,7 +701,7 @@ namespace GAIA
 			zeromem(&saddr);
 			saddr.sin_family = AF_INET;
 			if(addr.check())
-				addr2saddr(addr, &saddr);
+				GAIA::NETWORK::addr2saddr(addr, &saddr);
 
 			socklen_t recvfrom_addr_len = sizeof(saddr);
 			GAIA::N32 nRecved = (GAIA::N32)recvfrom(m_nSocket, (GAIA::CH*)p, nSize, nFlag, (sockaddr*)&saddr, &recvfrom_addr_len);
@@ -720,7 +721,7 @@ namespace GAIA
 				THROW_LASTERROR;
 			}
 
-			saddr2addr(&saddr, addr);
+			GAIA::NETWORK::saddr2addr(&saddr, addr);
 
 			return nRecved;
 		}
@@ -749,7 +750,7 @@ namespace GAIA
 			if(getpeername(m_nSocket, (sockaddr*)&saddr, &sock_addr_len) != 0)
 				return GAIA::False;
 
-			saddr2addr(&saddr, addr);
+			GAIA::NETWORK::saddr2addr(&saddr, addr);
 
 			return GAIA::True;
 		}
@@ -765,7 +766,7 @@ namespace GAIA
 			if(getsockname(m_nSocket, (sockaddr*)&saddr, &sock_addr_len) != 0)
 				return GAIA::False;
 
-			saddr2addr(&saddr, addr);
+			GAIA::NETWORK::saddr2addr(&saddr, addr);
 
 			return GAIA::True;
 		}
