@@ -21,18 +21,50 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
-		class HttpRequest : public GAIA::Base
+		class HttpRequest : public GAIA::RefObject
 		{
 			friend class Http;
 
 		public:
-			HttpRequest();
-			~HttpRequest();
 
+			// Constructor and destructor.
+			HttpRequest(GAIA::NETWORK::Http& http);
+			~HttpRequest();
+			Http& GetHttp();
+
+			// Base http operation.
+			GAIA::GVOID SetMethod(GAIA::NETWORK::HTTP_METHOD method);
+			GAIA::NETWORK::HTTP_METHOD GetMethod() const;
+			GAIA::GVOID SetURL(const GAIA::CH* pszURL);
+			const GAIA::CH* GetURL() const;
+			GAIA::GVOID SetHead(const GAIA::NETWORK::HttpHead& pHead);
+			const GAIA::NETWORK::HttpHead& GetHead() const;
+			GAIA::NETWORK::HttpHead& GetHead();
+
+			// Buffer control.
+			GAIA::BL BindBuffer(const GAIA::GVOID* p, GAIA::NUM sSize); // If p == GNIL, will allocate buffer.
+			const GAIA::GVOID* GetBuffer() const;
+			GAIA::NUM GetBufferSize() const;
+
+			// Work flow control.
+			GAIA::BL Request();
+			GAIA::BL Cancel();
+			GAIA::BL Pause();
+			GAIA::BL Resume();
+			GAIA::BL Wait(GAIA::U32 uMilliSeconds);
+
+			// Query result.
+			GAIA::BL IsComplete() const;
+			GAIA::N64 GetResultCode() const;
+			GAIA::NUM GetResultSize() const;
+
+			// Mode control.
 			GAIA::GVOID SetAsync(GAIA::BL bAsync);
 			GAIA::BL GetAsync() const;
 			GAIA::GVOID SetTimeout(const GAIA::U64& uTimeout);
 			const GAIA::U64& GetTimeout() const;
+
+			// Cookic control.
 			GAIA::GVOID EnableWriteCookicRAM(GAIA::BL bEnable);
 			GAIA::BL IsEnableWriteCookicRAM() const;
 			GAIA::GVOID EnableWriteCookicFile(GAIA::BL bEnable);
@@ -45,41 +77,19 @@ namespace GAIA
 			GAIA::BL IsEnableReadCookicFile() const;
 			GAIA::GVOID SetReadCookicTime(const GAIA::U64& uTime);
 			const GAIA::U64& GetReadCookicTime() const;
-			GAIA::GVOID SetURL(const GAIA::CH* pszURL);
-			const GAIA::CH* GetURL() const;
-			GAIA::GVOID SetHead(const GAIA::NETWORK::HttpHead* pHead);
-			const GAIA::NETWORK::HttpHead* GetHead() const;
 
-		private:
-			GAIA::CH* m_pszURL;
-			GAIA::NETWORK::HttpHead* m_pHead;
-		};
+		protected:
 
-		class HttpResponse : public GAIA::RefObject
-		{
-			friend class Http;
-
-		public:
-			HttpResponse(){}
-			~HttpResponse(){}
-
-			const GAIA::NETWORK::HttpRequest* GetRequest() const;
-			const GAIA::NETWORK::HttpHead* GetHead() const;
-			GAIA::N16 GetResultCode() const;
-
-		public:
-			virtual GAIA::BL OnProgress(const GAIA::GVOID* pData, GAIA::NUM sDataSize){return GAIA::False;}
+			// Stream like read write callback.
 			virtual GAIA::GVOID OnBegin(){}
-			virtual GAIA::GVOID OnComplete(const GAIA::GVOID* pData, GAIA::NUM sDataSize){}
 			virtual GAIA::GVOID OnEnd(GAIA::BL bCanceled){}
+			virtual GAIA::BL OnWrite(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){return GAIA::False;}
+			virtual GAIA::BL OnRead(GAIA::N64 lOffset, GAIA::GVOID* pData, GAIA::NUM sMaxDataSize, GAIA::NUM& sPracticeDataSize){return GAIA::False;}
 
 		private:
-			GAIA::GVOID SetRequest(const GAIA::NETWORK::HttpRequest* pRequest);
-			GAIA::GVOID SetHead(const GAIA::NETWORK::HttpHead* pHead);
-			GAIA::GVOID SetResultCode(GAIA::N64 nResultCode);
+			GAIA::NETWORK::HttpURL m_url;
+			GAIA::NETWORK::HttpHead m_head;
 
-		private:
-			GAIA::N16 m_nResultCode;
 		};
 
 		class HttpDesc : public GAIA::Base
@@ -99,6 +109,8 @@ namespace GAIA
 
 		class Http : public GAIA::Base
 		{
+			friend class HttpRequest;
+
 		public:
 			Http();
 			~Http();
@@ -112,13 +124,6 @@ namespace GAIA
 			GAIA::BL End();
 			GAIA::BL IsBegin() const;
 
-			GAIA::GVOID Put(const GAIA::NETWORK::HttpRequest& req, GAIA::NETWORK::HttpResponse& resp, const GAIA::GVOID* pData, GAIA::NUM sDataSize);
-			GAIA::GVOID Post(const GAIA::NETWORK::HttpRequest& req, GAIA::NETWORK::HttpResponse& resp, const GAIA::GVOID* pData, GAIA::NUM sDataSize);
-			GAIA::GVOID Get(const GAIA::NETWORK::HttpRequest& req, GAIA::NETWORK::HttpResponse& resp);
-			GAIA::GVOID Head(const GAIA::NETWORK::HttpRequest& req, GAIA::NETWORK::HttpResponse& resp);
-			GAIA::GVOID Delete(const GAIA::NETWORK::HttpRequest& req, GAIA::NETWORK::HttpResponse& resp);
-			GAIA::GVOID Cancel(GAIA::NETWORK::HttpResponse& resp);
-
 			GAIA::GVOID EnableWriteCookicRAM(GAIA::BL bEnable);
 			GAIA::BL IsEnableWriteCookicRAM() const;
 			GAIA::GVOID EnableWriteCookicFile(GAIA::BL bEnable);
@@ -130,6 +135,8 @@ namespace GAIA
 			GAIA::BL CleanupCookic(GAIA::BL bMem = GAIA::True, GAIA::BL bFile = GAIA::True, const GAIA::U64& uBeyondTime = 0);
 
 		private:
+			GAIA::BL m_bCreated;
+			HttpDesc m_desc;
 		};
 	}
 }
