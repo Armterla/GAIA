@@ -78,7 +78,7 @@ namespace GAIA
 
 				@return Return current AsyncSocket's AsyncDispatcher.
 			*/
-			GAIA::NETWORK::AsyncDispatcher* GetDispatcher() const{return m_pDispatcher;}
+			GAIA::NETWORK::AsyncDispatcher& GetDispatcher() const{return *m_pDispatcher;}
 
 			/*!
 				@brief Get socket type.
