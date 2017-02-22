@@ -261,7 +261,6 @@ namespace TEST
 		}
 
 		// Multi connect, send, receive, close.
-		if(false)
 		{
 			AsyncCtx ctx;
 			ctx.listListenSockets.reserve(LISTEN_SOCKET_COUNT);
