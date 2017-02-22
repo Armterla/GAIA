@@ -42,6 +42,7 @@ namespace GAIA
 
 		GAIA_ENUM_BEGIN(ASYNC_SOCKET_TYPE)
 			ASYNC_SOCKET_TYPE_CONNECTED,
+			ASYNC_SOCKET_TYPE_ACCEPTING,
 			ASYNC_SOCKET_TYPE_ACCEPTED,
 			ASYNC_SOCKET_TYPE_LISTEN,
 		GAIA_ENUM_END(ASYNC_SOCKET_TYPE)
@@ -249,6 +250,7 @@ namespace GAIA
 
 		private:
 			GAIA::GVOID init();
+			GAIA::GVOID SetAsyncSocketType(GAIA::NETWORK::ASYNC_SOCKET_TYPE socktype){m_socktype = socktype;}
 			GAIA::GVOID SetPeerAddress(const GAIA::NETWORK::Addr& addr){m_sock.SetPeerAddress(addr);}
 			GAIA::BL SwapBrokenState()
 			{
