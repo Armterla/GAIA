@@ -26,9 +26,7 @@ namespace GAIA
 
 		public:
 			static const GAIA::NUM DEFAULT_THREAD_COUNT = 4;
-			static const GAIA::NUM DEFAULT_CONNECT_EVENT_COUNT = 4;
 			static const GAIA::NUM DEFAULT_ACCEPT_EVENT_COUNT = 4;
-			static const GAIA::NUM DEFAULT_SEND_EVENT_COUNT = 100;
 			static const GAIA::NUM DEFAULT_RECV_EVENT_COUNT = 100;
 			class Desc : public GAIA::Base
 			{
@@ -36,20 +34,14 @@ namespace GAIA
 				GINL GAIA::GVOID reset()
 				{
 					sThreadCount = DEFAULT_THREAD_COUNT;
-					sConnectEventCount = DEFAULT_CONNECT_EVENT_COUNT;
 					sAcceptEventCount = DEFAULT_ACCEPT_EVENT_COUNT;
-					sSendEventCount = DEFAULT_SEND_EVENT_COUNT;
 					sRecvEventCount = DEFAULT_RECV_EVENT_COUNT;
 				}
 				GINL GAIA::BL check() const
 				{
 					if(sThreadCount <= 0)
 						return GAIA::False;
-					if(sConnectEventCount <= 0)
-						return GAIA::False;
 					if(sAcceptEventCount <= 0)
-						return GAIA::False;
-					if(sSendEventCount <= 0)
 						return GAIA::False;
 					if(sRecvEventCount <= 0)
 						return GAIA::False;
@@ -57,9 +49,7 @@ namespace GAIA
 				}
 			public:
 				GAIA::NUM sThreadCount;
-				GAIA::NUM sConnectEventCount;
 				GAIA::NUM sAcceptEventCount;
-				GAIA::NUM sSendEventCount;
 				GAIA::NUM sRecvEventCount;
 			};
 			class CallBack : public GAIA::Base
@@ -73,8 +63,8 @@ namespace GAIA
 
 			GAIA::BL Create(const GAIA::NETWORK::AsyncDispatcher::Desc& desc);
 			GAIA::BL Destroy();
-			GAIA::BL IsCreated() const;
-			const GAIA::NETWORK::AsyncDispatcher::Desc& GetDesc() const;
+			GAIA::BL IsCreated() const{return m_bCreated;}
+			const GAIA::NETWORK::AsyncDispatcher::Desc& GetDesc() const{return m_desc;}
 
 			GAIA::BL Begin();
 			GAIA::BL End();
@@ -96,9 +86,17 @@ namespace GAIA
 			GAIA::BL CollectConnectedSocket(CallBack& cb) const;
 
 		protected:
-			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket();
-			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptedSocket();
-			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen);
+			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket()
+			{
+				GAIA::NETWORK::AsyncSocket* pListenSocket = gnew GAIA::NETWORK::AsyncSocket(*this, GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE_LISTEN);
+				return pListenSocket;
+			}
+			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptedSocket()
+			{
+				GAIA::NETWORK::AsyncSocket* pAcceptedSocket = gnew GAIA::NETWORK::AsyncSocket(*this, GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE_ACCEPTED);
+				return pAcceptedSocket;
+			}
+			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen){return GAIA::False;}
 
 		private:
 			class Node : public GAIA::Base
