@@ -69,7 +69,7 @@ namespace GAIA
 				this->Destroy();
 		}
 
-		GAIA::BL AsyncDispatcher::Create(const GAIA::NETWORK::AsyncDispatcher::Desc& desc)
+		GAIA::BL AsyncDispatcher::Create(const GAIA::NETWORK::AsyncDispatcherDesc& desc)
 		{
 			if(this->IsCreated())
 				return GAIA::False;
@@ -218,7 +218,7 @@ namespace GAIA
 				return GAIA::False;
 
 			//
-			AsyncSocket* pListenSocket = this->OnCreateListenSocket();
+			GAIA::NETWORK::AsyncSocket* pListenSocket = this->OnCreateListenSocket();
 			pListenSocket->Create();
 			pListenSocket->Bind(addr);
 
@@ -332,7 +332,7 @@ namespace GAIA
 			return m_listen_sockets.size();
 		}
 
-		GAIA::BL AsyncDispatcher::CollectListenSocket(CallBack& cb) const
+		GAIA::BL AsyncDispatcher::CollectListenSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwListenSockets);
 			for(GAIA::CTN::Set<Node>::const_it it = m_listen_sockets.const_frontit(); !it.empty(); ++it)
@@ -362,7 +362,7 @@ namespace GAIA
 			return m_accepted_sockets.size();
 		}
 
-		GAIA::BL AsyncDispatcher::CollectAcceptedSocket(CallBack& cb) const
+		GAIA::BL AsyncDispatcher::CollectAcceptedSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwAcceptedSockets);
 			for(GAIA::CTN::Set<Node>::const_it it = m_accepted_sockets.const_frontit(); !it.empty(); ++it)
@@ -392,7 +392,7 @@ namespace GAIA
 			return m_connected_sockets.size();
 		}
 
-		GAIA::BL AsyncDispatcher::CollectConnectedSocket(CallBack& cb) const
+		GAIA::BL AsyncDispatcher::CollectConnectedSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwConnectedSockets);
 			for(GAIA::CTN::Set<Node>::const_it it = m_connected_sockets.const_frontit(); !it.empty(); ++it)

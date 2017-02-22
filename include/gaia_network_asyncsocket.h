@@ -40,6 +40,11 @@ namespace GAIA
 
 		#endif
 
+		GAIA_ENUM_BEGIN(ASYNC_SOCKET_TYPE)
+			ASYNC_SOCKET_TYPE_CONNECTED,
+			ASYNC_SOCKET_TYPE_ACCEPTED,
+			ASYNC_SOCKET_TYPE_LISTEN,
+		GAIA_ENUM_END(ASYNC_SOCKET_TYPE)
 
 		/*!
 			@brief Async socket.
@@ -51,18 +56,11 @@ namespace GAIA
 			friend class AsyncDispatcher;
 
 		public:
-			GAIA_ENUM_BEGIN(ASYNC_SOCKET_TYPE)
-				ASYNC_SOCKET_TYPE_CONNECTED,
-				ASYNC_SOCKET_TYPE_ACCEPTED,
-				ASYNC_SOCKET_TYPE_LISTEN,
-			GAIA_ENUM_END(ASYNC_SOCKET_TYPE)
-
-		public:
 
 			/*!
 				@brief Constructor.
 			*/
-			AsyncSocket(GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE socktype = GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE_CONNECTED);
+			AsyncSocket(GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::ASYNC_SOCKET_TYPE socktype = GAIA::NETWORK::ASYNC_SOCKET_TYPE_CONNECTED);
 
 			/*!
 				@brief Destructor.
@@ -82,7 +80,7 @@ namespace GAIA
 			/*!
 				@brief Get socket type.
 			*/
-			GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE GetAsyncSocketType() const{return m_socktype;}
+			GAIA::NETWORK::ASYNC_SOCKET_TYPE GetAsyncSocketType() const{return m_socktype;}
 
 			/*!
 				@brief Create async socket.
@@ -263,7 +261,7 @@ namespace GAIA
 
 		private:
 			GAIA::NETWORK::AsyncDispatcher* m_pDispatcher;
-			GAIA::NETWORK::AsyncSocket::ASYNC_SOCKET_TYPE m_socktype;
+			GAIA::NETWORK::ASYNC_SOCKET_TYPE m_socktype;
 			GAIA::NETWORK::Socket m_sock;
 			GAIA::SYNC::Lock m_lrSend;
 			GAIA::SYNC::Lock m_lrRecv;
