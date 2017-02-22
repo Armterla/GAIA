@@ -22,8 +22,8 @@ namespace GAIA
 		{
 		public:
 			static const GAIA::NUM DEFAULT_THREAD_COUNT = 4;
-			static const GAIA::NUM DEFAULT_ACCEPT_EVENT_COUNT = 4;
-			static const GAIA::NUM DEFAULT_RECV_EVENT_COUNT = 100;
+			static const GAIA::NUM DEFAULT_ACCEPT_EVENT_COUNT = 10;
+			static const GAIA::NUM DEFAULT_RECV_EVENT_COUNT = 10;
 
 		public:
 			GINL GAIA::GVOID reset()
@@ -139,6 +139,8 @@ namespace GAIA
 			GAIA::NETWORK::IOCPOverlapped* alloc_iocpol();
 			GAIA::GVOID release_iocpol(GAIA::NETWORK::IOCPOverlapped* pOverlapped);
 			GAIA::BL attach_socket_iocp(GAIA::NETWORK::AsyncSocket& sock);
+			GAIA::GVOID request_accept(GAIA::NETWORK::AsyncSocket& listensock);
+			GAIA::GVOID request_recv(GAIA::NETWORK::AsyncSocket& datasock);
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID

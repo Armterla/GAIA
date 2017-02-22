@@ -30,7 +30,7 @@ namespace GAIA
 				OVERLAPPED _ovlp;
 				IOCP_OVERLAPPED_TYPE type;
 				AsyncSocket* pListenSocket;
-				AsyncSocket* pAcceptedSocket;
+				AsyncSocket* pDataSocket;
 				WSABUF _buf;
 				GAIA::U8 data[2000];
 			};
@@ -156,7 +156,7 @@ namespace GAIA
 				@remarks
 					This function is async call.
 			*/
-			GAIA::GVOID Send(const GAIA::GVOID* pData, GAIA::NUM sSize);
+			GAIA::NUM Send(const GAIA::GVOID* pData, GAIA::NUM sSize);
 
 			/*!
 				@brief Get socket file descriptor.
@@ -249,7 +249,6 @@ namespace GAIA
 
 		private:
 			GAIA::GVOID init();
-			GAIA::GVOID Recv();
 			GAIA::GVOID SetPeerAddress(const GAIA::NETWORK::Addr& addr){m_sock.SetPeerAddress(addr);}
 			GAIA::BL SwapBrokenState()
 			{
