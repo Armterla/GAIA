@@ -132,40 +132,16 @@ namespace GAIA
 			if(!this->IsBegin())
 				return GAIA::False;
 
-			// Close all sockets.
+			// Close all listen sockets.
 			{
-				// Listen sockets.
+				GAIA::SYNC::AutolockW al(m_rwListenSockets);
+				for(GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*>::it it = m_listen_sockets.frontit(); !it.empty(); ++it)
 				{
-					GAIA::SYNC::AutolockW al(m_rwListenSockets);
-					for(GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*>::it it = m_listen_sockets.frontit(); !it.empty(); ++it)
-					{
-						GAIA::NETWORK::AsyncSocket* pSock = *it;
-						pSock->m_sock.Close();
-					}
-					m_listen_sockets.clear();
+					GAIA::NETWORK::AsyncSocket* pSock = *it;
+					pSock->m_sock.Close();
+					pSock->drop_ref();
 				}
-
-				// Accepted sockets.
-				{
-					GAIA::SYNC::AutolockW al(m_rwAcceptedSockets);
-					for(GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*>::it it = m_accepted_sockets.frontit(); !it.empty(); ++it)
-					{
-						GAIA::NETWORK::AsyncSocket* pSock = *it;
-						pSock->m_sock.Close();
-					}
-					m_accepted_sockets.clear();
-				}
-
-				// Connected sockets.
-				{
-					GAIA::SYNC::AutolockW al(m_rwConnectedSockets);
-					for(GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*>::it it = m_connected_sockets.frontit(); !it.empty(); ++it)
-					{
-						GAIA::NETWORK::AsyncSocket* pSock = *it;
-						pSock->m_sock.Close();
-					}
-					m_connected_sockets.clear();
-				}
+				m_listen_sockets.clear();
 			}
 
 			// Notify the thread exit.
@@ -255,7 +231,16 @@ namespace GAIA
 		GAIA::BL AsyncDispatcher::RemoveListenSocket(const GAIA::NETWORK::Addr& addrListen)
 		{
 			GAIA::SYNC::AutolockW al(m_rwListenSockets);
-			return m_listen_sockets.erase(addrListen);
+			GAIA::NETWORK::AsyncSocket** ppAsyncSocket = m_listen_sockets.find(addrListen);
+			if(ppAsyncSocket == GNIL)
+				return GAIA::False;
+			GAIA::NETWORK::AsyncSocket* pAsyncSocket = *ppAsyncSocket;
+			GAST(pAsyncSocket != GNIL);
+			m_listen_sockets.erase(addrListen);
+			pAsyncSocket->Shutdown();
+			pAsyncSocket->Close();
+			pAsyncSocket->drop_ref();
+			return GAIA::True;
 		}
 
 		GAIA::BL AsyncDispatcher::RemoveListenSocketAll()

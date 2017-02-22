@@ -252,7 +252,6 @@ namespace GAIA
 			GAIA::GVOID SetPeerAddress(const GAIA::NETWORK::Addr& addr){m_sock.SetPeerAddress(addr);}
 			GAIA::BL SwapBrokenState()
 			{
-				GAST(this->IsCreated());
 				GAIA::N64 lNewValue = m_atomBrokenTimes.Increase();
 				GAST(lNewValue > 0);
 				return lNewValue == 1;

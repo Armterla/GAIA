@@ -32,7 +32,7 @@ namespace GAIA
 
 			if(m_socktype == GAIA::NETWORK::ASYNC_SOCKET_TYPE_ACCEPTED)
 				m_pDispatcher->AddAcceptedSocket(*this);
-			else if(m_socktype == m_socktype == GAIA::NETWORK::ASYNC_SOCKET_TYPE_CONNECTED)
+			else if(m_socktype == GAIA::NETWORK::ASYNC_SOCKET_TYPE_CONNECTED)
 				m_pDispatcher->AddConnectedSocket(*this);
 		}
 
@@ -40,7 +40,7 @@ namespace GAIA
 		{
 			if(m_socktype == GAIA::NETWORK::ASYNC_SOCKET_TYPE_ACCEPTED)
 				m_pDispatcher->RemoveAcceptedSocket(*this);
-			else if(m_socktype == m_socktype == GAIA::NETWORK::ASYNC_SOCKET_TYPE_CONNECTED)
+			else if(m_socktype == GAIA::NETWORK::ASYNC_SOCKET_TYPE_CONNECTED)
 				m_pDispatcher->RemoveConnectedSocket(*this);
 		}
 

@@ -24,7 +24,7 @@ namespace GAIA
 		public:
 			static const GAIA::NUM DEFAULT_THREAD_COUNT = 4;
 			static const GAIA::NUM DEFAULT_ACCEPT_EVENT_COUNT = 10;
-			static const GAIA::NUM DEFAULT_RECV_EVENT_COUNT = 10;
+			static const GAIA::NUM DEFAULT_RECV_EVENT_COUNT = 1;
 
 		public:
 			GINL GAIA::GVOID reset()
