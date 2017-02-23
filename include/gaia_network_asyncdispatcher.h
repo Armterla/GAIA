@@ -23,30 +23,34 @@ namespace GAIA
 		{
 		public:
 			static const GAIA::NUM DEFAULT_THREAD_COUNT = 4;
-			static const GAIA::NUM DEFAULT_ACCEPT_EVENT_COUNT = 10;
-			static const GAIA::NUM DEFAULT_RECV_EVENT_COUNT = 1;
+
+			static const GAIA::NUM DEFAULT_WINIOCP_ACCEPT_EVENT_COUNT = 10;
+			static const GAIA::NUM DEFAULT_WINIOCP_RECV_EVENT_COUNT = 1;
 
 		public:
 			GINL GAIA::GVOID reset()
 			{
 				sThreadCount = DEFAULT_THREAD_COUNT;
-				sAcceptEventCount = DEFAULT_ACCEPT_EVENT_COUNT;
-				sRecvEventCount = DEFAULT_RECV_EVENT_COUNT;
+
+				sWinIOCPAcceptEventCount = DEFAULT_WINIOCP_ACCEPT_EVENT_COUNT;
+				sWinIOCPRecvEventCount = DEFAULT_WINIOCP_RECV_EVENT_COUNT;
 			}
 			GINL GAIA::BL check() const
 			{
 				if(sThreadCount <= 0)
 					return GAIA::False;
-				if(sAcceptEventCount <= 0)
+
+				if(sWinIOCPAcceptEventCount <= 0)
 					return GAIA::False;
-				if(sRecvEventCount <= 0)
+				if(sWinIOCPRecvEventCount <= 0)
 					return GAIA::False;
 				return GAIA::True;
 			}
 		public:
 			GAIA::NUM sThreadCount;
-			GAIA::NUM sAcceptEventCount;
-			GAIA::NUM sRecvEventCount;
+
+			GAIA::NUM sWinIOCPAcceptEventCount;
+			GAIA::NUM sWinIOCPRecvEventCount;
 		};
 
 		class AsyncDispatcherCallBack : public GAIA::Base
@@ -72,7 +76,7 @@ namespace GAIA
 
 			GAIA::BL Begin();
 			GAIA::BL End();
-			GAIA::BL IsBegin() const;
+			GAIA::BL IsBegin() const{return m_bBegin;}
 
 			GAIA::BL AddListenSocket(const GAIA::NETWORK::Addr& addrListen);
 			GAIA::BL RemoveListenSocket(const GAIA::NETWORK::Addr& addrListen);
@@ -116,20 +120,18 @@ namespace GAIA
 			GAIA::BL RemoveConnectedSocket(GAIA::NETWORK::AsyncSocket& sock);
 			GAIA::BL Execute();
 
+			GAIA::NETWORK::AsyncContext* alloc_async_ctx();
+			GAIA::GVOID release_async_ctx(GAIA::NETWORK::AsyncContext* pOverlapped);
+
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			GAIA::NETWORK::IOCPOverlapped* alloc_iocpol();
-			GAIA::GVOID release_iocpol(GAIA::NETWORK::IOCPOverlapped* pOverlapped);
 			GAIA::BL attach_socket_iocp(GAIA::NETWORK::AsyncSocket& sock);
 			GAIA::GVOID request_accept(GAIA::NETWORK::AsyncSocket& listensock, const GAIA::NETWORK::Addr& addrListen);
 			GAIA::GVOID request_recv(GAIA::NETWORK::AsyncSocket& datasock);
-		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
-
-		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
-
 		#endif
 
 		private:
 			GAIA::BL m_bCreated;
+			GAIA::BL m_bBegin;
 			GAIA::NETWORK::AsyncDispatcherDesc m_desc;
 
 			GAIA::SYNC::LockRW m_rwListenSockets;
@@ -141,18 +143,15 @@ namespace GAIA
 			GAIA::SYNC::LockRW m_rwConnectedSockets;
 			GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*> m_connected_sockets;
 
-			GAIA::CTN::Vector<GAIA::THREAD::Thread*> m_threads;
+			GAIA::CTN::Vector<AsyncDispatcherThread*> m_threads;
 			
+			GAIA::CTN::Pool<GAIA::NETWORK::AsyncContext> m_AsyncCtxPool;
+			GAIA::SYNC::Lock m_lrAsyncCtxPool;
+
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::GVOID* m_pIOCP;
-			GAIA::CTN::Pool<GAIA::NETWORK::IOCPOverlapped> m_IOCPOLPool;
-			GAIA::SYNC::Lock m_lrIOCPOLPool;
 			GAIA::SYNC::LockRW m_rwPostAcceptAble;
 			GAIA::BL m_bPostAcceptAble;
-		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
-			GAIA::N32 m_kqueue;
-		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
-			GAIA::N32 m_epoll;
 		#endif
 		};
 	}

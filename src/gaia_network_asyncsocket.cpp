@@ -15,7 +15,10 @@
 #	include <winsock2.h>
 #	include <windows.h>
 #elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
-
+#	include <sys/types.h>
+#	include <sys/event.h>
+#	include <sys/time.h>
+#	include <unistd.h>
 #elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
 
 #endif
@@ -117,8 +120,8 @@ namespace GAIA
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			m_pDispatcher->attach_socket_iocp(*this);
 
-			IOCPOverlapped* pOverlapped = m_pDispatcher->alloc_iocpol();
-			pOverlapped->type = IOCP_OVERLAPPED_TYPE_CONNECT;
+			AsyncContext* pOverlapped = m_pDispatcher->alloc_async_ctx();
+			pOverlapped->type = ASYNC_CONTEXT_TYPE_CONNECT;
 			pOverlapped->pDataSocket = this;
 			this->rise_ref();
 
@@ -131,7 +134,7 @@ namespace GAIA
 				DWORD err = WSAGetLastError();
 				if(err != ERROR_IO_PENDING)
 				{
-					m_pDispatcher->release_iocpol(pOverlapped);
+					m_pDispatcher->release_async_ctx(pOverlapped);
 					this->OnConnected(GAIA::False, addr);
 					this->drop_ref();
 					return;
@@ -147,8 +150,8 @@ namespace GAIA
 		GAIA::GVOID AsyncSocket::Disconnect()
 		{
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			IOCPOverlapped* pOverlapped = m_pDispatcher->alloc_iocpol();
-			pOverlapped->type = IOCP_OVERLAPPED_TYPE_DISCONNECT;
+			AsyncContext* pOverlapped = m_pDispatcher->alloc_async_ctx();
+			pOverlapped->type = ASYNC_CONTEXT_TYPE_DISCONNECT;
 			pOverlapped->pDataSocket = this;
 			this->rise_ref();
 
@@ -157,16 +160,14 @@ namespace GAIA
 				DWORD err = WSAGetLastError();
 				if(err != ERROR_IO_PENDING)
 				{
-					m_pDispatcher->release_iocpol(pOverlapped);
+					m_pDispatcher->release_async_ctx(pOverlapped);
 					this->OnDisconnected(GAIA::False);
 					this->drop_ref();
 					return;
 				}
 			}
-		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
-
-		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
-
+		#else
+			this->Shutdown();
 		#endif
 		}
 
@@ -175,7 +176,7 @@ namespace GAIA
 			GAIA::SYNC::Autolock al(m_lrSend);
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			GAIA::NUM sPieceSize = gsizeofobj(IOCPOverlapped, data);
+			GAIA::NUM sPieceSize = gsizeofobj(AsyncContext, data);
 			GAIA::NUM sPieceCount = sSize / sPieceSize + ((sSize % sPieceSize) != 0 ? 1 : 0);
 			GAIA::NUM sOffset = 0;
 			for(GAIA::NUM x = 0; x < sPieceCount; ++x)
@@ -183,8 +184,8 @@ namespace GAIA
 				GAIA::NUM sCurrentPieceSize = GAIA::ALGO::gmin(sSize - sOffset, sPieceSize);
 				GAST(sCurrentPieceSize != 0);
 
-				IOCPOverlapped* pOverlapped = m_pDispatcher->alloc_iocpol();
-				pOverlapped->type = IOCP_OVERLAPPED_TYPE_SEND;
+				AsyncContext* pOverlapped = m_pDispatcher->alloc_async_ctx();
+				pOverlapped->type = ASYNC_CONTEXT_TYPE_SEND;
 				pOverlapped->pDataSocket = this;
 				GAIA::ALGO::gmemcpy(pOverlapped->data, (const GAIA::U8*)pData + sOffset, sCurrentPieceSize);
 				pOverlapped->_buf.len = sCurrentPieceSize;
@@ -198,7 +199,7 @@ namespace GAIA
 					if(err != ERROR_IO_PENDING)
 					{
 						this->OnSent(GAIA::False, pData, sOffset, sSize);
-						m_pDispatcher->release_iocpol(pOverlapped);
+						m_pDispatcher->release_async_ctx(pOverlapped);
 						this->drop_ref();
 						return sOffset;
 					}
@@ -226,10 +227,6 @@ namespace GAIA
 			m_pfnAcceptEx = GNIL;
 			m_pfnConnectEx = GNIL;
 			m_pfnDisconnectEx = GNIL;
-		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
-
-		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
-
 		#endif
 		}
 	}

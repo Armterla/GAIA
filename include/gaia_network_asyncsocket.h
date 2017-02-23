@@ -15,30 +15,33 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		GAIA_ENUM_BEGIN(ASYNC_CONTEXT_TYPE)
+			ASYNC_CONTEXT_TYPE_STOP,
+			ASYNC_CONTEXT_TYPE_CONNECT,
+			ASYNC_CONTEXT_TYPE_DISCONNECT,
+			ASYNC_CONTEXT_TYPE_ACCEPT,
+			ASYNC_CONTEXT_TYPE_SEND,
+			ASYNC_CONTEXT_TYPE_RECV,
+		GAIA_ENUM_END(ASYNC_CONTEXT_TYPE)
+
+		class AsyncContext : public GAIA::Base
+		{
+		public:
+
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			GAIA_ENUM_BEGIN(IOCP_OVERLAPPED_TYPE)
-				IOCP_OVERLAPPED_TYPE_STOP,
-				IOCP_OVERLAPPED_TYPE_CONNECT,
-				IOCP_OVERLAPPED_TYPE_DISCONNECT,
-				IOCP_OVERLAPPED_TYPE_ACCEPT,
-				IOCP_OVERLAPPED_TYPE_SEND,
-				IOCP_OVERLAPPED_TYPE_RECV,
-			GAIA_ENUM_END(IOCP_OVERLAPPED_TYPE)
-			class IOCPOverlapped : public GAIA::Base
-			{
-			public:
-				OVERLAPPED _ovlp;
-				IOCP_OVERLAPPED_TYPE type;
-				AsyncSocket* pListenSocket;
-				AsyncSocket* pDataSocket;
-				WSABUF _buf;
-				GAIA::U8 data[2000];
-			};
-		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
-
-		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
-
+			OVERLAPPED _ovlp;
+			WSABUF _buf;
+			GAIA::NETWORK::AsyncSocket* pListenSocket;
+			GAIA::NETWORK::AsyncSocket* pDataSocket;
+			GAIA::U8 data[2000];
+		#else
+			GAIA::NETWORK::AsyncSocket* pDataSocket;
+			GAIA::NUM sThreadIndex;
+			GAIA::N32 kqep; // kqueue or epoll.
 		#endif
+
+			GAIA::NETWORK::ASYNC_CONTEXT_TYPE type;
+		};
 
 		GAIA_ENUM_BEGIN(ASYNC_SOCKET_TYPE)
 			ASYNC_SOCKET_TYPE_CONNECTED,

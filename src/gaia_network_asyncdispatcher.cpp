@@ -43,6 +43,10 @@ namespace GAIA
 			GINL AsyncDispatcherThread(AsyncDispatcher* pDispatcher)
 			{
 				m_pDispatcher = pDispatcher;
+
+			#if GAIA_OS != GAIA_OS_WINDOWS
+				kqep = GINVALID;
+			#endif
 			}
 
 			virtual GAIA::GVOID Run()
@@ -56,6 +60,11 @@ namespace GAIA
 
 		private:
 			AsyncDispatcher* m_pDispatcher;
+
+		public:
+		#if GAIA_OS != GAIA_OS_WINDOWS
+			GAIA::N32 kqep; // kqueue or epoll.
+		#endif
 		};
 
 		AsyncDispatcher::AsyncDispatcher()
@@ -95,7 +104,7 @@ namespace GAIA
 
 			for(GAIA::NUM x = 0; x < m_threads.size(); ++x)
 			{
-				AsyncDispatcherThread* pThread = (AsyncDispatcherThread*)m_threads[x];
+				AsyncDispatcherThread* pThread = m_threads[x];
 				GAST(pThread != GNIL);
 				gdel pThread;
 			}
@@ -122,15 +131,23 @@ namespace GAIA
 			// Create async controller in OS.
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			m_pIOCP = ::CreateIoCompletionPort( INVALID_HANDLE_VALUE, NULL, 0, 0 );
-		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
-			m_kqueue = kqueue();
-		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
-			m_epoll = epoll_create();
 		#endif
 
 			// Start thread.
 			for(GAIA::NUM x = 0; x < m_threads.size(); ++x)
+			{
+				AsyncDispatcherThread* pThread = m_threads[x];
+
+			#if GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
+				pThread->kqep = kqueue();
+			#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
+				pThread->kqep = epoll_create();
+			#endif
+
 				m_threads[x]->Start();
+			}
+
+			m_bBegin = GAIA::True;
 
 			return GAIA::True;
 		}
@@ -176,9 +193,9 @@ namespace GAIA
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			for(GAIA::NUM x = 0; x < m_threads.size(); ++x)
 			{
-				IOCPOverlapped* pOverlapped = this->alloc_iocpol();
-				pOverlapped->type = IOCP_OVERLAPPED_TYPE_STOP;
-				PostQueuedCompletionStatus(m_pIOCP, sizeof(IOCPOverlapped), 0, (OVERLAPPED*)pOverlapped);
+				AsyncContext* pOverlapped = this->alloc_async_ctx();
+				pOverlapped->type = ASYNC_CONTEXT_TYPE_STOP;
+				PostQueuedCompletionStatus(m_pIOCP, sizeof(AsyncContext), 0, (OVERLAPPED*)pOverlapped);
 			}
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 
@@ -188,36 +205,26 @@ namespace GAIA
 
 			// End thread.
 			for(GAIA::NUM x = 0; x < m_threads.size(); ++x)
-				m_threads[x]->Wait();
+			{
+				AsyncDispatcherThread* pThread = m_threads[x];
+
+			#if GAIA_OS != GAIA_OS_WINDOWS
+				close(pThread->kqep);
+				pThread->kqep = GINVALID;
+			#endif
+
+				pThread->Wait();
+			}
 
 			// Close async controller in OS.
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			::CloseHandle(m_pIOCP);
 			m_pIOCP = GNIL;
-		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
-			close(m_kqueue);
-			m_kqueue = GINVALID;
-		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
-			close(m_epoll);
-			m_epoll = GINVALID;
 		#endif
+
+			m_bBegin = GAIA::False;
 
 			return GAIA::True;
-		}
-
-		GAIA::BL AsyncDispatcher::IsBegin() const
-		{
-		#if GAIA_OS == GAIA_OS_WINDOWS
-			if(m_pIOCP != GNIL)
-				return GAIA::True;
-		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
-			if(m_kqueue != GINVALID)
-				return GAIA::True;
-		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
-			if(m_epoll != GINVALID)
-				return GAIA::True;
-		#endif
-			return GAIA::False;
 		}
 
 		GAIA::BL AsyncDispatcher::AddListenSocket(const GAIA::NETWORK::Addr& addrListen)
@@ -245,7 +252,7 @@ namespace GAIA
 			pListenSocket->m_sock.Listen();
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			for(GAIA::NUM x = 0; x < m_desc.sAcceptEventCount; ++x)
+			for(GAIA::NUM x = 0; x < m_desc.sWinIOCPAcceptEventCount; ++x)
 				this->request_accept(*pListenSocket, addrListen);
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 
@@ -394,14 +401,11 @@ namespace GAIA
 		GAIA::GVOID AsyncDispatcher::init()
 		{
 			m_bCreated = GAIA::False;
+			m_bBegin = GAIA::False;
 			m_desc.reset();
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			m_pIOCP = GNIL;
 			m_bPostAcceptAble = GAIA::True;
-		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
-			m_kqueue = GINVALID;
-		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
-			m_epoll = GINVALID;
 		#endif
 		}
 
@@ -455,10 +459,10 @@ namespace GAIA
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			DWORD dwTrans = 0;
 			GAIA::GVOID* pPointer = GNIL;
-			GAIA::NETWORK::IOCPOverlapped* pOverlapped = GNIL;
+			GAIA::NETWORK::AsyncContext* pOverlapped = GNIL;
 			if(GetQueuedCompletionStatus(m_pIOCP, &dwTrans, (PULONG_PTR)&pPointer, (OVERLAPPED**)&pOverlapped, INFINITE))
 			{
-				if(pOverlapped->type == GAIA::NETWORK::IOCP_OVERLAPPED_TYPE_ACCEPT)
+				if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_ACCEPT)
 				{
 					// Dispatch.
 					pOverlapped->pDataSocket->SetAsyncSocketType(GAIA::NETWORK::ASYNC_SOCKET_TYPE_ACCEPTED);
@@ -477,13 +481,13 @@ namespace GAIA
 					this->OnAcceptSocket(*pOverlapped->pDataSocket, addrListen);
 
 					// Begin receive.
-					for(GAIA::NUM x = 0; x < m_desc.sRecvEventCount; ++x)
+					for(GAIA::NUM x = 0; x < m_desc.sWinIOCPRecvEventCount; ++x)
 						this->request_recv(*pOverlapped->pDataSocket);
 
 					// Re-request.
 					this->request_accept(*pOverlapped->pListenSocket, addrListen);
 				}
-				else if(pOverlapped->type == GAIA::NETWORK::IOCP_OVERLAPPED_TYPE_CONNECT)
+				else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_CONNECT)
 				{
 					// Dispatch.
 					GAIA::NETWORK::Addr addrPeer;
@@ -491,20 +495,20 @@ namespace GAIA
 					pOverlapped->pDataSocket->OnConnected(GAIA::True, addrPeer);
 
 					// Begin receive.
-					for(GAIA::NUM x = 0; x < m_desc.sRecvEventCount; ++x)
+					for(GAIA::NUM x = 0; x < m_desc.sWinIOCPRecvEventCount; ++x)
 						this->request_recv(*pOverlapped->pDataSocket);
 				}
-				else if(pOverlapped->type == GAIA::NETWORK::IOCP_OVERLAPPED_TYPE_DISCONNECT)
+				else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_DISCONNECT)
 				{
 					pOverlapped->pDataSocket->OnDisconnected(GAIA::True);
 					pOverlapped->pDataSocket->SwapBrokenState();
 				}
-				else if(pOverlapped->type == GAIA::NETWORK::IOCP_OVERLAPPED_TYPE_SEND)
+				else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_SEND)
 				{
 					GAST(dwTrans == pOverlapped->_buf.len);
 					pOverlapped->pDataSocket->OnSent(GAIA::True, pOverlapped->data, dwTrans, pOverlapped->_buf.len);
 				}
-				else if(pOverlapped->type == GAIA::NETWORK::IOCP_OVERLAPPED_TYPE_RECV)
+				else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
 				{
 					// Dispatch.
 					if(dwTrans > 0)
@@ -525,12 +529,12 @@ namespace GAIA
 					// Re-request.
 					this->request_recv(*pOverlapped->pDataSocket);
 				}
-				else if(pOverlapped->type == GAIA::NETWORK::IOCP_OVERLAPPED_TYPE_STOP)
+				else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_STOP)
 				{
 					GAST(pOverlapped->pListenSocket == GNIL);
 					GAST(pOverlapped->pDataSocket == GNIL);
-					GAIA::SYNC::Autolock al(m_lrIOCPOLPool);
-					m_IOCPOLPool.release(pOverlapped);
+					GAIA::SYNC::Autolock al(m_lrAsyncCtxPool);
+					m_AsyncCtxPool.release(pOverlapped);
 					return GAIA::False;
 				}
 				else
@@ -542,7 +546,7 @@ namespace GAIA
 				{
 					if(pOverlapped->pDataSocket->SwapBrokenState())
 					{
-						if(pOverlapped->type == GAIA::NETWORK::IOCP_OVERLAPPED_TYPE_RECV)
+						if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
 						{
 							if(dwTrans == 0)
 							{
@@ -563,22 +567,22 @@ namespace GAIA
 							else
 								GASTFALSE;
 						}
-						else if(pOverlapped->type == GAIA::NETWORK::IOCP_OVERLAPPED_TYPE_SEND)
+						else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_SEND)
 						{
 							pOverlapped->pDataSocket->OnSent(GAIA::False, pOverlapped->data, dwTrans, pOverlapped->_buf.len);
 							pOverlapped->pDataSocket->OnDisconnected(GAIA::True);
 						}
-						else if(pOverlapped->type == GAIA::NETWORK::IOCP_OVERLAPPED_TYPE_CONNECT)
+						else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_CONNECT)
 						{
 							GAIA::NETWORK::Addr addrPeer;
 							pOverlapped->pDataSocket->GetPeerAddress(addrPeer);
 							pOverlapped->pDataSocket->OnConnected(GAIA::False, addrPeer);
 						}
-						else if(pOverlapped->type == GAIA::NETWORK::IOCP_OVERLAPPED_TYPE_DISCONNECT)
+						else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_DISCONNECT)
 						{
 							pOverlapped->pDataSocket->OnDisconnected(GAIA::False);
 						}
-						else if(pOverlapped->type == GAIA::NETWORK::IOCP_OVERLAPPED_TYPE_ACCEPT)
+						else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_ACCEPT)
 						{
 							GAIA::NETWORK::Addr addrBinded;
 							pOverlapped->pListenSocket->GetBindedAddress(addrBinded);
@@ -597,8 +601,8 @@ namespace GAIA
 					pOverlapped->pListenSocket->drop_ref();
 				if(pOverlapped->pDataSocket != GNIL)
 					pOverlapped->pDataSocket->drop_ref();
-				GAIA::SYNC::Autolock al(m_lrIOCPOLPool);
-				m_IOCPOLPool.release(pOverlapped);
+				GAIA::SYNC::Autolock al(m_lrAsyncCtxPool);
+				m_AsyncCtxPool.release(pOverlapped);
 			}
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 
@@ -608,27 +612,33 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-	#if GAIA_OS == GAIA_OS_WINDOWS
-		GAIA::NETWORK::IOCPOverlapped* AsyncDispatcher::alloc_iocpol()
+		GAIA::NETWORK::AsyncContext* AsyncDispatcher::alloc_async_ctx()
 		{
-			GAIA::SYNC::Autolock al(m_lrIOCPOLPool);
-			GAIA::NETWORK::IOCPOverlapped* pRet = m_IOCPOLPool.alloc();
+			GAIA::SYNC::Autolock al(m_lrAsyncCtxPool);
+			GAIA::NETWORK::AsyncContext* pRet = m_AsyncCtxPool.alloc();
+		#if GAIA_OS == GAIA_OS_WINDOWS
 			zeromem(&pRet->_ovlp);
-			pRet->type = IOCP_OVERLAPPED_TYPE_INVALID;
-			pRet->pListenSocket = GNIL;
-			pRet->pDataSocket = GNIL;
 			pRet->_buf.len = 0;
 			pRet->_buf.buf = (GAIA::CH*)pRet->data;
+			pRet->pListenSocket = GNIL;
+			pRet->pDataSocket = GNIL;
+		#else
+			pRet->pDataSocket = GNIL;
+			pRet->sThreadIndex = GINVALID;
+			pRet->kqep = GINVALID;
+		#endif
+			pRet->type = GAIA::NETWORK::ASYNC_CONTEXT_TYPE_INVALID;
 			return pRet;
 		}
 
-		GAIA::GVOID AsyncDispatcher::release_iocpol(GAIA::NETWORK::IOCPOverlapped* pOverlapped)
+		GAIA::GVOID AsyncDispatcher::release_async_ctx(GAIA::NETWORK::AsyncContext* pOverlapped)
 		{
 			GAST(pOverlapped != GNIL);
-			GAIA::SYNC::Autolock al(m_lrIOCPOLPool);
-			return m_IOCPOLPool.release(pOverlapped);
+			GAIA::SYNC::Autolock al(m_lrAsyncCtxPool);
+			return m_AsyncCtxPool.release(pOverlapped);
 		}
 
+	#if GAIA_OS == GAIA_OS_WINDOWS
 		GAIA::BL AsyncDispatcher::attach_socket_iocp(GAIA::NETWORK::AsyncSocket& sock)
 		{
 			if(!this->IsCreated())
@@ -650,8 +660,8 @@ namespace GAIA
 			GAIA::NETWORK::AsyncSocket* pAcceptingSocket = this->OnCreateAcceptingSocket(addrListen);
 			pAcceptingSocket->Create();
 
-			GAIA::NETWORK::IOCPOverlapped* pOverlapped = this->alloc_iocpol();
-			pOverlapped->type = IOCP_OVERLAPPED_TYPE_ACCEPT;
+			GAIA::NETWORK::AsyncContext* pOverlapped = this->alloc_async_ctx();
+			pOverlapped->type = ASYNC_CONTEXT_TYPE_ACCEPT;
 			pOverlapped->pListenSocket = &listensock;
 			pOverlapped->pDataSocket = pAcceptingSocket;
 			listensock.rise_ref();
@@ -670,7 +680,7 @@ namespace GAIA
 					listensock.drop_ref();
 					pAcceptingSocket->drop_ref();
 					pAcceptingSocket->drop_ref();
-					this->release_iocpol(pOverlapped);
+					this->release_async_ctx(pOverlapped);
 					GERR << "GAIA AsyncDispatcher IOCP error, cannot AcceptEx, ErrorCode = " << ::WSAGetLastError() << GEND;
 				}
 			}
@@ -678,8 +688,8 @@ namespace GAIA
 
 		GAIA::GVOID AsyncDispatcher::request_recv(GAIA::NETWORK::AsyncSocket& datasock)
 		{
-			IOCPOverlapped* pOverlapped = this->alloc_iocpol();
-			pOverlapped->type = IOCP_OVERLAPPED_TYPE_RECV;
+			AsyncContext* pOverlapped = this->alloc_async_ctx();
+			pOverlapped->type = ASYNC_CONTEXT_TYPE_RECV;
 			pOverlapped->pDataSocket = &datasock;
 			pOverlapped->_buf.len = sizeof(pOverlapped->data);
 			datasock.rise_ref();
@@ -691,15 +701,11 @@ namespace GAIA
 				DWORD err = WSAGetLastError();
 				if(err != ERROR_IO_PENDING)
 				{
-					this->release_iocpol(pOverlapped);
+					this->release_async_ctx(pOverlapped);
 					datasock.drop_ref();
 				}
 			}
 		}
-	#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
-
-	#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
-
 	#endif
 	}
 }
