@@ -120,21 +120,21 @@ namespace GAIA
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			m_pDispatcher->attach_socket_iocp(*this);
 
-			AsyncContext* pOverlapped = m_pDispatcher->alloc_async_ctx();
-			pOverlapped->type = ASYNC_CONTEXT_TYPE_CONNECT;
-			pOverlapped->pDataSocket = this;
+			AsyncContext* pCtx = m_pDispatcher->alloc_async_ctx();
+			pCtx->type = ASYNC_CONTEXT_TYPE_CONNECT;
+			pCtx->pDataSocket = this;
 			this->rise_ref();
 
 			sockaddr_in saddr_in;
 			GAIA::NETWORK::addr2saddr(addr, &saddr_in);
 			GAIA::N32 nAddrLen = sizeof(SOCKADDR_IN) + 16;
 			DWORD dwSent;
-			if(!((LPFN_CONNECTEX)m_pfnConnectEx)(this->GetFD(), (sockaddr*)&saddr_in, nAddrLen, GNIL, 0, &dwSent, (OVERLAPPED*)pOverlapped))
+			if(!((LPFN_CONNECTEX)m_pfnConnectEx)(this->GetFD(), (sockaddr*)&saddr_in, nAddrLen, GNIL, 0, &dwSent, (OVERLAPPED*)pCtx))
 			{
 				DWORD err = WSAGetLastError();
 				if(err != ERROR_IO_PENDING)
 				{
-					m_pDispatcher->release_async_ctx(pOverlapped);
+					m_pDispatcher->release_async_ctx(pCtx);
 					this->OnConnected(GAIA::False, addr);
 					this->drop_ref();
 					return;
@@ -150,17 +150,17 @@ namespace GAIA
 		GAIA::GVOID AsyncSocket::Disconnect()
 		{
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			AsyncContext* pOverlapped = m_pDispatcher->alloc_async_ctx();
-			pOverlapped->type = ASYNC_CONTEXT_TYPE_DISCONNECT;
-			pOverlapped->pDataSocket = this;
+			AsyncContext* pCtx = m_pDispatcher->alloc_async_ctx();
+			pCtx->type = ASYNC_CONTEXT_TYPE_DISCONNECT;
+			pCtx->pDataSocket = this;
 			this->rise_ref();
 
-			if(!((LPFN_DISCONNECTEX)m_pfnDisconnectEx)(this->GetFD(), (OVERLAPPED*)pOverlapped, 0, 0))
+			if(!((LPFN_DISCONNECTEX)m_pfnDisconnectEx)(this->GetFD(), (OVERLAPPED*)pCtx, 0, 0))
 			{
 				DWORD err = WSAGetLastError();
 				if(err != ERROR_IO_PENDING)
 				{
-					m_pDispatcher->release_async_ctx(pOverlapped);
+					m_pDispatcher->release_async_ctx(pCtx);
 					this->OnDisconnected(GAIA::False);
 					this->drop_ref();
 					return;
@@ -184,22 +184,22 @@ namespace GAIA
 				GAIA::NUM sCurrentPieceSize = GAIA::ALGO::gmin(sSize - sOffset, sPieceSize);
 				GAST(sCurrentPieceSize != 0);
 
-				AsyncContext* pOverlapped = m_pDispatcher->alloc_async_ctx();
-				pOverlapped->type = ASYNC_CONTEXT_TYPE_SEND;
-				pOverlapped->pDataSocket = this;
-				GAIA::ALGO::gmemcpy(pOverlapped->data, (const GAIA::U8*)pData + sOffset, sCurrentPieceSize);
-				pOverlapped->_buf.len = sCurrentPieceSize;
+				AsyncContext* pCtx = m_pDispatcher->alloc_async_ctx();
+				pCtx->type = ASYNC_CONTEXT_TYPE_SEND;
+				pCtx->pDataSocket = this;
+				GAIA::ALGO::gmemcpy(pCtx->data, (const GAIA::U8*)pData + sOffset, sCurrentPieceSize);
+				pCtx->_buf.len = sCurrentPieceSize;
 				this->rise_ref();
 
 				DWORD dwTrans = 0;
 				DWORD dwFlag = 0;
-				if(!::WSASend(this->GetFD(), &pOverlapped->_buf, 1, &dwTrans, dwFlag, (OVERLAPPED*)pOverlapped, GNIL))
+				if(!::WSASend(this->GetFD(), &pCtx->_buf, 1, &dwTrans, dwFlag, (OVERLAPPED*)pCtx, GNIL))
 				{
 					DWORD err = WSAGetLastError();
 					if(err != ERROR_IO_PENDING)
 					{
 						this->OnSent(GAIA::False, pData, sOffset, sSize);
-						m_pDispatcher->release_async_ctx(pOverlapped);
+						m_pDispatcher->release_async_ctx(pCtx);
 						this->drop_ref();
 						return sOffset;
 					}

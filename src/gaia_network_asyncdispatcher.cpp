@@ -193,9 +193,9 @@ namespace GAIA
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			for(GAIA::NUM x = 0; x < m_threads.size(); ++x)
 			{
-				AsyncContext* pOverlapped = this->alloc_async_ctx();
-				pOverlapped->type = ASYNC_CONTEXT_TYPE_STOP;
-				PostQueuedCompletionStatus(m_pIOCP, sizeof(AsyncContext), 0, (OVERLAPPED*)pOverlapped);
+				AsyncContext* pCtx = this->alloc_async_ctx();
+				pCtx->type = ASYNC_CONTEXT_TYPE_STOP;
+				PostQueuedCompletionStatus(m_pIOCP, sizeof(AsyncContext), 0, (OVERLAPPED*)pCtx);
 			}
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 
@@ -459,82 +459,82 @@ namespace GAIA
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			DWORD dwTrans = 0;
 			GAIA::GVOID* pPointer = GNIL;
-			GAIA::NETWORK::AsyncContext* pOverlapped = GNIL;
-			if(GetQueuedCompletionStatus(m_pIOCP, &dwTrans, (PULONG_PTR)&pPointer, (OVERLAPPED**)&pOverlapped, INFINITE))
+			GAIA::NETWORK::AsyncContext* pCtx = GNIL;
+			if(GetQueuedCompletionStatus(m_pIOCP, &dwTrans, (PULONG_PTR)&pPointer, (OVERLAPPED**)&pCtx, INFINITE))
 			{
-				if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_ACCEPT)
+				if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_ACCEPT)
 				{
 					// Dispatch.
-					pOverlapped->pDataSocket->SetAsyncSocketType(GAIA::NETWORK::ASYNC_SOCKET_TYPE_ACCEPTED);
-					this->RemoveAcceptingSocket(*pOverlapped->pDataSocket);
-					this->AddAcceptedSocket(*pOverlapped->pDataSocket);
+					pCtx->pDataSocket->SetAsyncSocketType(GAIA::NETWORK::ASYNC_SOCKET_TYPE_ACCEPTED);
+					this->RemoveAcceptingSocket(*pCtx->pDataSocket);
+					this->AddAcceptedSocket(*pCtx->pDataSocket);
 
-					this->attach_socket_iocp(*pOverlapped->pDataSocket);
+					this->attach_socket_iocp(*pCtx->pDataSocket);
 					GAIA::N32 nAddrLen = sizeof(SOCKADDR_IN) + 16;
-					sockaddr_in* saddr_peer = (sockaddr_in*)(pOverlapped->data + nAddrLen);
+					sockaddr_in* saddr_peer = (sockaddr_in*)(pCtx->data + nAddrLen);
 					GAIA::NETWORK::Addr addrPeer;
 					GAIA::NETWORK::saddr2addr(saddr_peer, addrPeer);
-					pOverlapped->pDataSocket->SetPeerAddress(addrPeer);
+					pCtx->pDataSocket->SetPeerAddress(addrPeer);
 					GAIA::NETWORK::Addr addrListen;
-					pOverlapped->pListenSocket->GetBindedAddress(addrListen);
-					pOverlapped->pDataSocket->OnAccepted(GAIA::True, addrListen);
-					this->OnAcceptSocket(*pOverlapped->pDataSocket, addrListen);
+					pCtx->pListenSocket->GetBindedAddress(addrListen);
+					pCtx->pDataSocket->OnAccepted(GAIA::True, addrListen);
+					this->OnAcceptSocket(*pCtx->pDataSocket, addrListen);
 
 					// Begin receive.
 					for(GAIA::NUM x = 0; x < m_desc.sWinIOCPRecvEventCount; ++x)
-						this->request_recv(*pOverlapped->pDataSocket);
+						this->request_recv(*pCtx->pDataSocket);
 
 					// Re-request.
-					this->request_accept(*pOverlapped->pListenSocket, addrListen);
+					this->request_accept(*pCtx->pListenSocket, addrListen);
 				}
-				else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_CONNECT)
+				else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_CONNECT)
 				{
 					// Dispatch.
 					GAIA::NETWORK::Addr addrPeer;
-					pOverlapped->pDataSocket->GetPeerAddress(addrPeer);
-					pOverlapped->pDataSocket->OnConnected(GAIA::True, addrPeer);
+					pCtx->pDataSocket->GetPeerAddress(addrPeer);
+					pCtx->pDataSocket->OnConnected(GAIA::True, addrPeer);
 
 					// Begin receive.
 					for(GAIA::NUM x = 0; x < m_desc.sWinIOCPRecvEventCount; ++x)
-						this->request_recv(*pOverlapped->pDataSocket);
+						this->request_recv(*pCtx->pDataSocket);
 				}
-				else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_DISCONNECT)
+				else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_DISCONNECT)
 				{
-					pOverlapped->pDataSocket->OnDisconnected(GAIA::True);
-					pOverlapped->pDataSocket->SwapBrokenState();
+					pCtx->pDataSocket->OnDisconnected(GAIA::True);
+					pCtx->pDataSocket->SwapBrokenState();
 				}
-				else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_SEND)
+				else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_SEND)
 				{
-					GAST(dwTrans == pOverlapped->_buf.len);
-					pOverlapped->pDataSocket->OnSent(GAIA::True, pOverlapped->data, dwTrans, pOverlapped->_buf.len);
+					GAST(dwTrans == pCtx->_buf.len);
+					pCtx->pDataSocket->OnSent(GAIA::True, pCtx->data, dwTrans, pCtx->_buf.len);
 				}
-				else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
+				else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
 				{
 					// Dispatch.
 					if(dwTrans > 0)
 					{
-						pOverlapped->pDataSocket->OnRecved(GAIA::True, pOverlapped->data, dwTrans);
+						pCtx->pDataSocket->OnRecved(GAIA::True, pCtx->data, dwTrans);
 					}
 					else if(dwTrans == 0)
 					{
 						DWORD dwErr = WSAGetLastError();
 						if(dwErr == ERROR_IO_PENDING)
-							this->request_recv(*pOverlapped->pDataSocket);
+							this->request_recv(*pCtx->pDataSocket);
 						else if(IsIOCPDisconnected(dwErr))
-							pOverlapped->pDataSocket->OnDisconnected(GAIA::True);
+							pCtx->pDataSocket->OnDisconnected(GAIA::True);
 					}
 					else
 						GASTFALSE;
 
 					// Re-request.
-					this->request_recv(*pOverlapped->pDataSocket);
+					this->request_recv(*pCtx->pDataSocket);
 				}
-				else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_STOP)
+				else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_STOP)
 				{
-					GAST(pOverlapped->pListenSocket == GNIL);
-					GAST(pOverlapped->pDataSocket == GNIL);
+					GAST(pCtx->pListenSocket == GNIL);
+					GAST(pCtx->pDataSocket == GNIL);
 					GAIA::SYNC::Autolock al(m_lrAsyncCtxPool);
-					m_AsyncCtxPool.release(pOverlapped);
+					m_AsyncCtxPool.release(pCtx);
 					return GAIA::False;
 				}
 				else
@@ -542,11 +542,11 @@ namespace GAIA
 			}
 			else
 			{
-				if(pOverlapped != GNIL)
+				if(pCtx != GNIL)
 				{
-					if(pOverlapped->pDataSocket->SwapBrokenState())
+					if(pCtx->pDataSocket->SwapBrokenState())
 					{
-						if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
+						if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
 						{
 							if(dwTrans == 0)
 							{
@@ -554,12 +554,12 @@ namespace GAIA
 								if(dwError == ERROR_NETNAME_DELETED)
 								{
 									DWORD dwTrans, dwFlags;
-									if(WSAGetOverlappedResult(pOverlapped->pDataSocket->GetFD(),
-										(WSAOVERLAPPED*)pOverlapped, &dwTrans, GAIA::False, &dwFlags))
+									if(WSAGetOverlappedResult(pCtx->pDataSocket->GetFD(),
+										(WSAOVERLAPPED*)pCtx, &dwTrans, GAIA::False, &dwFlags))
 										dwError = WSAGetLastError();
 
 									if(IsIOCPDisconnected(dwError))
-										pOverlapped->pDataSocket->OnDisconnected(GAIA::True);
+										pCtx->pDataSocket->OnDisconnected(GAIA::True);
 								}
 								else
 									GERR << "GAIA AsyncDispatcher IOCP error, cannot recv, ErrorCode = " << dwError << GEND;
@@ -567,26 +567,26 @@ namespace GAIA
 							else
 								GASTFALSE;
 						}
-						else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_SEND)
+						else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_SEND)
 						{
-							pOverlapped->pDataSocket->OnSent(GAIA::False, pOverlapped->data, dwTrans, pOverlapped->_buf.len);
-							pOverlapped->pDataSocket->OnDisconnected(GAIA::True);
+							pCtx->pDataSocket->OnSent(GAIA::False, pCtx->data, dwTrans, pCtx->_buf.len);
+							pCtx->pDataSocket->OnDisconnected(GAIA::True);
 						}
-						else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_CONNECT)
+						else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_CONNECT)
 						{
 							GAIA::NETWORK::Addr addrPeer;
-							pOverlapped->pDataSocket->GetPeerAddress(addrPeer);
-							pOverlapped->pDataSocket->OnConnected(GAIA::False, addrPeer);
+							pCtx->pDataSocket->GetPeerAddress(addrPeer);
+							pCtx->pDataSocket->OnConnected(GAIA::False, addrPeer);
 						}
-						else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_DISCONNECT)
+						else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_DISCONNECT)
 						{
-							pOverlapped->pDataSocket->OnDisconnected(GAIA::False);
+							pCtx->pDataSocket->OnDisconnected(GAIA::False);
 						}
-						else if(pOverlapped->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_ACCEPT)
+						else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_ACCEPT)
 						{
 							GAIA::NETWORK::Addr addrBinded;
-							pOverlapped->pListenSocket->GetBindedAddress(addrBinded);
-							pOverlapped->pDataSocket->OnAccepted(GAIA::False, addrBinded);
+							pCtx->pListenSocket->GetBindedAddress(addrBinded);
+							pCtx->pDataSocket->OnAccepted(GAIA::False, addrBinded);
 						}
 						else
 							GASTFALSE;
@@ -595,14 +595,14 @@ namespace GAIA
 				else
 					GASTFALSE;
 			}
-			if(pOverlapped != GNIL)
+			if(pCtx != GNIL)
 			{
-				if(pOverlapped->pListenSocket != GNIL)
-					pOverlapped->pListenSocket->drop_ref();
-				if(pOverlapped->pDataSocket != GNIL)
-					pOverlapped->pDataSocket->drop_ref();
+				if(pCtx->pListenSocket != GNIL)
+					pCtx->pListenSocket->drop_ref();
+				if(pCtx->pDataSocket != GNIL)
+					pCtx->pDataSocket->drop_ref();
 				GAIA::SYNC::Autolock al(m_lrAsyncCtxPool);
-				m_AsyncCtxPool.release(pOverlapped);
+				m_AsyncCtxPool.release(pCtx);
 			}
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 
@@ -631,11 +631,11 @@ namespace GAIA
 			return pRet;
 		}
 
-		GAIA::GVOID AsyncDispatcher::release_async_ctx(GAIA::NETWORK::AsyncContext* pOverlapped)
+		GAIA::GVOID AsyncDispatcher::release_async_ctx(GAIA::NETWORK::AsyncContext* pCtx)
 		{
-			GAST(pOverlapped != GNIL);
+			GAST(pCtx != GNIL);
 			GAIA::SYNC::Autolock al(m_lrAsyncCtxPool);
-			return m_AsyncCtxPool.release(pOverlapped);
+			return m_AsyncCtxPool.release(pCtx);
 		}
 
 	#if GAIA_OS == GAIA_OS_WINDOWS
@@ -660,10 +660,10 @@ namespace GAIA
 			GAIA::NETWORK::AsyncSocket* pAcceptingSocket = this->OnCreateAcceptingSocket(addrListen);
 			pAcceptingSocket->Create();
 
-			GAIA::NETWORK::AsyncContext* pOverlapped = this->alloc_async_ctx();
-			pOverlapped->type = ASYNC_CONTEXT_TYPE_ACCEPT;
-			pOverlapped->pListenSocket = &listensock;
-			pOverlapped->pDataSocket = pAcceptingSocket;
+			GAIA::NETWORK::AsyncContext* pCtx = this->alloc_async_ctx();
+			pCtx->type = ASYNC_CONTEXT_TYPE_ACCEPT;
+			pCtx->pListenSocket = &listensock;
+			pCtx->pDataSocket = pAcceptingSocket;
 			listensock.rise_ref();
 			pAcceptingSocket->rise_ref();
 
@@ -671,8 +671,8 @@ namespace GAIA
 			DWORD dwRecved = 0;
 			if(!((LPFN_ACCEPTEX)listensock.m_pfnAcceptEx)(
 				listensock.GetFD(), pAcceptingSocket->GetFD(),
-				pOverlapped->data, sizeof(pOverlapped->data) - nAddrLen - nAddrLen,
-				nAddrLen, nAddrLen, &dwRecved, (OVERLAPPED*)pOverlapped))
+				pCtx->data, sizeof(pCtx->data) - nAddrLen - nAddrLen,
+				nAddrLen, nAddrLen, &dwRecved, (OVERLAPPED*)pCtx))
 			{
 				DWORD err = WSAGetLastError();
 				if(err != ERROR_IO_PENDING)
@@ -680,7 +680,7 @@ namespace GAIA
 					listensock.drop_ref();
 					pAcceptingSocket->drop_ref();
 					pAcceptingSocket->drop_ref();
-					this->release_async_ctx(pOverlapped);
+					this->release_async_ctx(pCtx);
 					GERR << "GAIA AsyncDispatcher IOCP error, cannot AcceptEx, ErrorCode = " << ::WSAGetLastError() << GEND;
 				}
 			}
@@ -688,20 +688,20 @@ namespace GAIA
 
 		GAIA::GVOID AsyncDispatcher::request_recv(GAIA::NETWORK::AsyncSocket& datasock)
 		{
-			AsyncContext* pOverlapped = this->alloc_async_ctx();
-			pOverlapped->type = ASYNC_CONTEXT_TYPE_RECV;
-			pOverlapped->pDataSocket = &datasock;
-			pOverlapped->_buf.len = sizeof(pOverlapped->data);
+			AsyncContext* pCtx = this->alloc_async_ctx();
+			pCtx->type = ASYNC_CONTEXT_TYPE_RECV;
+			pCtx->pDataSocket = &datasock;
+			pCtx->_buf.len = sizeof(pCtx->data);
 			datasock.rise_ref();
 
 			DWORD dwTrans = 0;
 			DWORD dwFlag = 0;
-			if(!::WSARecv(datasock.GetFD(), &pOverlapped->_buf, 1, &dwTrans, &dwFlag, (OVERLAPPED*)pOverlapped, GNIL))
+			if(!::WSARecv(datasock.GetFD(), &pCtx->_buf, 1, &dwTrans, &dwFlag, (OVERLAPPED*)pCtx, GNIL))
 			{
 				DWORD err = WSAGetLastError();
 				if(err != ERROR_IO_PENDING)
 				{
-					this->release_async_ctx(pOverlapped);
+					this->release_async_ctx(pCtx);
 					datasock.drop_ref();
 				}
 			}

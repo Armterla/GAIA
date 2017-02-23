@@ -121,7 +121,7 @@ namespace GAIA
 			GAIA::BL Execute();
 
 			GAIA::NETWORK::AsyncContext* alloc_async_ctx();
-			GAIA::GVOID release_async_ctx(GAIA::NETWORK::AsyncContext* pOverlapped);
+			GAIA::GVOID release_async_ctx(GAIA::NETWORK::AsyncContext* pCtx);
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::BL attach_socket_iocp(GAIA::NETWORK::AsyncSocket& sock);
