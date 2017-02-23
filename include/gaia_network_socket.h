@@ -181,7 +181,7 @@ namespace GAIA
 				@exception
 					GAIA::ECT::EctNetwork If accept socket option failed.
 			*/
-			GINL GAIA::GVOID Accept(Socket& sock);
+			GINL GAIA::GVOID Accept(GAIA::NETWORK::Socket& sock);
 
 			/*!
 				@brief Listen socket.(Stream socket only)

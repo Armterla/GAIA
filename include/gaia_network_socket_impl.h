@@ -494,7 +494,7 @@ namespace GAIA
 			}
 		}
 
-		GINL GAIA::GVOID Socket::Accept(Socket& sock)
+		GINL GAIA::GVOID Socket::Accept(GAIA::NETWORK::Socket& sock)
 		{
 			if(sock.IsCreated())
 				GTHROW(InvalidParam);
@@ -509,6 +509,10 @@ namespace GAIA
 				THROW_LASTERROR;
 			sock.m_bBinded = true;
 			sock.m_bConnected = true;
+
+			GAIA::NETWORK::Addr addrPeer;
+			GAIA::NETWORK::saddr2addr(&newaddr, addrPeer);
+			this->SetPeerAddress(addrPeer);
 		}
 
 		GINL GAIA::GVOID Socket::Listen()
@@ -547,6 +551,8 @@ namespace GAIA
 			#endif
 				THROW_LASTERROR;
 			}
+
+			this->SetPeerAddress(addr);
 
 			m_bConnected = true;
 		}
