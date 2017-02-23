@@ -217,13 +217,12 @@ namespace GAIA
 			for(GAIA::NUM x = 0; x < m_threads.size(); ++x)
 			{
 				AsyncDispatcherThread* pThread = m_threads[x];
+				pThread->Wait();
 
 			#if GAIA_OS != GAIA_OS_WINDOWS
 				close(pThread->kqep);
 				pThread->kqep = GINVALID;
 			#endif
-
-				pThread->Wait();
 			}
 
 			// Close async controller in OS.
@@ -677,7 +676,8 @@ namespace GAIA
 										struct kevent newe[2];
 										EV_SET(&newe[0], nNewSocket, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
 										EV_SET(&newe[1], nNewSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, pCtxSend);
-										GAIA::N32 nResult = kevent(pThread->kqep, newe, 2, NULL, 0, NULL);
+										GAIA::N32 kqep = this->select_kqep(*pAcceptedSock);
+										GAIA::N32 nResult = kevent(kqep, newe, 2, NULL, 0, NULL);
 										GAST(nResult != -1);
 									}
 									else
@@ -720,6 +720,7 @@ namespace GAIA
 								struct kevent newe[2];
 								EV_SET(&newe[0], (GAIA::N32)e.data, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, &ctx);
 								EV_SET(&newe[1], (GAIA::N32)e.data, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
+								GAST(pThread->kqep == this->select_kqep(*ctx.pSocket));
 								GAIA::N32 nResult = kevent(pThread->kqep, newe, 2, NULL, 0, NULL);
 								GAST(nResult != -1);
 							}
@@ -838,6 +839,15 @@ namespace GAIA
 					datasock.drop_ref();
 				}
 			}
+		}
+	#else
+		GAIA::N32 AsyncDispatcher::select_kqep(GAIA::NETWORK::AsyncSocket& sock) const
+		{
+			GAST(this->IsCreated());
+			GAST(this->IsBegin());
+			GAIA::NUM sIndex = sock.GetFD() / sizeof(GAIA::GVOID*) % m_threads.size();
+			GAIA::N32 kqep = m_threads[sIndex]->kqep;
+			return kqep;
 		}
 	#endif
 	}

@@ -132,6 +132,8 @@ namespace GAIA
 			GAIA::BL attach_socket_iocp(GAIA::NETWORK::AsyncSocket& sock);
 			GAIA::GVOID request_accept(GAIA::NETWORK::AsyncSocket& listensock, const GAIA::NETWORK::Addr& addrListen);
 			GAIA::GVOID request_recv(GAIA::NETWORK::AsyncSocket& datasock);
+		#else
+			GAIA::N32 select_kqep(GAIA::NETWORK::AsyncSocket& sock) const;
 		#endif
 
 		private:
