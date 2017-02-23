@@ -23,6 +23,7 @@ namespace GAIA
 		{
 		public:
 			static const GAIA::NUM DEFAULT_THREAD_COUNT = 4;
+			static const GAIA::NUM DEFAULT_MAX_CONNECTOIN_COUNT = 1000;
 
 			static const GAIA::NUM DEFAULT_WINIOCP_ACCEPT_EVENT_COUNT = 10;
 			static const GAIA::NUM DEFAULT_WINIOCP_RECV_EVENT_COUNT = 1;
@@ -31,6 +32,7 @@ namespace GAIA
 			GINL GAIA::GVOID reset()
 			{
 				sThreadCount = DEFAULT_THREAD_COUNT;
+				sMaxConnectionCount = DEFAULT_MAX_CONNECTOIN_COUNT;
 
 				sWinIOCPAcceptEventCount = DEFAULT_WINIOCP_ACCEPT_EVENT_COUNT;
 				sWinIOCPRecvEventCount = DEFAULT_WINIOCP_RECV_EVENT_COUNT;
@@ -38,6 +40,8 @@ namespace GAIA
 			GINL GAIA::BL check() const
 			{
 				if(sThreadCount <= 0)
+					return GAIA::False;
+				if(sMaxConnectionCount <= 0)
 					return GAIA::False;
 
 				if(sWinIOCPAcceptEventCount <= 0)
@@ -48,6 +52,7 @@ namespace GAIA
 			}
 		public:
 			GAIA::NUM sThreadCount;
+			GAIA::NUM sMaxConnectionCount;
 
 			GAIA::NUM sWinIOCPAcceptEventCount;
 			GAIA::NUM sWinIOCPRecvEventCount;

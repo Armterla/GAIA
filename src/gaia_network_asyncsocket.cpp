@@ -61,6 +61,7 @@ namespace GAIA
 				return;
 			}
 			m_sock.SetFD(nSocket);
+			m_sock.SetType(GAIA::NETWORK::Socket::SOCKET_TYPE_STREAM);
 			DWORD dwBytes;
 			GUID GuidAcceptEx = WSAID_ACCEPTEX;
 			GUID GuidConnectEx = WSAID_CONNECTEX;

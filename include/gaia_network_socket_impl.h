@@ -804,9 +804,39 @@ namespace GAIA
 
 		GINL GAIA::BL Socket::SetFD(GAIA::N32 nFD)
 		{
+			GAST(nFD != GINVALID);
+			GAST(m_nSocket == GINVALID);
 			if(m_nSocket != GINVALID)
 				return GAIA::False;
 			m_nSocket = nFD;
+			return GAIA::True;
+		}
+
+		GINL GAIA::BL Socket::SetType(GAIA::NETWORK::Socket::SOCKET_TYPE type)
+		{
+			GAST(type != GAIA::NETWORK::Socket::SOCKET_TYPE_INVALID);
+			GAST(m_SockType == SOCKET_TYPE_INVALID);
+			if(m_SockType != SOCKET_TYPE_INVALID)
+				return GAIA::False;
+			m_SockType = type;
+			return GAIA::True;
+		}
+
+		GINL GAIA::BL Socket::SetBinded(GAIA::BL bBinded)
+		{
+			GAST(this->IsCreated());
+			if(!this->IsCreated())
+				return GAIA::False;
+			m_bBinded = bBinded;
+			return GAIA::False;
+		}
+
+		GINL GAIA::BL Socket::SetConnected(GAIA::BL bConnected)
+		{
+			GAST(this->IsCreated());
+			if(!this->IsCreated())
+				return GAIA::False;
+			m_bConnected = bConnected;
 			return GAIA::True;
 		}
 

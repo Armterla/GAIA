@@ -148,7 +148,10 @@ namespace GAIA
 			#if GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 				pThread->kqep = kqueue();
 			#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
-				pThread->kqep = epoll_create();
+				GAIA::NUM sThreadMaxConnCount = m_desc.sMaxConnectionCount / m_desc.sThreadCount;
+				if((m_desc.sMaxConnectionCount % m_desc.sThreadCount) != 0)
+					sThreadMaxConnCount += 1;
+				pThread->kqep = epoll_create(sThreadMaxCnnCount);
 			#endif
 
 				m_threads[x]->Start();
@@ -479,11 +482,14 @@ namespace GAIA
 					this->AddAcceptedSocket(*pCtx->pDataSocket);
 
 					this->attach_socket_iocp(*pCtx->pDataSocket);
+					pCtx->pDataSocket->SetBinded(GAIA::True);
+					pCtx->pDataSocket->SetConnected(GAIA::True);
 					GAIA::N32 nAddrLen = sizeof(SOCKADDR_IN) + 16;
 					sockaddr_in* saddr_peer = (sockaddr_in*)(pCtx->data + nAddrLen);
 					GAIA::NETWORK::Addr addrPeer;
 					GAIA::NETWORK::saddr2addr(saddr_peer, addrPeer);
 					pCtx->pDataSocket->SetPeerAddress(addrPeer);
+
 					GAIA::NETWORK::Addr addrListen;
 					pCtx->pListenSocket->GetBindedAddress(addrListen);
 					pCtx->pDataSocket->OnAccepted(GAIA::True, addrListen);
@@ -614,7 +620,127 @@ namespace GAIA
 				m_AsyncCtxPool.release(pCtx);
 			}
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
+			struct kevent elist[128];
+			GAIA::NUM sEventCount = kevent(pThread->kqep, GNIL, 0, elist, sizeofarray(elist), GNIL);
+			if(sEventCount > 0)
+			{
+				for(GAIA::NUM x = 0; x < sEventCount; ++x)
+				{
+					struct kevent& e = elist[x];
+					GAIA::NETWORK::AsyncContext& ctx = *(GAIA::NETWORK::AsyncContext*)e.udata;
+					if(e.filter == EVFILT_READ)
+					{
+						switch(ctx.type)
+						{
+						case GAIA::NETWORK::ASYNC_CONTEXT_TYPE_ACCEPT:
+							{
+								GAST((GAIA::N32)e.data == ctx.pSocket->GetFD());
+								GAIA::NUM sAcceptAbleCount = (GAIA::NUM)e.data;
+								for(GAIA::NUM y = 0; y < sAcceptAbleCount; ++y)
+								{
+									sockaddr_in addraccept;
+									socklen_t newaddrlen = sizeof(addraccept);
+									GAIA::N32 nNewSocket = accept(ctx.pSocket->GetFD(), (sockaddr*)&addraccept, &newaddrlen);
+									if(nNewSocket != GINVALID)
+									{
+										GAIA::NETWORK::Addr addrListen;
+										ctx.pSocket->GetBindedAddress(addrListen);
+										GAIA::NETWORK::AsyncSocket* pAcceptedSock = this->OnCreateAcceptingSocket(addrListen);
+										pAcceptedSock->SetFD(nNewSocket);
+										pAcceptedSock->SetType(GAIA::NETWORK::Socket::SOCKET_TYPE_STREAM);
+										pAcceptedSock->SetBinded(GAIA::True);
+										pAcceptedSock->SetConnected(GAIA::True);
+										GAIA::NETWORK::Addr addrPeer;
+										GAIA::NETWORK::saddr2addr(&addraccept, addrPeer);
+										pAcceptedSock->SetPeerAddress(addrPeer);
 
+										pAcceptedSock->SetAsyncSocketType(GAIA::NETWORK::ASYNC_SOCKET_TYPE_ACCEPTED);
+										this->RemoveAcceptingSocket(*pAcceptedSock);
+										this->AddAcceptedSocket(*pAcceptedSock);
+
+										pAcceptedSock->OnAccepted(GAIA::True, addrListen);
+										this->OnAcceptSocket(*pAcceptedSock, addrListen);
+
+										AsyncContext* pCtxRecv;
+										AsyncContext* pCtxSend;
+										{
+											GAIA::SYNC::Autolock al(m_lrAsyncCtxPool);
+											pCtxRecv = m_AsyncCtxPool.alloc();
+											pCtxSend = m_AsyncCtxPool.alloc();
+										}
+
+										pCtxRecv->pSocket = pAcceptedSock;
+										pCtxSend->pSocket = pAcceptedSock;
+										pCtxRecv->type = GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV;
+										pCtxSend->type = GAIA::NETWORK::ASYNC_CONTEXT_TYPE_SEND;
+
+										struct kevent newe[2];
+										EV_SET(&newe[0], nNewSocket, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
+										EV_SET(&newe[1], nNewSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, pCtxSend);
+										GAIA::N32 nResult = kevent(pThread->kqep, newe, 2, NULL, 0, NULL);
+										GAST(nResult != -1);
+									}
+									else
+										break;
+								}
+							}
+							break;
+						case GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV:
+							{
+								GAST((GAIA::N32)e.data == ctx.pSocket->GetFD());
+								GAIA::NUM sRecvAbleSize = (GAIA::NUM)e.data;
+								if(sRecvAbleSize > 0)
+								{
+
+								}
+							}
+							break;
+						default:
+							GASTFALSE;
+							break;
+						}
+					}
+					else if(e.filter == EVFILT_WRITE)
+					{
+						switch(ctx.type)
+						{
+						case GAIA::NETWORK::ASYNC_CONTEXT_TYPE_CONNECT:
+							{
+								GAST((GAIA::N32)e.data == ctx.pSocket->GetFD());
+								AsyncContext* pCtxRecv;
+								{
+									GAIA::SYNC::Autolock al(m_lrAsyncCtxPool);
+									pCtxRecv = m_AsyncCtxPool.alloc();
+								}
+
+								pCtxRecv->pSocket = ctx.pSocket;
+								pCtxRecv->type = GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV;
+								ctx.type = GAIA::NETWORK::ASYNC_CONTEXT_TYPE_SEND;
+
+								struct kevent newe[2];
+								EV_SET(&newe[0], (GAIA::N32)e.data, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, &ctx);
+								EV_SET(&newe[1], (GAIA::N32)e.data, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
+								GAIA::N32 nResult = kevent(pThread->kqep, newe, 2, NULL, 0, NULL);
+								GAST(nResult != -1);
+							}
+							break;
+						case GAIA::NETWORK::ASYNC_CONTEXT_TYPE_SEND:
+							{
+								GAST((GAIA::N32)e.data == ctx.pSocket->GetFD());
+								GAIA::NUM sSendAbleSize = (GAIA::NUM)e.data;
+								if(sSendAbleSize > 0)
+								{
+
+								}
+							}
+							break;
+						default:
+							GASTFALSE;
+							break;
+						}
+					}
+				}
+			}
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
 
 		#endif
@@ -632,10 +758,8 @@ namespace GAIA
 			pRet->pListenSocket = GNIL;
 			pRet->pDataSocket = GNIL;
 		#else
-			pRet->pDataSocket = GNIL;
-			pRet->kqep = GINVALID;
+			pRet->pSocket = GNIL;
 		#endif
-			pRet->sThreadIndex = GINVALID;
 			pRet->type = GAIA::NETWORK::ASYNC_CONTEXT_TYPE_INVALID;
 			return pRet;
 		}

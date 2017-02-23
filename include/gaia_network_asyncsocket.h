@@ -27,7 +27,6 @@ namespace GAIA
 		class AsyncContext : public GAIA::Base
 		{
 		public:
-
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			OVERLAPPED _ovlp;
 			WSABUF _buf;
@@ -35,11 +34,8 @@ namespace GAIA
 			GAIA::NETWORK::AsyncSocket* pDataSocket;
 			GAIA::U8 data[2000];
 		#else
-			GAIA::NETWORK::AsyncSocket* pDataSocket;
-			GAIA::N32 kqep; // kqueue or epoll.
+			GAIA::NETWORK::AsyncSocket* pSocket;
 		#endif
-
-			GAIA::NUM sThreadIndex;
 			GAIA::NETWORK::ASYNC_CONTEXT_TYPE type;
 		};
 
@@ -253,6 +249,10 @@ namespace GAIA
 
 		private:
 			GAIA::GVOID init();
+			GAIA::BL SetFD(GAIA::N32 nFD){return m_sock.SetFD(nFD);}
+			GAIA::BL SetType(GAIA::NETWORK::Socket::SOCKET_TYPE type){return m_sock.SetType(type);}
+			GAIA::BL SetBinded(GAIA::BL bBinded){return m_sock.SetBinded(bBinded);}
+			GAIA::BL SetConnected(GAIA::BL bConnected){return m_sock.SetConnected(bConnected);}
 			GAIA::GVOID SetAsyncSocketType(GAIA::NETWORK::ASYNC_SOCKET_TYPE socktype){m_socktype = socktype;}
 			GAIA::GVOID SetPeerAddress(const GAIA::NETWORK::Addr& addr){m_sock.SetPeerAddress(addr);}
 			GAIA::BL SwapBrokenState()
