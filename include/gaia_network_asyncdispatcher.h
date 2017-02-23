@@ -118,7 +118,7 @@ namespace GAIA
 			GAIA::BL RemoveAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock);
 			GAIA::BL AddConnectedSocket(GAIA::NETWORK::AsyncSocket& sock);
 			GAIA::BL RemoveConnectedSocket(GAIA::NETWORK::AsyncSocket& sock);
-			GAIA::BL Execute();
+			GAIA::BL Execute(GAIA::NETWORK::AsyncDispatcherThread* pThread);
 
 			GAIA::NETWORK::AsyncContext* alloc_async_ctx();
 			GAIA::GVOID release_async_ctx(GAIA::NETWORK::AsyncContext* pCtx);

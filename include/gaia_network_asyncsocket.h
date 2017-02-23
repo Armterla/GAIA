@@ -36,10 +36,10 @@ namespace GAIA
 			GAIA::U8 data[2000];
 		#else
 			GAIA::NETWORK::AsyncSocket* pDataSocket;
-			GAIA::NUM sThreadIndex;
 			GAIA::N32 kqep; // kqueue or epoll.
 		#endif
 
+			GAIA::NUM sThreadIndex;
 			GAIA::NETWORK::ASYNC_CONTEXT_TYPE type;
 		};
 

@@ -44,6 +44,8 @@ namespace GAIA
 			{
 				m_pDispatcher = pDispatcher;
 
+				sIndex = GINVALID;
+
 			#if GAIA_OS != GAIA_OS_WINDOWS
 				kqep = GINVALID;
 			#endif
@@ -53,7 +55,7 @@ namespace GAIA
 			{
 				for(;;)
 				{
-					if(!m_pDispatcher->Execute())
+					if(!m_pDispatcher->Execute(this))
 						break;
 				}
 			}
@@ -62,6 +64,7 @@ namespace GAIA
 			AsyncDispatcher* m_pDispatcher;
 
 		public:
+			GAIA::NUM sIndex;
 		#if GAIA_OS != GAIA_OS_WINDOWS
 			GAIA::N32 kqep; // kqueue or epoll.
 		#endif
@@ -87,7 +90,11 @@ namespace GAIA
 
 			m_threads.resize(desc.sThreadCount);
 			for(GAIA::NUM x = 0; x < m_threads.size(); ++x)
-				m_threads[x] = gnew AsyncDispatcherThread(this);
+			{
+				AsyncDispatcherThread* pThread = gnew AsyncDispatcherThread(this);
+				pThread->sIndex = x;
+				m_threads[x] = pThread;
+			}
 
 			m_desc = desc;
 			m_bCreated = GAIA::True;
@@ -454,8 +461,10 @@ namespace GAIA
 			return m_connected_sockets.erase(&sock) != GNIL;
 		}
 
-		GAIA::BL AsyncDispatcher::Execute()
+		GAIA::BL AsyncDispatcher::Execute(GAIA::NETWORK::AsyncDispatcherThread* pThread)
 		{
+			GAST(pThread != GNIL);
+
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			DWORD dwTrans = 0;
 			GAIA::GVOID* pPointer = GNIL;
@@ -624,9 +633,9 @@ namespace GAIA
 			pRet->pDataSocket = GNIL;
 		#else
 			pRet->pDataSocket = GNIL;
-			pRet->sThreadIndex = GINVALID;
 			pRet->kqep = GINVALID;
 		#endif
+			pRet->sThreadIndex = GINVALID;
 			pRet->type = GAIA::NETWORK::ASYNC_CONTEXT_TYPE_INVALID;
 			return pRet;
 		}
