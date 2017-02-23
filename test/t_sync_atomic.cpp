@@ -55,5 +55,12 @@ namespace TEST
 			TERROR;
 		if((GAIA::N64)a != 13)
 			TERROR;
+		if(a < (GAIA::SYNC::Atomic)13)
+			TERROR;
+		if(a > 13)
+			TERROR;
+		a.Set(0);
+		if(a.Get() != 0)
+			TERROR;
 	}
 }

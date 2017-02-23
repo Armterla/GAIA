@@ -30,6 +30,8 @@ namespace GAIA
 			GINL Atomic(){this->init();}
 			GINL Atomic(const Atomic& src){this->operator = (src);}
 			GINL Atomic(const GAIA::N64& src){this->operator = (src);}
+			GINL GAIA::GVOID Set(const GAIA::N64& l){m_n = l;}
+			GINL GAIA::N64 Get() const{return m_n;}
 			GINL Atomic& operator = (const Atomic& src){GAST(&src != this); m_n = src.m_n; return *this;}
 			GINL Atomic& operator = (const GAIA::N64& src)
 			{
@@ -132,6 +134,37 @@ namespace GAIA
 			GINL GAIA::N64 operator -- (GAIA::N32){return this->Decrease() + 1;}
 			GINL GAIA::N64 operator += (const GAIA::N64& src){return this->Add(+src);}
 			GINL GAIA::N64 operator -= (const GAIA::N64& src){return this->Add(-src);}
+			GINL GAIA::N32 compare(const Atomic& src) const
+			{
+				GAIA::N64 l = m_n;
+				GAIA::N64 lsrc = src.m_n;
+				if(l < lsrc)
+					return -1;
+				else if(l > lsrc)
+					return +1;
+				return 0;
+			}
+			GINL GAIA::N32 compare(const GAIA::N64& src) const
+			{
+				GAIA::N64 l = m_n;
+				if(l < src)
+					return -1;
+				else if(l > src)
+					return +1;
+				return 0;
+			}
+			GINL GAIA::N32 compare(GAIA::N32 src) const
+			{
+				GAIA::N64 l = m_n;
+				if(l < src)
+					return -1;
+				else if(l > src)
+					return +1;
+				return 0;
+			}
+			GCLASS_COMPARE_BYCOMPARE(GAIA::SYNC::Atomic)
+			GCLASS_COMPARE_BYCOMPARE(GAIA::N64)
+			GCLASS_COMPARE_BYCOMPARE(GAIA::N32)
 		private:
 			GINL GAIA::GVOID init(){m_n = 0;}
 		private:
