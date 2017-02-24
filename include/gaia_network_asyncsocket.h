@@ -281,22 +281,24 @@ namespace GAIA
 			GAIA::BL SetConnected(GAIA::BL bConnected){return m_sock.SetConnected(bConnected);}
 			GAIA::GVOID SetAsyncSocketType(GAIA::NETWORK::ASYNC_SOCKET_TYPE socktype){m_socktype = socktype;}
 			GAIA::GVOID SetPeerAddress(const GAIA::NETWORK::Addr& addr){m_sock.SetPeerAddress(addr);}
+
+		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::BL SwapBrokenState()
 			{
 				GAIA::N64 lNewValue = m_atomBrokenTimes.Increase();
 				GAST(lNewValue > 0);
 				return lNewValue == 1;
 			}
+		#endif
 
 		private:
 			GAIA::NETWORK::AsyncDispatcher* m_pDispatcher;
 			GAIA::NETWORK::ASYNC_SOCKET_TYPE m_socktype;
 			GAIA::NETWORK::Socket m_sock;
 			GAIA::SYNC::Lock m_lrSend;
-			GAIA::SYNC::Lock m_lrRecv;
-			GAIA::SYNC::Atomic m_atomBrokenTimes;
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
+			GAIA::SYNC::Atomic m_atomBrokenTimes;
 			GAIA::GVOID* m_pfnAcceptEx;
 			GAIA::GVOID* m_pfnConnectEx;
 			GAIA::GVOID* m_pfnDisconnectEx;

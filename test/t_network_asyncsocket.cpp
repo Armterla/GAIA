@@ -337,7 +337,8 @@ namespace TEST
 						GAIA::SYNC::gsleep(5000);
 					}
 
-					TAST(ctx.listAcceptedSockets.size() == ctx.listConnectedSockets.size());
+					if(ctx.listAcceptedSockets.size() != ctx.listConnectedSockets.size())
+						TERROR;
 
 					// Shutdown.
 					for(GAIA::NUM x = 0; x < ctx.listConnectedSockets.size(); ++x)
