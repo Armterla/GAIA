@@ -309,52 +309,6 @@ namespace GAIA
 			return m_nSocket != GINVALID;
 		}
 
-		GINL GAIA::NETWORK::Socket::SOCKET_TYPE Socket::GetType() const
-		{
-			if(!this->IsCreated())
-				GTHROW(Illegal);
-			return m_SockType;
-		}
-
-		GINL GAIA::GVOID Socket::Bind(const GAIA::NETWORK::Addr& addr)
-		{
-			if(!this->IsCreated())
-				GTHROW(Illegal);
-			if(m_bBinded)
-				GTHROW(Illegal);
-
-			sockaddr_in saddr;
-			zeromem(&saddr);
-			saddr.sin_family = AF_INET;
-
-			// Construct network ip.
-			if(!addr.ip.check())
-				saddr.sin_addr.s_addr = 0;
-			else
-				GAIA::NETWORK::addr2saddr(addr, &saddr);
-
-			// Construct network port.
-			if(addr.uPort == 0)
-				saddr.sin_port = 0;
-			else
-				saddr.sin_port = GAIA::NETWORK::port2sport((GAIA::U16)addr.uPort);
-
-			//
-			if(bind(m_nSocket, (sockaddr*)&saddr, sizeof(saddr)) == GINVALID)
-				THROW_LASTERROR;
-
-			//
-			m_bBinded = true;
-		}
-
-		GINL GAIA::BL Socket::IsBinded() const
-		{
-			if(!this->IsCreated())
-				GTHROW(Illegal);
-
-			return m_bBinded;
-		}
-
 		GINL GAIA::GVOID Socket::SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION op, const GAIA::CTN::Vari& v)
 		{
 			if(!this->IsCreated())
@@ -492,6 +446,52 @@ namespace GAIA
 			default:
 				GTHROW(InvalidParam);
 			}
+		}
+
+		GINL GAIA::NETWORK::Socket::SOCKET_TYPE Socket::GetType() const
+		{
+			if(!this->IsCreated())
+				GTHROW(Illegal);
+			return m_SockType;
+		}
+
+		GINL GAIA::GVOID Socket::Bind(const GAIA::NETWORK::Addr& addr)
+		{
+			if(!this->IsCreated())
+				GTHROW(Illegal);
+			if(m_bBinded)
+				GTHROW(Illegal);
+
+			sockaddr_in saddr;
+			zeromem(&saddr);
+			saddr.sin_family = AF_INET;
+
+			// Construct network ip.
+			if(!addr.ip.check())
+				saddr.sin_addr.s_addr = 0;
+			else
+				GAIA::NETWORK::addr2saddr(addr, &saddr);
+
+			// Construct network port.
+			if(addr.uPort == 0)
+				saddr.sin_port = 0;
+			else
+				saddr.sin_port = GAIA::NETWORK::port2sport((GAIA::U16)addr.uPort);
+
+			//
+			if(bind(m_nSocket, (sockaddr*)&saddr, sizeof(saddr)) == GINVALID)
+				THROW_LASTERROR;
+
+			//
+			m_bBinded = true;
+		}
+
+		GINL GAIA::BL Socket::IsBinded() const
+		{
+			if(!this->IsCreated())
+				GTHROW(Illegal);
+
+			return m_bBinded;
 		}
 
 		GINL GAIA::GVOID Socket::Accept(GAIA::NETWORK::Socket& sock)

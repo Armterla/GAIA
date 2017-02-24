@@ -125,29 +125,6 @@ namespace GAIA
 			GINL GAIA::BL IsCreated() const;
 
 			/*!
-				@brief Get socket type.
-			*/
-			GINL GAIA::NETWORK::Socket::SOCKET_TYPE GetType() const;
-
-			/*!
-				@brief Bind socket to a network address, include IP and port.
-
-				@exception
-					GAIA::ECT::EctIllegal If socket is not created.
-
-				@exception
-					GAIA::ECT::EctNetwork If bind socket failed.
-			*/
-			GINL GAIA::GVOID Bind(const GAIA::NETWORK::Addr& addr);
-
-			/*!
-				@brief Check current socket is binded or not.
-
-				@return If the socket is bound, return GAIA::True, or return GAIA::False.
-			*/
-			GINL GAIA::BL IsBinded() const;
-
-			/*!
 				@brief Set socket option.
 
 				@exception
@@ -171,6 +148,29 @@ namespace GAIA
 					GAIA::ECT::EctIllegal If socket is not created.
 			*/
 			GINL GAIA::GVOID GetOption(GAIA::NETWORK::Socket::SOCKET_OPTION op, GAIA::CTN::Vari& v);
+
+			/*!
+				@brief Get socket type.
+			*/
+			GINL GAIA::NETWORK::Socket::SOCKET_TYPE GetType() const;
+
+			/*!
+				@brief Bind socket to a network address, include IP and port.
+
+				@exception
+					GAIA::ECT::EctIllegal If socket is not created.
+
+				@exception
+					GAIA::ECT::EctNetwork If bind socket failed.
+			*/
+			GINL GAIA::GVOID Bind(const GAIA::NETWORK::Addr& addr);
+
+			/*!
+				@brief Check current socket is binded or not.
+
+				@return If the socket is bound, return GAIA::True, or return GAIA::False.
+			*/
+			GINL GAIA::BL IsBinded() const;
 
 			/*!
 				@brief Accept a socket.(Stream socket only)

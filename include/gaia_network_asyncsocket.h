@@ -69,7 +69,7 @@ namespace GAIA
 				@remarks
 					If current async socket is created, it will be close automatically.
 			*/
-			~AsyncSocket();
+			virtual ~AsyncSocket();
 
 			/*!
 				@brief Get AsyncDispatcher.
@@ -92,7 +92,7 @@ namespace GAIA
 				@remarks
 					This function is async call.
 			*/
-			GAIA::GVOID Create();
+			virtual GAIA::GVOID Create();
 
 			/*!
 				@brief Close async socket.
@@ -100,7 +100,7 @@ namespace GAIA
 				@remarks
 					This function is async call.
 			*/
-			GAIA::GVOID Close();
+			virtual GAIA::GVOID Close();
 
 			/*!
 				@brief Shutdown current async socket.
@@ -108,7 +108,7 @@ namespace GAIA
 				@remarks
 					This function is async call.
 			*/
-			GAIA::GVOID Shutdown(GAIA::N32 nShutdownFlag = GAIA::NETWORK::Socket::SSDF_RECV | GAIA::NETWORK::Socket::SSDF_SEND);
+			virtual GAIA::GVOID Shutdown(GAIA::N32 nShutdownFlag = GAIA::NETWORK::Socket::SSDF_RECV | GAIA::NETWORK::Socket::SSDF_SEND);
 
 			/*!
 				@brief Check current socket is create or not.
@@ -116,12 +116,37 @@ namespace GAIA
 			GAIA::BL IsCreated() const{return m_sock.IsCreated();}
 
 			/*!
+				@brief Set socket option.
+
+				@exception
+					GAIA::ECT::EctInvalidParam If parameter op is a invalid enum.
+
+				@exception
+					GAIA::ECT::EctIllegal If socket is not created.
+
+				@exception
+					GAIA::ECT::EctNetwork If set socket option failed.
+			*/
+			virtual GAIA::GVOID SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION op, const GAIA::CTN::Vari& v){return m_sock.SetOption(op, v);}
+
+			/*!
+				@brief Get socket option.
+
+				@exception
+					GAIA::ECT::EctInvalidParam If parameter op is a invalid enum.
+
+				@exception
+					GAIA::ECT::EctIllegal If socket is not created.
+			*/
+			virtual GAIA::GVOID GetOption(GAIA::NETWORK::Socket::SOCKET_OPTION op, GAIA::CTN::Vari& v){return m_sock.GetOption(op, v);}
+
+			/*!
 				@brief Bind async socket to a network address, include IP and port.
 
 				@remarks
 					This function is async call.
 			*/
-			GAIA::GVOID Bind(const GAIA::NETWORK::Addr& addr);
+			virtual GAIA::GVOID Bind(const GAIA::NETWORK::Addr& addr);
 
 			/*!
 				@brief Check the socket is bound or not.
@@ -136,7 +161,7 @@ namespace GAIA
 				@remarks
 					This function is async call.
 			*/
-			GAIA::GVOID Connect(const GAIA::NETWORK::Addr& addr);
+			virtual GAIA::GVOID Connect(const GAIA::NETWORK::Addr& addr);
 
 			/*!
 				@brief Disconnect from a network address.
@@ -144,7 +169,7 @@ namespace GAIA
 				@remarks
 					This function is async call.
 			*/
-			GAIA::GVOID Disconnect();
+			virtual GAIA::GVOID Disconnect();
 
 			/*!
 				@brief Check current async socket is connected or not.
@@ -157,7 +182,7 @@ namespace GAIA
 				@remarks
 					This function is async call.
 			*/
-			GAIA::N32 Send(const GAIA::GVOID* p, GAIA::N32 nSize);
+			virtual GAIA::N32 Send(const GAIA::GVOID* p, GAIA::N32 nSize);
 
 			/*!
 				@brief Get socket file descriptor.
