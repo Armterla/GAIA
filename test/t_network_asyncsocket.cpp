@@ -49,6 +49,17 @@ namespace TEST
 			m_bNoMoreCallBack = GAIA::False;
 		}
 
+		virtual GAIA::GVOID Create()
+		{
+			AsyncSocket::Create();
+
+		#if GAIA_OS != GAIA_OS_WINDOWS
+			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, 1024 * 1024);
+			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, 1024 * 1024);
+			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
+		#endif
+		}
+
 	protected:
 		virtual GAIA::GVOID OnCreated(GAIA::BL bResult)
 		{
@@ -324,7 +335,7 @@ namespace TEST
 
 					// Wait complete.
 					{
-						GAIA::SYNC::gsleep(10000);
+						GAIA::SYNC::gsleep(5000);
 					}
 
 					// Sign no more back.
@@ -353,7 +364,7 @@ namespace TEST
 
 					// Wait no more callback.
 					{
-						GAIA::SYNC::gsleep(2000);
+						GAIA::SYNC::gsleep(1000);
 					}
 
 					// Check receive.
