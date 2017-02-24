@@ -6,6 +6,7 @@
 #include "gaia_sync_atomic.h"
 #include "gaia_sync_lock.h"
 #include "gaia_sync_autolock.h"
+#include "gaia_ctn_bufferrw.h"
 #include "gaia_network_ip.h"
 #include "gaia_network_addr.h"
 #include "gaia_network_base.h"
@@ -275,6 +276,7 @@ namespace GAIA
 			GAIA::GVOID* m_pfnConnectEx;
 			GAIA::GVOID* m_pfnDisconnectEx;
 		#else
+			GAIA::CTN::BufferRW m_sendbuf;
 			AsyncContext* m_pReadAsyncCtx;
 			AsyncContext* m_pWriteAsyncCtx;
 		#endif

@@ -81,9 +81,7 @@ namespace GAIA
 					 &GuidDisonnectEx, sizeof(GuidDisonnectEx), 
 					 &m_pfnDisconnectEx, sizeof(m_pfnDisconnectEx), 
 					 &dwBytes, GNIL, GNIL);
-		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
-			m_sock.Create(GAIA::NETWORK::Socket::SOCKET_TYPE_STREAM);
-		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
+		#else
 			m_sock.Create(GAIA::NETWORK::Socket::SOCKET_TYPE_STREAM);
 		#endif
 
@@ -240,11 +238,20 @@ namespace GAIA
 
 			GAST(sOffset == nSize);
 			return sOffset;
-		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
-			return GINVALID;
-		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
-			return GINVALID;
+		#else
+			m_sendbuf.write(p, nSize);
+			GAIA::N32 kqep = m_pDispatcher->select_kqep(*this);
+		#	if GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
+				GAST(m_pWriteAsyncCtx != GNIL);
+				struct kevent ke;
+				EV_SET(&ke, this->GetFD(), EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, m_pWriteAsyncCtx);
+				GAIA::NUM sResult = kevent(kqep, &ke, 1, GNIL, 0, GNIL);
+				GAST(sResult != GINVALID);
+		#	elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
+
+		#	endif
 		#endif
+			return nSize;
 		}
 
 		GAIA::GVOID AsyncSocket::init()
