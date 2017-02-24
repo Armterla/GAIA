@@ -644,6 +644,25 @@ namespace GAIA
 				{
 					struct kevent& e = elist[x];
 					GAIA::NETWORK::AsyncContext& ctx = *(GAIA::NETWORK::AsyncContext*)e.udata;
+					GAIA::BL bConnectBroken = GAIA::False;
+					if(e.flags & EV_EOF)
+						bConnectBroken = GAIA::True;
+					else if(e.flags & EV_ERROR)
+					{
+						GAIA::N32 nErr = (GAIA::N32)e.data;
+						if(nErr != EWOULDBLOCK && nErr != EINPROGRESS)
+							bConnectBroken = GAIA::True;
+					}
+					if(bConnectBroken)
+					{
+						ctx.pSocket->OnDisconnected(GAIA::True);
+						struct kevent ke[2];
+						EV_SET(&ke[0], e.ident, EVFILT_READ, EV_DELETE, 0, 0, GNIL);
+						EV_SET(&ke[1], e.ident, EVFILT_WRITE, EV_DELETE, 0, 0, GNIL);
+						kevent(pThread->kqep, ke, 2, GNIL, 0, GNIL);
+						continue;
+					}
+
 					if(e.filter == EVFILT_READ)
 					{
 						GAST((GAIA::N32)e.ident == ctx.pSocket->GetFD());
@@ -691,11 +710,11 @@ namespace GAIA
 										pAcceptedSock->OnAccepted(GAIA::True, addrListen);
 										this->OnAcceptSocket(*pAcceptedSock, addrListen);
 
-										struct kevent newe[2];
-										EV_SET(&newe[0], nNewSocket, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
-										EV_SET(&newe[1], nNewSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, pCtxSend);
+										struct kevent ke[2];
+										EV_SET(&ke[0], nNewSocket, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
+										EV_SET(&ke[1], nNewSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, pCtxSend);
 										GAIA::N32 kqep = this->select_kqep(*pAcceptedSock);
-										GAIA::NUM sResult = kevent(kqep, newe, 2, GNIL, 0, GNIL);
+										GAIA::NUM sResult = kevent(kqep, ke, 2, GNIL, 0, GNIL);
 										GAST(sResult != GINVALID);
 									}
 									else
@@ -741,10 +760,10 @@ namespace GAIA
 								ctx.pSocket->GetPeerAddress(addrPeer);
 								ctx.pSocket->OnConnected(GAIA::True, addrPeer);
 
-								struct kevent newe[2];
-								EV_SET(&newe[0], (GAIA::N32)e.ident, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, &ctx);
-								EV_SET(&newe[1], (GAIA::N32)e.ident, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
-								GAIA::NUM sResult = kevent(pThread->kqep, newe, 2, GNIL, 0, GNIL);
+								struct kevent ke[2];
+								EV_SET(&ke[0], (GAIA::N32)e.ident, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, &ctx);
+								EV_SET(&ke[1], (GAIA::N32)e.ident, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
+								GAIA::NUM sResult = kevent(pThread->kqep, ke, 2, GNIL, 0, GNIL);
 								GAST(sResult != GINVALID);
 							}
 							break;
