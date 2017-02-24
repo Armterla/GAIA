@@ -48,6 +48,7 @@ namespace GAIA
 
 			#if GAIA_OS != GAIA_OS_WINDOWS
 				kqep = GINVALID;
+				bStopCmd = GAIA::False;
 			#endif
 			}
 
@@ -55,6 +56,8 @@ namespace GAIA
 			{
 				for(;;)
 				{
+					if(bStopCmd)
+						break;
 					if(!m_pDispatcher->Execute(this))
 						break;
 				}
@@ -67,6 +70,7 @@ namespace GAIA
 			GAIA::NUM sIndex;
 		#if GAIA_OS != GAIA_OS_WINDOWS
 			GAIA::N32 kqep; // kqueue or epoll.
+			GAIA::BL bStopCmd;
 		#endif
 		};
 
@@ -152,9 +156,9 @@ namespace GAIA
 				if((m_desc.sMaxConnectionCount % m_desc.sThreadCount) != 0)
 					sThreadMaxConnCount += 1;
 				pThread->kqep = epoll_create(sThreadMaxCnnCount);
+				pThread->bStopCmd = GAIA::False;
 			#endif
-
-				m_threads[x]->Start();
+				pThread->Start();
 			}
 
 			m_bBegin = GAIA::True;
@@ -200,18 +204,17 @@ namespace GAIA
 			}
 
 			// Notify the thread exit.
-		#if GAIA_OS == GAIA_OS_WINDOWS
 			for(GAIA::NUM x = 0; x < m_threads.size(); ++x)
 			{
+				AsyncDispatcherThread* pThread = m_threads[x];
+			#if GAIA_OS == GAIA_OS_WINDOWS
 				AsyncContext* pCtx = this->alloc_async_ctx();
 				pCtx->type = ASYNC_CONTEXT_TYPE_STOP;
 				PostQueuedCompletionStatus(m_pIOCP, sizeof(AsyncContext), 0, (OVERLAPPED*)pCtx);
+			#else
+				pThread->bStopCmd = GAIA::True;
+			#endif
 			}
-		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
-
-		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
-
-		#endif
 
 			// End thread.
 			for(GAIA::NUM x = 0; x < m_threads.size(); ++x)
@@ -222,6 +225,7 @@ namespace GAIA
 			#if GAIA_OS != GAIA_OS_WINDOWS
 				close(pThread->kqep);
 				pThread->kqep = GINVALID;
+				pThread->bStopCmd = GAIA::False;
 			#endif
 			}
 
@@ -619,8 +623,11 @@ namespace GAIA
 				m_AsyncCtxPool.release(pCtx);
 			}
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
+			struct timespec timeout;
+			timeout.tv_sec = 0;
+			timeout.tv_nsec = 10 * 1000 * 1000; // 10 MilliSeconds.
 			struct kevent elist[128];
-			GAIA::NUM sEventCount = kevent(pThread->kqep, GNIL, 0, elist, sizeofarray(elist), GNIL);
+			GAIA::NUM sEventCount = kevent(pThread->kqep, GNIL, 0, elist, sizeofarray(elist), &timeout);
 			if(sEventCount > 0)
 			{
 				for(GAIA::NUM x = 0; x < sEventCount; ++x)
