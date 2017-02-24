@@ -116,6 +116,7 @@ namespace TEST
 			m_nSentCount[bResult]++;
 			if(m_bNoMoreCallBack)
 				m_nSentCount[2]++;
+			m_nSendSize += nPracticeSize;
 		}
 		virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize)
 		{
@@ -130,6 +131,7 @@ namespace TEST
 			m_nRecvCount[bResult]++;
 			if(m_bNoMoreCallBack)
 				m_nRecvCount[2]++;
+			m_nRecvSize += nSize;
 		}
 		virtual GAIA::GVOID OnShutdowned(GAIA::BL bResult, GAIA::N32 nShutdownFlag)
 		{
@@ -154,6 +156,8 @@ namespace TEST
 		GAIA::SYNC::Atomic m_nSentCount[3];
 		GAIA::SYNC::Atomic m_nRecvCount[3];
 		GAIA::SYNC::Atomic m_nShutCount[3];
+		GAIA::SYNC::Atomic m_nSendSize;
+		GAIA::SYNC::Atomic m_nRecvSize;
 		GAIA::BL m_bNoMoreCallBack;
 	};
 
@@ -308,17 +312,12 @@ namespace TEST
 						ctx.listConnectedSockets.push_back(pSocket);
 					}
 
-					// Bind.
-					{
-
-					}
-
 					// Connect.
 					for(GAIA::NUM x = 0; x < ctx.listConnectedSockets.size(); ++x)
 					{
 						AsyncSocketEx* pSocket = ctx.listConnectedSockets[x];
-						GAIA::NUM sRandIndex = GAIA::MATH::xrandom() % ctx.listListenSockets.size();
-						GAIA::NETWORK::Addr addrConnectTo = ctx.listListenSockets[sRandIndex].front();
+						GAIA::NUM sConnectIndex = x % ctx.listListenSockets.size();
+						GAIA::NETWORK::Addr addrConnectTo = ctx.listListenSockets[sConnectIndex].front();
 						pSocket->Connect(addrConnectTo);
 					}
 
@@ -338,15 +337,34 @@ namespace TEST
 						GAIA::SYNC::gsleep(5000);
 					}
 
+					TAST(ctx.listAcceptedSockets.size() == ctx.listConnectedSockets.size());
+
+					// Shutdown.
+					for(GAIA::NUM x = 0; x < ctx.listConnectedSockets.size(); ++x)
+					{
+						AsyncSocketEx* pSocket = ctx.listConnectedSockets[x];
+						pSocket->Shutdown();
+					}
+					for(GAIA::NUM x = 0; x < ctx.listAcceptedSockets.size(); ++x)
+					{
+						AsyncSocketEx* pSocket = ctx.listAcceptedSockets[x];
+						pSocket->Shutdown();
+					}
+
+					// Close.
+					for(GAIA::NUM x = 0; x < ctx.listConnectedSockets.size(); ++x)
+					{
+						AsyncSocketEx* pSocket = ctx.listConnectedSockets[x];
+						pSocket->Close();
+					}
+					for(GAIA::NUM x = 0; x < ctx.listAcceptedSockets.size(); ++x)
+					{
+						AsyncSocketEx* pSocket = ctx.listAcceptedSockets[x];
+						pSocket->Close();
+					}
+
 					// Sign no more back.
 					{
-						// Listen.
-						{
-							GAIA::SYNC::Autolock al(ctx.lrListenSocket);
-							for(GAIA::NUM x = 0; x < ctx.listListenSockets.size(); ++x)
-								ctx.listListenSockets[x].back()->m_bNoMoreCallBack = GAIA::True;
-						}
-
 						// Connected.
 						{
 							GAIA::SYNC::Autolock al(ctx.lrConnectedSocket);
@@ -367,9 +385,44 @@ namespace TEST
 						GAIA::SYNC::gsleep(1000);
 					}
 
+					// Check send.
+					for(GAIA::NUM x = 0; x < ctx.listConnectedSockets.size(); ++x)
+					{
+						AsyncSocketEx* pSock = ctx.listConnectedSockets[x];
+						if(pSock->m_sendbuf.size() != sizeof(GAIA::NUM) * DATA_TRANSFER_COUNT)
+						{
+							TERROR;
+							break;
+						}
+						for(GAIA::NUM y = 0; y < DATA_TRANSFER_COUNT; ++y)
+						{
+							GAIA::NUM yy = pSock->m_sendbuf.readx<GAIA::NUM>();
+							if(yy != y)
+							{
+								TERROR;
+								break;
+							}
+						}
+					}
+
 					// Check receive.
 					for(GAIA::NUM x = 0; x < ctx.listAcceptedSockets.size(); ++x)
 					{
+						AsyncSocketEx* pSock = ctx.listAcceptedSockets[x];
+						if(pSock->m_recvbuf.size() != sizeof(GAIA::NUM) * DATA_TRANSFER_COUNT)
+						{
+							TERROR;
+							break;
+						}
+						for(GAIA::NUM y = 0; y < DATA_TRANSFER_COUNT; ++y)
+						{
+							GAIA::NUM yy = pSock->m_recvbuf.readx<GAIA::NUM>();
+							if(yy != y)
+							{
+								TERROR;
+								break;
+							}
+						}
 					}
 
 					// Check callback workflow result.
@@ -380,6 +433,38 @@ namespace TEST
 							for(GAIA::NUM x = 0; x < ctx.listListenSockets.size(); ++x)
 							{
 								AsyncSocketEx* pSock = ctx.listListenSockets[x].back();
+								if(pSock->m_nCreatedCount[0] != 0){TERROR;break;}
+								if(pSock->m_nCreatedCount[1] != 1){TERROR;break;}
+								if(pSock->m_nCreatedCount[2] != 0){TERROR;break;}
+								if(pSock->m_nClosedCount[0] != 0){TERROR;break;}
+								if(pSock->m_nClosedCount[1] != 0){TERROR;break;}
+								if(pSock->m_nClosedCount[2] != 0){TERROR;break;}
+								if(pSock->m_nBoundCount[0] != 0){TERROR;break;}
+								if(pSock->m_nBoundCount[1] != 1){TERROR;break;}
+								if(pSock->m_nBoundCount[2] != 0){TERROR;break;}
+								if(pSock->m_nConnectedCount[0] != 0){TERROR;break;}
+								if(pSock->m_nConnectedCount[1] != 0){TERROR;break;}
+								if(pSock->m_nConnectedCount[2] != 0){TERROR;break;}
+								if(pSock->m_nDisconnectedCount[0] != 0){TERROR;break;}
+								if(pSock->m_nDisconnectedCount[1] != 0){TERROR;break;}
+								if(pSock->m_nDisconnectedCount[2] != 0){TERROR;break;}
+								if(pSock->m_nListenCount[0] != 0){TERROR;break;}
+								if(pSock->m_nListenCount[1] != 1){TERROR;break;}
+								if(pSock->m_nListenCount[2] != 0){TERROR;break;}
+								if(pSock->m_nAcceptedCount[0] != 0){TERROR;break;}
+								if(pSock->m_nAcceptedCount[1] != DATA_SOCKET_COUNT / LISTEN_SOCKET_COUNT){TERROR;break;}
+								if(pSock->m_nAcceptedCount[2] != 0){TERROR;break;}
+								if(pSock->m_nSentCount[0] != 0){TERROR;break;}
+								if(pSock->m_nSentCount[1] != 0){TERROR;break;}
+								if(pSock->m_nSentCount[2] != 0){TERROR;break;}
+								if(pSock->m_nRecvCount[0] != 0){TERROR;break;}
+								if(pSock->m_nRecvCount[1] != 0){TERROR;break;}
+								if(pSock->m_nRecvCount[2] != 0){TERROR;break;}
+								if(pSock->m_nShutCount[0] != 0){TERROR;break;}
+								if(pSock->m_nShutCount[1] != 0){TERROR;break;}
+								if(pSock->m_nShutCount[2] != 0){TERROR;break;}
+								if(pSock->m_nSendSize != 0){TERROR;break;}
+								if(pSock->m_nRecvSize != 0){TERROR;break;}
 							}
 						}
 
@@ -389,6 +474,38 @@ namespace TEST
 							for(GAIA::NUM x = 0; x < ctx.listConnectedSockets.size(); ++x)
 							{
 								AsyncSocketEx* pSock = ctx.listConnectedSockets[x];
+								if(pSock->m_nCreatedCount[0] != 0){TERROR;break;}
+								if(pSock->m_nCreatedCount[1] != 1){TERROR;break;}
+								if(pSock->m_nCreatedCount[2] != 0){TERROR;break;}
+								if(pSock->m_nClosedCount[0] != 0){TERROR;break;}
+								if(pSock->m_nClosedCount[1] != 1){TERROR;break;}
+								if(pSock->m_nClosedCount[2] != 0){TERROR;break;}
+								if(pSock->m_nBoundCount[0] != 0){TERROR;break;}
+								if(pSock->m_nBoundCount[1] != 0){TERROR;break;}
+								if(pSock->m_nBoundCount[2] != 0){TERROR;break;}
+								if(pSock->m_nConnectedCount[0] != 0){TERROR;break;}
+								if(pSock->m_nConnectedCount[1] != 1){TERROR;break;}
+								if(pSock->m_nConnectedCount[2] != 0){TERROR;break;}
+								if(pSock->m_nDisconnectedCount[0] != 0){TERROR;break;}
+								if(pSock->m_nDisconnectedCount[1] != 1){TERROR;break;}
+								if(pSock->m_nDisconnectedCount[2] != 0){TERROR;break;}
+								if(pSock->m_nListenCount[0] != 0){TERROR;break;}
+								if(pSock->m_nListenCount[1] != 0){TERROR;break;}
+								if(pSock->m_nListenCount[2] != 0){TERROR;break;}
+								if(pSock->m_nAcceptedCount[0] != 0){TERROR;break;}
+								if(pSock->m_nAcceptedCount[1] != 0){TERROR;break;}
+								if(pSock->m_nAcceptedCount[2] != 0){TERROR;break;}
+								if(pSock->m_nSentCount[0] != 0){TERROR;break;}
+								if(pSock->m_nSentCount[1] <= 0){TERROR;break;}
+								if(pSock->m_nSentCount[2] != 0){TERROR;break;}
+								if(pSock->m_nRecvCount[0] != 0){TERROR;break;}
+								if(pSock->m_nRecvCount[1] != 0){TERROR;break;}
+								if(pSock->m_nRecvCount[2] != 0){TERROR;break;}
+								if(pSock->m_nShutCount[0] != 0){TERROR;break;}
+								if(pSock->m_nShutCount[1] != 1){TERROR;break;}
+								if(pSock->m_nShutCount[2] != 0){TERROR;break;}
+								if(pSock->m_nSendSize != (GAIA::N64)(sizeof(GAIA::NUM) * DATA_TRANSFER_COUNT)){TERROR;break;}
+								if(pSock->m_nRecvSize != 0){TERROR;break;}
 							}
 						}
 
@@ -399,22 +516,40 @@ namespace TEST
 							{
 								AsyncSocketEx* pSock = ctx.listAcceptedSockets[x];
 								TAST((GAIA::N64)pSock->m_nRecvCount[1] > 0);
+								if(pSock->m_nCreatedCount[0] != 0){TERROR;break;}
+								if(pSock->m_nCreatedCount[1] != 1){TERROR;break;}
+								if(pSock->m_nCreatedCount[2] != 0){TERROR;break;}
+								if(pSock->m_nClosedCount[0] != 0){TERROR;break;}
+								if(pSock->m_nClosedCount[1] != 1){TERROR;break;}
+								if(pSock->m_nClosedCount[2] != 0){TERROR;break;}
+								if(pSock->m_nBoundCount[0] != 0){TERROR;break;}
+								if(pSock->m_nBoundCount[1] != 0){TERROR;break;}
+								if(pSock->m_nBoundCount[2] != 0){TERROR;break;}
+								if(pSock->m_nConnectedCount[0] != 0){TERROR;break;}
+								if(pSock->m_nConnectedCount[1] != 0){TERROR;break;}
+								if(pSock->m_nConnectedCount[2] != 0){TERROR;break;}
+								if(pSock->m_nDisconnectedCount[0] != 0){TERROR;break;}
+								if(pSock->m_nDisconnectedCount[1] != 1){TERROR;break;}
+								if(pSock->m_nDisconnectedCount[2] != 0){TERROR;break;}
+								if(pSock->m_nListenCount[0] != 0){TERROR;break;}
+								if(pSock->m_nListenCount[1] != 0){TERROR;break;}
+								if(pSock->m_nListenCount[2] != 0){TERROR;break;}
+								if(pSock->m_nAcceptedCount[0] != 0){TERROR;break;}
+								if(pSock->m_nAcceptedCount[1] != 0){TERROR;break;}
+								if(pSock->m_nAcceptedCount[2] != 0){TERROR;break;}
+								if(pSock->m_nSentCount[0] != 0){TERROR;break;}
+								if(pSock->m_nSentCount[1] != 0){TERROR;break;}
+								if(pSock->m_nSentCount[2] != 0){TERROR;break;}
+								if(pSock->m_nRecvCount[0] != 0){TERROR;break;}
+								if(pSock->m_nRecvCount[1] <= 0){TERROR;break;}
+								if(pSock->m_nRecvCount[2] != 0){TERROR;break;}
+								if(pSock->m_nShutCount[0] != 0){TERROR;break;}
+								if(pSock->m_nShutCount[1] != 1){TERROR;break;}
+								if(pSock->m_nShutCount[2] != 0){TERROR;break;}
+								if(pSock->m_nSendSize != 0){TERROR;break;}
+								if(pSock->m_nRecvSize != (GAIA::N64)(sizeof(GAIA::NUM) * DATA_TRANSFER_COUNT)){TERROR;break;}
 							}
 						}
-					}
-
-					// Shutdown.
-					for(GAIA::NUM x = 0; x < DATA_SOCKET_COUNT; ++x)
-					{
-						AsyncSocketEx* pSocket = ctx.listConnectedSockets[x];
-						pSocket->Shutdown();
-					}
-
-					// Close.
-					for(GAIA::NUM x = 0; x < DATA_SOCKET_COUNT; ++x)
-					{
-						AsyncSocketEx* pSocket = ctx.listConnectedSockets[x];
-						pSocket->Close();
 					}
 
 					// Release.
@@ -434,6 +569,16 @@ namespace TEST
 						addrListen.uPort++;
 					}
 					ctx.listListenSockets.clear();
+
+					// Signal no more back for listen socket.
+					{
+						// Listen.
+						{
+							GAIA::SYNC::Autolock al(ctx.lrListenSocket);
+							for(GAIA::NUM x = 0; x < ctx.listListenSockets.size(); ++x)
+								ctx.listListenSockets[x].back()->m_bNoMoreCallBack = GAIA::True;
+						}
+					}
 				}
 				TAST(disp.End());
 			}
