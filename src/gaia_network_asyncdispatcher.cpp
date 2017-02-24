@@ -644,6 +644,11 @@ namespace GAIA
 				{
 					struct kevent& e = elist[x];
 					GAIA::NETWORK::AsyncContext& ctx = *(GAIA::NETWORK::AsyncContext*)e.udata;
+					GAIA::N32 nSocket = (GAIA::N32)e.ident;
+					GAST(nSocket != GINVALID);
+					GAST(nSocket == ctx.pSocket->GetFD());
+					GAST(pThread->kqep == this->select_kqep(*ctx.pSocket));
+
 					GAIA::BL bConnectBroken = GAIA::False;
 					if(e.flags & EV_EOF)
 						bConnectBroken = GAIA::True;
@@ -657,27 +662,24 @@ namespace GAIA
 					{
 						ctx.pSocket->OnDisconnected(GAIA::True);
 						struct kevent ke[2];
-						EV_SET(&ke[0], e.ident, EVFILT_READ, EV_DELETE, 0, 0, GNIL);
-						EV_SET(&ke[1], e.ident, EVFILT_WRITE, EV_DELETE, 0, 0, GNIL);
+						EV_SET(&ke[0], nSocket, EVFILT_READ, EV_DELETE, 0, 0, GNIL);
+						EV_SET(&ke[1], nSocket, EVFILT_WRITE, EV_DELETE, 0, 0, GNIL);
 						kevent(pThread->kqep, ke, 2, GNIL, 0, GNIL);
 						continue;
 					}
 
 					if(e.filter == EVFILT_READ)
 					{
-						GAST((GAIA::N32)e.ident == ctx.pSocket->GetFD());
-						GAST(pThread->kqep == this->select_kqep(*ctx.pSocket));
 						switch(ctx.type)
 						{
 						case GAIA::NETWORK::ASYNC_CONTEXT_TYPE_ACCEPT:
 							{
-								GAST((GAIA::N32)e.ident == ctx.pSocket->GetFD());
 								GAIA::NUM sAcceptAbleCount = (GAIA::NUM)e.data;
 								for(GAIA::NUM y = 0; y < sAcceptAbleCount; ++y)
 								{
 									sockaddr_in addraccept;
 									socklen_t newaddrlen = sizeof(addraccept);
-									GAIA::N32 nNewSocket = accept(ctx.pSocket->GetFD(), (sockaddr*)&addraccept, &newaddrlen);
+									GAIA::N32 nNewSocket = accept(nSocket, (sockaddr*)&addraccept, &newaddrlen);
 									if(nNewSocket != GINVALID)
 									{
 										GAIA::NETWORK::Addr addrListen;
@@ -724,12 +726,11 @@ namespace GAIA
 							break;
 						case GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV:
 							{
-								GAST((GAIA::N32)e.ident == ctx.pSocket->GetFD());
 								GAIA::NUM sRecvAbleSize = (GAIA::NUM)e.data;
 								if(sRecvAbleSize > 0)
 								{
 									pThread->tempbuf.resize(sRecvAbleSize);
-									GAIA::NUM sRecved = (GAIA::NUM)recv(ctx.pSocket->GetFD(), pThread->tempbuf.fptr(), sRecvAbleSize, 0);
+									GAIA::NUM sRecved = (GAIA::NUM)recv(nSocket, pThread->tempbuf.fptr(), sRecvAbleSize, 0);
 									ctx.pSocket->OnRecved(GAIA::True, pThread->tempbuf.fptr(), sRecved);
 								}
 							}
@@ -745,7 +746,6 @@ namespace GAIA
 						{
 						case GAIA::NETWORK::ASYNC_CONTEXT_TYPE_CONNECT:
 							{
-								GAST((GAIA::N32)e.ident == ctx.pSocket->GetFD());
 								AsyncContext* pCtxRecv = this->alloc_async_ctx();
 								pCtxRecv->pSocket = ctx.pSocket;
 								pCtxRecv->type = GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV;
@@ -761,15 +761,14 @@ namespace GAIA
 								ctx.pSocket->OnConnected(GAIA::True, addrPeer);
 
 								struct kevent ke[2];
-								EV_SET(&ke[0], (GAIA::N32)e.ident, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, &ctx);
-								EV_SET(&ke[1], (GAIA::N32)e.ident, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
+								EV_SET(&ke[0], nSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, &ctx);
+								EV_SET(&ke[1], nSocket, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
 								GAIA::NUM sResult = kevent(pThread->kqep, ke, 2, GNIL, 0, GNIL);
 								GAST(sResult != GINVALID);
 							}
 							break;
 						case GAIA::NETWORK::ASYNC_CONTEXT_TYPE_SEND:
 							{
-								GAST((GAIA::N32)e.ident == ctx.pSocket->GetFD());
 								GAIA::NUM sSendAbleSize = (GAIA::NUM)e.data;
 								if(sSendAbleSize > 0)
 								{
@@ -779,7 +778,7 @@ namespace GAIA
 										GAIA::NUM sNeedSendSize = ctx.pSocket->m_sendbuf.read(pThread->tempbuf.fptr(), sSendAbleSize);
 										if(sNeedSendSize > 0)
 										{
-											GAIA::NUM sSendedSize = (GAIA::NUM)send(ctx.pSocket->GetFD(), pThread->tempbuf.fptr(), sNeedSendSize, 0);
+											GAIA::NUM sSendedSize = (GAIA::NUM)send(nSocket, pThread->tempbuf.fptr(), sNeedSendSize, 0);
 											GAST(sSendedSize == sNeedSendSize);
 											ctx.pSocket->OnSent(GAIA::True, pThread->tempbuf.fptr(), sSendedSize, sSendedSize + pThread->tempbuf.remain());
 										}
@@ -787,7 +786,7 @@ namespace GAIA
 										{
 											GAST(ctx.pSocket->m_pWriteAsyncCtx != GNIL);
 											struct kevent ke;
-											EV_SET(&ke, ctx.pSocket->GetFD(), EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, ctx.pSocket->m_pWriteAsyncCtx);
+											EV_SET(&ke, nSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, ctx.pSocket->m_pWriteAsyncCtx);
 											GAIA::NUM sResult = kevent(pThread->kqep, &ke, 1, GNIL, 0, GNIL);
 											GAST(sResult != GINVALID);
 										}

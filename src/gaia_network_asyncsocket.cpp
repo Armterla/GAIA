@@ -43,12 +43,38 @@ namespace GAIA
 
 		AsyncSocket::~AsyncSocket()
 		{
+			//
+			GTRY
+			{
+				if(this->IsCreated())
+					this->Close();
+			}
+			GCATCH(Network)
+			{
+				e.SetDispatched(GAIA::True);
+			}
+
+			//
 			if(m_socktype == GAIA::NETWORK::ASYNC_SOCKET_TYPE_ACCEPTING)
 				m_pDispatcher->RemoveAcceptingSocket(*this);
 			else if(m_socktype == GAIA::NETWORK::ASYNC_SOCKET_TYPE_ACCEPTED)
 				m_pDispatcher->RemoveAcceptedSocket(*this);
 			else if(m_socktype == GAIA::NETWORK::ASYNC_SOCKET_TYPE_CONNECTED)
 				m_pDispatcher->RemoveConnectedSocket(*this);
+
+			//
+		#if GAIA_OS != GAIA_OS_WINDOWS
+			if(m_pReadAsyncCtx != GNIL)
+			{
+				m_pDispatcher->release_async_ctx(m_pReadAsyncCtx);
+				m_pReadAsyncCtx = GNIL;
+			}
+			if(m_pWriteAsyncCtx != GNIL)
+			{
+				m_pDispatcher->release_async_ctx(m_pWriteAsyncCtx);
+				m_pWriteAsyncCtx = GNIL;
+			}
+		#endif
 		}
 
 		GAIA::GVOID AsyncSocket::Create()

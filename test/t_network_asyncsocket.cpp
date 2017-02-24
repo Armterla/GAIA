@@ -4,8 +4,8 @@
 namespace TEST
 {
 	static const GAIA::NUM LISTEN_SOCKET_COUNT = 10;
-	static const GAIA::NUM DATA_SOCKET_COUNT = 1000;
-	static const GAIA::NUM DATA_TRANSFER_COUNT = 100;
+	static const GAIA::NUM DATA_SOCKET_COUNT = 100;
+	static const GAIA::NUM DATA_TRANSFER_COUNT = 1000;
 	static const GAIA::NUM START_PORT = 10000;
 
 	class AsyncSocketEx;
