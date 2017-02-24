@@ -180,7 +180,7 @@ namespace GAIA
 			GAST(m_pWriteAsyncCtx == GNIL);
 			m_pWriteAsyncCtx = pCtx;
 
-			GAIA::N32 kqep = m_pDispatcher->select_kqep(*this);
+			GAIA::N32 kqep = m_pDispatcher->select_kqep(this->GetFD());
 
 			struct kevent ke;
 			EV_SET(&ke, this->GetFD(), EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, pCtx);
@@ -266,7 +266,7 @@ namespace GAIA
 			return sOffset;
 		#else
 			m_sendbuf.write(p, nSize);
-			GAIA::N32 kqep = m_pDispatcher->select_kqep(*this);
+			GAIA::N32 kqep = m_pDispatcher->select_kqep(this->GetFD());
 		#	if GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 				GAST(m_pWriteAsyncCtx != GNIL);
 				struct kevent ke;

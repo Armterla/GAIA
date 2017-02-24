@@ -105,15 +105,21 @@ namespace GAIA
 		protected:
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
-				GAIA::NETWORK::AsyncSocket* pListenSocket = gnew GAIA::NETWORK::AsyncSocket(*this, ASYNC_SOCKET_TYPE_LISTEN);
+				GAIA::NETWORK::AsyncSocket* pListenSocket =
+						gnew GAIA::NETWORK::AsyncSocket(*this, ASYNC_SOCKET_TYPE_LISTEN);
 				return pListenSocket;
 			}
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptingSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
-				GAIA::NETWORK::AsyncSocket* pAcceptingSocket = gnew GAIA::NETWORK::AsyncSocket(*this, ASYNC_SOCKET_TYPE_ACCEPTING);
+				GAIA::NETWORK::AsyncSocket* pAcceptingSocket =
+						gnew GAIA::NETWORK::AsyncSocket(*this, ASYNC_SOCKET_TYPE_ACCEPTING);
 				return pAcceptingSocket;
 			}
-			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen){return GAIA::False;}
+			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen)
+			{
+				sock.drop_ref();
+				return GAIA::False;
+			}
 
 		private:
 			GAIA::GVOID init();
@@ -133,7 +139,7 @@ namespace GAIA
 			GAIA::GVOID request_accept(GAIA::NETWORK::AsyncSocket& listensock, const GAIA::NETWORK::Addr& addrListen);
 			GAIA::GVOID request_recv(GAIA::NETWORK::AsyncSocket& datasock);
 		#else
-			GAIA::N32 select_kqep(GAIA::NETWORK::AsyncSocket& sock) const;
+			GAIA::N32 select_kqep(GAIA::N32 nSocket) const;
 		#endif
 
 		private:
