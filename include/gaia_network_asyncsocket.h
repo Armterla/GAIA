@@ -156,7 +156,7 @@ namespace GAIA
 				@remarks
 					This function is async call.
 			*/
-			GAIA::NUM Send(const GAIA::GVOID* pData, GAIA::NUM sSize);
+			GAIA::N32 Send(const GAIA::GVOID* p, GAIA::N32 nSize);
 
 			/*!
 				@brief Get socket file descriptor.
@@ -235,12 +235,12 @@ namespace GAIA
 			/*!
 				@brief On async socket sent callback.
 			*/
-			virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::NUM sPracticeSize, GAIA::NUM sSize){}
+			virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nPracticeSize, GAIA::N32 nSize){}
 
 			/*!
 				@brief On async socket recv callback.
 			*/
-			virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::NUM sSize){}
+			virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize){}
 
 			/*!
 				@brief On async socket shutdown callback.
@@ -274,6 +274,9 @@ namespace GAIA
 			GAIA::GVOID* m_pfnAcceptEx;
 			GAIA::GVOID* m_pfnConnectEx;
 			GAIA::GVOID* m_pfnDisconnectEx;
+		#else
+			AsyncContext* m_pReadAsyncCtx;
+			AsyncContext* m_pWriteAsyncCtx;
 		#endif
 		};
 	}

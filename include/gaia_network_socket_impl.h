@@ -544,10 +544,10 @@ namespace GAIA
 			{
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				GAIA::N32 nOSError = WSAGetLastError();
-				if(nOSError != WSAEWOULDBLOCK)
+				if(nOSError != WSAEWOULDBLOCK && nOSError != WSAEINPROGRESS)
 			#else
 				GAIA::N32 nOSError = errno;
-				if(nOSError != EWOULDBLOCK)
+				if(nOSError != EWOULDBLOCK && nOSError != EINPROGRESS)
 			#endif
 				THROW_LASTERROR;
 			}

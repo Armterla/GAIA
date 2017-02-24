@@ -53,8 +53,11 @@ namespace GAIA
 
 		GAIA::GVOID AsyncSocket::Create()
 		{
+			if(this->IsCreated())
+				GTHROW(Illegal);
+
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			GAIA::N32 nSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, NULL, 0, WSA_FLAG_OVERLAPPED);
+			GAIA::N32 nSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, GNIL, 0, WSA_FLAG_OVERLAPPED);
 			if(nSocket == INVALID_SOCKET)
 			{
 				this->OnCreated(GAIA::False);
@@ -69,15 +72,15 @@ namespace GAIA
 			WSAIoctl(nSocket, SIO_GET_EXTENSION_FUNCTION_POINTER, 
 					 &GuidAcceptEx, sizeof(GuidAcceptEx), 
 					 &m_pfnAcceptEx, sizeof(m_pfnAcceptEx), 
-					 &dwBytes, NULL, NULL);
+					 &dwBytes, GNIL, GNIL);
 			WSAIoctl(nSocket, SIO_GET_EXTENSION_FUNCTION_POINTER, 
 					 &GuidConnectEx, sizeof(GuidConnectEx), 
 					 &m_pfnConnectEx, sizeof(m_pfnConnectEx), 
-					 &dwBytes, NULL, NULL);
+					 &dwBytes, GNIL, GNIL);
 			WSAIoctl(nSocket, SIO_GET_EXTENSION_FUNCTION_POINTER, 
 					 &GuidDisonnectEx, sizeof(GuidDisonnectEx), 
 					 &m_pfnDisconnectEx, sizeof(m_pfnDisconnectEx), 
-					 &dwBytes, NULL, NULL);
+					 &dwBytes, GNIL, GNIL);
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 			m_sock.Create(GAIA::NETWORK::Socket::SOCKET_TYPE_STREAM);
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
@@ -107,9 +110,14 @@ namespace GAIA
 
 		GAIA::GVOID AsyncSocket::Connect(const GAIA::NETWORK::Addr& addr)
 		{
-			GAST(addr.check());
 			if(!addr.check())
-				return;
+				GTHROW(InvalidParam);
+
+			if(!this->IsCreated())
+				GTHROW(Illegal);
+			if(this->IsConnected())
+				GTHROW(Illegal);
+
 			GAIA::NETWORK::Addr addrPeer;
 			addrPeer.reset();
 			this->GetPeerAddress(addrPeer);
@@ -142,7 +150,20 @@ namespace GAIA
 				}
 			}
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
+			AsyncContext* pCtx = m_pDispatcher->alloc_async_ctx();
+			pCtx->pSocket = this;
+			pCtx->type = GAIA::NETWORK::ASYNC_CONTEXT_TYPE_CONNECT;
+			GAST(m_pWriteAsyncCtx == GNIL);
+			m_pWriteAsyncCtx = pCtx;
 
+			GAIA::N32 kqep = m_pDispatcher->select_kqep(*this);
+
+			struct kevent ke;
+			EV_SET(&ke, this->GetFD(), EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, pCtx);
+			GAIA::NUM sResult = kevent(kqep, &ke, 1, GNIL, 0, GNIL);
+			GAST(sResult != GINVALID);
+
+			m_sock.Connect(addr);
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
 
 		#endif
@@ -172,23 +193,31 @@ namespace GAIA
 		#endif
 		}
 
-		GAIA::NUM AsyncSocket::Send(const GAIA::GVOID* pData, GAIA::NUM sSize)
+		GAIA::N32 AsyncSocket::Send(const GAIA::GVOID* p, GAIA::N32 nSize)
 		{
+			if(p == GNIL)
+				GTHROW(InvalidParam);
+			if(nSize <= 0)
+				GTHROW(InvalidParam);
+
+			if(!this->IsCreated())
+				GTHROW(Illegal);
+
 			GAIA::SYNC::Autolock al(m_lrSend);
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::NUM sPieceSize = gsizeofobj(AsyncContext, data);
-			GAIA::NUM sPieceCount = sSize / sPieceSize + ((sSize % sPieceSize) != 0 ? 1 : 0);
+			GAIA::NUM sPieceCount = nSize / sPieceSize + ((nSize % sPieceSize) != 0 ? 1 : 0);
 			GAIA::NUM sOffset = 0;
 			for(GAIA::NUM x = 0; x < sPieceCount; ++x)
 			{
-				GAIA::NUM sCurrentPieceSize = GAIA::ALGO::gmin(sSize - sOffset, sPieceSize);
+				GAIA::NUM sCurrentPieceSize = GAIA::ALGO::gmin(nSize - sOffset, sPieceSize);
 				GAST(sCurrentPieceSize != 0);
 
 				AsyncContext* pCtx = m_pDispatcher->alloc_async_ctx();
 				pCtx->type = ASYNC_CONTEXT_TYPE_SEND;
 				pCtx->pDataSocket = this;
-				GAIA::ALGO::gmemcpy(pCtx->data, (const GAIA::U8*)pData + sOffset, sCurrentPieceSize);
+				GAIA::ALGO::gmemcpy(pCtx->data, (const GAIA::U8*)p + sOffset, sCurrentPieceSize);
 				pCtx->_buf.len = sCurrentPieceSize;
 				this->rise_ref();
 
@@ -199,7 +228,7 @@ namespace GAIA
 					DWORD err = WSAGetLastError();
 					if(err != ERROR_IO_PENDING)
 					{
-						this->OnSent(GAIA::False, pData, sOffset, sSize);
+						this->OnSent(GAIA::False, p, sOffset, nSize);
 						m_pDispatcher->release_async_ctx(pCtx);
 						this->drop_ref();
 						return sOffset;
@@ -209,14 +238,13 @@ namespace GAIA
 				sOffset += sCurrentPieceSize;
 			}
 
-			GAST(sOffset == sSize);
+			GAST(sOffset == nSize);
 			return sOffset;
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 			return GINVALID;
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
 			return GINVALID;
 		#endif
-
 		}
 
 		GAIA::GVOID AsyncSocket::init()
@@ -228,6 +256,9 @@ namespace GAIA
 			m_pfnAcceptEx = GNIL;
 			m_pfnConnectEx = GNIL;
 			m_pfnDisconnectEx = GNIL;
+		#else
+			m_pReadAsyncCtx = GNIL;
+			m_pWriteAsyncCtx = GNIL;
 		#endif
 		}
 	}

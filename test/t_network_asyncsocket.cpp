@@ -92,28 +92,28 @@ namespace TEST
 			if(m_bNoMoreCallBack)
 				m_nAcceptedCount[2]++;
 		}
-		virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::NUM sPracticeSize, GAIA::NUM sSize)
+		virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nPracticeSize, GAIA::N32 nSize)
 		{
 			if(bResult)
 			{
-				if(sPracticeSize > 0)
+				if(nPracticeSize > 0)
 				{
 					GAIA::SYNC::Autolock al(m_lrSendBuf);
-					m_sendbuf.write(pData, sPracticeSize);
+					m_sendbuf.write(pData, nPracticeSize);
 				}
 			}
 			m_nSentCount[bResult]++;
 			if(m_bNoMoreCallBack)
 				m_nSentCount[2]++;
 		}
-		virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::NUM sSize)
+		virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize)
 		{
 			if(bResult)
 			{
-				if(sSize > 0)
+				if(nSize > 0)
 				{
 					GAIA::SYNC::Autolock al(m_lrRecvBuf);
-					m_recvbuf.write(pData, sSize);
+					m_recvbuf.write(pData, nSize);
 				}
 			}
 			m_nRecvCount[bResult]++;
