@@ -48,7 +48,7 @@ namespace GAIA
 				sIndex = GINVALID;
 
 			#if GAIA_OS == GAIA_OS_WINDOWS
-				iocp = GINVALID;
+				iocp = (GAIA::GVOID*)(GAIA::U64)GINVALID;
 			#else
 				kqep = GINVALID;
 				bStopCmd = GAIA::False;
@@ -59,8 +59,10 @@ namespace GAIA
 			{
 				for(;;)
 				{
+				#if GAIA_OS != GAIA_OS_WINDOWS
 					if(bStopCmd)
 						break;
+				#endif
 					if(!m_pDispatcher->Execute(this))
 						break;
 				}
@@ -230,7 +232,7 @@ namespace GAIA
 
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				::CloseHandle(pThread->iocp);
-				pThread->iocp = GINVALID;
+				pThread->iocp = (GAIA::GVOID*)(GAIA::U64)GINVALID;
 			#else
 				close(pThread->kqep);
 				pThread->kqep = GINVALID;
@@ -872,8 +874,8 @@ namespace GAIA
 			if(!sock.IsCreated())
 				return GAIA::False;
 			GAIA::NUM sIndex = sock.GetFD() / sizeof(GAIA::GVOID*) % m_threads.size();
-			GAIA::GVOID* iocp = m_threads[sIndex].iocp;
-			::CreateIoCompletionPort((HANDLE)sock.GetFD(), (HANDLE)iocp, 0, 0);
+			GAIA::GVOID* iocp = m_threads[sIndex]->iocp;
+			::CreateIoCompletionPort((HANDLE)(GAIA::U64)sock.GetFD(), (HANDLE)iocp, 0, 0);
 			return GAIA::True;
 		}
 
