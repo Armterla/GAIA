@@ -162,7 +162,6 @@ namespace GAIA
 			GAIA::SYNC::Lock m_lrAsyncCtxPool;
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			GAIA::GVOID* m_pIOCP;
 			GAIA::SYNC::LockRW m_rwPostAcceptAble;
 			GAIA::BL m_bPostAcceptAble;
 		#endif

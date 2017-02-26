@@ -47,7 +47,9 @@ namespace GAIA
 
 				sIndex = GINVALID;
 
-			#if GAIA_OS != GAIA_OS_WINDOWS
+			#if GAIA_OS == GAIA_OS_WINDOWS
+				iocp = GINVALID;
+			#else
 				kqep = GINVALID;
 				bStopCmd = GAIA::False;
 			#endif
@@ -69,7 +71,9 @@ namespace GAIA
 
 		public:
 			GAIA::NUM sIndex;
-		#if GAIA_OS != GAIA_OS_WINDOWS
+		#if GAIA_OS == GAIA_OS_WINDOWS
+			GAIA::GVOID* iocp;
+		#else
 			GAIA::N32 kqep; // kqueue or epoll.
 			GAIA::BL bStopCmd;
 			GAIA::CTN::Buffer tempbuf;
@@ -141,17 +145,14 @@ namespace GAIA
 			}
 		#endif
 
-			// Create async controller in OS.
-		#if GAIA_OS == GAIA_OS_WINDOWS
-			m_pIOCP = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, GNIL, 0, 0);
-		#endif
-
 			// Start thread.
 			for(GAIA::NUM x = 0; x < m_threads.size(); ++x)
 			{
 				AsyncDispatcherThread* pThread = m_threads[x];
 
-			#if GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
+			#if GAIA_OS == GAIA_OS_WINDOWS
+				pThread->iocp = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, GNIL, 0, 0);
+			#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 				pThread->kqep = kqueue();
 				GAST(pThread->kqep != GINVALID);
 				pThread->bStopCmd = GAIA::False;
@@ -215,7 +216,7 @@ namespace GAIA
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				AsyncContext* pCtx = this->alloc_async_ctx();
 				pCtx->type = ASYNC_CONTEXT_TYPE_STOP;
-				PostQueuedCompletionStatus(m_pIOCP, sizeof(AsyncContext), 0, (OVERLAPPED*)pCtx);
+				PostQueuedCompletionStatus(pThread->iocp, sizeof(AsyncContext), 0, (OVERLAPPED*)pCtx);
 			#else
 				pThread->bStopCmd = GAIA::True;
 			#endif
@@ -227,18 +228,15 @@ namespace GAIA
 				AsyncDispatcherThread* pThread = m_threads[x];
 				pThread->Wait();
 
-			#if GAIA_OS != GAIA_OS_WINDOWS
+			#if GAIA_OS == GAIA_OS_WINDOWS
+				::CloseHandle(pThread->iocp);
+				pThread->iocp = GINVALID;
+			#else
 				close(pThread->kqep);
 				pThread->kqep = GINVALID;
 				pThread->bStopCmd = GAIA::False;
 			#endif
 			}
-
-			// Close async controller in OS.
-		#if GAIA_OS == GAIA_OS_WINDOWS
-			::CloseHandle(m_pIOCP);
-			m_pIOCP = GNIL;
-		#endif
 
 			m_bBegin = GAIA::False;
 
@@ -448,7 +446,6 @@ namespace GAIA
 			m_bBegin = GAIA::False;
 			m_desc.reset();
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			m_pIOCP = GNIL;
 			m_bPostAcceptAble = GAIA::True;
 		#endif
 		}
@@ -506,7 +503,7 @@ namespace GAIA
 			DWORD dwTrans = 0;
 			GAIA::GVOID* pPointer = GNIL;
 			GAIA::NETWORK::AsyncContext* pCtx = GNIL;
-			if(GetQueuedCompletionStatus(m_pIOCP, &dwTrans, (PULONG_PTR)&pPointer, (OVERLAPPED**)&pCtx, INFINITE))
+			if(GetQueuedCompletionStatus(pThread->iocp, &dwTrans, (PULONG_PTR)&pPointer, (OVERLAPPED**)&pCtx, INFINITE))
 			{
 				if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_ACCEPT)
 				{
@@ -874,7 +871,9 @@ namespace GAIA
 				return GAIA::False;
 			if(!sock.IsCreated())
 				return GAIA::False;
-			::CreateIoCompletionPort((HANDLE)sock.GetFD(), m_pIOCP, 0, 0);
+			GAIA::NUM sIndex = sock.GetFD() / sizeof(GAIA::GVOID*) % m_threads.size();
+			GAIA::GVOID* iocp = m_threads[sIndex].iocp;
+			::CreateIoCompletionPort((HANDLE)sock.GetFD(), (HANDLE)iocp, 0, 0);
 			return GAIA::True;
 		}
 
