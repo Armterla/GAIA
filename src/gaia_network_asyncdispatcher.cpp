@@ -867,15 +867,19 @@ namespace GAIA
 	#if GAIA_OS == GAIA_OS_WINDOWS
 		GAIA::BL AsyncDispatcher::attach_socket_iocp(GAIA::NETWORK::AsyncSocket& sock)
 		{
+			GAST(this->IsCreated());
 			if(!this->IsCreated())
 				return GAIA::False;
+			GAST(this->IsBegin());
 			if(!this->IsBegin())
 				return GAIA::False;
+			GAST(sock.IsCreated());
 			if(!sock.IsCreated())
 				return GAIA::False;
 			GAIA::NUM sIndex = sock.GetFD() / sizeof(GAIA::GVOID*) % m_threads.size();
 			GAIA::GVOID* iocp = m_threads[sIndex]->iocp;
-			::CreateIoCompletionPort((HANDLE)(GAIA::U64)sock.GetFD(), (HANDLE)iocp, 0, 0);
+			HANDLE h = ::CreateIoCompletionPort((HANDLE)(GAIA::U64)sock.GetFD(), (HANDLE)iocp, 0, 0);
+			GAST(h != NULL);
 			return GAIA::True;
 		}
 
