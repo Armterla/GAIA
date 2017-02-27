@@ -899,7 +899,7 @@ namespace GAIA
 			DWORD dwRecved = 0;
 			if(!((LPFN_ACCEPTEX)listensock.m_pfnAcceptEx)(
 				listensock.GetFD(), pAcceptingSocket->GetFD(),
-				pCtx->data, sizeof(pCtx->data) - nAddrLen - nAddrLen,
+				pCtx->data, 0,
 				nAddrLen, nAddrLen, &dwRecved, (OVERLAPPED*)pCtx))
 			{
 				DWORD err = WSAGetLastError();

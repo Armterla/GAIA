@@ -1,4 +1,4 @@
-#ifndef		__GAIA_NETWORK_BASE_IMPL_H__
+﻿#ifndef		__GAIA_NETWORK_BASE_IMPL_H__
 #define		__GAIA_NETWORK_BASE_IMPL_H__
 
 #include "gaia_type.h"
@@ -78,9 +78,10 @@ namespace GAIA
 		{
 			return ntohs(uPort);
 		}
-		GINL GAIA::GVOID addr2saddr(const GAIA::NETWORK::Addr& a, GAIA::GVOID* sa)
+		GINL GAIA::GVOID addr2saddr(const GAIA::NETWORK::Addr& a, GAIA::GVOID* sa, GAIA::N32 family)
 		{
 			sockaddr_in& saddr = *(sockaddr_in*)sa;
+			saddr.sin_family = family;
 			GAIA::NETWORK::ip2sip(a.ip, sa);
 			saddr.sin_port = GAIA::NETWORK::port2sport(a.uPort);
 		}
