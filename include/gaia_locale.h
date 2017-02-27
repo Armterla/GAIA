@@ -73,7 +73,10 @@ namespace GAIA
 			size_t uDstSize = dst_size_in_wchar * sizeof(GAIA::WCH);
 
 			if(iconv(cv, &pTempSrc, &uSrcSize, &pTempDst, &uDstSize) == (GAIA::UM)-1)
+			{
+				iconv_close(cv);
 				return 0;
+			}
 
 			if(iconv_close(cv) == -1)
 				return 0;
@@ -142,7 +145,10 @@ namespace GAIA
 			size_t uDstSize = dst_size_in_bytes;
 
 			if(iconv(cv, &pTempSrc, &uSrcSize, &pTempDst, &uDstSize) == (GAIA::UM)-1)
+			{
+				iconv_close(cv);
 				return 0;
+			}
 
 			if(iconv_close(cv) == -1)
 				return 0;
