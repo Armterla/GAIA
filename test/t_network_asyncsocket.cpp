@@ -47,6 +47,8 @@ namespace TEST
 		{
 			m_ctx = &ctx;
 			m_bNoMoreCallBack = GAIA::False;
+			m_uCallBackThreadID = GINVALID;
+			m_bExistDiffThreadCallBack = GAIA::False;
 		}
 
 		virtual GAIA::GVOID Create()
@@ -84,12 +86,24 @@ namespace TEST
 			m_nConnectedCount[bResult]++;
 			if(m_bNoMoreCallBack)
 				m_nConnectedCount[2]++;
+
+			GAIA::UM uThreadID = GAIA::THREAD::threadid();
+			if(m_uCallBackThreadID == GINVALID)
+				m_uCallBackThreadID = uThreadID;
+			else if(uThreadID != m_uCallBackThreadID)
+				m_bExistDiffThreadCallBack = GAIA::True;
 		}
 		virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult)
 		{
 			m_nDisconnectedCount[bResult]++;
 			if(m_bNoMoreCallBack)
 				m_nDisconnectedCount[2]++;
+
+			GAIA::UM uThreadID = GAIA::THREAD::threadid();
+			if(m_uCallBackThreadID == GINVALID)
+				m_uCallBackThreadID = uThreadID;
+			else if(uThreadID != m_uCallBackThreadID)
+				m_bExistDiffThreadCallBack = GAIA::True;
 		}
 		virtual GAIA::GVOID OnListened(GAIA::BL bResult)
 		{
@@ -102,6 +116,12 @@ namespace TEST
 			m_nAcceptedCount[bResult]++;
 			if(m_bNoMoreCallBack)
 				m_nAcceptedCount[2]++;
+
+			GAIA::UM uThreadID = GAIA::THREAD::threadid();
+			if(m_uCallBackThreadID == GINVALID)
+				m_uCallBackThreadID = uThreadID;
+			else if(uThreadID != m_uCallBackThreadID)
+				m_bExistDiffThreadCallBack = GAIA::True;
 		}
 		virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nPracticeSize, GAIA::N32 nSize)
 		{
@@ -117,6 +137,12 @@ namespace TEST
 			if(m_bNoMoreCallBack)
 				m_nSentCount[2]++;
 			m_nSendSize += nPracticeSize;
+
+			GAIA::UM uThreadID = GAIA::THREAD::threadid();
+			if(m_uCallBackThreadID == GINVALID)
+				m_uCallBackThreadID = uThreadID;
+			else if(uThreadID != m_uCallBackThreadID)
+				m_bExistDiffThreadCallBack = GAIA::True;
 		}
 		virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize)
 		{
@@ -132,6 +158,12 @@ namespace TEST
 			if(m_bNoMoreCallBack)
 				m_nRecvCount[2]++;
 			m_nRecvSize += nSize;
+
+			GAIA::UM uThreadID = GAIA::THREAD::threadid();
+			if(m_uCallBackThreadID == GINVALID)
+				m_uCallBackThreadID = uThreadID;
+			else if(uThreadID != m_uCallBackThreadID)
+				m_bExistDiffThreadCallBack = GAIA::True;
 		}
 		virtual GAIA::GVOID OnShutdowned(GAIA::BL bResult, GAIA::N32 nShutdownFlag)
 		{
@@ -159,6 +191,9 @@ namespace TEST
 		GAIA::SYNC::Atomic m_nSendSize;
 		GAIA::SYNC::Atomic m_nRecvSize;
 		GAIA::BL m_bNoMoreCallBack;
+
+		GAIA::UM m_uCallBackThreadID;
+		GAIA::BL m_bExistDiffThreadCallBack;
 	};
 
 	class AsyncDispatcherEx : public GAIA::NETWORK::AsyncDispatcher
@@ -434,6 +469,7 @@ namespace TEST
 							for(GAIA::NUM x = 0; x < ctx.listListenSockets.size(); ++x)
 							{
 								AsyncSocketEx* pSock = ctx.listListenSockets[x].back();
+								if(pSock->m_bExistDiffThreadCallBack){TERROR;break;}
 								if(pSock->m_nCreatedCount[0] != 0){TERROR;break;}
 								if(pSock->m_nCreatedCount[1] != 1){TERROR;break;}
 								if(pSock->m_nCreatedCount[2] != 0){TERROR;break;}
@@ -475,6 +511,7 @@ namespace TEST
 							for(GAIA::NUM x = 0; x < ctx.listConnectedSockets.size(); ++x)
 							{
 								AsyncSocketEx* pSock = ctx.listConnectedSockets[x];
+								if(pSock->m_bExistDiffThreadCallBack){TERROR;break;}
 								if(pSock->m_nCreatedCount[0] != 0){TERROR;break;}
 								if(pSock->m_nCreatedCount[1] != 1){TERROR;break;}
 								if(pSock->m_nCreatedCount[2] != 0){TERROR;break;}
@@ -516,7 +553,8 @@ namespace TEST
 							for(GAIA::NUM x = 0; x < ctx.listAcceptedSockets.size(); ++x)
 							{
 								AsyncSocketEx* pSock = ctx.listAcceptedSockets[x];
-								TAST((GAIA::N64)pSock->m_nRecvCount[1] > 0);
+								if((GAIA::N64)pSock->m_nRecvCount[1] <= 0){TERROR;break;}
+								if(pSock->m_bExistDiffThreadCallBack){TERROR;break;}
 								if(pSock->m_nCreatedCount[0] != 0){TERROR;break;}
 								if(pSock->m_nCreatedCount[1] != 1){TERROR;break;}
 								if(pSock->m_nCreatedCount[2] != 0){TERROR;break;}
