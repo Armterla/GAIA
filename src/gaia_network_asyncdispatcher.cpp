@@ -879,7 +879,7 @@ namespace GAIA
 			GAIA::NUM sIndex = sock.GetFD() / sizeof(GAIA::GVOID*) % m_threads.size();
 			GAIA::GVOID* iocp = m_threads[sIndex]->iocp;
 			HANDLE h = ::CreateIoCompletionPort((HANDLE)(GAIA::U64)sock.GetFD(), (HANDLE)iocp, 0, 0);
-			GAST(h != NULL);
+			GAST(h != GNIL);
 			return GAIA::True;
 		}
 

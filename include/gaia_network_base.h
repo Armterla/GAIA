@@ -46,7 +46,7 @@ namespace GAIA
 		/*!
 			@brief Convert GAIA Addr to socket sockaddr_in.
 		*/
-		GINL GAIA::GVOID addr2saddr(const GAIA::NETWORK::Addr& a, GAIA::GVOID* sa, GAIA::N32 family = AF_INET);
+		GINL GAIA::GVOID addr2saddr(const GAIA::NETWORK::Addr& a, GAIA::GVOID* sa, GAIA::N32 nFamily);
 
 		/*!
 			@brief Convert sockaddr_in to GAIA Addr.

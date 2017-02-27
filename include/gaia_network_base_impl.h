@@ -78,10 +78,10 @@ namespace GAIA
 		{
 			return ntohs(uPort);
 		}
-		GINL GAIA::GVOID addr2saddr(const GAIA::NETWORK::Addr& a, GAIA::GVOID* sa, GAIA::N32 family)
+		GINL GAIA::GVOID addr2saddr(const GAIA::NETWORK::Addr& a, GAIA::GVOID* sa, GAIA::N32 nFamily)
 		{
 			sockaddr_in& saddr = *(sockaddr_in*)sa;
-			saddr.sin_family = family;
+			saddr.sin_family = nFamily;
 			GAIA::NETWORK::ip2sip(a.ip, sa);
 			saddr.sin_port = GAIA::NETWORK::port2sport(a.uPort);
 		}
