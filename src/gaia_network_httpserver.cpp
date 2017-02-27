@@ -8,6 +8,52 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		class HttpAsyncSocket : public GAIA::NETWORK::AsyncSocket
+		{
+		public:
+			HttpAsyncSocket(GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::ASYNC_SOCKET_TYPE socktype = GAIA::NETWORK::ASYNC_SOCKET_TYPE_CONNECTED)
+				: GAIA::NETWORK::AsyncSocket(disp, socktype)
+			{
+			}
+			virtual ~HttpAsyncSocket()
+			{
+			}
+
+		protected:
+			virtual GAIA::GVOID OnCreated(GAIA::BL bResult){}
+			virtual GAIA::GVOID OnClosed(GAIA::BL bResult){}
+			virtual GAIA::GVOID OnBound(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
+			virtual GAIA::GVOID OnConnected(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
+			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult){}
+			virtual GAIA::GVOID OnListened(GAIA::BL bResult){}
+			virtual GAIA::GVOID OnAccepted(GAIA::BL bResult, const GAIA::NETWORK::Addr& addrListen){}
+			virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nPracticeSize, GAIA::N32 nSize){}
+			virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize){}
+			virtual GAIA::GVOID OnShutdowned(GAIA::BL bResult, GAIA::N32 nShutdownFlag){}
+		};
+
+		class HttpAsyncDispatcher : public GAIA::NETWORK::AsyncDispatcher
+		{
+		protected:
+			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket(const GAIA::NETWORK::Addr& addrListen)
+			{
+				HttpAsyncSocket* pListenSocket =
+						gnew HttpAsyncSocket(*this, ASYNC_SOCKET_TYPE_LISTEN);
+				return pListenSocket;
+			}
+			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptingSocket(const GAIA::NETWORK::Addr& addrListen)
+			{
+				HttpAsyncSocket* pAcceptingSocket =
+						gnew HttpAsyncSocket(*this, ASYNC_SOCKET_TYPE_ACCEPTING);
+				return pAcceptingSocket;
+			}
+			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen)
+			{
+				sock.drop_ref();
+				return GAIA::False;
+			}
+		};
+
 		HttpServerLink::HttpServerLink(GAIA::NETWORK::HttpServer& svr)
 		{
 			this->init();
@@ -15,17 +61,29 @@ namespace GAIA
 
 		HttpServerLink::~HttpServerLink()
 		{
-
+			if(m_pSock != GNIL)
+				this->Close();
 		}
 
-		GAIA::GVOID HttpServerLink::Response(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize, const GAIA::U64& uCacheTime)
+		GAIA::BL HttpServerLink::Response(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize, const GAIA::U64& uCacheTime)
 		{
+			GPCHR_TRUE_RET(url.Empty(), GAIA::False);
+			GPCHR_TRUE_RET(httphead.Empty(), GAIA::False);
+			GPCHR_NULL_RET(m_pSock, GAIA::False);
 
+			if(uCacheTime == GINVALID)
+			{
+
+			}
 		}
 
-		GAIA::GVOID HttpServerLink::Close()
+		GAIA::BL HttpServerLink::Close()
 		{
-
+			if(m_pSock == GNIL)
+				return GAIA::False;
+			m_pSock->drop_ref();
+			m_pSock = GNIL;
+			return GAIA::True;
 		}
 
 		HttpServerCallBack::HttpServerCallBack(HttpServer& svr)
@@ -35,7 +93,6 @@ namespace GAIA
 
 		HttpServerCallBack::~HttpServerCallBack()
 		{
-
 		}
 
 		HttpServer::HttpServer()
@@ -106,6 +163,17 @@ namespace GAIA
 				return GAIA::False;
 
 			// Create async dispatcher.
+			m_disp = gnew HttpAsyncDispatcher;
+			GAIA::NETWORK::AsyncDispatcherDesc descDisp;
+			descDisp.reset();
+			descDisp.sThreadCount = desc.sThreadCount;
+			descDisp.sMaxConnectionCount = desc.sMaxConnCount;
+			if(!m_disp->Create(descDisp))
+			{
+				gdel m_disp;
+				m_disp = GNIL;
+				return GAIA::False;
+			}
 
 			m_bCreated = GAIA::True;
 			return GAIA::True;
@@ -117,39 +185,46 @@ namespace GAIA
 				return GAIA::False;
 
 			//
-			if(this->IsStartuped())
-				this->Shutdown();
+			if(this->IsBegin())
+				this->End();
 
 			// Destroy async dispatcher.
+			m_disp->Destroy();
+			gdel m_disp;
+			m_disp = GNIL;
 
 			//
+			this->RemoveDynamicCacheAll();
+			this->RemoveStaticCacheAll();
 			this->UnregistCallBackAll();
 
 			m_bCreated = GAIA::False;
 			return GAIA::True;
 		}
 
-		GAIA::BL HttpServer::Startup()
+		GAIA::BL HttpServer::Begin()
 		{
 			GPCHR_FALSE_RET(this->IsCreated(), GAIA::False);
-			if(this->IsStartuped())
+			if(this->IsBegin())
 				return GAIA::False;
 
-			// Startup async dispatcher.
+			// Begin async dispatcher.
+			m_disp->Begin();
 
-			m_bStartuped = GAIA::True;
+			m_bBegin = GAIA::True;
 			return GAIA::True;
 		}
 
-		GAIA::BL HttpServer::Shutdown()
+		GAIA::BL HttpServer::End()
 		{
 			GPCHR_FALSE_RET(this->IsCreated(), GAIA::False);
-			if(!this->IsStartuped())
+			if(!this->IsBegin())
 				return GAIA::False;
 
-			// Shutdown async dispatcher.
+			// End async dispatcher.
+			m_disp->End();
 
-			m_bStartuped = GAIA::False;
+			m_bBegin = GAIA::False;
 			return GAIA::True;
 		}
 
@@ -158,28 +233,47 @@ namespace GAIA
 			GPCHR_FALSE_RET(this->IsCreated(), GAIA::False);
 			GPCHR_FALSE_RET(addr.check(), GAIA::False);
 
-			//
+			if(!m_disp->AddListenSocket(addr))
+				return GAIA::False;
+
+			return GAIA::True;
 		}
 
 		GAIA::BL HttpServer::CloseAddr(const GAIA::NETWORK::Addr& addr)
 		{
 			GPCHR_FALSE_RET(this->IsCreated(), GAIA::False);
 			GPCHR_FALSE_RET(addr.check(), GAIA::False);
+
+			if(!m_disp->RemoveListenSocket(addr))
+				return GAIA::False;
+
+			return GAIA::True;
 		}
 
 		GAIA::BL HttpServer::CloseAddrAll()
 		{
 			GPCHR_FALSE_RET(this->IsCreated(), GAIA::False);
+
+			if(!m_disp->RemoveListenSocketAll())
+				return GAIA::False;
+
+			return GAIA::True;
 		}
 
 		GAIA::BL HttpServer::IsOpennedAddr(const GAIA::NETWORK::Addr& addr) const
 		{
 			GPCHR_FALSE_RET(this->IsCreated(), GAIA::False);
+
+			if(!m_disp->IsExistListenSocket(addr))
+				return GAIA::False;
+
+			return GAIA::True;
 		}
 
 		GAIA::NUM HttpServer::GetOpennedAddrCount() const
 		{
 			GPCHR_FALSE_RET(this->IsCreated(), 0);
+			return m_disp->GetListenSocketCount();
 		}
 
 		const GAIA::NETWORK::Addr* HttpServer::GetOpennedAddr(GAIA::NUM sIndex) const
@@ -219,41 +313,67 @@ namespace GAIA
 
 		GAIA::GVOID HttpServer::AddBlackList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uTime)
 		{
+			GPCHR_FALSE(ip.check());
 			GAIA::SYNC::AutolockW al(m_rwBlackList);
+			BWNode n;
+			n.ip = ip;
+			n.uRegistTime = GAIA::TIME::gmt_time();
+			n.uEffectTime = uTime;
+			m_BlackList.insert(n);
 		}
 
 		GAIA::GVOID HttpServer::RemoveBlackList(const GAIA::NETWORK::IP& ip)
 		{
+			GPCHR_FALSE(ip.check());
 			GAIA::SYNC::AutolockW al(m_rwBlackList);
+			BWNode n;
+			n.ip = ip;
+			m_BlackList.erase(n);
 		}
 
 		GAIA::GVOID HttpServer::RemoveBlackListAll()
 		{
 			GAIA::SYNC::AutolockW al(m_rwBlackList);
+			m_BlackList.clear();
 		}
 
 		GAIA::GVOID HttpServer::AddWhiteList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uTime)
 		{
+			GPCHR_FALSE(ip.check());
 			GAIA::SYNC::AutolockW al(m_rwWhiteList);
+			BWNode n;
+			n.ip = ip;
+			n.uRegistTime = GAIA::TIME::gmt_time();
+			n.uEffectTime = uTime;
+			m_WhiteList.insert(n);
 		}
 
 		GAIA::GVOID HttpServer::RemoveWhiteList(const GAIA::NETWORK::IP& ip)
 		{
+			GPCHR_FALSE(ip.check());
 			GAIA::SYNC::AutolockW al(m_rwWhiteList);
+			BWNode n;
+			n.ip = ip;
+			m_WhiteList.erase(n);
 		}
 
 		GAIA::GVOID HttpServer::RemoveWhiteListAll()
 		{
 			GAIA::SYNC::AutolockW al(m_rwWhiteList);
+			m_WhiteList.clear();
 		}
 
 		GAIA::GVOID HttpServer::AddDynamicCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize)
 		{
+			GPCHR_TRUE(url.Empty());
+			GPCHR_TRUE(httphead.Empty());
 			GAIA::SYNC::AutolockW al(m_rwDynamicCache);
 		}
 
 		GAIA::GVOID HttpServer::RemoveDynamicCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead)
 		{
+			GPCHR_TRUE(url.Empty());
+			GPCHR_TRUE(httphead.Empty());
 			GAIA::SYNC::AutolockW al(m_rwDynamicCache);
 		}
 
@@ -264,11 +384,13 @@ namespace GAIA
 
 		GAIA::GVOID HttpServer::RequestStaticCache(const GAIA::NETWORK::HttpURL& url)
 		{
+			GPCHR_TRUE(url.Empty());
 			GAIA::SYNC::AutolockW al(m_rwStaticCache);
 		}
 
 		GAIA::GVOID HttpServer::RemoveStaticCache(const GAIA::NETWORK::HttpURL& url)
 		{
+			GPCHR_TRUE(url.Empty());
 			GAIA::SYNC::AutolockW al(m_rwStaticCache);
 		}
 

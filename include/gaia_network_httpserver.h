@@ -45,7 +45,7 @@ namespace GAIA
 			{
 				sThreadCount = DEFAULT_THREAD_COUNT;
 				pszRootPath = GNILSTR;
-				uMaxConnCount = DEFAULT_MAX_CONN_COUNT;
+				sMaxConnCount = DEFAULT_MAX_CONN_COUNT;
 				uMaxConnTime = DEFAULT_MAX_CONN_TIME;
 				uMaxHarfConnTime = DEFAULT_MAX_HALFCONN_TIME;
 				uMaxDynamicCacheSize = DEFAULT_MAX_DYNAMIC_CACHE_SIZE;
@@ -60,7 +60,7 @@ namespace GAIA
 					return GAIA::False;
 				if(pszRootPath == GNIL)
 					return GAIA::False;
-				if(uMaxConnCount == 0)
+				if(sMaxConnCount == 0)
 					return GAIA::False;
 				if(uMaxConnTime == 0)
 					return GAIA::False;
@@ -74,7 +74,7 @@ namespace GAIA
 		public:
 			GAIA::NUM sThreadCount;
 			const GAIA::CH* pszRootPath;
-			GAIA::NUM uMaxConnCount;
+			GAIA::NUM sMaxConnCount;
 			GAIA::U64 uMaxConnTime;
 			GAIA::U64 uMaxHarfConnTime;
 			GAIA::U64 uMaxDynamicCacheSize;
@@ -132,6 +132,9 @@ namespace GAIA
 			GAIA::U64 u503Count;
 		};
 
+		class HttpAsyncSocket;
+		class HttpAsyncDispatcher;
+
 		class HttpServerLink : public GAIA::Base
 		{
 			friend class HttpServer;
@@ -141,8 +144,8 @@ namespace GAIA
 			~HttpServerLink();
 
 			GINL GAIA::NETWORK::HttpServer& GetServer() const{return *m_pSvr;}
-			GAIA::GVOID Response(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize, const GAIA::U64& uCacheTime = GINVALID);
-			GAIA::GVOID Close();
+			GAIA::BL Response(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize, const GAIA::U64& uCacheTime = GINVALID);
+			GAIA::BL Close();
 
 			GINL GAIA::N32 compare(const HttpServerLink& src) const{}
 			GCLASS_COMPARE_BYCOMPARE(HttpServerLink)
@@ -156,7 +159,7 @@ namespace GAIA
 
 		private:
 			GAIA::NETWORK::HttpServer* m_pSvr;
-			GAIA::NETWORK::AsyncSocket* m_pSock;
+			HttpAsyncSocket* m_pSock;
 		};
 
 		class HttpServerCallBack : public GAIA::RefObject
@@ -210,9 +213,9 @@ namespace GAIA
 			GAIA::BL IsCreated() const{return m_bCreated;}
 			const GAIA::NETWORK::HttpServerDesc& GetDesc() const{return m_desc;}
 
-			GAIA::BL Startup();
-			GAIA::BL Shutdown();
-			GAIA::BL IsStartuped() const{return m_bStartuped;}
+			GAIA::BL Begin();
+			GAIA::BL End();
+			GAIA::BL IsBegin() const{return m_bBegin;}
 
 			GAIA::BL OpenAddr(const GAIA::NETWORK::Addr& addr);
 			GAIA::BL CloseAddr(const GAIA::NETWORK::Addr& addr);
@@ -251,19 +254,20 @@ namespace GAIA
 			{
 				m_desc.reset();
 				m_bCreated = GAIA::False;
-				m_bStartuped = GAIA::False;
+				m_bBegin = GAIA::False;
 				m_bEnableDynamicResponseCache = GAIA::True;
 				m_bEnableStaticResponseCache = GAIA::True;
 				m_blackwhitemode = GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE_BLACK;
+				m_disp = GNIL;
 				m_status.reset();
 			}
 
 		private:
-			class WBNode : public GAIA::Base // White and black node.
+			class BWNode : public GAIA::Base // White and black node.
 			{
 			public:
-				GINL GAIA::N32 compare(const WBNode& src) const{return ip.compare(src.ip);}
-				GCLASS_COMPARE_BYCOMPARE(WBNode)
+				GINL GAIA::N32 compare(const BWNode& src) const{return ip.compare(src.ip);}
+				GCLASS_COMPARE_BYCOMPARE(BWNode)
 
 			public:
 				GAIA::NETWORK::IP ip;
@@ -271,26 +275,53 @@ namespace GAIA
 				GAIA::U64 uEffectTime; // Relative time in microseconds.
 			};
 
+			class DynamicCacheNode : public GAIA::Base
+			{
+			public:
+				GINL GAIA::N32 compare(const DynamicCacheNode& src) const{}
+				GCLASS_COMPARE_BYCOMPARE(DynamicCacheNode)
+
+			public:
+				GAIA::NETWORK::HttpURL url;
+				GAIA::NETWORK::HttpHead head;
+				GAIA::NUM sIndex;
+				GAIA::CTN::Buffer buf;
+			};
+
+			class StaticCacheNode : public GAIA::Base
+			{
+			public:
+				GINL GAIA::N32 compare(const StaticCacheNode& src) const{}
+				GCLASS_COMPARE_BYCOMPARE(StaticCacheNode)
+
+			public:
+				GAIA::NETWORK::HttpURL url;
+				GAIA::NUM sIndex;
+				GAIA::CTN::Buffer buf;
+			};
+
 		private:
 			GAIA::NETWORK::HttpServerDesc m_desc;
 			GAIA::SYNC::LockRW m_rwCBS;
 			GAIA::CTN::Vector<GAIA::NETWORK::HttpServerCallBack*> m_cbs;
 			GAIA::BL m_bCreated;
-			GAIA::BL m_bStartuped;
+			GAIA::BL m_bBegin;
 
 			GAIA::BL m_bEnableDynamicResponseCache;
 			GAIA::BL m_bEnableStaticResponseCache;
 
 			GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE m_blackwhitemode;
 			GAIA::SYNC::LockRW m_rwBlackList;
-			GAIA::CTN::Set<WBNode> m_BlackList;
+			GAIA::CTN::Set<BWNode> m_BlackList;
 			GAIA::SYNC::LockRW m_rwWhiteList;
-			GAIA::CTN::Set<WBNode> m_WhiteList;
+			GAIA::CTN::Set<BWNode> m_WhiteList;
 
 			GAIA::SYNC::LockRW m_rwDynamicCache;
+			GAIA::CTN::Set<DynamicCacheNode> m_dynamiccache;
 			GAIA::SYNC::LockRW m_rwStaticCache;
+			GAIA::CTN::Set<StaticCacheNode> m_staticcache;
 
-			GAIA::NETWORK::AsyncDispatcher m_disp;
+			HttpAsyncDispatcher* m_disp;
 			GAIA::NETWORK::HttpServerStatus m_status;
 		};
 	}

@@ -77,8 +77,24 @@ namespace GAIA
 			GINL ~HttpURL(){}
 			GINL GAIA::BL Empty() const{return m_url.empty();}
 			GINL GAIA::GVOID Reset(){m_url.clear(); this->clear_analyzed();}
-			GINL GAIA::BL FromString(const GAIA::CH* psz){m_url = psz; this->clear_analyzed(); return GAIA::True;}
-			GINL const GAIA::CH* ToString() const{return m_url.fptr();}
+			GINL GAIA::BL FromString(const GAIA::CH* psz, const GAIA::NUM* pLength = GNIL)
+			{
+				if(pLength != GNIL)
+				{
+					GAST(*pLength <= GAIA::ALGO::gstrlen(psz));
+					m_url.assign(psz, *pLength);
+				}
+				else
+					m_url = psz;
+				this->clear_analyzed();
+				return GAIA::True;
+			}
+			GINL const GAIA::CH* ToString(GAIA::NUM* pLength = GNIL) const
+			{
+				if(pLength != GNIL)
+					*pLength = m_url.size();
+				return m_url.fptr();
+			}
 			GINL GAIA::CH* GetProtocal(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
@@ -489,7 +505,7 @@ namespace GAIA
 			GINL HttpHead(const GAIA::CH* psz){this->init(); this->operator = (psz);}
 			GINL ~HttpHead(){this->Reset();}
 			GINL GAIA::BL Empty() const{return this->Size() == 0;}
-			GINL GAIA::BL FromString(const GAIA::CH* psz)
+			GINL GAIA::BL FromString(const GAIA::CH* psz, const GAIA::NUM* pLength = GNIL)
 			{
 				this->Reset();
 				if(GAIA::ALGO::gstremp(psz))
@@ -500,6 +516,8 @@ namespace GAIA
 				GAIA::CTN::ACharsString strValue;
 				while(*p != '\0')
 				{
+					if(pLength != GNIL && p - psz == *pLength)
+						break;
 					if(*p == ':') // Name end.
 					{
 						if(!strName.empty() || p - pLast == 0)
