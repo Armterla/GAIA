@@ -22,6 +22,9 @@ namespace GAIA
 			{
 			}
 
+			GINL GAIA::GVOID SetLink(GAIA::NETWORK::HttpServerLink* pLink){m_pLink = pLink;}
+			GINL GAIA::NETWORK::HttpServerLink* GetLink() const{return m_pLink;}
+
 		protected:
 			virtual GAIA::GVOID OnCreated(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnClosed(GAIA::BL bResult){}
@@ -39,15 +42,28 @@ namespace GAIA
 			}
 			virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize)
 			{
+				// Callback HttpServerLink::OnRecv.
+				{
+					GAIA::SYNC::AutolockR al(m_pSvr->m_rwCBS);
+					for(GAIA::NUM x = 0 ; x < m_pSvr->m_cbs.size(); ++x)
+					{
+						GAIA::NETWORK::HttpServerCallBack* pCallBack = m_pSvr->m_cbs[x];
+						GAST(pCallBack != GNIL);
+						if(pCallBack->OnRecv(*m_pLink, pData, nSize))
+							break;
+					}
+				}
 
+				// TODO:
 			}
 			virtual GAIA::GVOID OnShutdowned(GAIA::BL bResult, GAIA::N32 nShutdownFlag){}
 
 		private:
-			GINL GAIA::GVOID init(){m_pSvr = GNIL;}
+			GINL GAIA::GVOID init(){m_pSvr = GNIL; m_pLink = GNIL;}
 
 		private:
 			GAIA::NETWORK::HttpServer* m_pSvr;
+			GAIA::NETWORK::HttpServerLink* m_pLink;
 		};
 
 		class HttpAsyncDispatcher : public GAIA::NETWORK::AsyncDispatcher
@@ -77,15 +93,46 @@ namespace GAIA
 			}
 			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen)
 			{
+				GAIA::NETWORK::Addr addrPeer;
+				GAIA::BL bGetPeerAddrResult = sock.GetPeerAddress(addrPeer);
+				GAST(bGetPeerAddrResult && addrPeer.check());
+
+				// If the IP address is in black list.
+				if(m_pSvr->GetBlackWhiteMode() == GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE_BLACK)
+				{
+					if(m_pSvr->IsInBlackList(addrPeer.ip))
+					{
+						sock.drop_ref();
+						return GAIA::False;
+					}
+				}
+
+				// If the IP address is in white list.
+				else if(m_pSvr->GetBlackWhiteMode() == GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE_WHITE)
+				{
+					if(!m_pSvr->IsInWhiteList(addrPeer.ip))
+					{
+						sock.drop_ref();
+						return GAIA::False;
+					}
+				}
+
+				// If connection count is too many, close it.
+				if(m_pSvr->m_links.size() >= m_pSvr->GetDesc().sMaxConnCount)
+				{
+					sock.drop_ref();
+					return GAIA::False;
+				}
+
+				//
 				GAIA::NETWORK::HttpServerLink* pLink = gnew GAIA::NETWORK::HttpServerLink(*m_pSvr);
 				pLink->SetAsyncSocket(*(GAIA::NETWORK::HttpAsyncSocket*)&sock);
-				GAIA::NETWORK::Addr addrPeer;
-				sock.GetPeerAddress(addrPeer);
-				GAST(addrPeer.check());
 				pLink->SetPeerAddr(addrPeer);
+				pLink->SetAcceptTime(GAIA::TIME::gmt_time());
+				((HttpAsyncSocket*)&sock)->SetLink(pLink);
 				GAIA::SYNC::AutolockW al(m_pSvr->m_rwLinks);
 				m_pSvr->m_links.insert(GAIA::CTN::Ref<GAIA::NETWORK::HttpServerLink>(pLink));
-				return GAIA::False;
+				return GAIA::True;
 			}
 
 		private:
@@ -98,6 +145,7 @@ namespace GAIA
 		HttpServerLink::HttpServerLink(GAIA::NETWORK::HttpServer& svr)
 		{
 			this->init();
+			m_pSvr = &svr;
 		}
 
 		HttpServerLink::~HttpServerLink()

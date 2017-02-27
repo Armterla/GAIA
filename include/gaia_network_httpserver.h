@@ -139,6 +139,7 @@ namespace GAIA
 		class HttpServerLink : public GAIA::Base
 		{
 			friend class HttpServer;
+			friend class HttpAsyncSocket;
 			friend class HttpAsyncDispatcher;
 
 		public:
@@ -148,10 +149,16 @@ namespace GAIA
 			GINL GAIA::NETWORK::HttpServer& GetServer() const{return *m_pSvr;}
 			GINL GAIA::NETWORK::HttpAsyncSocket& GetAsyncSocket() const{return *m_pSock;}
 			GINL const GAIA::NETWORK::Addr& GetPeerAddr() const{return m_addrPeer;}
+			GINL const GAIA::U64& GetAcceptTime() const{return m_uAcceptTime;}
 			GAIA::BL Response(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize, const GAIA::U64& uCacheTime = GINVALID);
 			GAIA::BL Close();
 
-			GINL GAIA::N32 compare(const HttpServerLink& src) const{return m_addrPeer.compare(src.m_addrPeer);}
+			GINL GAIA::N32 compare(const HttpServerLink& src) const
+			{
+				GAST(m_addrPeer.check());
+				GAST(src.m_addrPeer.check());
+				return m_addrPeer.compare(src.m_addrPeer);
+			}
 			GCLASS_COMPARE_BYCOMPARE(HttpServerLink)
 
 		private:
@@ -160,18 +167,26 @@ namespace GAIA
 				m_pSvr = GNIL;
 				m_pSock = GNIL;
 				m_addrPeer.reset();
+				m_uAcceptTime = GINVALID;
 			}
 			GINL GAIA::GVOID SetAsyncSocket(GAIA::NETWORK::HttpAsyncSocket& sock){m_pSock = &sock;}
 			GINL GAIA::GVOID SetPeerAddr(const GAIA::NETWORK::Addr& addrPeer){m_addrPeer = addrPeer;}
+			GINL GAIA::GVOID SetAcceptTime(GAIA::U64 uTime){m_uAcceptTime = uTime;}
 
 		private:
 			GAIA::NETWORK::HttpServer* m_pSvr;
 			HttpAsyncSocket* m_pSock;
 			GAIA::NETWORK::Addr m_addrPeer;
+			GAIA::U64 m_uAcceptTime;
 		};
 
 		class HttpServerCallBack : public GAIA::RefObject
 		{
+			friend class HttpServerLink;
+			friend class HttpServer;
+			friend class HttpAsyncSocket;
+			friend class HttpAsyncDispatcher;
+
 		public:
 			HttpServerCallBack(HttpServer& svr);
 			virtual ~HttpServerCallBack();
