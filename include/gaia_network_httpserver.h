@@ -234,20 +234,20 @@ namespace GAIA
 			GAIA::GVOID AddBlackList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uTime = GINVALID);
 			GAIA::GVOID RemoveBlackList(const GAIA::NETWORK::IP& ip);
 			GAIA::GVOID RemoveBlackListAll();
+			GAIA::BL IsInBlackList(const GAIA::NETWORK::IP& ip) const;
 			GAIA::GVOID AddWhiteList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uTime = GINVALID);
 			GAIA::GVOID RemoveWhiteList(const GAIA::NETWORK::IP& ip);
 			GAIA::GVOID RemoveWhiteListAll();
+			GAIA::BL IsInWhiteList(const GAIA::NETWORK::IP& ip) const;
 
 			GINL const GAIA::NETWORK::HttpServerStatus& GetStatus() const{return m_status;}
 
 		private:
-			GAIA::GVOID AddDynamicCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize);
-			GAIA::GVOID RemoveDynamicCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead);
-			GAIA::GVOID RemoveDynamicCacheAll();
-
-			GAIA::GVOID RequestStaticCache(const GAIA::NETWORK::HttpURL& url);
-			GAIA::GVOID RemoveStaticCache(const GAIA::NETWORK::HttpURL& url);
-			GAIA::GVOID RemoveStaticCacheAll();
+			GAIA::BL RequestCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sHeadLen, GAIA::GVOID** p, GAIA::NUM& sSize);
+			GAIA::BL ReleaseCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sHeadLen);
+			GAIA::BL UpdateCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sHeadLen, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime = GINVALID);
+			GAIA::BL RecycleCache();
+			GAIA::BL DestroyCache();
 
 		private:
 			GINL GAIA::GVOID init()
@@ -275,29 +275,18 @@ namespace GAIA
 				GAIA::U64 uEffectTime; // Relative time in microseconds.
 			};
 
-			class DynamicCacheNode : public GAIA::Base
+			class CacheNode : public GAIA::Base
 			{
 			public:
-				GINL GAIA::N32 compare(const DynamicCacheNode& src) const{}
-				GCLASS_COMPARE_BYCOMPARE(DynamicCacheNode)
+				GINL GAIA::N32 compare(const CacheNode& src) const{return strUrlAndHead.compare(src.strUrlAndHead);}
+				GCLASS_COMPARE_BYCOMPARE(CacheNode)
 
 			public:
-				GAIA::NETWORK::HttpURL url;
-				GAIA::NETWORK::HttpHead head;
-				GAIA::NUM sIndex;
-				GAIA::CTN::Buffer buf;
-			};
-
-			class StaticCacheNode : public GAIA::Base
-			{
-			public:
-				GINL GAIA::N32 compare(const StaticCacheNode& src) const{}
-				GCLASS_COMPARE_BYCOMPARE(StaticCacheNode)
-
-			public:
-				GAIA::NETWORK::HttpURL url;
-				GAIA::NUM sIndex;
-				GAIA::CTN::Buffer buf;
+				GAIA::CTN::AString strUrlAndHead;
+				GAIA::CTN::Buffer* buf;
+				GAIA::U64 uRegistTime;
+				GAIA::U64 uEffectTime;
+				GAIA::N64 nRefCount;
 			};
 
 		private:
@@ -316,10 +305,8 @@ namespace GAIA
 			GAIA::SYNC::LockRW m_rwWhiteList;
 			GAIA::CTN::Set<BWNode> m_WhiteList;
 
-			GAIA::SYNC::LockRW m_rwDynamicCache;
-			GAIA::CTN::Set<DynamicCacheNode> m_dynamiccache;
-			GAIA::SYNC::LockRW m_rwStaticCache;
-			GAIA::CTN::Set<StaticCacheNode> m_staticcache;
+			GAIA::SYNC::LockRW m_rwCache;
+			GAIA::CTN::Set<CacheNode> m_cache;
 
 			HttpAsyncDispatcher* m_disp;
 			GAIA::NETWORK::HttpServerStatus m_status;

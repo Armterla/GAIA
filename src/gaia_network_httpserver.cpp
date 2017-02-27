@@ -15,6 +15,7 @@ namespace GAIA
 				: GAIA::NETWORK::AsyncSocket(disp, socktype)
 			{
 			}
+
 			virtual ~HttpAsyncSocket()
 			{
 			}
@@ -34,6 +35,15 @@ namespace GAIA
 
 		class HttpAsyncDispatcher : public GAIA::NETWORK::AsyncDispatcher
 		{
+		public:
+			HttpAsyncDispatcher()
+			{
+			}
+
+			~HttpAsyncDispatcher()
+			{
+			}
+
 		protected:
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
@@ -194,9 +204,9 @@ namespace GAIA
 			m_disp = GNIL;
 
 			//
-			this->RemoveDynamicCacheAll();
-			this->RemoveStaticCacheAll();
-			this->UnregistCallBackAll();
+			this->RemoveBlackListAll();
+			this->RemoveWhiteListAll();
+			this->DestroyCache();
 
 			m_bCreated = GAIA::False;
 			return GAIA::True;
@@ -337,6 +347,17 @@ namespace GAIA
 			m_BlackList.clear();
 		}
 
+		GAIA::BL HttpServer::IsInBlackList(const GAIA::NETWORK::IP& ip) const
+		{
+			GPCHR_FALSE_RET(ip.check(), GAIA::False);
+			GAIA::SYNC::AutolockR al(GCCAST(HttpServer*)(this)->m_rwBlackList);
+			BWNode n;
+			n.ip = ip;
+			if(m_BlackList.find(n) == GNIL)
+				return GAIA::False;
+			return GAIA::True;
+		}
+
 		GAIA::GVOID HttpServer::AddWhiteList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uTime)
 		{
 			GPCHR_FALSE(ip.check());
@@ -363,40 +384,113 @@ namespace GAIA
 			m_WhiteList.clear();
 		}
 
-		GAIA::GVOID HttpServer::AddDynamicCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize)
+		GAIA::BL HttpServer::IsInWhiteList(const GAIA::NETWORK::IP& ip) const
 		{
-			GPCHR_TRUE(url.Empty());
-			GPCHR_TRUE(httphead.Empty());
-			GAIA::SYNC::AutolockW al(m_rwDynamicCache);
+			GPCHR_FALSE_RET(ip.check(), GAIA::False);
+			GAIA::SYNC::AutolockR al(GCCAST(HttpServer*)(this)->m_rwWhiteList);
+			BWNode n;
+			n.ip = ip;
+			if(m_WhiteList.find(n) == GNIL)
+				return GAIA::False;
+			return GAIA::True;
 		}
 
-		GAIA::GVOID HttpServer::RemoveDynamicCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead)
+		GAIA::BL HttpServer::RequestCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sUrlAndHeadLen, GAIA::GVOID** p, GAIA::NUM& sSize)
 		{
-			GPCHR_TRUE(url.Empty());
-			GPCHR_TRUE(httphead.Empty());
-			GAIA::SYNC::AutolockW al(m_rwDynamicCache);
+			GPCHR_NULLSTR_RET(pszUrlAndHead, GAIA::False);
+			GPCHR_NULL_RET(p, GAIA::False);
+			m_rwCache.EnterRead();
+			if(sUrlAndHeadLen == GINVALID)
+				sUrlAndHeadLen = GAIA::ALGO::gstrlen(pszUrlAndHead);
+			CacheNode n;
+			n.strUrlAndHead.proxy(pszUrlAndHead, sUrlAndHeadLen, 0);
+			CacheNode* pFinded = m_cache.find(n);
+			n.strUrlAndHead.proxy(GNIL, 0, 0);
+			if(pFinded == GNIL)
+			{
+				m_rwCache.LeaveRead();
+				return GAIA::False;
+			}
+			pFinded->nRefCount++;
+			*p = (GAIA::GVOID*)pFinded->buf->fptr();
+			sSize = pFinded->buf->write_size();
+			return GAIA::True;
 		}
 
-		GAIA::GVOID HttpServer::RemoveDynamicCacheAll()
+		GAIA::BL HttpServer::ReleaseCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sUrlAndHeadLen)
 		{
-			GAIA::SYNC::AutolockW al(m_rwDynamicCache);
+			GPCHR_NULLSTR_RET(pszUrlAndHead, GAIA::False);
+			if(sUrlAndHeadLen == GINVALID)
+				sUrlAndHeadLen = GAIA::ALGO::gstrlen(pszUrlAndHead);
+			CacheNode n;
+			n.strUrlAndHead.proxy(pszUrlAndHead, sUrlAndHeadLen, 0);
+			CacheNode* pFinded = m_cache.find(n);
+			n.strUrlAndHead.proxy(GNIL, 0, 0);
+			if(pFinded == GNIL)
+				return GAIA::False;
+			pFinded->nRefCount--;
+			if(pFinded->nRefCount == 0)
+				m_cache.erase(*pFinded);
+			m_rwCache.LeaveRead();
+			return GAIA::True;
 		}
 
-		GAIA::GVOID HttpServer::RequestStaticCache(const GAIA::NETWORK::HttpURL& url)
+		GAIA::BL HttpServer::UpdateCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sUrlAndHeadLen, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime)
 		{
-			GPCHR_TRUE(url.Empty());
-			GAIA::SYNC::AutolockW al(m_rwStaticCache);
+			GPCHR_NULLSTR_RET(pszUrlAndHead, GAIA::False);
+			if(sUrlAndHeadLen == GINVALID)
+				sUrlAndHeadLen = GAIA::ALGO::gstrlen(pszUrlAndHead);
+			GAIA::SYNC::AutolockW al(m_rwCache);
+			CacheNode n;
+			n.strUrlAndHead.proxy(pszUrlAndHead, sUrlAndHeadLen, 0);
+			CacheNode* pFinded = m_cache.find(n);
+			n.strUrlAndHead.proxy(GNIL, 0, 0);
+			if(pFinded == GNIL)
+			{
+				n.strUrlAndHead.assign(pszUrlAndHead, sUrlAndHeadLen);
+				n.buf->assign(p, sSize);
+				n.uRegistTime = GAIA::TIME::gmt_time();
+				n.uEffectTime = uEffectTime;
+				n.nRefCount = 0;
+			}
+			else
+				pFinded->buf->assign(p, sSize);
+			return GAIA::True;
 		}
 
-		GAIA::GVOID HttpServer::RemoveStaticCache(const GAIA::NETWORK::HttpURL& url)
+		GAIA::BL HttpServer::RecycleCache()
 		{
-			GPCHR_TRUE(url.Empty());
-			GAIA::SYNC::AutolockW al(m_rwStaticCache);
+			GAIA::U64 uCurrentTime = GAIA::TIME::gmt_time();
+			GAIA::SYNC::AutolockW al(m_rwCache);
+			if(m_cache.empty())
+				return GAIA::False;
+			for(GAIA::CTN::Set<CacheNode>::it it = m_cache.frontit(); !it.empty(); )
+			{
+				CacheNode& cn = *it;
+				if(cn.nRefCount == 0 && cn.uRegistTime + cn.uEffectTime < uCurrentTime)
+				{
+					gdel cn.buf;
+					it.erase();
+				}
+				else
+					++it;
+			}
+			return GAIA::True;
 		}
 
-		GAIA::GVOID HttpServer::RemoveStaticCacheAll()
+		GAIA::BL HttpServer::DestroyCache()
 		{
-			GAIA::SYNC::AutolockW al(m_rwStaticCache);
+			GAIA::U64 uCurrentTime = GAIA::TIME::gmt_time();
+			GAIA::SYNC::AutolockW al(m_rwCache);
+			if(m_cache.empty())
+				return GAIA::False;
+			for(GAIA::CTN::Set<CacheNode>::it it = m_cache.frontit(); !it.empty(); )
+			{
+				CacheNode& cn = *it;
+				gdel cn.buf;
+			}
+			m_cache.clear();
+			return GAIA::True;
 		}
 	}
 }
