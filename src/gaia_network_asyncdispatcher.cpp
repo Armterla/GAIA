@@ -527,6 +527,7 @@ namespace GAIA
 					pCtx->pListenSocket->GetBindedAddress(addrListen);
 					pCtx->pDataSocket->OnAccepted(GAIA::True, addrListen);
 					this->OnAcceptSocket(*pCtx->pDataSocket, addrListen);
+					// TODO:
 
 					// Begin receive.
 					for(GAIA::NUM x = 0; x < m_desc.sWinIOCPRecvEventCount; ++x)
@@ -736,6 +737,7 @@ namespace GAIA
 										pAcceptedSock->OnCreated(GAIA::True);
 										ctx.pSocket->OnAccepted(GAIA::True, addrListen);
 										this->OnAcceptSocket(*pAcceptedSock, addrListen);
+										// TODO:
 
 										struct kevent ke[2];
 										EV_SET(&ke[0], nNewSocket, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);

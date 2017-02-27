@@ -151,7 +151,7 @@ namespace GAIA
 			this->SetPeerAddress(addr);
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			if(!this->IsBinded())
+			if(!this->IsBinded()) // TODO:
 			{
 				GAIA::NETWORK::Addr addrSelf;
 				addrSelf.reset();
