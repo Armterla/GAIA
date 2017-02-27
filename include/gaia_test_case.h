@@ -69,7 +69,7 @@ namespace GAIA
 
 		public:
 			GINL Case(){this->init();}
-			GINL ~Case(){this->destruct();}
+			GINL virtual ~Case(){this->destruct();}
 
 			GINL GAIA::BL SetDesc(const GAIA::TEST::Case::Desc& desc)
 			{

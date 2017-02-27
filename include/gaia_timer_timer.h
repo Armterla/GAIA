@@ -113,7 +113,7 @@ namespace GAIA
 
 		public:
 			GINL Timer(){this->init();}
-			GINL ~Timer(){this->Destroy();}
+			GINL virtual ~Timer(){this->Destroy();}
 
 			GINL GAIA::BL Create(const GAIA::TIME::Timer::Desc& desc)
 			{
@@ -199,7 +199,7 @@ namespace GAIA
 
 		public:
 			GINL TimerMgr(){this->init();}
-			GINL ~TimerMgr(){this->Destroy();}
+			GINL virtual ~TimerMgr(){this->Destroy();}
 
 			GINL GAIA::BL Create(const GAIA::TIME::TimerMgr::Desc& desc)
 			{

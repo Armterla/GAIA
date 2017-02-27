@@ -25,7 +25,7 @@ namespace GAIA
 
 		public:
 			GINL RealTimer(){this->init();}
-			GINL ~RealTimer(){this->Destroy();}
+			GINL virtual ~RealTimer(){this->Destroy();}
 
 			GINL GAIA::BL Create(const GAIA::TIME::RealTimer::RealTimerDesc& desc);
 			GINL GAIA::GVOID Destroy(){}
@@ -57,7 +57,7 @@ namespace GAIA
 
 		public:
 			GINL RealTimerMgr(){this->init();}
-			GINL ~RealTimerMgr(){this->Destroy();}
+			GINL virtual ~RealTimerMgr(){this->Destroy();}
 
 			GINL GAIA::BL Create(const GAIA::TIME::RealTimerMgr::RealTimerMgrDesc& desc);
 			GINL GAIA::GVOID Destroy(){}

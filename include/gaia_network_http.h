@@ -29,7 +29,7 @@ namespace GAIA
 
 			// Constructor and destructor.
 			HttpRequest(GAIA::NETWORK::Http& http);
-			~HttpRequest();
+			virtual ~HttpRequest();
 			Http& GetHttp();
 
 			// Base http operation.

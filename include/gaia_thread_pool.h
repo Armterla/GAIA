@@ -24,6 +24,7 @@ namespace GAIA
 				friend class ThreadPool;
 			public:
 				GINL Task(){m_uGroupIndex = GINVALID;}
+				GINL virtual ~Task(){}
 				virtual GAIA::GVOID Run() = 0;
 				GINL GAIA::GVOID SetGroupIndex(GAIA::U32 uGroupIndex){m_uGroupIndex = uGroupIndex;}
 				GINL GAIA::U32 GetGroupIndex() const{return m_uGroupIndex;}
@@ -44,7 +45,7 @@ namespace GAIA
 				GAIA_ENUM_END(STOP_TYPE)
 			private:
 				WorkThread(){this->init();}
-				~WorkThread(){this->destruct();}
+				virtual ~WorkThread(){this->destruct();}
 				GINL GAIA::GVOID SetStopCmd(STOP_TYPE stoptype){m_stoptype = stoptype;}
 				GINL STOP_TYPE GetStopCmd() const{return m_stoptype;}
 				GINL GAIA::GVOID BeginPushTask(){m_lrTaskQueue.Enter();}
