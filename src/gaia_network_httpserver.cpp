@@ -11,9 +11,11 @@ namespace GAIA
 		class HttpAsyncSocket : public GAIA::NETWORK::AsyncSocket
 		{
 		public:
-			HttpAsyncSocket(GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::ASYNC_SOCKET_TYPE socktype = GAIA::NETWORK::ASYNC_SOCKET_TYPE_CONNECTED)
+			HttpAsyncSocket(HttpServer& svr, GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::ASYNC_SOCKET_TYPE socktype = GAIA::NETWORK::ASYNC_SOCKET_TYPE_CONNECTED)
 				: GAIA::NETWORK::AsyncSocket(disp, socktype)
 			{
+				this->init();
+				m_pSvr = &svr;
 			}
 
 			virtual ~HttpAsyncSocket()
@@ -25,12 +27,27 @@ namespace GAIA
 			virtual GAIA::GVOID OnClosed(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnBound(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
 			virtual GAIA::GVOID OnConnected(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
-			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult){}
+			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult)
+			{
+
+			}
 			virtual GAIA::GVOID OnListened(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnAccepted(GAIA::BL bResult, const GAIA::NETWORK::Addr& addrListen){}
-			virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nPracticeSize, GAIA::N32 nSize){}
-			virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize){}
+			virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nPracticeSize, GAIA::N32 nSize)
+			{
+
+			}
+			virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize)
+			{
+
+			}
 			virtual GAIA::GVOID OnShutdowned(GAIA::BL bResult, GAIA::N32 nShutdownFlag){}
+
+		private:
+			GINL GAIA::GVOID init(){m_pSvr = GNIL;}
+
+		private:
+			GAIA::NETWORK::HttpServer* m_pSvr;
 		};
 
 		class HttpAsyncDispatcher : public GAIA::NETWORK::AsyncDispatcher
@@ -38,6 +55,7 @@ namespace GAIA
 		public:
 			HttpAsyncDispatcher()
 			{
+				this->init();
 			}
 
 			~HttpAsyncDispatcher()
@@ -48,20 +66,33 @@ namespace GAIA
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
 				HttpAsyncSocket* pListenSocket =
-						gnew HttpAsyncSocket(*this, ASYNC_SOCKET_TYPE_LISTEN);
+						gnew HttpAsyncSocket(*m_pSvr, *this, ASYNC_SOCKET_TYPE_LISTEN);
 				return pListenSocket;
 			}
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptingSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
 				HttpAsyncSocket* pAcceptingSocket =
-						gnew HttpAsyncSocket(*this, ASYNC_SOCKET_TYPE_ACCEPTING);
+						gnew HttpAsyncSocket(*m_pSvr, *this, ASYNC_SOCKET_TYPE_ACCEPTING);
 				return pAcceptingSocket;
 			}
 			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen)
 			{
-				sock.drop_ref();
+				GAIA::NETWORK::HttpServerLink* pLink = gnew GAIA::NETWORK::HttpServerLink(*m_pSvr);
+				pLink->SetAsyncSocket(*(GAIA::NETWORK::HttpAsyncSocket*)&sock);
+				GAIA::NETWORK::Addr addrPeer;
+				sock.GetPeerAddress(addrPeer);
+				GAST(addrPeer.check());
+				pLink->SetPeerAddr(addrPeer);
+				GAIA::SYNC::AutolockW al(m_pSvr->m_rwLinks);
+				m_pSvr->m_links.insert(GAIA::CTN::Ref<GAIA::NETWORK::HttpServerLink>(pLink));
 				return GAIA::False;
 			}
+
+		private:
+			GINL GAIA::GVOID init(){m_pSvr = GNIL;}
+
+		private:
+			GAIA::NETWORK::HttpServer* m_pSvr;
 		};
 
 		HttpServerLink::HttpServerLink(GAIA::NETWORK::HttpServer& svr)
@@ -85,6 +116,8 @@ namespace GAIA
 			{
 
 			}
+
+			return GAIA::True;
 		}
 
 		GAIA::BL HttpServerLink::Close()
@@ -230,6 +263,19 @@ namespace GAIA
 			GPCHR_FALSE_RET(this->IsCreated(), GAIA::False);
 			if(!this->IsBegin())
 				return GAIA::False;
+
+			// Release all links.
+			{
+				GAIA::SYNC::AutolockW al(m_rwLinks);
+				for(__LinkSetType::it it = m_links.frontit(); !it.empty(); )
+				{
+					__LinkSetType::_datatype& t = *it;
+					GAIA::NETWORK::HttpServerLink* pLink = t;
+					GAST(pLink != GNIL);
+					it.erase();
+					gdel pLink;
+				}
+			}
 
 			// End async dispatcher.
 			m_disp->End();

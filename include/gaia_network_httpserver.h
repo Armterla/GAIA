@@ -8,6 +8,7 @@
 #include "gaia_sync_lockrw.h"
 #include "gaia_sync_autolockr.h"
 #include "gaia_sync_autolockw.h"
+#include "gaia_ctn_ref.h"
 #include "gaia_ctn_vector.h"
 #include "gaia_ctn_buffer.h"
 #include "gaia_ctn_set.h"
@@ -138,16 +139,19 @@ namespace GAIA
 		class HttpServerLink : public GAIA::Base
 		{
 			friend class HttpServer;
+			friend class HttpAsyncDispatcher;
 
 		public:
 			HttpServerLink(GAIA::NETWORK::HttpServer& svr);
 			~HttpServerLink();
 
 			GINL GAIA::NETWORK::HttpServer& GetServer() const{return *m_pSvr;}
+			GINL GAIA::NETWORK::HttpAsyncSocket& GetAsyncSocket() const{return *m_pSock;}
+			GINL const GAIA::NETWORK::Addr& GetPeerAddr() const{return m_addrPeer;}
 			GAIA::BL Response(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize, const GAIA::U64& uCacheTime = GINVALID);
 			GAIA::BL Close();
 
-			GINL GAIA::N32 compare(const HttpServerLink& src) const{}
+			GINL GAIA::N32 compare(const HttpServerLink& src) const{return m_addrPeer.compare(src.m_addrPeer);}
 			GCLASS_COMPARE_BYCOMPARE(HttpServerLink)
 
 		private:
@@ -155,11 +159,15 @@ namespace GAIA
 			{
 				m_pSvr = GNIL;
 				m_pSock = GNIL;
+				m_addrPeer.reset();
 			}
+			GINL GAIA::GVOID SetAsyncSocket(GAIA::NETWORK::HttpAsyncSocket& sock){m_pSock = &sock;}
+			GINL GAIA::GVOID SetPeerAddr(const GAIA::NETWORK::Addr& addrPeer){m_addrPeer = addrPeer;}
 
 		private:
 			GAIA::NETWORK::HttpServer* m_pSvr;
 			HttpAsyncSocket* m_pSock;
+			GAIA::NETWORK::Addr m_addrPeer;
 		};
 
 		class HttpServerCallBack : public GAIA::RefObject
@@ -198,6 +206,8 @@ namespace GAIA
 		class HttpServer : public GAIA::Base
 		{
 			friend class HttpLink;
+			friend class HttpAsyncSocket;
+			friend class HttpAsyncDispatcher;
 
 		public:
 			HttpServer();
@@ -290,11 +300,17 @@ namespace GAIA
 			};
 
 		private:
+			typedef GAIA::CTN::Set<GAIA::CTN::Ref<GAIA::NETWORK::HttpServerLink> > __LinkSetType;
+
+		private:
 			GAIA::NETWORK::HttpServerDesc m_desc;
 			GAIA::SYNC::LockRW m_rwCBS;
 			GAIA::CTN::Vector<GAIA::NETWORK::HttpServerCallBack*> m_cbs;
 			GAIA::BL m_bCreated;
 			GAIA::BL m_bBegin;
+
+			GAIA::SYNC::LockRW m_rwLinks;
+			__LinkSetType m_links;
 
 			GAIA::BL m_bEnableDynamicResponseCache;
 			GAIA::BL m_bEnableStaticResponseCache;
