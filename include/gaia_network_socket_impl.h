@@ -464,11 +464,13 @@ namespace GAIA
 
 			sockaddr_in saddr;
 			zeromem(&saddr);
-			saddr.sin_family = AF_INET;
 
 			// Construct network ip.
 			if(!addr.ip.check())
+			{
+				saddr.sin_family = AF_INET;
 				saddr.sin_addr.s_addr = 0;
+			}
 			else
 				GAIA::NETWORK::addr2saddr(addr, &saddr);
 
@@ -537,7 +539,6 @@ namespace GAIA
 			// Construct network address.
 			sockaddr_in saddr;
 			zeromem(&saddr);
-			saddr.sin_family = AF_INET;
 			GAIA::NETWORK::addr2saddr(addr, &saddr);
 
 			if(connect(m_nSocket, (sockaddr*)&saddr, sizeof(saddr)) == GINVALID)
@@ -660,7 +661,6 @@ namespace GAIA
 
 			sockaddr_in saddr;
 			zeromem(&saddr);
-			saddr.sin_family = AF_INET;
 			GAIA::NETWORK::addr2saddr(addr, &saddr);
 
 		#if GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_UNIX
@@ -705,9 +705,10 @@ namespace GAIA
 
 			sockaddr_in saddr;
 			zeromem(&saddr);
-			saddr.sin_family = AF_INET;
 			if(addr.check())
 				GAIA::NETWORK::addr2saddr(addr, &saddr);
+			else
+				saddr.sin_family = AF_INET;
 
 			socklen_t recvfrom_addr_len = sizeof(saddr);
 			GAIA::N32 nRecved = (GAIA::N32)recvfrom(m_nSocket, (GAIA::CH*)p, nSize, nFlag, (sockaddr*)&saddr, &recvfrom_addr_len);

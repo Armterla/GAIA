@@ -151,6 +151,13 @@ namespace GAIA
 			this->SetPeerAddress(addr);
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
+			if(!this->IsBinded())
+			{
+				GAIA::NETWORK::Addr addrSelf;
+				addrSelf.reset();
+				addrSelf.ip = "127.0.0.1";
+				this->Bind(addrSelf);
+			}
 			m_pDispatcher->attach_socket_iocp(*this);
 
 			AsyncContext* pCtx = m_pDispatcher->alloc_async_ctx();
@@ -159,10 +166,12 @@ namespace GAIA
 			this->rise_ref();
 
 			sockaddr_in saddr_in;
+			zeromem(&saddr_in);
 			GAIA::NETWORK::addr2saddr(addr, &saddr_in);
-			GAIA::N32 nAddrLen = sizeof(SOCKADDR_IN) + 16;
+			GAIA::N32 nAddrLen = sizeof(sockaddr_in);
+
 			DWORD dwSent;
-			if(!((LPFN_CONNECTEX)m_pfnConnectEx)(this->GetFD(), (sockaddr*)&saddr_in, nAddrLen, GNIL, 0, &dwSent, (OVERLAPPED*)pCtx))
+			if(!((LPFN_CONNECTEX)m_pfnConnectEx)(this->GetFD(), (SOCKADDR*)&saddr_in, nAddrLen, GNIL, 0, &dwSent, (OVERLAPPED*)pCtx))
 			{
 				DWORD err = WSAGetLastError();
 				if(err != ERROR_IO_PENDING)
