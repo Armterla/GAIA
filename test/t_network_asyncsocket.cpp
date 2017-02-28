@@ -59,6 +59,8 @@ namespace TEST
 			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, 1024 * 1024);
 			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, 1024 * 1024);
 			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
+		#else
+			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY, GAIA::True);
 		#endif
 		}
 
@@ -116,12 +118,6 @@ namespace TEST
 			m_nAcceptedCount[bResult]++;
 			if(m_bNoMoreCallBack)
 				m_nAcceptedCount[2]++;
-
-			GAIA::UM uThreadID = GAIA::THREAD::threadid();
-			if(m_uCallBackThreadID == GINVALID)
-				m_uCallBackThreadID = uThreadID;
-			else if(uThreadID != m_uCallBackThreadID)
-				m_bExistDiffThreadCallBack = GAIA::True;
 		}
 		virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nPracticeSize, GAIA::N32 nSize)
 		{
@@ -222,7 +218,7 @@ namespace TEST
 		{
 			GAIA::SYNC::Autolock al(m_ctx->lrAcceptedSocket);
 			m_ctx->listAcceptedSockets.push_back((AsyncSocketEx*)&sock);
-			return GAIA::False;
+			return GAIA::True;
 		}
 
 	public:
@@ -356,6 +352,14 @@ namespace TEST
 						pSocket->Connect(addrConnectTo);
 					}
 
+					// Wait connect complete.
+					{
+						GAIA::SYNC::gsleep(5000);
+					}
+
+					if(ctx.listAcceptedSockets.size() != ctx.listConnectedSockets.size())
+						TERROR;
+
 					// Send.
 					for(GAIA::NUM x = 0; x < ctx.listConnectedSockets.size(); ++x)
 					{
@@ -367,13 +371,10 @@ namespace TEST
 						}
 					}
 
-					// Wait complete.
+					// Wait send complete.
 					{
 						GAIA::SYNC::gsleep(5000);
 					}
-
-					if(ctx.listAcceptedSockets.size() != ctx.listConnectedSockets.size())
-						TERROR;
 
 					// Shutdown.
 					for(GAIA::NUM x = 0; x < ctx.listConnectedSockets.size(); ++x)
@@ -489,7 +490,7 @@ namespace TEST
 								if(pSock->m_nListenCount[1] != 1){TERROR;break;}
 								if(pSock->m_nListenCount[2] != 0){TERROR;break;}
 								if(pSock->m_nAcceptedCount[0] != 0){TERROR;break;}
-								if(pSock->m_nAcceptedCount[1] != DATA_SOCKET_COUNT / LISTEN_SOCKET_COUNT){TERROR;break;}
+								if(pSock->m_nAcceptedCount[1] != 0){TERROR;break;}
 								if(pSock->m_nAcceptedCount[2] != 0){TERROR;break;}
 								if(pSock->m_nSentCount[0] != 0){TERROR;break;}
 								if(pSock->m_nSentCount[1] != 0){TERROR;break;}
@@ -519,7 +520,11 @@ namespace TEST
 								if(pSock->m_nClosedCount[1] != 1){TERROR;break;}
 								if(pSock->m_nClosedCount[2] != 0){TERROR;break;}
 								if(pSock->m_nBoundCount[0] != 0){TERROR;break;}
+							#if GAIA_OS == GAIA_OS_WINDOWS
+								if(pSock->m_nBoundCount[1] != 1){TERROR;break;}
+							#else
 								if(pSock->m_nBoundCount[1] != 0){TERROR;break;}
+							#endif
 								if(pSock->m_nBoundCount[2] != 0){TERROR;break;}
 								if(pSock->m_nConnectedCount[0] != 0){TERROR;break;}
 								if(pSock->m_nConnectedCount[1] != 1){TERROR;break;}
@@ -574,7 +579,7 @@ namespace TEST
 								if(pSock->m_nListenCount[1] != 0){TERROR;break;}
 								if(pSock->m_nListenCount[2] != 0){TERROR;break;}
 								if(pSock->m_nAcceptedCount[0] != 0){TERROR;break;}
-								if(pSock->m_nAcceptedCount[1] != 0){TERROR;break;}
+								if(pSock->m_nAcceptedCount[1] != 1){TERROR;break;}
 								if(pSock->m_nAcceptedCount[2] != 0){TERROR;break;}
 								if(pSock->m_nSentCount[0] != 0){TERROR;break;}
 								if(pSock->m_nSentCount[1] != 0){TERROR;break;}

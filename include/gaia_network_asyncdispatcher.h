@@ -138,6 +138,7 @@ namespace GAIA
 			GAIA::BL attach_socket_iocp(GAIA::NETWORK::AsyncSocket& sock);
 			GAIA::GVOID request_accept(GAIA::NETWORK::AsyncSocket& listensock, const GAIA::NETWORK::Addr& addrListen);
 			GAIA::GVOID request_recv(GAIA::NETWORK::AsyncSocket& datasock);
+			//GAIA::GVOID GetAcceptAddr(const GAIA::NETWORK::AsyncContext* pCtx, GAIA::NETWORK::Addr& addrPeer);
 		#else
 			GAIA::N32 select_kqep(GAIA::N32 nSocket) const;
 		#endif
@@ -164,6 +165,8 @@ namespace GAIA
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::SYNC::LockRW m_rwPostAcceptAble;
 			GAIA::BL m_bPostAcceptAble;
+
+			GAIA::SYNC::LockRW m_rwAsyncCtxEnding;
 		#endif
 		};
 	}
