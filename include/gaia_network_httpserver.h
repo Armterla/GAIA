@@ -1,4 +1,4 @@
-#ifndef	 __GAIA_NETWORK_HTTPSERVER_H__
+﻿#ifndef	 __GAIA_NETWORK_HTTPSERVER_H__
 #define	 __GAIA_NETWORK_HTTPSERVER_H__
 
 #include "gaia_type.h"
@@ -33,7 +33,7 @@ namespace GAIA
 		public:
 			static const GAIA::NUM DEFAULT_THREAD_COUNT = 4;
 			static const GAIA::NUM DEFAULT_MAX_CONN_COUNT = 10000;
-			static const GAIA::U64 DEFAULT_MAX_CONN_TIME = 1000 * 1000 * 3600 * 24;
+			static const GAIA::U64 DEFAULT_MAX_CONN_TIME = (GAIA::U64)1000 * 1000 * 3600 * 24;
 			static const GAIA::U64 DEFAULT_MAX_HALFCONN_TIME = 1000 * 1000 * 10;
 			static const GAIA::U64 DEFAULT_MAX_DYNAMIC_CACHE_SIZE = 1024 * 1024 * 1024;
 			static const GAIA::U64 DEFAULT_MAX_DYNAMIC_CACHE_COUNT = 1024 * 1024;

@@ -199,6 +199,8 @@ namespace GAIA
 		GINL Socket::Socket()
 		{
 			this->init();
+			m_addrBinded.reset();
+			m_addrPeer.reset();
 		}
 
 		GINL Socket::~Socket()
@@ -485,6 +487,7 @@ namespace GAIA
 				THROW_LASTERROR;
 
 			//
+			m_addrBinded = addr;
 			m_bBinded = true;
 		}
 
@@ -792,8 +795,6 @@ namespace GAIA
 			m_SockType = SOCKET_TYPE_INVALID;
 			m_nSendBufferSize = 1024 * 2;
 			m_nRecvBufferSize = 1024 * 2;
-			m_addrBinded.reset();
-			m_addrPeer.reset();
 			m_bBinded = GAIA::False;
 			m_bConnected = GAIA::False;
 			m_bNotBlock = GAIA::False;

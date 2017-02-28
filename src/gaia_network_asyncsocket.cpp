@@ -167,7 +167,7 @@ namespace GAIA
 
 			sockaddr_in saddr_in;
 			zeromem(&saddr_in);
-			GAIA::NETWORK::addr2saddr(addr, &saddr_in);
+			GAIA::NETWORK::addr2saddr(addr, &saddr_in, AF_INET);
 			GAIA::N32 nAddrLen = sizeof(sockaddr_in);
 
 			DWORD dwSent;
@@ -179,6 +179,7 @@ namespace GAIA
 					m_pDispatcher->release_async_ctx(pCtx);
 					this->OnConnected(GAIA::False, addr);
 					this->drop_ref();
+					GERR << "GAIA AsyncSocket IOCP error, cannot ConnectEx, ErrorCode = " << ::WSAGetLastError() << GEND;
 					return;
 				}
 			}
@@ -218,6 +219,7 @@ namespace GAIA
 					m_pDispatcher->release_async_ctx(pCtx);
 					this->OnDisconnected(GAIA::False);
 					this->drop_ref();
+					GERR << "GAIA AsyncSocket IOCP error, cannot DisconnectEx, ErrorCode = " << ::WSAGetLastError() << GEND;
 					return;
 				}
 			}
@@ -256,7 +258,7 @@ namespace GAIA
 
 				DWORD dwTrans = 0;
 				DWORD dwFlag = 0;
-				if(!::WSASend(this->GetFD(), &pCtx->_buf, 1, &dwTrans, dwFlag, (OVERLAPPED*)pCtx, GNIL))
+				if(::WSASend(this->GetFD(), &pCtx->_buf, 1, &dwTrans, dwFlag, (OVERLAPPED*)pCtx, GNIL) != 0)
 				{
 					DWORD err = WSAGetLastError();
 					if(err != ERROR_IO_PENDING)
@@ -264,6 +266,7 @@ namespace GAIA
 						this->OnSent(GAIA::False, p, sOffset, nSize);
 						m_pDispatcher->release_async_ctx(pCtx);
 						this->drop_ref();
+						GERR << "GAIA AsyncSocket IOCP error, cannot WSASend, ErrorCode = " << ::WSAGetLastError() << GEND;
 						return sOffset;
 					}
 				}
