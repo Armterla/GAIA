@@ -34,46 +34,275 @@ namespace GAIA
 
 		// Http code declaration here.
 		GAIA_ENUM_BEGIN(HTTP_CODE)
-			HTTP_CODE_OK,
-			HTTP_CODE_BADREQUEST,
-			HTTP_CODE_UNAUTHORIZED,
-			HTTP_CODE_FORBIDDEN,
-			HTTP_CODE_NOTFOUND,
-			HTTP_CODE_INTERNALSERVERERROR,
-			HTTP_CODE_SERVERUNAVAILABLE,
+			/* Information */
+			HTTP_CODE_CONTINUE,					// 100
+			HTTP_CODE_SWITCHINGPROTOCALS,		// 101
+
+			/* Successful */
+			HTTP_CODE_OK,						// 200
+			HTTP_CODE_CREATED,					// 201
+			HTTP_CODE_ACCEPTED,					// 202
+			HTTP_CODE_NONAUTH,					// 203
+			HTTP_CODE_NOCONTENT,				// 204
+			HTTP_CODE_RESETCONTENT,				// 205
+			HTTP_CODE_PARTIALCONTENT,			// 206
+
+			/* Redirection */
+			HTTP_CODE_MULTIPLECHOISE,			// 300
+			HTTP_CODE_MOVEDPERMANENTLY,			// 301
+			HTTP_CODE_FOUND,					// 302
+			HTTP_CODE_SEEOTHER,					// 303
+			HTTP_CODE_NOTMODIFIED,				// 304
+			HTTP_CODE_USEPROXY,					// 305
+			HTTP_CODE_TEMPORARYREDIRECT,		// 307
+
+			/* Client error */
+			HTTP_CODE_BADREQUEST,				// 400
+			HTTP_CODE_UNAUTHORIZED,				// 401
+			HTTP_CODE_PAYMENTREQUIRED,			// 402
+			HTTP_CODE_FORBIDDEN,				// 403
+			HTTP_CODE_NOTFOUND,					// 404
+			HTTP_CODE_METHODNOTALLOWED,			// 405
+			HTTP_CODE_NOTACCEPTABLE,			// 406
+			HTTP_CODE_PROXYAUTHREQUIRED,		// 407
+			HTTP_CODE_REQUESTTIMEOUT,			// 408
+			HTTP_CODE_CONFLICT,					// 409
+			HTTP_CODE_GONE,						// 410
+			HTTP_CODE_LENGTHREQUIRED,			// 411
+			HTTP_CODE_PRECONDITIONFAILED,		// 412
+			HTTP_CODE_REQUESTENTITYTOOLARGE,	// 413
+			HTTP_CODE_REQUESTURITOOLONG,		// 414
+			HTTP_CODE_UNSUPPORTMEDIATYPE,		// 415
+			HTTP_CODE_REQUESTRANGENOTSATISFIABLE,// 416
+			HTTP_CODE_EXPECTATIONFAILED,		// 417
+
+			/* Server error */
+			HTTP_CODE_INTERNALSERVERERROR,		// 500
+			HTTP_CODE_NOTIMPLEMENT,				// 501
+			HTTP_CODE_BADGATEWAY,				// 502
+			HTTP_CODE_SERVICEUNAVAILABLE,		// 503
+			HTTP_CODE_GATEWAYTIMEOUT,			// 504
+			HTTP_CODE_HTTPVERSIONNOTSUPPORT,	// 505
 		GAIA_ENUM_END(HTTP_CODE)
+
 		static const HTTP_CODE HTTP_CODE_LIST[] =
 		{
 			HTTP_CODE_INVALID,
-			HTTP_CODE_OK,
-			HTTP_CODE_BADREQUEST,
-			HTTP_CODE_UNAUTHORIZED,
-			HTTP_CODE_FORBIDDEN,
-			HTTP_CODE_NOTFOUND,
-			HTTP_CODE_INTERNALSERVERERROR,
-			HTTP_CODE_SERVERUNAVAILABLE,
+
+			/* Information */
+			HTTP_CODE_CONTINUE,					// 100
+			HTTP_CODE_SWITCHINGPROTOCALS,		// 101
+
+			/* Successful */
+			HTTP_CODE_OK,						// 200
+			HTTP_CODE_CREATED,					// 201
+			HTTP_CODE_ACCEPTED,					// 202
+			HTTP_CODE_NONAUTH,					// 203
+			HTTP_CODE_NOCONTENT,				// 204
+			HTTP_CODE_RESETCONTENT,				// 205
+			HTTP_CODE_PARTIALCONTENT,			// 206
+
+			/* Redirection */
+			HTTP_CODE_MULTIPLECHOISE,			// 300
+			HTTP_CODE_MOVEDPERMANENTLY,			// 301
+			HTTP_CODE_FOUND,					// 302
+			HTTP_CODE_SEEOTHER,					// 303
+			HTTP_CODE_NOTMODIFIED,				// 304
+			HTTP_CODE_USEPROXY,					// 305
+			HTTP_CODE_TEMPORARYREDIRECT,		// 307
+
+			/* Client error */
+			HTTP_CODE_BADREQUEST,				// 400
+			HTTP_CODE_UNAUTHORIZED,				// 401
+			HTTP_CODE_PAYMENTREQUIRED,			// 402
+			HTTP_CODE_FORBIDDEN,				// 403
+			HTTP_CODE_NOTFOUND,					// 404
+			HTTP_CODE_METHODNOTALLOWED,			// 405
+			HTTP_CODE_NOTACCEPTABLE,			// 406
+			HTTP_CODE_PROXYAUTHREQUIRED,		// 407
+			HTTP_CODE_REQUESTTIMEOUT,			// 408
+			HTTP_CODE_CONFLICT,					// 409
+			HTTP_CODE_GONE,						// 410
+			HTTP_CODE_LENGTHREQUIRED,			// 411
+			HTTP_CODE_PRECONDITIONFAILED,		// 412
+			HTTP_CODE_REQUESTENTITYTOOLARGE,	// 413
+			HTTP_CODE_REQUESTURITOOLONG,		// 414
+			HTTP_CODE_UNSUPPORTMEDIATYPE,		// 415
+			HTTP_CODE_REQUESTRANGENOTSATISFIABLE,// 416
+			HTTP_CODE_EXPECTATIONFAILED,		// 417
+
+			/* Server error */
+			HTTP_CODE_INTERNALSERVERERROR,		// 500
+			HTTP_CODE_NOTIMPLEMENT,				// 501
+			HTTP_CODE_BADGATEWAY,				// 502
+			HTTP_CODE_SERVICEUNAVAILABLE,		// 503
+			HTTP_CODE_GATEWAYTIMEOUT,			// 504
+			HTTP_CODE_HTTPVERSIONNOTSUPPORT,	// 505
 		};
-		static const GAIA::N32 HTTP_CODE_INTERNAL[] =
-		{
-			0,	 // HTTP_CODE_INVALID
-			200, // HTTP_CODE_OK
-			400, // HTTP_CODE_BADREQUEST
-			401, // HTTP_CODE_UNAUTHORIZED
-			403, // HTTP_CODE_FORBIDDEN
-			404, // HTTP_CODE_NOTFOUND
-			500, // HTTP_CODE_INTERNALSERVERERROR
-			503, // HTTP_CODE_SERVERUNAVAILABLE
-		};
+
 		static const GAIA::CH* HTTP_CODE_STRING[] =
 		{
-			"Invalid",					// HTTP_CODE_INVALID(0)
-			"OK",						// HTTP_CODE_OK(200)
-			"Bad Request",				// HTTP_CODE_BADREQUEST(400)
-			"Unauthonzed",				// HTTP_CODE_UNAUTHORIZED(401)
-			"Forbidden",				// HTTP_CODE_FORBIDDEN(403)
-			"Not Found",				// HTTP_CODE_NOTFOUND(404)
-			"Internal Server Error",	// HTTP_CODE_INTERNALSERVERERROR(500)
-			"Service Unavailable",		// HTTP_CODE_SERVERUNAVAILABLE(503)
+			"0",	// HTTP_CODE_INVALID
+
+			/* Information */
+			"100",	// HTTP_CODE_CONTINUE
+			"101",	// HTTP_CODE_SWITCHINGPROTOCALS
+
+			/* Successful */
+			"200",	// HTTP_CODE_OK
+			"201",	// HTTP_CODE_CREATED
+			"202",	// HTTP_CODE_ACCEPTED
+			"203",	// HTTP_CODE_NONAUTH
+			"204",	// HTTP_CODE_NOCONTENT
+			"205",	// HTTP_CODE_RESETCONTENT
+			"206",	// HTTP_CODE_PARTIALCONTENT
+
+			/* Redirection */
+			"300",	// HTTP_CODE_MULTIPLECHOISE
+			"301",	// HTTP_CODE_MOVEDPERMANENTLY
+			"302",	// HTTP_CODE_FOUND
+			"303",	// HTTP_CODE_SEEOTHER
+			"304",	// HTTP_CODE_NOTMODIFIED
+			"305",	// HTTP_CODE_USEPROXY
+			"307",	// HTTP_CODE_TEMPORARYREDIRECT
+
+			/* Client error */
+			"400",	// HTTP_CODE_BADREQUEST
+			"401",	// HTTP_CODE_UNAUTHORIZED
+			"402",	// HTTP_CODE_PAYMENTREQUIRED
+			"403",	// HTTP_CODE_FORBIDDEN
+			"404",	// HTTP_CODE_NOTFOUND
+			"405",	// HTTP_CODE_METHODNOTALLOWED
+			"406",	// HTTP_CODE_NOTACCEPTABLE
+			"407",	// HTTP_CODE_PROXYAUTHREQUIRED
+			"408",	// HTTP_CODE_REQUESTTIMEOUT
+			"409",	// HTTP_CODE_CONFLICT
+			"410",	// HTTP_CODE_GONE
+			"411",	// HTTP_CODE_LENGTHREQUIRED
+			"412",	// HTTP_CODE_PRECONDITIONFAILED
+			"413",	// HTTP_CODE_REQUESTENTITYTOOLARGE
+			"414",	// HTTP_CODE_REQUESTURITOOLONG
+			"415",	// HTTP_CODE_UNSUPPORTMEDIATYPE
+			"416",	// HTTP_CODE_REQUESTRANGENOTSATISFIABLE
+			"417",	// HTTP_CODE_EXPECTATIONFAILED
+
+			/* Server error */
+			"500",	// HTTP_CODE_INTERNALSERVERERROR
+			"501",	// HTTP_CODE_NOTIMPLEMENT
+			"502",	// HTTP_CODE_BADGATEWAY
+			"503",	// HTTP_CODE_SERVICEUNAVAILABLE
+			"504",	// HTTP_CODE_GATEWAYTIMEOUT
+			"505",	// HTTP_CODE_HTTPVERSIONNOTSUPPORT
+		};
+
+		static const GAIA::N32 HTTP_CODE_VALUE[] =
+		{
+			0,		// HTTP_CODE_INVALID
+
+			/* Information */
+			100,	// HTTP_CODE_CONTINUE,
+			101,	// HTTP_CODE_SWITCHINGPROTOCALS,
+
+			/* Successful */
+			200,	// HTTP_CODE_OK
+			201,	// HTTP_CODE_CREATED
+			202,	// HTTP_CODE_ACCEPTED
+			203,	// HTTP_CODE_NONAUTH
+			204,	// HTTP_CODE_NOCONTENT
+			205,	// HTTP_CODE_RESETCONTENT
+			206,	// HTTP_CODE_PARTIALCONTENT
+
+			/* Redirection */
+			300,	// HTTP_CODE_MULTIPLECHOISE
+			301,	// HTTP_CODE_MOVEDPERMANENTLY
+			302,	// HTTP_CODE_FOUND
+			303,	// HTTP_CODE_SEEOTHER
+			304,	// HTTP_CODE_NOTMODIFIED
+			305,	// HTTP_CODE_USEPROXY
+			307,	// HTTP_CODE_TEMPORARYREDIRECT
+
+			/* Client error */
+			400,	// HTTP_CODE_BADREQUEST
+			401,	// HTTP_CODE_UNAUTHORIZED
+			402,	// HTTP_CODE_PAYMENTREQUIRED
+			403,	// HTTP_CODE_FORBIDDEN
+			404,	// HTTP_CODE_NOTFOUND
+			405,	// HTTP_CODE_METHODNOTALLOWED
+			406,	// HTTP_CODE_NOTACCEPTABLE
+			407,	// HTTP_CODE_PROXYAUTHREQUIRED
+			408,	// HTTP_CODE_REQUESTTIMEOUT
+			409,	// HTTP_CODE_CONFLICT
+			410,	// HTTP_CODE_GONE
+			411,	// HTTP_CODE_LENGTHREQUIRED
+			412,	// HTTP_CODE_PRECONDITIONFAILED
+			413,	// HTTP_CODE_REQUESTENTITYTOOLARGE
+			414,	// HTTP_CODE_REQUESTURITOOLONG
+			415,	// HTTP_CODE_UNSUPPORTMEDIATYPE
+			416,	// HTTP_CODE_REQUESTRANGENOTSATISFIABLE
+			417,	// HTTP_CODE_EXPECTATIONFAILED
+
+			/* Server error */
+			500,	// HTTP_CODE_INTERNALSERVERERROR
+			501,	// HTTP_CODE_NOTIMPLEMENT
+			502,	// HTTP_CODE_BADGATEWAY
+			503,	// HTTP_CODE_SERVICEUNAVAILABLE
+			504,	// HTTP_CODE_GATEWAYTIMEOUT
+			505,	// HTTP_CODE_HTTPVERSIONNOTSUPPORT
+		};
+
+		static const GAIA::CH* HTTP_CODE_DESCRIPTION[] =
+		{
+			"Invalid",						// HTTP_CODE_INVALID(0)
+
+			/* Information */
+			"Continue",						// HTTP_CODE_CONTINUE(100)
+			"Switching Protocals",			// HTTP_CODE_SWITCHINGPROTOCALS(101)
+
+			/* Successful */
+			"OK",							// HTTP_CODE_OK(200)
+			"Created",						// HTTP_CODE_CREATED(201)
+			"Accepted",						// HTTP_CODE_ACCEPTED(202)
+			"Non-Authoritative Information",// HTTP_CODE_NONAUTH(203)
+			"No Content",					// HTTP_CODE_NOCONTENT(204)
+			"Reset Content",				// HTTP_CODE_RESETCONTENT(205)
+			"Partial Content",				// HTTP_CODE_PARTIALCONTENT(206)
+
+			/* Redirection */
+			"Multiple Choices",				// HTTP_CODE_MULTIPLECHOISE(300)
+			"Moved Permanently",			// HTTP_CODE_MOVEDPERMANENTLY(301)
+			"Found ",						// HTTP_CODE_FOUND(302)
+			"See Other",					// HTTP_CODE_SEEOTHER(303)
+			"Not Modified",					// HTTP_CODE_NOTMODIFIED(304)
+			"Use Proxy",					// HTTP_CODE_USEPROXY(305)
+			"Temporary Redirect",			// HTTP_CODE_TEMPORARYREDIRECT(307)
+
+			/* Client error */
+			"Bad Request",					// HTTP_CODE_BADREQUEST(400)
+			"Unauthonzed",					// HTTP_CODE_UNAUTHORIZED(401)
+			"Payment Required",				// HTTP_CODE_PAYMENTREQUIRED(402)
+			"Forbidden",					// HTTP_CODE_FORBIDDEN(403)
+			"Not Found",					// HTTP_CODE_NOTFOUND(404)
+			"Method Not Allowed",			// HTTP_CODE_METHODNOTALLOWED(405)
+			"Not Acceptable",				// HTTP_CODE_NOTACCEPTABLE(406)
+			"Proxy Authentication Required",// HTTP_CODE_PROXYAUTHREQUIRED(407)
+			"Request Timeout",				// HTTP_CODE_REQUESTTIMEOUT(408)
+			"Conflict",						// HTTP_CODE_CONFLICT(409)
+			"Gone",							// HTTP_CODE_GONE(410)
+			"Length Required",				// HTTP_CODE_LENGTHREQUIRED(411)
+			"Precondition Failed",			// HTTP_CODE_PRECONDITIONFAILED(412)
+			"Request Entity Too Large",		// HTTP_CODE_REQUESTENTITYTOOLARGE(413)
+			"Request-URI Too Long",			// HTTP_CODE_REQUESTURITOOLONG(414)
+			"Unsupported Media Type",		// HTTP_CODE_UNSUPPORTMEDIATYPE(415)
+			"Requested Range Not Satisfiable", // HTTP_CODE_REQUESTRANGENOTSATISFIABLE(416)
+			"Expectation Failed",			// HTTP_CODE_EXPECTATIONFAILED(417)
+
+			/* Server error */
+			"Internal Server Error",		// HTTP_CODE_INTERNALSERVERERROR(500)
+			"Not Implemented",				// HTTP_CODE_NOTIMPLEMENT(501)
+			"Bad Gateway",					// HTTP_CODE_BADGATEWAY(502)
+			"Service Unavailable",			// HTTP_CODE_SERVICEUNAVAILABLE(503)
+			"Gateway Timeout",				// HTTP_CODE_GATEWAYTIMEOUT(504)
+			"HTTP Version Not Supported",	// HTTP_CODE_HTTPVERSIONNOTSUPPORT(505)
 		};
 
 		// Http head origin name declaration here.
@@ -567,6 +796,8 @@ namespace GAIA
 					}
 					else if(*p == '\r' && *(p + 1) == '\n') // Value end.
 					{
+						while(*pLast == ' ')
+							++pLast;
 						if(strName.empty() || p - pLast == 0)
 						{
 							this->Reset();
@@ -579,9 +810,13 @@ namespace GAIA
 						p += 2;
 						pLast = p;
 					}
+					else
+						p++;
 				}
 				if(p != pLast)
 				{
+					while(*pLast == ' ')
+						++pLast;
 					if(strName.empty() || p - pLast == 0)
 					{
 						this->Reset();
@@ -592,19 +827,27 @@ namespace GAIA
 				}
 				return GAIA::True;
 			}
-			GINL GAIA::CH* ToString(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
+			GINL GAIA::NUM GetStringLength() const{return m_sStringLen;}
+			GINL GAIA::CH* ToString(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL, GAIA::BL* pResult = GNIL) const
 			{
-				GAST(!GAIA::ALGO::gstremp(psz));
+				GAST(psz != GNIL);
+				GAST(sMaxSize == GINVALID || sMaxSize > 0);
 				GAIA::CH* p = psz;
 				GAIA::NUM sSize = 0;
+				if(pResult != GNIL)
+					*pResult = GAIA::True;
 				for(GAIA::NUM x = 0; x < m_nodes.size(); ++x)
 				{
 					const Node& n = m_nodes[x];
 					GAIA::NUM sNeedSize = GAIA::ALGO::gstrlen(n.pszName) + GAIA::ALGO::gstrlen(n.pszValue) + sizeof(":\r\n\0") - 1;
-					if(sSize + sNeedSize > sMaxSize)
+					if(sMaxSize != GINVALID && sSize + sNeedSize > sMaxSize)
+					{
+						if(pResult != GNIL)
+							*pResult = GAIA::False;
 						break;
+					}
 					sSize += sNeedSize - 1;
-					p = GAIA::ALGO::gstradd_notend(p, n.pszName); *p++ = ':';
+					p = GAIA::ALGO::gstradd_notend(p, n.pszName); *p++ = ':'; *p++ = ' ';
 					p = GAIA::ALGO::gstradd_notend(p, n.pszValue); *p++ = '\r'; *p++ = '\n';
 				}
 				*p++ = '\0';
@@ -629,6 +872,7 @@ namespace GAIA
 						n.pszName = this->requestname(pszName);
 						n.pszValue = this->requestvalue(pszValue);
 						m_nodes.push_back(n);
+						this->increase_string_len(n);
 						m_bSorted = GAIA::False;
 					}
 					else
@@ -660,6 +904,7 @@ namespace GAIA
 						n.pszName = this->requestname(pszName);
 						n.pszValue = this->requestvalue(pszValue);
 						m_nodes.push_back(n);
+						this->increase_string_len(n);
 					}
 				}
 				return GAIA::True;
@@ -690,7 +935,9 @@ namespace GAIA
 					GAIA::NUM sFinded = m_nodes.binary_search(finder);
 					if(sFinded == GINVALID)
 						return GAIA::False;
-					this->releasevalue(m_nodes[sFinded].pszValue);
+					Node& n = m_nodes[sFinded];
+					this->decrease_string_len(n);
+					this->releasevalue(n.pszValue);
 					return m_nodes.erase(sFinded);
 				}
 				else
@@ -700,6 +947,7 @@ namespace GAIA
 						const Node& n = m_nodes[x];
 						if(GAIA::ALGO::gstrequal(n.pszName, pszName))
 						{
+							this->decrease_string_len(n);
 							this->releasevalue(n.pszValue);
 							return m_nodes.erase(x);
 						}
@@ -715,6 +963,7 @@ namespace GAIA
 					this->releasevalue(n.pszValue);
 				}
 				m_nodes.clear();
+				m_sStringLen = 0;
 				m_bSorted = GAIA::True;
 			}
 			GINL GAIA::NUM Size() const{return m_nodes.size();}
@@ -799,7 +1048,7 @@ namespace GAIA
 			};
 
 		private:
-			GINL GAIA::GVOID init(){m_bSorted = GAIA::False;}
+			GINL GAIA::GVOID init(){m_sStringLen = 0; m_bSorted = GAIA::False;}
 			GINL GAIA::GVOID sortnodes()
 			{
 				if(m_bSorted)
@@ -807,12 +1056,26 @@ namespace GAIA
 				m_nodes.sort();
 				m_bSorted = GAIA::True;
 			}
+			GINL GAIA::GVOID increase_string_len(const Node& n)
+			{
+				m_sStringLen += GAIA::ALGO::gstrlen(n.pszName);
+				m_sStringLen += GAIA::ALGO::gstrlen(n.pszValue);
+				m_sStringLen += sizeof(": \r\n") - 1;
+			}
+			GINL GAIA::GVOID decrease_string_len(const Node& n)
+			{
+				m_sStringLen -= GAIA::ALGO::gstrlen(n.pszName);
+				m_sStringLen -= GAIA::ALGO::gstrlen(n.pszValue);
+				m_sStringLen -= sizeof(": \r\n") - 1;
+				GAST(m_sStringLen >= 0);
+			}
 			const GAIA::CH* requestname(const GAIA::CH* pszName);
 			const GAIA::CH* requestvalue(const GAIA::CH* pszValue);
 			GAIA::BL releasevalue(const GAIA::CH* pszValue);
 
 		private:
 			GAIA::CTN::Vector<Node> m_nodes;
+			GAIA::NUM m_sStringLen;
 			GAIA::BL m_bSorted;
 		};
 	}

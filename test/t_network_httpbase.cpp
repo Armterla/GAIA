@@ -297,6 +297,23 @@ namespace TEST
 			h.Reset();
 			TAST(h.Empty());
 			TAST(h != h1);
+
+			static const GAIA::CH HEAD_SAMPLE[] = "a: 1\r\nb: 2\r\nc: 3\r\n";
+			h = HEAD_SAMPLE;
+			h.FromString(HEAD_SAMPLE);
+			if(h.GetStringLength() != sizeof(HEAD_SAMPLE) - 1)
+				TERROR;
+			GAIA::CH szTemp[256];
+			GAIA::NUM sResultSize;
+			GAIA::BL bResult;
+			if(h.ToString(szTemp, sizeof(szTemp), &sResultSize, &bResult) != szTemp)
+				TERROR;
+			TAST(bResult);
+			TAST(sResultSize == sizeof(HEAD_SAMPLE) - 1);
+			TAST(GAIA::ALGO::gstrequal(HEAD_SAMPLE, szTemp));
+
+			TAST(h.FromString("a:1\r\n"));
+			TAST(!h.FromString("a=1\r\n"));
 		}
 	}
 }
