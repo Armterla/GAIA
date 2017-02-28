@@ -277,7 +277,7 @@ namespace GAIA
 				psz[l] = '\0';
 				return l;
 			}
-			template<typename _ParamSizeType, typename _ParamDataType> _SizeType find(_ParamDataType p, const _ParamSizeType& size, const _SizeType& index) const
+			template<typename _ParamSizeType, typename _ParamDataType> _SizeType find(_ParamDataType p, const _ParamSizeType& size, const _SizeType& index = 0) const
 			{
 				GAST(p != GNIL);
 				if(p == GNIL)
