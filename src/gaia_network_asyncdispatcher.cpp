@@ -11,6 +11,7 @@
 #	include <mswsock.h>
 #	include <winsock2.h>
 #	include <windows.h>
+//#	pragma comment(lib, "mswsock.lib")
 #elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 #	include <sys/types.h>
 #	include <sys/event.h>
@@ -530,10 +531,16 @@ namespace GAIA
 							this->attach_socket_iocp(*pCtx->pDataSocket);
 							pCtx->pDataSocket->SetBinded(GAIA::True);
 							pCtx->pDataSocket->SetConnected(GAIA::True);
-							GAIA::N32 nAddrLen = sizeof(SOCKADDR_IN) + 16;
-							sockaddr_in* saddr_peer = (sockaddr_in*)(pCtx->data + nAddrLen);
+
 							GAIA::NETWORK::Addr addrPeer;
-							GAIA::NETWORK::saddr2addr(saddr_peer, addrPeer);
+							//this->GetAcceptAddr(pCtx, addrPeer);
+							GAIA::N32 nListenSock = pCtx->pListenSocket->GetFD();
+							GAIA::N32 nSetSockOptResult = setsockopt(
+									pCtx->pDataSocket->GetFD(), SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT,
+									(char*)&nListenSock, sizeof(nListenSock));
+							GAST(nSetSockOptResult == 0);
+
+							pCtx->pDataSocket->GetGlobalAddress(addrPeer);
 							pCtx->pDataSocket->SetPeerAddress(addrPeer);
 
 							pCtx->pDataSocket->OnAccepted(GAIA::True, addrListen);
@@ -954,6 +961,20 @@ namespace GAIA
 				}
 			}
 		}
+
+		//GAIA::GVOID AsyncDispatcher::GetAcceptAddr(const GAIA::NETWORK::AsyncContext* pCtx, GAIA::NETWORK::Addr& addrPeer)
+		//{
+		//	SOCKADDR_IN* addrLocal = GNIL;
+		//	SOCKADDR_IN* addrRemote = GNIL;
+		//	GAIA::N32 nLocalAddrLen = 0;
+		//	GAIA::N32 nRemoteAddrLen = 0;
+		//	GAIA::N32 nAddrLen = sizeof(SOCKADDR_IN) + 16;
+
+		//	GetAcceptExSockaddrs((PVOID)pCtx->data, 0, nAddrLen, nAddrLen,
+		//		(SOCKADDR**)&addrLocal, &nLocalAddrLen, (SOCKADDR**)&addrRemote, &nRemoteAddrLen);
+
+		//	GAIA::NETWORK::saddr2addr(&addrRemote, addrPeer);
+		//}
 	#else
 		GAIA::N32 AsyncDispatcher::select_kqep(GAIA::N32 nSocket) const
 		{
