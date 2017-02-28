@@ -11,6 +11,7 @@
 #include "gaia_ctn_ref.h"
 #include "gaia_ctn_vector.h"
 #include "gaia_ctn_buffer.h"
+#include "gaia_ctn_pool.h"
 #include "gaia_ctn_set.h"
 #include "gaia_network_ip.h"
 #include "gaia_network_addr.h"
@@ -22,6 +23,8 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		static const GAIA::CH* HTTP_VERSION_STRING = "HTTP/1.1";
+
 		GAIA_ENUM_BEGIN(HTTP_SERVER_BLACKWHITE_MODE)
 			HTTP_SERVER_BLACKWHITE_MODE_BLACK, // Default value.
 			HTTP_SERVER_BLACKWHITE_MODE_WHITE,
@@ -55,6 +58,8 @@ namespace GAIA
 				uMaxStaticCacheCount = DEFAULT_MAX_STATIC_CACHE_COUNT;
 				uMaxResponseCountPerMinute = DEFAULT_MAX_RESPONSE_COUNT_PER_MINUTE;
 				bEnableAutoResponseStaticFile = GAIA::True;
+				GAIA::ALGO::gstrcpy(szHttpVer, GAIA::NETWORK::HTTP_VERSION_STRING);
+				sHttpVerLen = GAIA::ALGO::gstrlen(szHttpVer);
 			}
 			GINL GAIA::BL check() const
 			{
@@ -69,6 +74,12 @@ namespace GAIA
 				if(uMaxHarfConnTime == 0)
 					return GAIA::False;
 				if(uMaxResponseCountPerMinute == 0)
+					return GAIA::False;
+				if(szHttpVer[0] == '\0')
+					return GAIA::False;
+				if(sHttpVerLen <= 0)
+					return GAIA::False;
+				if(GAIA::ALGO::gstrlen(szHttpVer) != sHttpVerLen)
 					return GAIA::False;
 				return GAIA::True;
 			}
@@ -85,6 +96,8 @@ namespace GAIA
 			GAIA::U64 uMaxStaticCacheCount;
 			GAIA::U64 uMaxResponseCountPerMinute;
 			GAIA::BL bEnableAutoResponseStaticFile;
+			GAIA::CH szHttpVer[16];
+			GAIA::NUM sHttpVerLen;
 		};
 
 		class HttpServerStatus : public GAIA::Base
@@ -92,6 +105,11 @@ namespace GAIA
 		public:
 			GINL GAIA::GVOID reset()
 			{
+				uRequestAnalyzeFailedCount = 0;
+				uRequestDenyByBWCount = 0;
+				uRequestDenyByMaxConnCount = 0;
+				uRequestDenyByMaxHalfConnCount = 0;
+
 				uRequestPutCount = 0;
 				uRequestPostCount = 0;
 				uRequestGetCount = 0;
@@ -114,6 +132,11 @@ namespace GAIA
 			}
 
 		public:
+			GAIA::U64 uRequestAnalyzeFailedCount;
+			GAIA::U64 uRequestDenyByBWCount;
+			GAIA::U64 uRequestDenyByMaxConnCount;
+			GAIA::U64 uRequestDenyByMaxHalfConnCount;
+
 			GAIA::U64 uRequestPutCount;
 			GAIA::U64 uRequestPostCount;
 			GAIA::U64 uRequestGetCount;
@@ -152,7 +175,7 @@ namespace GAIA
 			GINL GAIA::NETWORK::HttpAsyncSocket& GetAsyncSocket() const{return *m_pSock;}
 			GINL const GAIA::NETWORK::Addr& GetPeerAddr() const{return m_addrPeer;}
 			GINL const GAIA::U64& GetAcceptTime() const{return m_uAcceptTime;}
-			GAIA::BL Response(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize, const GAIA::U64& uCacheTime = GINVALID);
+			GAIA::BL Response(GAIA::NETWORK::HTTP_CODE httpcode, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p = GNIL, GAIA::NUM sSize = 0, const GAIA::U64& uCacheTime = GINVALID);
 			GAIA::BL Close();
 
 			GINL GAIA::N32 compare(const HttpServerLink& src) const
@@ -190,7 +213,7 @@ namespace GAIA
 			friend class HttpAsyncDispatcher;
 
 		public:
-			HttpServerCallBack(HttpServer& svr);
+			HttpServerCallBack(GAIA::NETWORK::HttpServer& svr);
 			virtual ~HttpServerCallBack();
 
 			GINL GAIA::NETWORK::HttpServer& GetServer() const{return *m_pSvr;}
@@ -222,7 +245,7 @@ namespace GAIA
 
 		class HttpServer : public GAIA::Base
 		{
-			friend class HttpLink;
+			friend class HttpServerLink;
 			friend class HttpAsyncSocket;
 			friend class HttpAsyncDispatcher;
 
@@ -274,7 +297,9 @@ namespace GAIA
 			GAIA::BL ReleaseCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sHeadLen);
 			GAIA::BL UpdateCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sHeadLen, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime = GINVALID);
 			GAIA::BL RecycleCache();
-			GAIA::BL DestroyCache();
+
+			GAIA::CTN::Buffer* RequestBuffer();
+			GAIA::GVOID ReleaseBuffer(GAIA::CTN::Buffer* pBuf);
 
 		private:
 			GINL GAIA::GVOID init()
@@ -288,6 +313,8 @@ namespace GAIA
 				m_disp = GNIL;
 				m_status.reset();
 			}
+
+			GINL GAIA::NETWORK::HttpServerStatus& GetStatus(){return m_status;}
 
 		private:
 			class BWNode : public GAIA::Base // White and black node.
@@ -318,6 +345,7 @@ namespace GAIA
 
 		private:
 			typedef GAIA::CTN::Set<GAIA::CTN::Ref<GAIA::NETWORK::HttpServerLink> > __LinkSetType;
+			typedef GAIA::CTN::Vector<GAIA::NETWORK::HttpServerLink*> __LinkVectorType;
 
 		private:
 			GAIA::NETWORK::HttpServerDesc m_desc;
@@ -327,7 +355,10 @@ namespace GAIA
 			GAIA::BL m_bBegin;
 
 			GAIA::SYNC::LockRW m_rwLinks;
-			__LinkSetType m_links;
+			__LinkSetType m_links_bypeeraddr;
+
+			GAIA::SYNC::LockRW m_rwRCLinks; // RC means request complete.
+			__LinkVectorType m_rclinks; // RC means request complete.
 
 			GAIA::BL m_bEnableDynamicResponseCache;
 			GAIA::BL m_bEnableStaticResponseCache;
@@ -340,6 +371,9 @@ namespace GAIA
 
 			GAIA::SYNC::LockRW m_rwCache;
 			GAIA::CTN::Set<CacheNode> m_cache;
+
+			GAIA::SYNC::Lock m_lrBufPool;
+			GAIA::CTN::Pool<GAIA::CTN::Buffer> m_bufpool;
 
 			HttpAsyncDispatcher* m_disp;
 			GAIA::NETWORK::HttpServerStatus m_status;
