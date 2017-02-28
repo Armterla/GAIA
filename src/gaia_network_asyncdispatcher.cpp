@@ -526,12 +526,11 @@ namespace GAIA
 					GAIA::NETWORK::Addr addrListen;
 					pCtx->pListenSocket->GetBindedAddress(addrListen);
 					pCtx->pDataSocket->OnAccepted(GAIA::True, addrListen);
-					this->OnAcceptSocket(*pCtx->pDataSocket, addrListen);
-					// TODO:
-
-					// Begin receive.
-					for(GAIA::NUM x = 0; x < m_desc.sWinIOCPRecvEventCount; ++x)
-						this->request_recv(*pCtx->pDataSocket);
+					if(this->OnAcceptSocket(*pCtx->pDataSocket, addrListen))
+					{
+						for(GAIA::NUM x = 0; x < m_desc.sWinIOCPRecvEventCount; ++x)
+							this->request_recv(*pCtx->pDataSocket);
+					}
 
 					// Re-request.
 					this->request_accept(*pCtx->pListenSocket, addrListen);
@@ -736,18 +735,18 @@ namespace GAIA
 
 										pAcceptedSock->OnCreated(GAIA::True);
 										ctx.pSocket->OnAccepted(GAIA::True, addrListen);
-										this->OnAcceptSocket(*pAcceptedSock, addrListen);
-										// TODO:
-
-										struct kevent ke[2];
-										EV_SET(&ke[0], nNewSocket, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
-										EV_SET(&ke[1], nNewSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, pCtxSend);
-										GAIA::N32 kqep = this->select_kqep(nNewSocket);
-										GAIA::NUM sResult = kevent(kqep, ke, 2, GNIL, 0, GNIL);
-										if(sResult != GINVALID)
+										if(this->OnAcceptSocket(*pAcceptedSock, addrListen))
 										{
-											GAST(sResult == 0);
-											pAcceptedSock->rise_ref();
+											struct kevent ke[2];
+											EV_SET(&ke[0], nNewSocket, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
+											EV_SET(&ke[1], nNewSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, pCtxSend);
+											GAIA::N32 kqep = this->select_kqep(nNewSocket);
+											GAIA::NUM sResult = kevent(kqep, ke, 2, GNIL, 0, GNIL);
+											if(sResult != GINVALID)
+											{
+												GAST(sResult == 0);
+												pAcceptedSock->rise_ref();
+											}
 										}
 									}
 									else
