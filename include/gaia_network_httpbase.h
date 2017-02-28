@@ -839,7 +839,7 @@ namespace GAIA
 				for(GAIA::NUM x = 0; x < m_nodes.size(); ++x)
 				{
 					const Node& n = m_nodes[x];
-					GAIA::NUM sNeedSize = GAIA::ALGO::gstrlen(n.pszName) + GAIA::ALGO::gstrlen(n.pszValue) + sizeof(":\r\n\0") - 1;
+					GAIA::NUM sNeedSize = GAIA::ALGO::gstrlen(n.pszName) + GAIA::ALGO::gstrlen(n.pszValue) + sizeof(": \r\n\0") - 1;
 					if(sMaxSize != GINVALID && sSize + sNeedSize > sMaxSize)
 					{
 						if(pResult != GNIL)
