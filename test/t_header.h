@@ -312,6 +312,7 @@ namespace TEST
 	}
 
 	// GAIA performance test proc.
+	extern GAIA::GVOID tperf_msys_heapesg(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID tperf_ctn(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID tperf_ctn_avltree(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID tperf_ctn_dmpgraph(GAIA::LOG::Log& logobj);
@@ -324,6 +325,8 @@ namespace TEST
 		// Every test procedure.
 		TTEXT("[GAIA PERF TEST BEGIN]");
 		{
+			TITEM("MSys: HeapESG test begin!"); tperf_msys_heapesg(logobj); TITEM("End"); TTEXT("\t");
+
 			TITEM("Container: Ctn perf test begin!"); tperf_ctn(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Container: AVLTree perf test begin!"); tperf_ctn_avltree(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Container: DmpGraph perf test begin!"); tperf_ctn_dmpgraph(logobj); TITEM("End"); TTEXT("\t");
