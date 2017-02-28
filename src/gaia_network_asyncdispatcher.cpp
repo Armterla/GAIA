@@ -755,7 +755,7 @@ namespace GAIA
 										pAcceptedSock->m_pWriteAsyncCtx = pCtxSend;
 
 										pAcceptedSock->OnCreated(GAIA::True);
-										ctx.pSocket->OnAccepted(GAIA::True, addrListen);
+										pAcceptedSock->OnAccepted(GAIA::True, addrListen);
 										if(this->OnAcceptSocket(*pAcceptedSock, addrListen))
 										{
 											struct kevent ke[2];
