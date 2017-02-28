@@ -21,6 +21,17 @@ namespace GAIA
 			HTTP_METHOD_DELETE,
 		GAIA_ENUM_END(HTTP_METHOD)
 
+		// Http method string.
+		static const GAIA::CH* HTTP_METHOD_STRING[] =
+		{
+			"INVALID",	// HTTP_METHOD_INVALID
+			"PUT",		// HTTP_METHOD_PUT
+			"POST",		// HTTP_METHOD_POST
+			"GET",		// HTTP_METHOD_GET
+			"HEAD",		// HTTP_METHOD_HEAD
+			"DELETE",	// HTTP_METHOD_DELETE
+		};
+
 		// Http code declaration here.
 		static const GAIA::N32 HTTP_CODE_OK 					= 200;
 		static const GAIA::N32 HTTP_CODE_BADREQUEST 			= 400;
