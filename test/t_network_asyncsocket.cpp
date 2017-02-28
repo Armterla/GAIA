@@ -118,12 +118,6 @@ namespace TEST
 			m_nAcceptedCount[bResult]++;
 			if(m_bNoMoreCallBack)
 				m_nAcceptedCount[2]++;
-
-			GAIA::UM uThreadID = GAIA::THREAD::threadid();
-			if(m_uCallBackThreadID == GINVALID)
-				m_uCallBackThreadID = uThreadID;
-			else if(uThreadID != m_uCallBackThreadID)
-				m_bExistDiffThreadCallBack = GAIA::True;
 		}
 		virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nPracticeSize, GAIA::N32 nSize)
 		{
@@ -496,7 +490,7 @@ namespace TEST
 								if(pSock->m_nListenCount[1] != 1){TERROR;break;}
 								if(pSock->m_nListenCount[2] != 0){TERROR;break;}
 								if(pSock->m_nAcceptedCount[0] != 0){TERROR;break;}
-								if(pSock->m_nAcceptedCount[1] != DATA_SOCKET_COUNT / LISTEN_SOCKET_COUNT){TERROR;break;}
+								if(pSock->m_nAcceptedCount[1] != 0){TERROR;break;}
 								if(pSock->m_nAcceptedCount[2] != 0){TERROR;break;}
 								if(pSock->m_nSentCount[0] != 0){TERROR;break;}
 								if(pSock->m_nSentCount[1] != 0){TERROR;break;}
@@ -526,7 +520,11 @@ namespace TEST
 								if(pSock->m_nClosedCount[1] != 1){TERROR;break;}
 								if(pSock->m_nClosedCount[2] != 0){TERROR;break;}
 								if(pSock->m_nBoundCount[0] != 0){TERROR;break;}
+							#if GAIA_OS == GAIA_OS_WINDOWS
+								if(pSock->m_nBoundCount[1] != 1){TERROR;break;}
+							#else
 								if(pSock->m_nBoundCount[1] != 0){TERROR;break;}
+							#endif
 								if(pSock->m_nBoundCount[2] != 0){TERROR;break;}
 								if(pSock->m_nConnectedCount[0] != 0){TERROR;break;}
 								if(pSock->m_nConnectedCount[1] != 1){TERROR;break;}
@@ -581,7 +579,7 @@ namespace TEST
 								if(pSock->m_nListenCount[1] != 0){TERROR;break;}
 								if(pSock->m_nListenCount[2] != 0){TERROR;break;}
 								if(pSock->m_nAcceptedCount[0] != 0){TERROR;break;}
-								if(pSock->m_nAcceptedCount[1] != 0){TERROR;break;}
+								if(pSock->m_nAcceptedCount[1] != 1){TERROR;break;}
 								if(pSock->m_nAcceptedCount[2] != 0){TERROR;break;}
 								if(pSock->m_nSentCount[0] != 0){TERROR;break;}
 								if(pSock->m_nSentCount[1] != 0){TERROR;break;}
