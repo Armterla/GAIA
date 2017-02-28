@@ -14,6 +14,7 @@ namespace GAIA
 		public:
 			GINL Addr(){}
 			GINL Addr(const Addr& src){this->operator = (src);}
+			template<typename _ParamDataType> Addr(const _ParamDataType* psz){this->operator = (psz);}
 			GINL Addr(const GAIA::NETWORK::IP& ip, GAIA::U16 uPort){this->ip = ip; this->uPort = uPort;}
 			GINL GAIA::GVOID reset(){ip.reset(); uPort = 0;}
 			GINL GAIA::BL check() const{return ip.check() && uPort != 0;}
@@ -39,6 +40,7 @@ namespace GAIA
 				return psz;
 			}
 			GINL Addr& operator = (const Addr& src){GAST(&src != this); ip = src.ip; uPort = src.uPort; return *this;}
+			template<typename _ParamDataType> Addr& operator = (const _ParamDataType* psz){this->fromstring(psz); return *this;}
 			GINL GAIA::N32 compare(const GAIA::NETWORK::Addr& src) const
 			{
 				if(ip < src.ip)
