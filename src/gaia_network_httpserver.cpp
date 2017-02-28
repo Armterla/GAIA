@@ -266,6 +266,8 @@ namespace GAIA
 				return GAIA::False;
 			}
 
+			m_desc = desc;
+			m_desc.pszRootPath = GAIA::ALGO::gstrnew(desc.pszRootPath);
 			m_bCreated = GAIA::True;
 			return GAIA::True;
 		}
@@ -289,6 +291,8 @@ namespace GAIA
 			this->RemoveWhiteListAll();
 			this->DestroyCache();
 
+			gdel[] m_desc.pszRootPath;
+			m_desc.reset();
 			m_bCreated = GAIA::False;
 			return GAIA::True;
 		}

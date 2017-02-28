@@ -4,6 +4,8 @@
 #include "gaia_type.h"
 #include "gaia_assert.h"
 #include "gaia_algo_memory.h"
+#include "gaia_algo_string.h"
+#include "gaia_algo_search.h"
 
 namespace GAIA
 {
@@ -220,6 +222,48 @@ namespace GAIA
 				}
 				psz[l] = '\0';
 				return l;
+			}
+			template<typename _ParamSizeType, typename _ParamDataType> _SizeType find(_ParamDataType p, const _ParamSizeType& size, const _SizeType& index = 0) const
+			{
+				GAST(p != GNIL);
+				if(p == GNIL)
+					return GINVALID;
+				GAST(size > 0);
+				if(size <= 0)
+					return GINVALID;
+				GAST(index >= 0);
+				if(index < 0)
+					return GINVALID;
+				if(index >= this->remain())
+					return GINVALID;
+				const GAIA::U8* pFinded = GAIA::ALGO::finds(this->read_ptr() + index, this->write_ptr(), p, size);
+				if(pFinded == GNIL)
+					return GINVALID;
+				return (_SizeType)(pFinded - this->read_ptr());
+			}
+			template<typename _ParamSizeType, typename _ParamDataType> GAIA::BL startwith(_ParamDataType p, const _ParamSizeType& size) const
+			{
+				GAST(p != GNIL);
+				if(p == GNIL)
+					return GAIA::False;
+				GAST(size > 0);
+				if(size <= 0)
+					return GAIA::False;
+				if(this->remain() == 0)
+					return GAIA::False;
+				return GAIA::ALGO::startwith(this->read_ptr(), this->remain(), p, size);
+			}
+			template<typename _ParamSizeType, typename _ParamDataType> GAIA::BL endwith(_ParamDataType p, const _ParamSizeType& size) const
+			{
+				GAST(p != GNIL);
+				if(p == GNIL)
+					return GAIA::False;
+				GAST(size > 0);
+				if(size <= 0)
+					return GAIA::False;
+				if(this->remain() == 0)
+					return GAIA::False;
+				return GAIA::ALGO::endwith(this->read_ptr(), this->remain(), p, size);
 			}
 			GINL GAIA::N32 compare(const __MyType& src) const
 			{

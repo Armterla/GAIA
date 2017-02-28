@@ -54,6 +54,7 @@ namespace GAIA
 				uMaxStaticCacheSize = DEFAULT_MAX_STATIC_CACHE_SIZE;
 				uMaxStaticCacheCount = DEFAULT_MAX_STATIC_CACHE_COUNT;
 				uMaxResponseCountPerMinute = DEFAULT_MAX_RESPONSE_COUNT_PER_MINUTE;
+				bEnableAutoResponseStaticFile = GAIA::True;
 			}
 			GINL GAIA::BL check() const
 			{
@@ -83,6 +84,7 @@ namespace GAIA
 			GAIA::U64 uMaxStaticCacheSize;
 			GAIA::U64 uMaxStaticCacheCount;
 			GAIA::U64 uMaxResponseCountPerMinute;
+			GAIA::BL bEnableAutoResponseStaticFile;
 		};
 
 		class HttpServerStatus : public GAIA::Base
