@@ -167,7 +167,7 @@ namespace GAIA
 
 			sockaddr_in saddr_in;
 			zeromem(&saddr_in);
-			GAIA::NETWORK::addr2saddr(addr, &saddr_in);
+			GAIA::NETWORK::addr2saddr(addr, &saddr_in, AF_INET);
 			GAIA::N32 nAddrLen = sizeof(sockaddr_in);
 
 			DWORD dwSent;
