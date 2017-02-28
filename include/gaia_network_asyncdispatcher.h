@@ -164,6 +164,8 @@ namespace GAIA
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::SYNC::LockRW m_rwPostAcceptAble;
 			GAIA::BL m_bPostAcceptAble;
+
+			GAIA::SYNC::LockRW m_rwAsyncCtxEnding;
 		#endif
 		};
 	}

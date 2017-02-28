@@ -187,28 +187,34 @@ namespace GAIA
 			}
 		#endif
 
-			// Close all listen sockets.
 			{
-				GAIA::SYNC::AutolockW al(m_rwListenSockets);
-				for(GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*>::it it = m_listen_sockets.frontit(); !it.empty(); ++it)
-				{
-					GAIA::NETWORK::AsyncSocket* pSock = *it;
-					pSock->m_sock.Close();
-					pSock->drop_ref();
-				}
-				m_listen_sockets.clear();
-			}
+			#if GAIA_OS == GAIA_OS_WINDOWS
+				GAIA::SYNC::AutolockW al(m_rwAsyncCtxEnding);
+			#endif
 
-			// Close all accepting sockets.
-			{
-				GAIA::SYNC::AutolockW al(m_rwAcceptingSockets);
-				for(GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*>::it it = m_accepting_sockets.frontit(); !it.empty(); ++it)
+				// Close all listen sockets.
 				{
-					GAIA::NETWORK::AsyncSocket* pSock = *it;
-					pSock->m_sock.Close();
-					pSock->drop_ref();
+					GAIA::SYNC::AutolockW al(m_rwListenSockets);
+					for(GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*>::it it = m_listen_sockets.frontit(); !it.empty(); ++it)
+					{
+						GAIA::NETWORK::AsyncSocket* pSock = *it;
+						pSock->m_sock.Close();
+						pSock->drop_ref();
+					}
+					m_listen_sockets.clear();
 				}
-				m_accepting_sockets.clear();
+
+				// Close all accepting sockets.
+				{
+					GAIA::SYNC::AutolockW al(m_rwAcceptingSockets);
+					for(GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*>::it it = m_accepting_sockets.frontit(); !it.empty(); ++it)
+					{
+						GAIA::NETWORK::AsyncSocket* pSock = *it;
+						pSock->m_sock.Close();
+						pSock->drop_ref();
+					}
+					m_accepting_sockets.clear();
+				}
 			}
 
 			// Notify the thread exit.
@@ -514,26 +520,34 @@ namespace GAIA
 					this->RemoveAcceptingSocket(*pCtx->pDataSocket);
 					this->AddAcceptedSocket(*pCtx->pDataSocket);
 
-					this->attach_socket_iocp(*pCtx->pDataSocket);
-					pCtx->pDataSocket->SetBinded(GAIA::True);
-					pCtx->pDataSocket->SetConnected(GAIA::True);
-					GAIA::N32 nAddrLen = sizeof(SOCKADDR_IN) + 16;
-					sockaddr_in* saddr_peer = (sockaddr_in*)(pCtx->data + nAddrLen);
-					GAIA::NETWORK::Addr addrPeer;
-					GAIA::NETWORK::saddr2addr(saddr_peer, addrPeer);
-					pCtx->pDataSocket->SetPeerAddress(addrPeer);
-
 					GAIA::NETWORK::Addr addrListen;
 					pCtx->pListenSocket->GetBindedAddress(addrListen);
-					pCtx->pDataSocket->OnAccepted(GAIA::True, addrListen);
-					if(this->OnAcceptSocket(*pCtx->pDataSocket, addrListen))
-					{
-						for(GAIA::NUM x = 0; x < m_desc.sWinIOCPRecvEventCount; ++x)
-							this->request_recv(*pCtx->pDataSocket);
-					}
 
-					// Re-request.
-					this->request_accept(*pCtx->pListenSocket, addrListen);
+					{
+						GAIA::SYNC::AutolockR al(m_rwAsyncCtxEnding);
+						if(pCtx->pDataSocket->IsCreated())
+						{
+							this->attach_socket_iocp(*pCtx->pDataSocket);
+							pCtx->pDataSocket->SetBinded(GAIA::True);
+							pCtx->pDataSocket->SetConnected(GAIA::True);
+							GAIA::N32 nAddrLen = sizeof(SOCKADDR_IN) + 16;
+							sockaddr_in* saddr_peer = (sockaddr_in*)(pCtx->data + nAddrLen);
+							GAIA::NETWORK::Addr addrPeer;
+							GAIA::NETWORK::saddr2addr(saddr_peer, addrPeer);
+							pCtx->pDataSocket->SetPeerAddress(addrPeer);
+
+							pCtx->pDataSocket->OnAccepted(GAIA::True, addrListen);
+							if(this->OnAcceptSocket(*pCtx->pDataSocket, addrListen))
+							{
+								for(GAIA::NUM x = 0; x < m_desc.sWinIOCPRecvEventCount; ++x)
+									this->request_recv(*pCtx->pDataSocket);
+							}
+						}
+
+						// Re-request.
+						if(pCtx->pListenSocket->IsCreated())
+							this->request_accept(*pCtx->pListenSocket, addrListen);
+					}
 				}
 				else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_CONNECT)
 				{
@@ -929,13 +943,14 @@ namespace GAIA
 
 			DWORD dwTrans = 0;
 			DWORD dwFlag = 0;
-			if(!::WSARecv(datasock.GetFD(), &pCtx->_buf, 1, &dwTrans, &dwFlag, (OVERLAPPED*)pCtx, GNIL))
+			if(::WSARecv(datasock.GetFD(), &pCtx->_buf, 1, &dwTrans, &dwFlag, (OVERLAPPED*)pCtx, GNIL) != 0)
 			{
 				DWORD err = WSAGetLastError();
 				if(err != ERROR_IO_PENDING)
 				{
 					this->release_async_ctx(pCtx);
 					datasock.drop_ref();
+					GERR << "GAIA AsyncDispatcher IOCP error, cannot WSARecv, ErrorCode = " << ::WSAGetLastError() << GEND;
 				}
 			}
 		}
