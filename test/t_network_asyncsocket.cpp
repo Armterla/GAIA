@@ -59,6 +59,8 @@ namespace TEST
 			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, 1024 * 1024);
 			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, 1024 * 1024);
 			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
+		#else
+			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY, GAIA::True);
 		#endif
 		}
 
@@ -222,7 +224,7 @@ namespace TEST
 		{
 			GAIA::SYNC::Autolock al(m_ctx->lrAcceptedSocket);
 			m_ctx->listAcceptedSockets.push_back((AsyncSocketEx*)&sock);
-			return GAIA::False;
+			return GAIA::True;
 		}
 
 	public:
@@ -356,6 +358,14 @@ namespace TEST
 						pSocket->Connect(addrConnectTo);
 					}
 
+					// Wait connect complete.
+					{
+						GAIA::SYNC::gsleep(5000);
+					}
+
+					if(ctx.listAcceptedSockets.size() != ctx.listConnectedSockets.size())
+						TERROR;
+
 					// Send.
 					for(GAIA::NUM x = 0; x < ctx.listConnectedSockets.size(); ++x)
 					{
@@ -367,13 +377,10 @@ namespace TEST
 						}
 					}
 
-					// Wait complete.
+					// Wait send complete.
 					{
 						GAIA::SYNC::gsleep(5000);
 					}
-
-					if(ctx.listAcceptedSockets.size() != ctx.listConnectedSockets.size())
-						TERROR;
 
 					// Shutdown.
 					for(GAIA::NUM x = 0; x < ctx.listConnectedSockets.size(); ++x)
