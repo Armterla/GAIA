@@ -159,6 +159,11 @@ namespace TEST
 		GAIA::BL bOutputTime = GAIA::False;
 		GAIA::U64 uTimeBegin = 0, uTimeEnd = 0;
 
+		logobj << "GAIA VERSION : " << GAIA_VERSION_STRING << logobj.End();
+		logobj << "GAIA COMPILE TIME : " << GAIA_VERSION_COMPILEDATE << " " << GAIA_VERSION_COMPILETIME << logobj.End();
+		logobj << "GAIA LAST MODIFIED TIME : " << GAIA_VERSION_LASTMODIFYTIME << logobj.End();
+		logobj << "\n" << logobj.End();
+
 		// Every test procedure.
 		TTEXT("[GAIA PLATFORM TEST BEGIN]");
 		{
