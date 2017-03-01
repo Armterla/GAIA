@@ -84,6 +84,7 @@ namespace GAIA
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::N32 nSocket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, GNIL, 0, WSA_FLAG_OVERLAPPED);
+			GAST(nSocket <= GAIA::N32MAX);
 			if(nSocket == INVALID_SOCKET)
 			{
 				this->OnCreated(GAIA::False);

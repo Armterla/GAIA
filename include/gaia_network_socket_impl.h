@@ -227,6 +227,7 @@ namespace GAIA
 				m_nSocket = (GAIA::N32)socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 			else
 				GTHROW(InvalidParam);
+			GAST(m_nSocket <= GAIA::N32MAX);
 
 			if(m_nSocket == GINVALID)
 				THROW_LASTERROR;
