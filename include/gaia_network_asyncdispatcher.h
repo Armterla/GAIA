@@ -19,6 +19,11 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		/*!
+			@brief
+
+			@remarks
+		*/
 		class AsyncDispatcherDesc : public GAIA::Base
 		{
 		public:
@@ -29,6 +34,16 @@ namespace GAIA
 			static const GAIA::NUM DEFAULT_WINIOCP_RECV_EVENT_COUNT = 1;
 
 		public:
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::GVOID reset()
 			{
 				sThreadCount = DEFAULT_THREAD_COUNT;
@@ -37,6 +52,16 @@ namespace GAIA
 				sWinIOCPAcceptEventCount = DEFAULT_WINIOCP_ACCEPT_EVENT_COUNT;
 				sWinIOCPRecvEventCount = DEFAULT_WINIOCP_RECV_EVENT_COUNT;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::BL check() const
 			{
 				if(sThreadCount <= 0)
@@ -50,17 +75,45 @@ namespace GAIA
 					return GAIA::False;
 				return GAIA::True;
 			}
+
 		public:
+			/*!
+				@brief
+			*/
 			GAIA::NUM sThreadCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::NUM sMaxConnectionCount;
 
+			/*!
+				@brief
+			*/
 			GAIA::NUM sWinIOCPAcceptEventCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::NUM sWinIOCPRecvEventCount;
 		};
 
+		/*!
+			@brief
+		*/
 		class AsyncDispatcherCallBack : public GAIA::Base
 		{
 		public:
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			virtual GAIA::BL OnCollectAsyncSocket(GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::AsyncSocket& sock){return GAIA::False;}
 		};
 
@@ -71,50 +124,302 @@ namespace GAIA
 			friend class AsyncDispatcherThread;
 
 		public:
+
+			/*!
+				@brief Constructor.
+			*/
 			AsyncDispatcher();
+
+			/*!
+				@brief Destructor.
+			*/
 			~AsyncDispatcher();
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL Create(const GAIA::NETWORK::AsyncDispatcherDesc& desc);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL Destroy();
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL IsCreated() const{return m_bCreated;}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			const GAIA::NETWORK::AsyncDispatcherDesc& GetDesc() const{return m_desc;}
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL Begin();
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL End();
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL IsBegin() const{return m_bBegin;}
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL AddListenSocket(const GAIA::NETWORK::Addr& addrListen);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL RemoveListenSocket(const GAIA::NETWORK::Addr& addrListen);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL RemoveListenSocketAll();
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL IsExistListenSocket(const GAIA::NETWORK::Addr& addrListen) const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::NUM GetListenSocketCount() const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL CollectListenSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const;
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL IsExistAcceptingSocket(GAIA::NETWORK::AsyncSocket& sock) const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::NUM GetAcceptingSocketCount() const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL CollectAcceptingSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const;
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL IsExistAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock) const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::NUM GetAcceptedSocketCount() const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL CollectAcceptedSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const;
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL IsExistConnectedSocket(GAIA::NETWORK::AsyncSocket& sock) const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::NUM GetConnectedSocketCount() const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL CollectConnectedSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const;
 
 		protected:
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
 				GAIA::NETWORK::AsyncSocket* pListenSocket =
 						gnew GAIA::NETWORK::AsyncSocket(*this, ASYNC_SOCKET_TYPE_LISTEN);
 				return pListenSocket;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptingSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
 				GAIA::NETWORK::AsyncSocket* pAcceptingSocket =
 						gnew GAIA::NETWORK::AsyncSocket(*this, ASYNC_SOCKET_TYPE_ACCEPTING);
 				return pAcceptingSocket;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen)
 			{
 				sock.drop_ref();

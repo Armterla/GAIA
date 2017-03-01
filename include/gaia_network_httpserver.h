@@ -26,12 +26,18 @@ namespace GAIA
 	{
 		static const GAIA::CH* HTTP_VERSION_STRING = "HTTP/1.1";
 
+		/*!
+			@brief
+		*/
 		GAIA_ENUM_BEGIN(HTTP_SERVER_BLACKWHITE_MODE)
 			HTTP_SERVER_BLACKWHITE_MODE_BLACK, // Default value.
 			HTTP_SERVER_BLACKWHITE_MODE_WHITE,
 			HTTP_SERVER_BLACKWHITE_MODE_NONE,
 		GAIA_ENUM_END(HTTP_SERVER_BLACKWHITE_MODE)
 
+		/*!
+			@brief
+		*/
 		class HttpServerDesc : public GAIA::Base
 		{
 		public:
@@ -47,6 +53,16 @@ namespace GAIA
 			static const GAIA::U64 DEFAULT_MAX_RESPONSE_COUNT_PER_MINUTE = 100000;
 
 		public:
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::GVOID reset()
 			{
 				sNetworkThreadCount = DEFAULT_NETWORK_THREAD_COUNT;
@@ -64,6 +80,16 @@ namespace GAIA
 				GAIA::ALGO::gstrcpy(szHttpVer, GAIA::NETWORK::HTTP_VERSION_STRING);
 				sHttpVerLen = GAIA::ALGO::gstrlen(szHttpVer);
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::BL check() const
 			{
 				if(sNetworkThreadCount <= 0)
@@ -90,25 +116,94 @@ namespace GAIA
 			}
 
 		public:
+
+			/*!
+				@brief
+			*/
 			GAIA::NUM sNetworkThreadCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::NUM sWorkThreadCount;
+
+			/*!
+				@brief
+			*/
 			const GAIA::CH* pszRootPath;
+
+			/*!
+				@brief
+			*/
 			GAIA::NUM sMaxConnCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uMaxConnTime;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uMaxHarfConnTime;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uMaxDynamicCacheSize;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uMaxDynamicCacheCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uMaxStaticCacheSize;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uMaxStaticCacheCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uMaxResponseCountPerMinute;
+
+			/*!
+				@brief
+			*/
 			GAIA::BL bEnableAutoResponseStaticFile;
+
+			/*!
+				@brief
+			*/
 			GAIA::CH szHttpVer[16];
+
+			/*!
+				@brief
+			*/
 			GAIA::NUM sHttpVerLen;
 		};
 
+		/*!
+			@brief
+		*/
 		class HttpServerStatus : public GAIA::Base
 		{
 		public:
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::GVOID reset()
 			{
 				uRequestAnalyzeFailedCount = 0;
@@ -138,35 +233,119 @@ namespace GAIA
 			}
 
 		public:
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uRequestAnalyzeFailedCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uRequestDenyByBWCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uRequestDenyByMaxConnCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uRequestDenyByMaxHalfConnCount;
 
+			/*!
+				@brief
+			*/
 			GAIA::U64 uRequestPutCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uRequestPostCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uRequestGetCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uRequestHeadCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uRequestDeleteCount;
 
+			/*!
+				@brief
+			*/
 			GAIA::U64 uResponsePutCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uResponsePostCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uResponseGetCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uResponseHeadCount;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 uResponseDeleteCount;
 
+			/*!
+				@brief
+			*/
 			GAIA::U64 u200Count;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 u400Count;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 u401Count;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 u403Count;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 u404Count;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 u500Count;
+
+			/*!
+				@brief
+			*/
 			GAIA::U64 u503Count;
 		};
 
 		class HttpAsyncSocket;
 		class HttpAsyncDispatcher;
 
+		/*!
+			@brief
+		*/
 		class HttpServerLink : public GAIA::RefObject
 		{
 			friend class HttpServer;
@@ -174,16 +353,92 @@ namespace GAIA
 			friend class HttpAsyncDispatcher;
 
 		public:
+
+			/*!
+				@brief Constructor.
+			*/
 			HttpServerLink(GAIA::NETWORK::HttpServer& svr);
+
+			/*!
+				@brief Destructor.
+			*/
 			~HttpServerLink();
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::NETWORK::HttpServer& GetServer() const{return *m_pSvr;}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL const GAIA::NETWORK::Addr& GetPeerAddr() const{return m_addrPeer;}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL const GAIA::U64& GetAcceptTime() const{return m_uAcceptTime;}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL Response(GAIA::NETWORK::HTTP_CODE httpcode, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p = GNIL, GAIA::NUM sSize = 0, const GAIA::U64& uCacheTime = GINVALID);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL Response(GAIA::NETWORK::HTTP_CODE httpcode);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL Close();
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::N32 compare(const HttpServerLink& src) const
 			{
 				GAST(m_addrPeer.check());
@@ -218,18 +473,50 @@ namespace GAIA
 			friend class HttpAsyncDispatcher;
 
 		public:
+			/*!
+				@brief Constructor.
+			*/
 			HttpServerCallBack(GAIA::NETWORK::HttpServer& svr);
+
+			/*!
+				@brief Destructor.
+			*/
 			virtual ~HttpServerCallBack();
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::NETWORK::HttpServer& GetServer() const{return *m_pSvr;}
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL const GAIA::NETWORK::HttpServerStatus& GetStatus() const{return m_status;}
 
 		protected:
-			virtual GAIA::BL OnRequest(GAIA::NETWORK::HttpServerLink& l, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize){return GAIA::False;}
 
-		protected:
-			GINL HttpServerStatus& GetStatus(){return m_status;}
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			virtual GAIA::BL OnRequest(GAIA::NETWORK::HttpServerLink& l, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize){return GAIA::False;}
 
 		private:
 			GINL GAIA::GVOID init()
@@ -237,6 +524,7 @@ namespace GAIA
 				m_pSvr = GNIL;
 				m_status.reset();
 			}
+			GINL HttpServerStatus& GetStatus(){return m_status;}
 
 		private:
 			GAIA::NETWORK::HttpServer* m_pSvr;
@@ -252,48 +540,378 @@ namespace GAIA
 			friend class HttpAsyncDispatcher;
 
 		public:
+
+			/*!
+				@brief Constructor.
+			*/
 			HttpServer();
+
+			/*!
+				@brief Destructor.
+			*/
 			~HttpServer();
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL RegistCallBack(GAIA::NETWORK::HttpServerCallBack& cb);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL UnregistCallBack(GAIA::NETWORK::HttpServerCallBack& cb);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL UnregistCallBackAll();
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL IsRegistedCallBack(GAIA::NETWORK::HttpServerCallBack& cb);
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL Create(const GAIA::NETWORK::HttpServerDesc& desc);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL Destroy();
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL IsCreated() const{return m_bCreated;}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			const GAIA::NETWORK::HttpServerDesc& GetDesc() const{return m_desc;}
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL Begin();
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL End();
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL IsBegin() const{return m_bBegin;}
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL Execute();
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL OpenAddr(const GAIA::NETWORK::Addr& addr);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL CloseAddr(const GAIA::NETWORK::Addr& addr);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL CloseAddrAll();
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL IsOpennedAddr(const GAIA::NETWORK::Addr& addr) const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::NUM GetOpennedAddrCount() const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			const GAIA::NETWORK::Addr* GetOpennedAddr(GAIA::NUM sIndex) const;
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::GVOID EnableDynamicResponseCache(GAIA::BL bEnable);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL IsEnableDynamicResponseCache() const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::GVOID EnableStaticResponseCache(GAIA::BL bEnable);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL IsEnableStaticResponseCache() const;
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::GVOID SetBlackWhiteMode(GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE mode);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE GetBlackWhiteMode() const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::GVOID AddBlackList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uTime = GINVALID);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::GVOID RemoveBlackList(const GAIA::NETWORK::IP& ip);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::GVOID RemoveBlackListAll();
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL IsInBlackList(const GAIA::NETWORK::IP& ip) const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::GVOID AddWhiteList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uTime = GINVALID);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::GVOID RemoveWhiteList(const GAIA::NETWORK::IP& ip);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::GVOID RemoveWhiteListAll();
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL IsInWhiteList(const GAIA::NETWORK::IP& ip) const;
 
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL const GAIA::NETWORK::HttpServerStatus& GetStatus() const{return m_status;}
 
 		private:

@@ -16,6 +16,9 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		/*!
+			@brief
+		*/
 		GAIA_ENUM_BEGIN(ASYNC_CONTEXT_TYPE)
 			ASYNC_CONTEXT_TYPE_STOP,
 			ASYNC_CONTEXT_TYPE_CONNECT,
@@ -25,6 +28,9 @@ namespace GAIA
 			ASYNC_CONTEXT_TYPE_RECV,
 		GAIA_ENUM_END(ASYNC_CONTEXT_TYPE)
 
+		/*!
+			@brief
+		*/
 		class AsyncContext : public GAIA::Base
 		{
 		public:
@@ -40,6 +46,11 @@ namespace GAIA
 			GAIA::NETWORK::ASYNC_CONTEXT_TYPE type;
 		};
 
+		/*!
+			@brief
+
+			@remarks
+		*/
 		GAIA_ENUM_BEGIN(ASYNC_SOCKET_TYPE)
 			ASYNC_SOCKET_TYPE_CONNECTED,
 			ASYNC_SOCKET_TYPE_ACCEPTING,

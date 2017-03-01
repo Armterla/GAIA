@@ -527,12 +527,57 @@ namespace GAIA
 		class HttpURL : public GAIA::Base
 		{
 		public:
+			/*!
+				@brief Constructor.
+			*/
 			GINL HttpURL(){this->init();}
+
+			/*!
+				@brief Copy contructor.
+			*/
 			GINL HttpURL(const HttpURL& src){this->init(); this->operator = (src);}
+
+			/*!
+				@brief Contructor from a char array.
+			*/
 			GINL HttpURL(const GAIA::CH* psz){this->init(); this->operator = (psz);}
+
+			/*!
+				@brief Destructor.
+			*/
 			GINL ~HttpURL(){}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::BL Empty() const{return m_url.empty();}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::GVOID Reset(){m_url.clear(); this->clear_analyzed();}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::BL FromString(const GAIA::CH* psz, const GAIA::NUM* pLength = GNIL)
 			{
 				if(pLength != GNIL)
@@ -545,60 +590,160 @@ namespace GAIA
 				this->clear_analyzed();
 				return GAIA::True;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL const GAIA::CH* ToString(GAIA::NUM* pLength = GNIL) const
 			{
 				if(pLength != GNIL)
 					*pLength = m_url.size();
 				return m_url.fptr();
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::CH* GetProtocal(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
 					return GNIL;
 				return this->get_analyzed_node(m_protocal, psz, sMaxSize, pResultSize);
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::CH* GetHostName(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
 					return GNIL;
 				return this->get_analyzed_node(m_hostname, psz, sMaxSize, pResultSize);
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::CH* GetPort(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
 					return GNIL;
 				return this->get_analyzed_node(m_port, psz, sMaxSize, pResultSize);
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::CH* GetPath(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
 					return GNIL;
 				return this->get_analyzed_node(m_path, psz, sMaxSize, pResultSize);
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::CH* GetFullParam(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
 					return GNIL;
 				return this->get_analyzed_node(m_fullparam, psz, sMaxSize, pResultSize);
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::CH* GetFullQuery(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
 					return GNIL;
 				return this->get_analyzed_node(m_fullquery, psz, sMaxSize, pResultSize);
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::CH* GetFragment(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
 					return GNIL;
 				return this->get_analyzed_node(m_fragment, psz, sMaxSize, pResultSize);
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::NUM GetParamCount() const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
 					return 0;
 				return m_params.size();
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::BL GetParam(GAIA::NUM sIndex, GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
@@ -611,6 +756,16 @@ namespace GAIA
 					return GAIA::False;
 				return GAIA::True;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::BL ExistParam(const GAIA::CH* psz) const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
@@ -623,12 +778,32 @@ namespace GAIA
 				}
 				return GAIA::False;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::NUM GetQueryCount() const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
 					return 0;
 				return m_queries.size() / 2;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::BL GetQuery(GAIA::NUM sIndex, GAIA::CH* pszName, GAIA::CH* pszValue, GAIA::NUM sMaxNameSize = GINVALID, GAIA::NUM sMaxValueSize = GINVALID, GAIA::NUM* pNameResultSize = GNIL, GAIA::NUM* pValueResultSize = GNIL) const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
@@ -643,6 +818,16 @@ namespace GAIA
 				GAIA::CH* pszResultValue = this->get_analyzed_node(nvalue, pszValue, sMaxValueSize, pValueResultSize);
 				return GAIA::True;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::CH* GetQueryByName(const GAIA::CH* pszName, GAIA::CH* pszValue, GAIA::NUM sMaxValueSize, GAIA::NUM* pValueResultSize = GNIL) const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
@@ -659,6 +844,16 @@ namespace GAIA
 				}
 				return GNIL;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::BL ExistQuery(const GAIA::CH* pszName) const
 			{
 				if(!GCCAST(HttpURL*)(this)->analyze())
@@ -671,6 +866,16 @@ namespace GAIA
 				}
 				return GAIA::False;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL HttpURL& operator = (const HttpURL& src)
 			{
 				if(m_url == src.m_url)
@@ -679,6 +884,16 @@ namespace GAIA
 				this->clear_analyzed();
 				return *this;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL HttpURL& operator = (const GAIA::CH* psz)
 			{
 				if(m_url == psz)
@@ -686,8 +901,38 @@ namespace GAIA
 				this->FromString(psz);
 				return *this;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL operator const GAIA::CH*(){return m_url.fptr();}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::N32 compare(const GAIA::CH* psz) const{return m_url.compare(psz);}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::N32 compare(const HttpURL& src) const{return m_url.compare(src.m_url);}
 			GCLASS_COMPARE_BYCOMPAREPTR(GAIA::CH)
 			GCLASS_COMPARE_BYCOMPARE(HttpURL)
@@ -956,11 +1201,46 @@ namespace GAIA
 		class HttpHead : public GAIA::Base
 		{
 		public:
+			/*!
+				@brief Constructor.
+			*/
 			GINL HttpHead(){this->init();}
+
+			/*!
+				@brief Copy contructor.
+			*/
 			GINL HttpHead(const HttpHead& src){this->init(); this->operator = (src);}
+
+			/*!
+				@brief Contructor from char array.
+			*/
 			GINL HttpHead(const GAIA::CH* psz){this->init(); this->operator = (psz);}
+
+			/*!
+				@brief Destructor.
+			*/
 			GINL ~HttpHead(){this->Reset();}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::BL Empty() const{return this->Size() == 0;}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::BL FromString(const GAIA::CH* psz, const GAIA::NUM* pLength = GNIL)
 			{
 				this->Reset();
@@ -1018,7 +1298,27 @@ namespace GAIA
 				}
 				return GAIA::True;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::NUM GetStringLength() const{return m_sStringLen;}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::CH* ToString(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL, GAIA::BL* pResult = GNIL) const
 			{
 				GAST(psz != GNIL);
@@ -1046,6 +1346,16 @@ namespace GAIA
 					*pResultSize = sSize;
 				return psz;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::BL Set(const GAIA::CH* pszName, const GAIA::CH* pszValue, GAIA::BL bNotExistFailed = GAIA::False)
 			{
 				GAST(!GAIA::ALGO::gstremp(pszName));
@@ -1100,6 +1410,16 @@ namespace GAIA
 				}
 				return GAIA::True;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL const GAIA::CH* Get(const GAIA::CH* pszName) const
 			{
 				GAST(!GAIA::ALGO::gstremp(pszName));
@@ -1111,11 +1431,31 @@ namespace GAIA
 					return GNIL;
 				return m_nodes[sFinded].pszValue;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::BL Exist(const GAIA::CH* pszName) const
 			{
 				GAST(!GAIA::ALGO::gstremp(pszName));
 				return this->Get(pszName) != GNIL;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::BL Delete(const GAIA::CH* pszName)
 			{
 				GAST(!GAIA::ALGO::gstremp(pszName));
@@ -1146,6 +1486,16 @@ namespace GAIA
 					return GAIA::False;
 				}
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::GVOID Reset()
 			{
 				for(GAIA::NUM x = 0; x < m_nodes.size(); ++x)
@@ -1157,7 +1507,27 @@ namespace GAIA
 				m_sStringLen = 0;
 				m_bSorted = GAIA::True;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::NUM Size() const{return m_nodes.size();}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL const GAIA::CH* GetName(GAIA::NUM sIndex) const
 			{
 				GAST(sIndex >= 0 && sIndex < m_nodes.size());
@@ -1165,6 +1535,16 @@ namespace GAIA
 					return GNIL;
 				return m_nodes[sIndex].pszName;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL const GAIA::CH* GetValue(GAIA::NUM sIndex) const
 			{
 				GAST(sIndex >= 0 && sIndex < m_nodes.size());
@@ -1172,6 +1552,16 @@ namespace GAIA
 					return GNIL;
 				return m_nodes[sIndex].pszValue;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::BL GetNameAndValue(GAIA::NUM sIndex, GAIA::CH** ppName, GAIA::CH** ppValue) const
 			{
 				GAST(sIndex >= 0 && sIndex < m_nodes.size());
@@ -1182,6 +1572,16 @@ namespace GAIA
 				*ppValue = (GAIA::CH*)n.pszValue;
 				return GAIA::True;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL HttpHead& operator = (const HttpHead& src)
 			{
 				this->Reset();
@@ -1196,16 +1596,46 @@ namespace GAIA
 				m_bSorted = src.m_bSorted;
 				return *this;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL HttpHead& operator = (const GAIA::CH* psz)
 			{
 				this->FromString(psz);
 				return *this;
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::N32 compare(const GAIA::CH* psz) const
 			{
 				HttpHead src = psz;
 				return this->compare(src);
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::N32 compare(const HttpHead& src) const
 			{
 				GCCAST(HttpHead*)(this)->sortnodes();
