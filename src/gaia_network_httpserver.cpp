@@ -42,7 +42,7 @@ namespace GAIA
 
 			virtual GAIA::N32 Send(const GAIA::GVOID* p, GAIA::N32 nSize)
 			{
-				GAIA::N32 nSent = this->Send(p, nSize);
+				GAIA::N32 nSent = GAIA::NETWORK::AsyncSocket::Send(p, nSize);
 				m_needsendsize += nSent;
 				return nSent;
 			}
@@ -343,7 +343,6 @@ namespace GAIA
 		GAIA::BL HttpServerLink::Response(GAIA::NETWORK::HTTP_CODE httpcode, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize, const GAIA::U64& uCacheTime)
 		{
 			GPCHR_TRUE_RET(httpcode == GAIA::NETWORK::HTTP_CODE_INVALID, GAIA::False);
-			GPCHR_TRUE_RET(httphead.Empty(), GAIA::False);
 			GPCHR_NULL_RET(m_pSock, GAIA::False);
 
 			GAIA::CTN::Buffer* pBuf = m_pSvr->RequestBuffer();
@@ -352,17 +351,17 @@ namespace GAIA
 			// Write http version.
 			const GAIA::NETWORK::HttpServerDesc& descSvr = m_pSvr->GetDesc();
 			pBuf->write(descSvr.szHttpVer, descSvr.sHttpVerLen);
-			pBuf->write(" ");
+			pBuf->write(" ", 1);
 
 			// Write http code.
 			pBuf->write(GAIA::NETWORK::HTTP_CODE_STRING[httpcode],
 						sizeof(GAIA::NETWORK::HTTP_CODE_STRING[httpcode]) - sizeof(GAIA::CH));
-			pBuf->write(" ");
+			pBuf->write(" ", 1);
 
 			// Write http code descript text.
 			pBuf->write(GAIA::NETWORK::HTTP_CODE_DESCRIPTION[httpcode],
 						sizeof(GAIA::NETWORK::HTTP_CODE_DESCRIPTION[httpcode]) - sizeof(GAIA::CH));
-			pBuf->write(" ");
+			pBuf->write("\r\n", 2);
 
 			// Write head.
 			if(!httphead.Empty())
