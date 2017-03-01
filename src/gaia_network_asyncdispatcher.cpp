@@ -532,14 +532,13 @@ namespace GAIA
 							pCtx->pDataSocket->SetBinded(GAIA::True);
 							pCtx->pDataSocket->SetConnected(GAIA::True);
 
-							GAIA::NETWORK::Addr addrPeer;
-							//this->GetAcceptAddr(pCtx, addrPeer);
 							GAIA::N32 nListenSock = pCtx->pListenSocket->GetFD();
 							GAIA::N32 nSetSockOptResult = setsockopt(
 									pCtx->pDataSocket->GetFD(), SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT,
 									(char*)&nListenSock, sizeof(&nListenSock));
 							GAST(nSetSockOptResult == 0);
 
+							GAIA::NETWORK::Addr addrPeer;
 							pCtx->pDataSocket->GetGlobalAddress(addrPeer);
 							pCtx->pDataSocket->SetPeerAddress(addrPeer);
 
@@ -962,19 +961,6 @@ namespace GAIA
 			}
 		}
 
-		//GAIA::GVOID AsyncDispatcher::GetAcceptAddr(const GAIA::NETWORK::AsyncContext* pCtx, GAIA::NETWORK::Addr& addrPeer)
-		//{
-		//	SOCKADDR_IN* addrLocal = GNIL;
-		//	SOCKADDR_IN* addrRemote = GNIL;
-		//	GAIA::N32 nLocalAddrLen = 0;
-		//	GAIA::N32 nRemoteAddrLen = 0;
-		//	GAIA::N32 nAddrLen = sizeof(SOCKADDR_IN) + 16;
-
-		//	GetAcceptExSockaddrs((PVOID)pCtx->data, 0, nAddrLen, nAddrLen,
-		//		(SOCKADDR**)&addrLocal, &nLocalAddrLen, (SOCKADDR**)&addrRemote, &nRemoteAddrLen);
-
-		//	GAIA::NETWORK::saddr2addr(&addrRemote, addrPeer);
-		//}
 	#else
 		GAIA::N32 AsyncDispatcher::select_kqep(GAIA::N32 nSocket) const
 		{
