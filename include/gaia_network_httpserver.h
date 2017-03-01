@@ -34,7 +34,8 @@ namespace GAIA
 		class HttpServerDesc : public GAIA::Base
 		{
 		public:
-			static const GAIA::NUM DEFAULT_THREAD_COUNT = 4;
+			static const GAIA::NUM DEFAULT_NETWORK_THREAD_COUNT = 4;
+			static const GAIA::NUM DEFAULT_WORK_THREAD_COUNT = 4;
 			static const GAIA::NUM DEFAULT_MAX_CONN_COUNT = 10000;
 			static const GAIA::U64 DEFAULT_MAX_CONN_TIME = (GAIA::U64)1000 * 1000 * 3600 * 24;
 			static const GAIA::U64 DEFAULT_MAX_HALFCONN_TIME = 1000 * 1000 * 10;
@@ -47,7 +48,8 @@ namespace GAIA
 		public:
 			GINL GAIA::GVOID reset()
 			{
-				sThreadCount = DEFAULT_THREAD_COUNT;
+				sNetworkThreadCount = DEFAULT_NETWORK_THREAD_COUNT;
+				sWorkThreadCount = DEFAULT_WORK_THREAD_COUNT;
 				pszRootPath = GNILSTR;
 				sMaxConnCount = DEFAULT_MAX_CONN_COUNT;
 				uMaxConnTime = DEFAULT_MAX_CONN_TIME;
@@ -63,7 +65,9 @@ namespace GAIA
 			}
 			GINL GAIA::BL check() const
 			{
-				if(sThreadCount <= 0)
+				if(sNetworkThreadCount <= 0)
+					return GAIA::False;
+				if(sWorkThreadCount < 0)
 					return GAIA::False;
 				if(pszRootPath == GNIL)
 					return GAIA::False;
@@ -85,7 +89,8 @@ namespace GAIA
 			}
 
 		public:
-			GAIA::NUM sThreadCount;
+			GAIA::NUM sNetworkThreadCount;
+			GAIA::NUM sWorkThreadCount;
 			const GAIA::CH* pszRootPath;
 			GAIA::NUM sMaxConnCount;
 			GAIA::U64 uMaxConnTime;
@@ -243,9 +248,11 @@ namespace GAIA
 			GAIA::NETWORK::HttpServerStatus m_status;
 		};
 
+		class HttpServerWorkThread;
 		class HttpServer : public GAIA::Base
 		{
 			friend class HttpServerLink;
+			friend class HttpServerWorkThread;
 			friend class HttpAsyncSocket;
 			friend class HttpAsyncDispatcher;
 
@@ -266,6 +273,8 @@ namespace GAIA
 			GAIA::BL Begin();
 			GAIA::BL End();
 			GAIA::BL IsBegin() const{return m_bBegin;}
+
+			GAIA::BL Execute();
 
 			GAIA::BL OpenAddr(const GAIA::NETWORK::Addr& addr);
 			GAIA::BL CloseAddr(const GAIA::NETWORK::Addr& addr);
@@ -301,6 +310,8 @@ namespace GAIA
 			GAIA::CTN::Buffer* RequestBuffer();
 			GAIA::GVOID ReleaseBuffer(GAIA::CTN::Buffer* pBuf);
 
+			GINL GAIA::NETWORK::HttpServerStatus& GetStatus(){return m_status;}
+
 		private:
 			GINL GAIA::GVOID init()
 			{
@@ -313,8 +324,6 @@ namespace GAIA
 				m_disp = GNIL;
 				m_status.reset();
 			}
-
-			GINL GAIA::NETWORK::HttpServerStatus& GetStatus(){return m_status;}
 
 		private:
 			class BWNode : public GAIA::Base // White and black node.
@@ -375,7 +384,8 @@ namespace GAIA
 			GAIA::SYNC::Lock m_lrBufPool;
 			GAIA::CTN::Pool<GAIA::CTN::Buffer> m_bufpool;
 
-			HttpAsyncDispatcher* m_disp;
+			GAIA::NETWORK::HttpAsyncDispatcher* m_disp;
+			GAIA::CTN::Vector<GAIA::NETWORK::HttpServerWorkThread*> m_listWorkThreads;
 			GAIA::NETWORK::HttpServerStatus m_status;
 		};
 	}
