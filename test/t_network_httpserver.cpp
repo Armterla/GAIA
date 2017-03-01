@@ -15,27 +15,7 @@ namespace TEST
 		}
 
 	protected:
-		virtual GAIA::BL OnRecv(GAIA::NETWORK::HttpServerLink& l, const GAIA::GVOID* p, GAIA::NUM sSize)
-		{
-			return GAIA::False;
-		}
-		virtual GAIA::BL OnPut(GAIA::NETWORK::HttpServerLink& l, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize)
-		{
-			return GAIA::False;
-		}
-		virtual GAIA::BL OnPost(GAIA::NETWORK::HttpServerLink& l, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize)
-		{
-			return GAIA::False;
-		}
-		virtual GAIA::BL OnGet(GAIA::NETWORK::HttpServerLink& l, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead)
-		{
-			return GAIA::False;
-		}
-		virtual GAIA::BL OnHead(GAIA::NETWORK::HttpServerLink& l, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead)
-		{
-			return GAIA::False;
-		}
-		virtual GAIA::BL OnDelete(GAIA::NETWORK::HttpServerLink& l, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead)
+		virtual GAIA::BL OnRequest(GAIA::NETWORK::HttpServerLink& l, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize)
 		{
 			return GAIA::False;
 		}

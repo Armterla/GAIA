@@ -10,6 +10,7 @@
 #include "gaia_sync_autolockw.h"
 #include "gaia_ctn_ref.h"
 #include "gaia_ctn_vector.h"
+#include "gaia_ctn_queue.h"
 #include "gaia_ctn_buffer.h"
 #include "gaia_ctn_pool.h"
 #include "gaia_ctn_set.h"
@@ -166,7 +167,7 @@ namespace GAIA
 		class HttpAsyncSocket;
 		class HttpAsyncDispatcher;
 
-		class HttpServerLink : public GAIA::Base
+		class HttpServerLink : public GAIA::RefObject
 		{
 			friend class HttpServer;
 			friend class HttpAsyncSocket;
@@ -177,10 +178,10 @@ namespace GAIA
 			~HttpServerLink();
 
 			GINL GAIA::NETWORK::HttpServer& GetServer() const{return *m_pSvr;}
-			GINL GAIA::NETWORK::HttpAsyncSocket& GetAsyncSocket() const{return *m_pSock;}
 			GINL const GAIA::NETWORK::Addr& GetPeerAddr() const{return m_addrPeer;}
 			GINL const GAIA::U64& GetAcceptTime() const{return m_uAcceptTime;}
 			GAIA::BL Response(GAIA::NETWORK::HTTP_CODE httpcode, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p = GNIL, GAIA::NUM sSize = 0, const GAIA::U64& uCacheTime = GINVALID);
+			GAIA::BL Response(GAIA::NETWORK::HTTP_CODE httpcode);
 			GAIA::BL Close();
 
 			GINL GAIA::N32 compare(const HttpServerLink& src) const
@@ -199,7 +200,6 @@ namespace GAIA
 				m_addrPeer.reset();
 				m_uAcceptTime = GINVALID;
 			}
-			GINL GAIA::GVOID SetAsyncSocket(GAIA::NETWORK::HttpAsyncSocket& sock){m_pSock = &sock;}
 			GINL GAIA::GVOID SetPeerAddr(const GAIA::NETWORK::Addr& addrPeer){m_addrPeer = addrPeer;}
 			GINL GAIA::GVOID SetAcceptTime(GAIA::U64 uTime){m_uAcceptTime = uTime;}
 
@@ -226,12 +226,7 @@ namespace GAIA
 			GINL const GAIA::NETWORK::HttpServerStatus& GetStatus() const{return m_status;}
 
 		protected:
-			virtual GAIA::BL OnRecv(GAIA::NETWORK::HttpServerLink& l, const GAIA::GVOID* p, GAIA::NUM sSize){return GAIA::False;}
-			virtual GAIA::BL OnPut(GAIA::NETWORK::HttpServerLink& l, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize){return GAIA::False;}
-			virtual GAIA::BL OnPost(GAIA::NETWORK::HttpServerLink& l, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize){return GAIA::False;}
-			virtual GAIA::BL OnGet(GAIA::NETWORK::HttpServerLink& l, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead){return GAIA::False;}
-			virtual GAIA::BL OnHead(GAIA::NETWORK::HttpServerLink& l, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead){return GAIA::False;}
-			virtual GAIA::BL OnDelete(GAIA::NETWORK::HttpServerLink& l, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead){return GAIA::False;}
+			virtual GAIA::BL OnRequest(GAIA::NETWORK::HttpServerLink& l, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize){return GAIA::False;}
 
 		protected:
 			GINL HttpServerStatus& GetStatus(){return m_status;}
@@ -306,6 +301,7 @@ namespace GAIA
 			GAIA::BL ReleaseCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sHeadLen);
 			GAIA::BL UpdateCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sHeadLen, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime = GINVALID);
 			GAIA::BL RecycleCache();
+			GAIA::BL RecycleLink(GAIA::NETWORK::HttpServerLink& l);
 
 			GAIA::CTN::Buffer* RequestBuffer();
 			GAIA::GVOID ReleaseBuffer(GAIA::CTN::Buffer* pBuf);
@@ -354,7 +350,7 @@ namespace GAIA
 
 		private:
 			typedef GAIA::CTN::Set<GAIA::CTN::Ref<GAIA::NETWORK::HttpServerLink> > __LinkSetType;
-			typedef GAIA::CTN::Vector<GAIA::NETWORK::HttpServerLink*> __LinkVectorType;
+			typedef GAIA::CTN::Queue<GAIA::NETWORK::HttpServerLink*> __LinkQueueType;
 
 		private:
 			GAIA::NETWORK::HttpServerDesc m_desc;
@@ -367,7 +363,7 @@ namespace GAIA
 			__LinkSetType m_links_bypeeraddr;
 
 			GAIA::SYNC::LockRW m_rwRCLinks; // RC means request complete.
-			__LinkVectorType m_rclinks; // RC means request complete.
+			__LinkQueueType m_rclinks; // RC means request complete.
 
 			GAIA::BL m_bEnableDynamicResponseCache;
 			GAIA::BL m_bEnableStaticResponseCache;
