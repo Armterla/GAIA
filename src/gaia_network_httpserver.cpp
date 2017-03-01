@@ -40,6 +40,12 @@ namespace GAIA
 			}
 			GINL GAIA::NETWORK::HttpServerLink* GetLink() const{return m_pLink;}
 
+			virtual GAIA::GVOID Create()
+			{
+				GAIA::NETWORK::AsyncSocket::Create();
+				this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEADDR, GAIA::True);
+			}
+
 			virtual GAIA::N32 Send(const GAIA::GVOID* p, GAIA::N32 nSize)
 			{
 				GAIA::N32 nSent = GAIA::NETWORK::AsyncSocket::Send(p, nSize);

@@ -53,7 +53,7 @@ namespace TEST
 
 		virtual GAIA::GVOID Create()
 		{
-			AsyncSocket::Create();
+			GAIA::NETWORK::AsyncSocket::Create();
 
 		#if GAIA_OS != GAIA_OS_WINDOWS
 			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, 1024 * 1024);
