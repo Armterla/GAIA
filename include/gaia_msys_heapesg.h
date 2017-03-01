@@ -5,7 +5,7 @@
 #include "gaia_assert.h"
 #include "gaia_msys_base.h"
 #include "gaia_sync_atomic.h"
-#include "gaia_sync_lock.h"
+#include "gaia_sync_lockpure.h"
 #include <stdlib.h>
 
 namespace GAIA
@@ -348,7 +348,7 @@ namespace GAIA
 			GAIA::SYNC::Atomic m_piecesize;
 			GAIA::SYNC::Atomic m_alloctimes;
 		#ifdef GAIA_HEAP_THREADSAFE
-			GAIA::SYNC::Lock m_lr;
+			GAIA::SYNC::LockPure m_lr;
 		#endif
 		};
 	}
