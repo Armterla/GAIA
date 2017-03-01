@@ -573,6 +573,7 @@ namespace GAIA
 				}
 				else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_DISCONNECT)
 				{
+					pCtx->pDataSocket->SetConnected(GAIA::False);
 					pCtx->pDataSocket->OnDisconnected(GAIA::True);
 					pCtx->pDataSocket->SwapBrokenState();
 				}
@@ -597,7 +598,10 @@ namespace GAIA
 						else if(IsIOCPDisconnected(dwErr))
 						{
 							if(pCtx->pDataSocket->IsCreated() && pCtx->pDataSocket->IsConnected())
+							{
+								pCtx->pDataSocket->SetConnected(GAIA::False);
 								pCtx->pDataSocket->OnDisconnected(GAIA::True);
+							}
 						}
 						else
 							this->request_recv(*pCtx->pDataSocket);
@@ -635,7 +639,10 @@ namespace GAIA
 										dwError = WSAGetLastError();
 
 									if(IsIOCPDisconnected(dwError))
+									{
+										pCtx->pDataSocket->SetConnected(GAIA::False);
 										pCtx->pDataSocket->OnDisconnected(GAIA::True);
+									}
 								}
 								else
 									GERR << "GAIA AsyncDispatcher IOCP error, cannot recv, ErrorCode = " << dwError << GEND;
@@ -646,17 +653,18 @@ namespace GAIA
 						else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_SEND)
 						{
 							pCtx->pDataSocket->OnSent(GAIA::False, pCtx->data, dwTrans, pCtx->_buf.len);
+							pCtx->pDataSocket->SetConnected(GAIA::False);
 							pCtx->pDataSocket->OnDisconnected(GAIA::True);
 						}
 						else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_CONNECT)
 						{
 							GAIA::NETWORK::Addr addrPeer;
 							pCtx->pDataSocket->GetPeerAddress(addrPeer);
-							pCtx->pDataSocket->SetConnected(GAIA::True);
 							pCtx->pDataSocket->OnConnected(GAIA::False, addrPeer);
 						}
 						else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_DISCONNECT)
 						{
+							pCtx->pDataSocket->SetConnected(GAIA::False);
 							pCtx->pDataSocket->OnDisconnected(GAIA::False);
 						}
 						else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_ACCEPT)
@@ -711,6 +719,7 @@ namespace GAIA
 					}
 					if(bConnectBroken)
 					{
+						ctx.pSocket->SetConnected(GAIA::False);
 						ctx.pSocket->OnDisconnected(GAIA::True);
 						struct kevent ke;
 						EV_SET(&ke, nSocket, EVFILT_WRITE, EV_DELETE, 0, 0, GNIL);
@@ -817,7 +826,7 @@ namespace GAIA
 
 								GAIA::NETWORK::Addr addrPeer;
 								ctx.pSocket->GetPeerAddress(addrPeer);
-								pCtx->pDataSocket->SetConnected(GAIA::True);
+								ctx.pSocket->SetConnected(GAIA::True);
 								ctx.pSocket->OnConnected(GAIA::True, addrPeer);
 
 								struct kevent ke[2];
