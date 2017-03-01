@@ -1547,6 +1547,7 @@
     <ClCompile Include="..\test\tperf_ctn.cpp" />
     <ClCompile Include="..\test\tperf_ctn_avltree.cpp" />
     <ClCompile Include="..\test\tperf_ctn_dmpgraph.cpp" />
+    <ClCompile Include="..\test\tperf_msys_heapesg.cpp" />
     <ClCompile Include="..\test\tp_compiler.cpp" />
     <ClCompile Include="..\test\tp_objstatus.cpp" />
     <ClCompile Include="..\test\t_algo_base.cpp" />
