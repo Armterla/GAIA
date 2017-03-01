@@ -341,6 +341,12 @@ namespace GAIA
 			GAST(m_pSock != GNIL);
 			if(m_pSock != GNIL)
 			{
+				if(m_pSock->IsCreated())
+				{
+					GAST(m_pSock->m_needsendsize == 0);
+					m_pSock->Shutdown();
+					m_pSock->Close();
+				}
 				m_pSock->drop_ref();
 				m_pSock = GNIL;
 			}
