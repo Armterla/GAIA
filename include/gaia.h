@@ -28,6 +28,8 @@
 #include	"gaia_sync_atomic.h"
 #include	"gaia_sync_lock.h"
 #include 	"gaia_sync_autolock.h"
+#include	"gaia_sync_lockpure.h"
+#include	"gaia_sync_autolockpure.h"
 #include	"gaia_sync_lockfree.h"
 #include	"gaia_sync_autolockfree.h"
 #include	"gaia_sync_lockrw.h"
