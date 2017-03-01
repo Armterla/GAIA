@@ -68,13 +68,13 @@ namespace GAIA
 				GAIA::SYNC::Autolock al(m_lr);
 				if(m_pLink == GNIL)
 					return;
-				GAIA::N64 uRemain = m_needsendsize -= nPracticeSize;
+				GAIA::N64 uRemain = (m_needsendsize -= nPracticeSize);
 				if(uRemain == 0 && m_bClosed)
 					m_pSvr->RecycleLink(*m_pLink);
 			}
 			virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize)
 			{
-				if(bResult)
+				if(!bResult)
 					return;
 
 				// Try to analyze http information.
@@ -111,7 +111,7 @@ namespace GAIA
 						{
 							if(pBegin[x] == '\r' && pBegin[x + 1] == '\n' && (pBegin[x + 2] == '\r' || pBegin[x + 2] == '\n'))
 							{
-								pHeadEnd = pBegin + 3;
+								pHeadEnd = pBegin + x + 3;
 								break;
 							}
 						}
@@ -154,9 +154,7 @@ namespace GAIA
 
 								// Analyze http version.
 								GAIA::NUM sVerBeginPos = sUrlEndPos + 1;
-								GAIA::NUM sVerEndPos = m_pRecvBuf->find(" ", 1, sVerBeginPos);
-								if(sVerEndPos > sHeadBeginPos)
-									break;
+								GAIA::NUM sVerEndPos = sHeadBeginPos - 2;
 								GAIA::NUM sVerLen = sVerEndPos - sVerBeginPos;
 								if(sVerLen <= 0 || sVerLen > m_ver.capacity())
 									break;
@@ -553,15 +551,11 @@ namespace GAIA
 			// Destroy cache.
 			{
 				GAIA::SYNC::AutolockW al(m_rwCache);
-				if(m_cache.empty())
-					return GAIA::False;
 				for(GAIA::CTN::Set<CacheNode>::it it = m_cache.frontit(); !it.empty(); )
 				{
 					CacheNode& cn = *it;
 					gdel cn.buf;
 				}
-				m_cache.destroy();
-				return GAIA::True;
 			}
 
 			// Destroy buffer pool.

@@ -783,9 +783,9 @@ namespace GAIA
 				{
 					if(pLength != GNIL && p - psz == *pLength)
 						break;
-					if(*p == ':') // Name end.
+					if(strName.empty() && *p == ':') // Name end.
 					{
-						if(!strName.empty() || p - pLast == 0)
+						if(p - pLast == 0)
 						{
 							this->Reset();
 							return GAIA::False;
