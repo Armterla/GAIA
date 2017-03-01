@@ -9,6 +9,8 @@
 #	pragma comment(lib, "ws2_32.lib")
 #	include <objbase.h>
 #	pragma comment(lib, "ole32.lib")
+#else
+#	include <signal.h>
 #endif
 
 namespace GAIA
@@ -25,6 +27,7 @@ namespace GAIA
 			if(CoInitialize(GNIL) != S_OK)
 				GTHROWM(NotSupport, "Windows COM");
 		#else
+			signal(SIGPIPE, SIG_IGN);
 		#endif
 		}
 		GINL ~Platform()
@@ -32,7 +35,6 @@ namespace GAIA
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			::WSACleanup();
 			CoUninitialize();
-		#else
 		#endif
 		}
 	};
