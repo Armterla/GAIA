@@ -1902,5 +1902,8 @@
       <Filter>GAIA\test</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\test\tperf_msys_heapesg.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
