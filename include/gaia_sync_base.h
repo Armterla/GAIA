@@ -29,7 +29,7 @@ namespace GAIA
 			::Sleep((GAIA::U32)uMilliSeconds);
 			return uMilliSeconds;
 		#else
-			::usleep(GSCAST(useconds_t)(uMilliSeconds * 1000));
+			::usleep(GSCAST(useconds_t)((GAIA::U64)uMilliSeconds * (GAIA::U64)1000));
 			return uMilliSeconds;
 		#endif
 		}
@@ -44,7 +44,7 @@ namespace GAIA
 		GINL GAIA::U64 gusleep(const GAIA::U64& uMicroSeconds)
 		{
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			::Sleep((GAIA::U32)uMicroSeconds / 1000);
+			::Sleep((GAIA::U32)(uMicroSeconds / 1000));
 			return uMicroSeconds;
 		#else
 			::usleep((useconds_t)uMicroSeconds);
