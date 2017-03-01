@@ -55,6 +55,18 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			__SetType::it ittemp = s.findit(x);
+			if(ittemp.empty())
+			{
+				TERROR;
+				break;
+			}
+			__SetType::const_it cittemp = s.const_findit(x);
+			if(cittemp.empty())
+			{
+				TERROR;
+				break;
+			}
 			__SetType::it it_l = s.upper_equal(x);
 			if(it_l.empty())
 			{

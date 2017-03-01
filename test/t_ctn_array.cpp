@@ -158,12 +158,36 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			__ArrayType::it ittemp = arr.binary_searchit(*cit);
+			if(ittemp.empty())
+			{
+				TERROR;
+				break;
+			}
+			__ArrayType::const_it cittemp = arr.const_binary_searchit(*cit);
+			if(cittemp.empty())
+			{
+				TERROR;
+				break;
+			}
 			if(arr.find(*cit, 0) == GINVALID)
 			{
 				TERROR;
 				break;
 			}
 			if(arr.rfind(*cit, arr.size() - 1) == GINVALID)
+			{
+				TERROR;
+				break;
+			}
+			ittemp = arr.findit(*cit);
+			if(ittemp.empty())
+			{
+				TERROR;
+				break;
+			}
+			cittemp = arr.const_findit(*cit);
+			if(cittemp.empty())
 			{
 				TERROR;
 				break;

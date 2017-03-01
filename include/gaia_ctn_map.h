@@ -117,16 +117,8 @@ namespace GAIA
 				else
 					return m_avltree.insert(n, GNIL);
 			}
-			GINL GAIA::BL erase(const _KeyType& key)
-			{
-				Node n;
-				n.m_key = key;
-				return m_avltree.erase(n);
-			}
-			GINL _DataType* find(const _KeyType& key)
-			{
-				return GCCAST(_DataType*)((GCCAST(const __MyType*)(this))->find(key));
-			}
+			GINL GAIA::BL erase(const _KeyType& key){Node n; n.m_key = key; return m_avltree.erase(n);}
+			GINL _DataType* find(const _KeyType& key){return GCCAST(_DataType*)((GCCAST(const __MyType*)(this))->find(key));}
 			GINL const _DataType* find(const _KeyType& key) const
 			{
 				Node n;
@@ -136,6 +128,8 @@ namespace GAIA
 					return GNIL;
 				return &pNode->m_data;
 			}
+			GINL it findit(const _KeyType& key){it ret; Node f; f.m_key = key; ret.m_iter = m_avltree.findit(f); return ret;}
+			GINL const_it const_findit(const _KeyType& key) const{const_it ret; Node f; f.m_key = key; ret.m_iter = m_avltree.const_findit(f); return ret;}
 			GINL it upper_equal(const _KeyType& key){it ret; Node f; f.m_key = key; ret.m_iter = m_avltree.upper_equal(f); return ret;}
 			GINL it lower_equal(const _KeyType& key){it ret; Node f; f.m_key = key; ret.m_iter = m_avltree.lower_equal(f); return ret;}
 			GINL const_it upper_equal(const _KeyType& key) const{const_it ret; Node f; f.m_key = key; ret.m_iter = m_avltree.upper_equal(f); return ret;}
@@ -149,11 +143,7 @@ namespace GAIA
 			GINL const_it const_frontit() const{const_it ret; ret.m_iter = m_avltree.const_frontit(); return ret;}
 			GINL const_it const_backit() const{const_it ret; ret.m_iter = m_avltree.const_backit(); return ret;}
 			GINL __MyType& operator = (const __MyType& src){GAST(&src != this); m_avltree = src.m_avltree; return *this;}
-			GINL __MyType& operator += (const __MyType& src)
-			{
-				m_avltree += src.m_avltree;
-				return *this;
-			}
+			GINL __MyType& operator += (const __MyType& src){m_avltree += src.m_avltree; return *this;}
 			GINL GAIA::N32 compare(const __MyType& src) const{return m_avltree.compare(src.m_avltree);}
 			GCLASS_COMPARE(m_avltree, __MyType)
 		private:

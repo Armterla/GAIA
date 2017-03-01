@@ -431,6 +431,26 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				return GSCAST(_SizeType)(pFinded - this->fptr());
 			}
+			GINL it binary_searchit(const _DataType& t)
+			{
+				it iter;
+				_SizeType findedidx = this->binary_search(t);
+				if(findedidx == GINVALID)
+					return iter;
+				iter.m_pContainer = this;
+				iter.m_index = findedidx;
+				return iter;
+			}
+			GINL const_it const_binary_searchit(const _DataType& t) const
+			{
+				const_it iter;
+				_SizeType findedidx = this->binary_search(t);
+				if(findedidx == GINVALID)
+					return iter;
+				iter.m_pContainer = this;
+				iter.m_index = findedidx;
+				return iter;
+			}
 			GINL GAIA::GVOID relocation(const _SizeType& srcindex, const _SizeType& dstindex)
 			{
 				GPCHR_TRUE(srcindex < 0 || srcindex >= this->size());
@@ -453,6 +473,26 @@ namespace GAIA
 				}
 			}
 			GINL GAIA::GVOID swap(const _SizeType& index1, const _SizeType& index2){GAIA::ALGO::swap(this->operator[](index1), this->operator[](index2));}
+			GINL it findit(const _DataType& t, const _SizeType& index = 0)
+			{
+				it iter;
+				_SizeType findedidx = this->find(t, index);
+				if(findedidx == GINVALID)
+					return iter;
+				iter.m_pContainer = this;
+				iter.m_index = findedidx;
+				return iter;
+			}
+			GINL const_it const_findit(const _DataType& t, const _SizeType& index = 0) const
+			{
+				const_it iter;
+				_SizeType findedidx = this->find(t, index);
+				if(findedidx == GINVALID)
+					return iter;
+				iter.m_pContainer = this;
+				iter.m_index = findedidx;
+				return iter;
+			}
 			GINL it upper_equal(const _DataType& t)
 			{
 				it iter;

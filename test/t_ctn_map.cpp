@@ -55,6 +55,18 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			__MapType::it ittemp = m.findit(x);
+			if(ittemp.empty())
+			{
+				TERROR;
+				break;
+			}
+			__MapType::const_it cittemp = m.const_findit(x);
+			if(cittemp.empty())
+			{
+				TERROR;
+				break;
+			}
 			__MapType::it it_l = m.upper_equal(x);
 			if(it_l.empty())
 			{

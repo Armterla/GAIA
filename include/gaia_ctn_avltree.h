@@ -428,23 +428,49 @@ namespace GAIA
 			{
 				if(m_pRoot == GNIL)
 					return GNIL;
-				return this->find_node(m_pRoot, t);
+				Node* pFinded = this->find_node(m_pRoot, t);
+				if(pFinded == GNIL)
+					return GNIL;
+				return &pFinded->t;
 			}
 			GINL const _DataType* find(const _DataType& t) const
 			{
 				if(m_pRoot == GNIL)
 					return GNIL;
-				return this->find_node(m_pRoot, t);
+				const Node* pFinded = this->find_node(m_pRoot, t);
+				if(pFinded == GNIL)
+					return GNIL;
+				return &pFinded->t;
+			}
+			GINL it findit(const _DataType& t)
+			{
+				it iter;
+				if(m_pRoot == GNIL)
+					return iter;
+				Node* pFinded = this->find_node(m_pRoot, t);
+				if(pFinded == GNIL)
+					return iter;
+				iter.m_pNode = pFinded;
+				iter.m_pContainer = this;
+				return iter;
+			}
+			GINL const_it const_findit(const _DataType& t) const
+			{
+				const_it iter;
+				if(m_pRoot == GNIL)
+					return iter;
+				const Node* pFinded = this->find_node(m_pRoot, t);
+				if(pFinded == GNIL)
+					return iter;
+				iter.m_pNode = pFinded;
+				iter.m_pContainer = this;
+				return iter;
 			}
 			GINL it upper_equal(const _DataType& t)
 			{
 				it iter;
 				if(m_pRoot == GNIL)
-				{
-					iter.m_pNode = GNIL;
-					iter.m_pContainer = GNIL;
 					return iter;
-				}
 				iter.m_pNode = this->lower_bound_node(m_pRoot, t);
 				if(iter.m_pNode != GNIL)
 					iter.m_pContainer = this;
@@ -454,11 +480,7 @@ namespace GAIA
 			{
 				it iter;
 				if(m_pRoot == GNIL)
-				{
-					iter.m_pNode = GNIL;
-					iter.m_pContainer = GNIL;
 					return iter;
-				}
 				iter.m_pNode = this->upper_bound_node(m_pRoot, t);
 				if(iter.m_pNode != GNIL)
 					iter.m_pContainer = this;
@@ -468,11 +490,7 @@ namespace GAIA
 			{
 				const_it iter;
 				if(m_pRoot == GNIL)
-				{
-					iter.m_pNode = GNIL;
-					iter.m_pContainer = GNIL;
 					return iter;
-				}
 				iter.m_pNode = this->lower_bound_node(m_pRoot, t);
 				if(iter.m_pNode != GNIL)
 					iter.m_pContainer = this;
@@ -482,11 +500,7 @@ namespace GAIA
 			{
 				const_it iter;
 				if(m_pRoot == GNIL)
-				{
-					iter.m_pNode = GNIL;
-					iter.m_pContainer = GNIL;
 					return iter;
-				}
 				iter.m_pNode = this->upper_bound_node(m_pRoot, t);
 				if(iter.m_pNode != GNIL)
 					iter.m_pContainer = this;
@@ -504,60 +518,36 @@ namespace GAIA
 			{
 				it iter;
 				if(m_pRoot == GNIL)
-				{
-					iter.m_pNode = GNIL;
-					iter.m_pContainer = GNIL;
-				}
-				else
-				{
-					iter.m_pNode = this->front_node(m_pRoot);
-					iter.m_pContainer = this;
-				}
+					return iter;
+				iter.m_pNode = this->front_node(m_pRoot);
+				iter.m_pContainer = this;
 				return iter;
 			}
 			GINL it backit()
 			{
 				it iter;
 				if(m_pRoot == GNIL)
-				{
-					iter.m_pNode = GNIL;
-					iter.m_pContainer = GNIL;
-				}
-				else
-				{
-					iter.m_pNode = this->back_node(m_pRoot);
-					iter.m_pContainer = this;
-				}
+					return iter;
+				iter.m_pNode = this->back_node(m_pRoot);
+				iter.m_pContainer = this;
 				return iter;
 			}
 			GINL const_it const_frontit() const
 			{
 				const_it iter;
 				if(m_pRoot == GNIL)
-				{
-					iter.m_pNode = GNIL;
-					iter.m_pContainer = GNIL;
-				}
-				else
-				{
-					iter.m_pNode = this->front_node(m_pRoot);
-					iter.m_pContainer = this;
-				}
+					return iter;
+				iter.m_pNode = this->front_node(m_pRoot);
+				iter.m_pContainer = this;
 				return iter;
 			}
 			GINL const_it const_backit() const
 			{
 				const_it iter;
 				if(m_pRoot == GNIL)
-				{
-					iter.m_pNode = GNIL;
-					iter.m_pContainer = GNIL;
-				}
-				else
-				{
-					iter.m_pNode = this->back_node(m_pRoot);
-					iter.m_pContainer = this;
-				}
+					return iter;
+				iter.m_pNode = this->back_node(m_pRoot);
+				iter.m_pContainer = this;
 				return iter;
 			}
 			GINL __MyType& operator = (const __MyType& src)
@@ -784,7 +774,7 @@ namespace GAIA
 				this->balance(pNode);
 				return pNode;
 			}
-			GINL _DataType* find_node(Node* pNode, const _DataType& t)
+			GINL Node* find_node(Node* pNode, const _DataType& t)
 			{
 				if(t < pNode->t)
 				{
@@ -797,10 +787,10 @@ namespace GAIA
 						return this->find_node(pNode->pNext, t);
 				}
 				else
-					return &pNode->t;
+					return pNode;
 				return GNIL;
 			}
-			GINL const _DataType* find_node(Node* pNode, const _DataType& t) const
+			GINL const Node* find_node(Node* pNode, const _DataType& t) const
 			{
 				if(t < pNode->t)
 				{
@@ -813,7 +803,7 @@ namespace GAIA
 						return this->find_node(pNode->pNext, t);
 				}
 				else
-					return &pNode->t;
+					return pNode;
 				return GNIL;
 			}
 			GINL Node* lower_bound_node(Node* pNode, const _DataType& t) const

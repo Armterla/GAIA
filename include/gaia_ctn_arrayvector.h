@@ -504,6 +504,40 @@ namespace GAIA
 				else
 					return m_arr.binary_search(t);
 			}
+			GINL it binary_searchit(const _DataType& t)
+			{
+				it ret;
+				if(m_vec.capacity() != 0)
+				{
+					typename __VectorType::it ittemp = m_vec.binary_searchit(t);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_vec.frontit();
+				}
+				else
+				{
+					typename __ArrayType::it ittemp = m_arr.binary_searchit(t);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_arr.frontit();
+				}
+				return ret;
+			}
+			GINL const_it const_binary_searchit(const _DataType& t) const
+			{
+				const_it ret;
+				if(m_vec.capacity() != 0)
+				{
+					typename __VectorType::const_it ittemp = m_vec.const_binary_searchit(t);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_vec.const_frontit();
+				}
+				else
+				{
+					typename __ArrayType::const_it ittemp = m_arr.const_binary_searchit(t);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_arr.const_frontit();
+				}
+				return ret;
+			}
 			GINL GAIA::GVOID swap(const _SizeType& index1, const _SizeType& index2)
 			{
 				if(m_vec.capacity() != 0)
@@ -517,6 +551,40 @@ namespace GAIA
 					m_vec.relocation(srcindex, dstindex);
 				else
 					m_arr.relocation(srcindex, dstindex);
+			}
+			GINL it findit(const _DataType& t)
+			{
+				it iter;
+				if(m_vec.capacity() != 0)
+				{
+					typename __VectorType::it ittemp = m_vec.findit(t);
+					iter.m_pContainer = this;
+					iter.m_index = ittemp - m_vec.frontit();
+				}
+				else
+				{
+					typename __ArrayType::it ittemp = m_arr.findit(t);
+					iter.m_pContainer = this;
+					iter.m_index = ittemp - m_arr.frontit();
+				}
+				return iter;
+			}
+			GINL const_it const_findit(const _DataType& t) const
+			{
+				const_it iter;
+				if(m_vec.capacity() != 0)
+				{
+					typename __VectorType::const_it ittemp = m_vec.const_findit(t);
+					iter.m_pContainer = this;
+					iter.m_index = ittemp - m_vec.const_frontit();
+				}
+				else
+				{
+					typename __ArrayType::const_it ittemp = m_arr.const_findit(t);
+					iter.m_pContainer = this;
+					iter.m_index = ittemp - m_arr.const_frontit();
+				}
+				return iter;
 			}
 			GINL it upper_equal(const _DataType& t)
 			{
