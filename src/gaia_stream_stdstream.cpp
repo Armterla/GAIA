@@ -5,6 +5,7 @@
 #include <gaia_stream_stdstream.h>
 #include <gaia_sync_lock.h>
 #include <gaia_sync_autolock.h>
+#include <gaia_type_impl.h>
 #include <gaia_assert_impl.h>
 #include <gaia_thread_base_impl.h>
 
