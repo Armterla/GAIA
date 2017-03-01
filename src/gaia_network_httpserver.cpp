@@ -355,12 +355,12 @@ namespace GAIA
 
 			// Write http code.
 			pBuf->write(GAIA::NETWORK::HTTP_CODE_STRING[httpcode],
-						sizeof(GAIA::NETWORK::HTTP_CODE_STRING[httpcode]) - sizeof(GAIA::CH));
+						GAIA::NETWORK::HTTP_CODE_STRING_LENGTH[httpcode]);
 			pBuf->write(" ", 1);
 
 			// Write http code descript text.
 			pBuf->write(GAIA::NETWORK::HTTP_CODE_DESCRIPTION[httpcode],
-						sizeof(GAIA::NETWORK::HTTP_CODE_DESCRIPTION[httpcode]) - sizeof(GAIA::CH));
+						GAIA::NETWORK::HTTP_CODE_DESCRIPTION_LENGTH[httpcode]);
 			pBuf->write("\r\n", 2);
 
 			// Write head.
