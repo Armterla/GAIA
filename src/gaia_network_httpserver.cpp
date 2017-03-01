@@ -669,36 +669,45 @@ namespace GAIA
 			// Execute the link.
 			{
 				HttpAsyncSocket* pSock = pLink->m_pSock;
-
-				// Swap.
+				if(!pSock->m_bClosed)
 				{
-					GAIA::SYNC::Autolock al(pSock->m_lr);
-					GAST(pSock->m_pRecvBufSwap == GNIL || pSock->m_pRecvBufSwap->empty());
-					GAIA::ALGO::swap(pSock->m_pRecvBuf, pSock->m_pRecvBufSwap);
-				}
-
-				// Help.
-				GAIA::GVOID* pData = GNIL;
-				GAIA::NUM sDataSize = GINVALID;
-				if(pSock->m_pRecvBufSwap != GNIL)
-				{
-					pData = pSock->m_pRecvBufSwap->fptr();
-					sDataSize = pSock->m_pRecvBufSwap->write_size();
-				}
-
-				// Callback.
-				{
-					GAIA::SYNC::AutolockR al(m_rwCBS);
-					for(GAIA::NUM x = 0; x < m_cbs.size(); ++x)
+					// Swap.
 					{
-						GAIA::NETWORK::HttpServerCallBack* cb = m_cbs[x];
-						if(cb->OnRequest(*pLink, pSock->m_method, pSock->m_url, pSock->m_head, pData, sDataSize))
-							break;
+						GAIA::SYNC::Autolock al(pSock->m_lr);
+						GAST(pSock->m_pRecvBufSwap == GNIL || pSock->m_pRecvBufSwap->empty());
+						GAIA::ALGO::swap(pSock->m_pRecvBuf, pSock->m_pRecvBufSwap);
 					}
+
+					// Help.
+					GAIA::GVOID* pData = GNIL;
+					GAIA::NUM sDataSize = GINVALID;
+					if(pSock->m_pRecvBufSwap != GNIL)
+					{
+						pData = pSock->m_pRecvBufSwap->fptr();
+						sDataSize = pSock->m_pRecvBufSwap->write_size();
+					}
+
+					// Callback.
+					{
+						GAIA::SYNC::AutolockR al(m_rwCBS);
+						for(GAIA::NUM x = 0; x < m_cbs.size(); ++x)
+						{
+							GAIA::NETWORK::HttpServerCallBack* cb = m_cbs[x];
+							if(cb->OnRequest(*pLink, pSock->m_method, pSock->m_url, pSock->m_head, pData, sDataSize))
+								break;
+						}
+					}
+
+					// Clear buffer.
+					pSock->m_pRecvBufSwap->clear();
 				}
 
-				// Clear buffer.
-				pSock->m_pRecvBufSwap->clear();
+				// Try to recycle link.
+				if(pSock->m_bClosed)
+				{
+					if(pSock->m_needsendsize == 0)
+						this->RecycleLink(*pLink);
+				}
 			}
 
 			// Drop.
