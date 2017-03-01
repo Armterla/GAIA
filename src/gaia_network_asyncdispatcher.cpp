@@ -200,25 +200,35 @@ namespace GAIA
 				// Close all listen sockets.
 				{
 					GAIA::SYNC::AutolockW al(m_rwListenSockets);
+					GAIA::CTN::Vector<GAIA::NETWORK::AsyncSocket*> vecTemp;
+					vecTemp.reserve(m_listen_sockets.size());
 					for(GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*>::it it = m_listen_sockets.frontit(); !it.empty(); ++it)
+						vecTemp.push_back(*it);
+					m_listen_sockets.clear();
+
+					for(GAIA::NUM x = 0; x < vecTemp.size(); ++x)
 					{
-						GAIA::NETWORK::AsyncSocket* pSock = *it;
+						GAIA::NETWORK::AsyncSocket* pSock = vecTemp[x];
 						pSock->m_sock.Close();
 						pSock->drop_ref();
 					}
-					m_listen_sockets.clear();
 				}
 
 				// Close all accepting sockets.
 				{
 					GAIA::SYNC::AutolockW al(m_rwAcceptingSockets);
+					GAIA::CTN::Vector<GAIA::NETWORK::AsyncSocket*> vecTemp;
+					vecTemp.reserve(m_accepting_sockets.size());
 					for(GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*>::it it = m_accepting_sockets.frontit(); !it.empty(); ++it)
+						vecTemp.push_back(*it);
+					m_accepting_sockets.clear();
+
+					for(GAIA::NUM x = 0; x < vecTemp.size(); ++x)
 					{
-						GAIA::NETWORK::AsyncSocket* pSock = *it;
+						GAIA::NETWORK::AsyncSocket* pSock = vecTemp[x];
 						pSock->m_sock.Close();
 						pSock->drop_ref();
 					}
-					m_accepting_sockets.clear();
 				}
 			}
 
