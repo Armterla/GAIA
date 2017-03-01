@@ -537,7 +537,7 @@ namespace GAIA
 							GAIA::N32 nListenSock = pCtx->pListenSocket->GetFD();
 							GAIA::N32 nSetSockOptResult = setsockopt(
 									pCtx->pDataSocket->GetFD(), SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT,
-									(char*)&nListenSock, sizeof(nListenSock));
+									(char*)&nListenSock, sizeof(&nListenSock));
 							GAST(nSetSockOptResult == 0);
 
 							pCtx->pDataSocket->GetGlobalAddress(addrPeer);
