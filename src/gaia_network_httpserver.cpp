@@ -43,6 +43,7 @@ namespace GAIA
 			virtual GAIA::GVOID Create()
 			{
 				GAIA::NETWORK::AsyncSocket::Create();
+				this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
 				this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEADDR, GAIA::True);
 			}
 
