@@ -289,6 +289,7 @@ namespace GAIA
 				GAIA::NETWORK::HttpServerLink* pLink = gnew GAIA::NETWORK::HttpServerLink(*m_pSvr);
 				pLink->m_pSock = (GAIA::NETWORK::HttpAsyncSocket*)&sock;
 				pLink->SetPeerAddr(addrPeer);
+				pLink->SetListenAddr(addrListen);
 				pLink->SetAcceptTime(GAIA::TIME::gmt_time());
 				((HttpAsyncSocket*)&sock)->SetLink(pLink);
 				GAIA::SYNC::AutolockW al(m_pSvr->m_rwLinks);
