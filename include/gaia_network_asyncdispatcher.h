@@ -287,6 +287,17 @@ namespace GAIA
 
 				@remarks
 			*/
+			GAIA::BL CollectListenSocket(GAIA::CTN::Vector<GAIA::NETWORK::Addr>& listResult) const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL IsExistAcceptingSocket(GAIA::NETWORK::AsyncSocket& sock) const;
 
 			/*!

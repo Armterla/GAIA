@@ -390,6 +390,18 @@ namespace GAIA
 			return GAIA::True;
 		}
 
+		GAIA::BL AsyncDispatcher::CollectListenSocket(GAIA::CTN::Vector<GAIA::NETWORK::Addr>& listResult) const
+		{
+			GAIA::BL bRet = GAIA::False;
+			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwListenSockets);
+			for(GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*>::const_it it = m_listen_sockets.const_frontit(); !it.empty(); ++it)
+			{
+				listResult.push_back(*it.key());
+				bRet = GAIA::True;
+			}
+			return bRet;
+		}
+
 		GAIA::BL AsyncDispatcher::IsExistAcceptingSocket(GAIA::NETWORK::AsyncSocket& sock) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwAcceptingSockets);

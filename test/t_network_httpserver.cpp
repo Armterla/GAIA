@@ -3,16 +3,19 @@
 
 namespace TEST
 {
-	class MyHttpServerCallBack : public GAIA::NETWORK::HttpServerCallBack
+	class HttpServerCallBackForTest : public GAIA::NETWORK::HttpServerCallBack
 	{
 	public:
-		MyHttpServerCallBack(GAIA::NETWORK::HttpServer& svr)
+		HttpServerCallBackForTest(GAIA::NETWORK::HttpServer& svr)
 			: GAIA::NETWORK::HttpServerCallBack(svr)
 		{
 		}
-		virtual ~MyHttpServerCallBack()
+		virtual ~HttpServerCallBackForTest()
 		{
 		}
+
+	public:
+		virtual const GAIA::CH* GetName() const{return "HttpServerCallBackForTest";}
 
 	protected:
 		virtual GAIA::BL OnRequest(
@@ -48,9 +51,9 @@ namespace TEST
 		descServer.pszRootPath = "../testres/HTTPSERVER/";
 
 		GAIA::NETWORK::HttpServer svr;
-		MyHttpServerCallBack cb1(svr), cb2(svr), cb3(svr);
-		GAIA::NETWORK::HttpServerCallBack_Info cbi(svr);
-		GAIA::NETWORK::HttpServerCallBack_StaticFile cbsf(svr);
+		HttpServerCallBackForTest cb1(svr), cb2(svr), cb3(svr);
+		GAIA::NETWORK::HttpServerCallBackForInfo cbi(svr);
+		GAIA::NETWORK::HttpServerCallBackForStaticResource cbsf(svr);
 
 		TAST(!svr.IsCreated());
 		TAST(svr.Create(descServer));

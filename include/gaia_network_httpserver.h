@@ -52,6 +52,17 @@ namespace GAIA
 		GAIA_ENUM_END(HTTP_SERVER_BLACKWHITE_MODE)
 
 		/*!
+			@brief
+		*/
+		static const GAIA::CH* HTTP_SERVER_BLACKWHITE_MODE_STRING[] =
+		{
+			"HTTP_SERVER_BLACKWHITE_MODE_INVALID",
+			"HTTP_SERVER_BLACKWHITE_MODE_BLACK",
+			"HTTP_SERVER_BLACKWHITE_MODE_WHITE",
+			"HTTP_SERVER_BLACKWHITE_MODE_NONE",
+		};
+
+		/*!
 			@brief HttpServer create description.
 
 			@see HttpServer::Create
@@ -92,7 +103,7 @@ namespace GAIA
 				uMaxStaticCacheSize = DEFAULT_MAX_STATIC_CACHE_SIZE;
 				uMaxStaticCacheCount = DEFAULT_MAX_STATIC_CACHE_COUNT;
 				uMaxResponseCountPerMinute = DEFAULT_MAX_RESPONSE_COUNT_PER_MINUTE;
-				bEnableAutoResponseStaticFile = GAIA::True;
+				bEnableAutoResponseStaticResource = GAIA::True;
 				GAIA::ALGO::gstrcpy(szHttpVer, GAIA::NETWORK::HTTP_VERSION_STRING);
 				sHttpVerLen = GAIA::ALGO::gstrlen(szHttpVer);
 			}
@@ -194,7 +205,7 @@ namespace GAIA
 			/*!
 				@brief
 			*/
-			GAIA::BL bEnableAutoResponseStaticFile;
+			GAIA::BL bEnableAutoResponseStaticResource;
 
 			/*!
 				@brief
@@ -567,6 +578,18 @@ namespace GAIA
 			*/
 			GINL HttpServerStatus& GetStatus(){return m_status;}
 
+		public:
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			virtual const GAIA::CH* GetName() const{return "HttpServerCallBack";}
+
 		protected:
 
 			/*!
@@ -604,11 +627,14 @@ namespace GAIA
 		/*!
 			@brief
 		*/
-		class HttpServerCallBack_StaticFile : public GAIA::NETWORK::HttpServerCallBack
+		class HttpServerCallBackForStaticResource : public GAIA::NETWORK::HttpServerCallBack
 		{
 		public:
-			HttpServerCallBack_StaticFile(GAIA::NETWORK::HttpServer& svr);
-			virtual ~HttpServerCallBack_StaticFile();
+			HttpServerCallBackForStaticResource(GAIA::NETWORK::HttpServer& svr);
+			virtual ~HttpServerCallBackForStaticResource();
+
+		public:
+			virtual const GAIA::CH* GetName() const{return "HttpServerCallBackForStaticResource";}
 
 		protected:
 			virtual GAIA::BL OnRequest(
@@ -623,11 +649,14 @@ namespace GAIA
 		/*!
 			@brief
 		*/
-		class HttpServerCallBack_Info : public GAIA::NETWORK::HttpServerCallBack
+		class HttpServerCallBackForInfo : public GAIA::NETWORK::HttpServerCallBack
 		{
 		public:
-			HttpServerCallBack_Info(GAIA::NETWORK::HttpServer& svr);
-			virtual ~HttpServerCallBack_Info();
+			HttpServerCallBackForInfo(GAIA::NETWORK::HttpServer& svr);
+			virtual ~HttpServerCallBackForInfo();
+
+		public:
+			virtual const GAIA::CH* GetName() const{return "HttpServerCallBackForInfo";}
 
 		protected:
 			virtual GAIA::BL OnRequest(
@@ -702,6 +731,17 @@ namespace GAIA
 				@remarks
 			*/
 			GAIA::BL IsRegistedCallBack(GAIA::NETWORK::HttpServerCallBack& cb);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GAIA::BL CollectCallBack(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerCallBack*>& listResult);
 
 			/*!
 				@brief
@@ -855,7 +895,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			const GAIA::NETWORK::Addr* GetOpennedAddr(GAIA::NUM sIndex) const;
+			GAIA::BL CollectOpennedAddr(GAIA::CTN::Vector<GAIA::NETWORK::Addr>& listResult);
 
 			/*!
 				@brief
@@ -1098,6 +1138,17 @@ namespace GAIA
 				@remarks
 			*/
 			GAIA::BL RecycleCache();
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GAIA::NETWORK::HttpAsyncDispatcher* GetAsyncDispatcher() const{return m_disp;}
 
 		private:
 			GAIA::BL RecycleLink(GAIA::NETWORK::HttpServerLink& l);

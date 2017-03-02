@@ -442,16 +442,16 @@ namespace GAIA
 		{
 		}
 
-		HttpServerCallBack_StaticFile::HttpServerCallBack_StaticFile(GAIA::NETWORK::HttpServer& svr)
+		HttpServerCallBackForStaticResource::HttpServerCallBackForStaticResource(GAIA::NETWORK::HttpServer& svr)
 			: HttpServerCallBack(svr)
 		{
 		}
 
-		HttpServerCallBack_StaticFile::~HttpServerCallBack_StaticFile()
+		HttpServerCallBackForStaticResource::~HttpServerCallBackForStaticResource()
 		{
 		}
 
-		BL HttpServerCallBack_StaticFile::OnRequest(GAIA::NETWORK::HttpServerLink& l, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize)
+		BL HttpServerCallBackForStaticResource::OnRequest(GAIA::NETWORK::HttpServerLink& l, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize)
 		{
 			if(!url.IsPure())
 				return GAIA::False;
@@ -570,18 +570,16 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		HttpServerCallBack_Info::HttpServerCallBack_Info(GAIA::NETWORK::HttpServer& svr)
+		HttpServerCallBackForInfo::HttpServerCallBackForInfo(GAIA::NETWORK::HttpServer& svr)
 			: HttpServerCallBack(svr)
 		{
-
 		}
 
-		HttpServerCallBack_Info::~HttpServerCallBack_Info()
+		HttpServerCallBackForInfo::~HttpServerCallBackForInfo()
 		{
-
 		}
 
-		GAIA::BL HttpServerCallBack_Info::OnRequest(GAIA::NETWORK::HttpServerLink& l, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize)
+		GAIA::BL HttpServerCallBackForInfo::OnRequest(GAIA::NETWORK::HttpServerLink& l, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize)
 		{
 			if(method != GAIA::NETWORK::HTTP_METHOD_GET)
 				return GAIA::False;
@@ -684,6 +682,69 @@ namespace GAIA
 				strResp += "\tHitResponseCacheSize = "; strResp += s.uHitResponseCacheSize; strResp += "\n";
 				strResp += "\tNotHitResponseCacheCount = "; strResp += s.uNotHitResponseCacheCount; strResp += "\n";
 				strResp += "\tNotResponseCount = "; strResp += s.uNotResponseCount; strResp += "\n";
+				strResp += "\n";
+
+				strResp += "[GAIA HTTP SERVER CALLBACK]\n\n";
+				GAIA::CTN::Vector<GAIA::NETWORK::HttpServerCallBack*> listCallBack;
+				this->GetServer().CollectCallBack(listCallBack);
+				for(GAIA::NUM x = 0; x < listCallBack.size(); ++x)
+				{
+					GAIA::NETWORK::HttpServerCallBack* pCallBack = listCallBack[x];
+					const GAIA::CH* pszCallBackName = pCallBack->GetName();
+					strResp += "\t["; strResp += (x + 1); strResp += "] Name = "; strResp += pszCallBackName; strResp += "\n";
+					pCallBack->drop_ref();
+				}
+				listCallBack.clear();
+				strResp += "\n";
+
+				strResp += "[GAIA HTTP SERVER WORK STATE]\n\n";
+				strResp += "\tEnableDynamicResponseCache = "; strResp += this->GetServer().IsEnableDynamicResponseCache(); strResp += "\n";
+				strResp += "\tEnableStaticResponseCache = "; strResp += this->GetServer().IsEnableStaticResponseCache(); strResp += "\n";
+				strResp += "\tBlackWhiteMode = "; strResp += GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE_STRING[this->GetServer().GetBlackWhiteMode()]; strResp += "\n";
+				strResp += "\n";
+
+				strResp += "[GAIA HTTP SERVER OPEN ADDRESS]\n\n";
+				GAIA::CTN::Vector<GAIA::NETWORK::Addr> listOpennedAddrs;
+				this->GetServer().CollectOpennedAddr(listOpennedAddrs);
+				for(GAIA::NUM x = 0; x < listOpennedAddrs.size(); ++x)
+				{
+					const GAIA::NETWORK::Addr& addr = listOpennedAddrs[x];
+					GAIA::CH szTemp[64];
+					addr.tostring(szTemp);
+					strResp += "\t["; strResp += (x + 1); strResp += "] Address = "; strResp += szTemp; strResp += "\n";
+				}
+				strResp += "\n";
+
+				const GAIA::NETWORK::HttpServerDesc& descSvr = this->GetServer().GetDesc();
+				strResp += "[GAIA HTTP SERVER CREATE DESC]\n\n";
+				strResp += "\tNetworkThreadCount = "; strResp += descSvr.sNetworkThreadCount; strResp += "\n";
+				strResp += "\tWorkThreadCount = "; strResp += descSvr.sWorkThreadCount; strResp += "\n";
+				strResp += "\tRootPath = "; strResp += descSvr.pszRootPath; strResp += "\n";
+				strResp += "\tMaxConnCount = "; strResp += descSvr.sMaxConnCount; strResp += "\n";
+				strResp += "\tMaxConnTime = "; strResp += descSvr.uMaxConnTime; strResp += "\n";
+				strResp += "\tMaxHalfConnTime = "; strResp += descSvr.uMaxHarfConnTime; strResp += "\n";
+				strResp += "\tMaxDynamicCacheSize = "; strResp += descSvr.uMaxDynamicCacheSize; strResp += "\n";
+				strResp += "\tMaxDynamicCacheCount = "; strResp += descSvr.uMaxDynamicCacheCount; strResp += "\n";
+				strResp += "\tMaxStaticCacheSize = "; strResp += descSvr.uMaxStaticCacheSize; strResp += "\n";
+				strResp += "\tMaxStaticCacheCount = "; strResp += descSvr.uMaxStaticCacheCount; strResp += "\n";
+				strResp += "\tMaxResponseCountPerMinute = "; strResp += descSvr.uMaxResponseCountPerMinute; strResp += "\n";
+				strResp += "\tEnableAutoResponseStaticResource = "; strResp += descSvr.bEnableAutoResponseStaticResource; strResp += "\n";
+				strResp += "\tHttpVersion = "; strResp += descSvr.sHttpVerLen; strResp += "\n";
+				strResp += "\n";
+
+				strResp += "[GAIA ASYNC NETWORK]\n\n";
+				strResp += "\tUploadSpeed = "; strResp += "Not supported!"; strResp += "\n";
+				strResp += "\tDownloadSpeed = "; strResp += "Not supported!"; strResp += "\n";
+				strResp += "\tListenSocketCount = "; strResp += this->GetServer().GetAsyncDispatcher()->GetListenSocketCount(); strResp += "\n";
+				strResp += "\tAcceptedSocketCount = "; strResp += this->GetServer().GetAsyncDispatcher()->GetAcceptedSocketCount(); strResp += "\n";
+				strResp += "\tConnectedSocketCount = "; strResp += this->GetServer().GetAsyncDispatcher()->GetConnectedSocketCount(); strResp += "\n";
+				strResp += "\n";
+
+				strResp += "[GAIA INFO]\n\n";
+				strResp += "\tGAIA Version = "; strResp += GAIA_VERSION_STRING; strResp += "\n";
+				strResp += "\tGAIA Compile Time = "; strResp += GAIA_VERSION_COMPILEDATE; strResp += " "; strResp += GAIA_VERSION_COMPILETIME; strResp += "\n";
+				strResp += "\tGAIA Last Modify Time = "; strResp += GAIA_VERSION_LASTMODIFYTIME; strResp += "\n";
+				strResp += "\n";
 			}
 
 			GAIA::CH szContentLen[32];
@@ -762,6 +823,21 @@ namespace GAIA
 					return GAIA::True;
 			}
 			return GAIA::False;
+		}
+
+		GAIA::BL HttpServer::CollectCallBack(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerCallBack*>& listResult)
+		{
+			GPCHR_FALSE_RET(this->IsCreated(), GAIA::False);
+			GAIA::BL bRet = GAIA::False;
+			GAIA::SYNC::AutolockR al(m_rwCBS);
+			for(GAIA::NUM x = 0; x < m_cbs.size(); ++x)
+			{
+				GAIA::NETWORK::HttpServerCallBack* pCallBack = m_cbs[x];
+				pCallBack->rise_ref();
+				listResult.push_back(pCallBack);
+				bRet = GAIA::True;
+			}
+			return bRet;
 		}
 
 		GAIA::BL HttpServer::Create(const GAIA::NETWORK::HttpServerDesc& desc)
@@ -1083,9 +1159,10 @@ namespace GAIA
 			return m_disp->GetListenSocketCount();
 		}
 
-		const GAIA::NETWORK::Addr* HttpServer::GetOpennedAddr(GAIA::NUM sIndex) const
+		GAIA::BL HttpServer::CollectOpennedAddr(GAIA::CTN::Vector<GAIA::NETWORK::Addr>& listResult)
 		{
-			GPCHR_FALSE_RET(this->IsCreated(), GNIL);
+			GPCHR_FALSE_RET(this->IsCreated(), GAIA::False);
+			return m_disp->CollectListenSocket(listResult);
 		}
 
 		GAIA::GVOID HttpServer::EnableDynamicResponseCache(GAIA::BL bEnable)
