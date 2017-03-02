@@ -49,7 +49,7 @@ namespace TEST
 
 		GAIA::NETWORK::HttpServer svr;
 		MyHttpServerCallBack cb1(svr), cb2(svr), cb3(svr);
-		GAIA::NETWORK::HttpServerCallBack_Status cbs(svr);
+		GAIA::NETWORK::HttpServerCallBack_Info cbi(svr);
 		GAIA::NETWORK::HttpServerCallBack_StaticFile cbsf(svr);
 
 		TAST(!svr.IsCreated());
@@ -58,12 +58,12 @@ namespace TEST
 			TAST(svr.RegistCallBack(cb1));
 			TAST(svr.RegistCallBack(cb2));
 			TAST(svr.RegistCallBack(cb3));
-			TAST(svr.RegistCallBack(cbs));
+			TAST(svr.RegistCallBack(cbi));
 			TAST(svr.RegistCallBack(cbsf));
 			TAST(!svr.RegistCallBack(cb1));
 			TAST(!svr.RegistCallBack(cb2));
 			TAST(!svr.RegistCallBack(cb3));
-			TAST(!svr.RegistCallBack(cbs));
+			TAST(!svr.RegistCallBack(cbi));
 			TAST(!svr.RegistCallBack(cbsf));
 
 			TAST(svr.IsCreated());

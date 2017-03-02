@@ -570,18 +570,18 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		HttpServerCallBack_Status::HttpServerCallBack_Status(GAIA::NETWORK::HttpServer& svr)
+		HttpServerCallBack_Info::HttpServerCallBack_Info(GAIA::NETWORK::HttpServer& svr)
 			: HttpServerCallBack(svr)
 		{
 
 		}
 
-		HttpServerCallBack_Status::~HttpServerCallBack_Status()
+		HttpServerCallBack_Info::~HttpServerCallBack_Info()
 		{
 
 		}
 
-		GAIA::BL HttpServerCallBack_Status::OnRequest(GAIA::NETWORK::HttpServerLink& l, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize)
+		GAIA::BL HttpServerCallBack_Info::OnRequest(GAIA::NETWORK::HttpServerLink& l, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize)
 		{
 			if(method != GAIA::NETWORK::HTTP_METHOD_GET)
 				return GAIA::False;
@@ -592,12 +592,12 @@ namespace GAIA
 
 			GAIA::CH szPath[32];
 			url.GetPath(szPath, sizeof(szPath));
-			if(GAIA::ALGO::gstrcmp(szPath, "/httpstatus") != 0)
+			if(GAIA::ALGO::gstrcmp(szPath, "/httpinfo") != 0)
 				return GAIA::False;
 
 			const GAIA::NETWORK::HttpServerStatus& s = this->GetServer().GetStatus();
 			{
-				strResp = "GAIA HTTP SERVER STATUS\n\n";
+				strResp = "[GAIA HTTP SERVER STATUS]\n\n";
 
 				strResp += "\tRequestAnalyzeFailedCount = "; strResp += s.uRequestAnalyzeFailedCount; strResp += "\n";
 				strResp += "\tRequestDenyByBWCount = "; strResp += s.uRequestDenyByBWCount; strResp += "\n";

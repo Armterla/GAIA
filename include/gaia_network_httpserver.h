@@ -623,11 +623,11 @@ namespace GAIA
 		/*!
 			@brief
 		*/
-		class HttpServerCallBack_Status : public GAIA::NETWORK::HttpServerCallBack
+		class HttpServerCallBack_Info : public GAIA::NETWORK::HttpServerCallBack
 		{
 		public:
-			HttpServerCallBack_Status(GAIA::NETWORK::HttpServer& svr);
-			virtual ~HttpServerCallBack_Status();
+			HttpServerCallBack_Info(GAIA::NETWORK::HttpServer& svr);
+			virtual ~HttpServerCallBack_Info();
 
 		protected:
 			virtual GAIA::BL OnRequest(
