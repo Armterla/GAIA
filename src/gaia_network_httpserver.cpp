@@ -570,6 +570,133 @@ namespace GAIA
 			return GAIA::True;
 		}
 
+		HttpServerCallBack_Status::HttpServerCallBack_Status(GAIA::NETWORK::HttpServer& svr)
+			: HttpServerCallBack(svr)
+		{
+
+		}
+
+		HttpServerCallBack_Status::~HttpServerCallBack_Status()
+		{
+
+		}
+
+		GAIA::BL HttpServerCallBack_Status::OnRequest(GAIA::NETWORK::HttpServerLink& l, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize)
+		{
+			if(method != GAIA::NETWORK::HTTP_METHOD_GET)
+				return GAIA::False;
+
+			GAIA::NETWORK::HttpHead resphead;
+			GAIA::CTN::AString strResp;
+			strResp.reserve(1024 * 100);
+
+			GAIA::CH szPath[32];
+			url.GetPath(szPath, sizeof(szPath));
+			if(GAIA::ALGO::gstrcmp(szPath, "/httpstatus") != 0)
+				return GAIA::False;
+
+			const GAIA::NETWORK::HttpServerStatus& s = this->GetServer().GetStatus();
+			{
+				strResp = "GAIA HTTP SERVER STATUS\n\n";
+
+				strResp += "\tRequestAnalyzeFailedCount = "; strResp += s.uRequestAnalyzeFailedCount; strResp += "\n";
+				strResp += "\tRequestDenyByBWCount = "; strResp += s.uRequestDenyByBWCount; strResp += "\n";
+				strResp += "\tRequestDenyByMaxConnCount = "; strResp += s.uRequestDenyByMaxConnCount; strResp += "\n";
+				strResp += "\tRequestDenyByMaxHalfConnCount = "; strResp += s.uRequestDenyByMaxHalfConnCount; strResp += "\n\n";
+
+				strResp += "\tRequestCount = "; strResp += s.uRequestCount; strResp += "\n";
+				for(GAIA::NUM x = 1; x < sizeofarray(s.uRequestCountByMethod); ++x)
+				{
+					strResp += "\t\t";
+					strResp += GAIA::NETWORK::HTTP_METHOD_STRING[x];
+					strResp += " = ";
+					strResp += s.uRequestCountByMethod[x];
+					strResp += "\n";
+				}
+				strResp += "\n";
+
+				strResp += "\tResponseCount = "; strResp += s.uResponseCount; strResp += "\n";
+				for(GAIA::NUM x = 1; x < sizeofarray(s.uResponseCountByMethod); ++x)
+				{
+					strResp += "\t\t";
+					strResp += GAIA::NETWORK::HTTP_METHOD_STRING[x];
+					strResp += " = ";
+					strResp += s.uResponseCountByMethod[x];
+					strResp += "\n";
+				}
+				strResp += "\n";
+
+				strResp += "\tRequestPieceCount = "; strResp += s.uRequestPieceCount; strResp += "\n";
+				for(GAIA::NUM x = 1; x < sizeofarray(s.uRequestPieceCountByMethod); ++x)
+				{
+					strResp += "\t\t";
+					strResp += GAIA::NETWORK::HTTP_METHOD_STRING[x];
+					strResp += " = ";
+					strResp += s.uRequestPieceCountByMethod[x];
+					strResp += "\n";
+				}
+				strResp += "\n";
+
+				strResp += "\tResponsePieceCount = "; strResp += s.uResponsePieceCount; strResp += "\n";
+				for(GAIA::NUM x = 1; x < sizeofarray(s.uResponsePieceCountByMethod); ++x)
+				{
+					strResp += "\t\t";
+					strResp += GAIA::NETWORK::HTTP_METHOD_STRING[x];
+					strResp += " = ";
+					strResp += s.uResponsePieceCountByMethod[x];
+					strResp += "\n";
+				}
+				strResp += "\n";
+
+				strResp += "\tRequestSize = "; strResp += s.uRequestSize; strResp += "\n";
+				for(GAIA::NUM x = 1; x < sizeofarray(s.uRequestSizeByMethod); ++x)
+				{
+					strResp += "\t\t";
+					strResp += GAIA::NETWORK::HTTP_METHOD_STRING[x];
+					strResp += " = ";
+					strResp += s.uRequestSizeByMethod[x];
+					strResp += "\n";
+				}
+				strResp += "\n";
+
+				strResp += "\tResponseSize = "; strResp += s.uResponseSize; strResp += "\n\n";
+				for(GAIA::NUM x = 1; x < sizeofarray(s.uResponseSizeByMethod); ++x)
+				{
+					strResp += "\t\t";
+					strResp += GAIA::NETWORK::HTTP_METHOD_STRING[x];
+					strResp += " = ";
+					strResp += s.uResponseSizeByMethod[x];
+					strResp += "\n";
+				}
+				strResp += "\n";
+
+				for(GAIA::NUM x = 1; x < sizeofarray(s.uResponseCountByCode); ++x)
+				{
+					strResp += "\tCode ";
+					strResp += GAIA::NETWORK::HTTP_CODE_STRING[x];
+					strResp += " = ";
+					strResp += s.uResponseCountByCode[x];
+					strResp += "\n";
+				}
+				strResp += "\n";
+
+				strResp += "\tHitResponseCacheCount = "; strResp += s.uHitResponseCacheCount; strResp += "\n";
+				strResp += "\tHitResponseCacheSize = "; strResp += s.uHitResponseCacheSize; strResp += "\n";
+				strResp += "\tNotHitResponseCacheCount = "; strResp += s.uNotHitResponseCacheCount; strResp += "\n";
+				strResp += "\tNotResponseCount = "; strResp += s.uNotResponseCount; strResp += "\n";
+			}
+
+			GAIA::CH szContentLen[32];
+			GAIA::ALGO::castv(strResp.size(), szContentLen, sizeof(szContentLen));
+			resphead.Set(GAIA::NETWORK::HTTP_HEADNAME_CONTENTLENGTH, szContentLen);
+			resphead.Set(GAIA::NETWORK::HTTP_HEADNAME_CONTENTTYPE, "text/plain; charset=UTF-8");
+
+			l.Response(GAIA::NETWORK::HTTP_CODE_OK, &resphead, strResp.fptr(), strResp.size());
+			l.Close();
+
+			return GAIA::True;
+		}
+
 		HttpServer::HttpServer()
 		{
 			GAST(HTTP_METHOD_MAXENUMCOUNT == sizeofarray(GAIA::NETWORK::HTTP_METHOD_STRING));

@@ -565,7 +565,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GINL const GAIA::NETWORK::HttpServerStatus& GetStatus() const{return m_status;}
+			GINL HttpServerStatus& GetStatus(){return m_status;}
 
 		protected:
 
@@ -595,7 +595,6 @@ namespace GAIA
 				m_pSvr = GNIL;
 				m_status.reset();
 			}
-			GINL HttpServerStatus& GetStatus(){return m_status;}
 
 		private:
 			GAIA::NETWORK::HttpServer* m_pSvr;
@@ -607,6 +606,22 @@ namespace GAIA
 		public:
 			HttpServerCallBack_StaticFile(GAIA::NETWORK::HttpServer& svr);
 			virtual ~HttpServerCallBack_StaticFile();
+
+		protected:
+			virtual GAIA::BL OnRequest(
+					GAIA::NETWORK::HttpServerLink& l,
+					GAIA::NETWORK::HTTP_METHOD method,
+					const GAIA::NETWORK::HttpURL& url,
+					const GAIA::NETWORK::HttpHead& httphead,
+					const GAIA::GVOID* p,
+					GAIA::NUM sSize);
+		};
+
+		class HttpServerCallBack_Status : public GAIA::NETWORK::HttpServerCallBack
+		{
+		public:
+			HttpServerCallBack_Status(GAIA::NETWORK::HttpServer& svr);
+			virtual ~HttpServerCallBack_Status();
 
 		protected:
 			virtual GAIA::BL OnRequest(
@@ -999,7 +1014,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GINL const GAIA::NETWORK::HttpServerStatus& GetStatus() const{return m_status;}
+			GINL GAIA::NETWORK::HttpServerStatus& GetStatus(){return m_status;}
 
 			/*!
 				@brief
@@ -1080,11 +1095,8 @@ namespace GAIA
 
 		private:
 			GAIA::BL RecycleLink(GAIA::NETWORK::HttpServerLink& l);
-
 			GAIA::CTN::Buffer* RequestBuffer();
 			GAIA::GVOID ReleaseBuffer(GAIA::CTN::Buffer* pBuf);
-
-			GINL GAIA::NETWORK::HttpServerStatus& GetStatus(){return m_status;}
 
 		private:
 			GINL GAIA::GVOID init()
