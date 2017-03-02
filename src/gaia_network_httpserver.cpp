@@ -646,24 +646,32 @@ namespace GAIA
 				}
 				strResp += "\n";
 
-				strResp += "\tRequestSize = "; strResp += s.uRequestSize; strResp += "\n";
+				strResp += "\tRequestSize = "; strResp += s.uRequestSize;
+				strResp += ", Avg = "; strResp += s.uRequestSize / (s.uRequestCount == 0 ? 1 : s.uRequestCount);
+				strResp += "\n";
 				for(GAIA::NUM x = 1; x < sizeofarray(s.uRequestSizeByMethod); ++x)
 				{
 					strResp += "\t\t";
 					strResp += GAIA::NETWORK::HTTP_METHOD_STRING[x];
 					strResp += " = ";
 					strResp += s.uRequestSizeByMethod[x];
+					strResp += ", Avg = ";
+					strResp += s.uRequestSizeByMethod[x] / (s.uRequestCountByMethod[x] == 0 ? 1 : s.uRequestCountByMethod[x]);
 					strResp += "\n";
 				}
 				strResp += "\n";
 
-				strResp += "\tResponseSize = "; strResp += s.uResponseSize; strResp += "\n";
+				strResp += "\tResponseSize = "; strResp += s.uResponseSize;
+				strResp += ", Avg = "; strResp += s.uResponseSize / (s.uResponseCount == 0 ? 1 : s.uResponseCount);
+				strResp += "\n";
 				for(GAIA::NUM x = 1; x < sizeofarray(s.uResponseSizeByMethod); ++x)
 				{
 					strResp += "\t\t";
 					strResp += GAIA::NETWORK::HTTP_METHOD_STRING[x];
 					strResp += " = ";
 					strResp += s.uResponseSizeByMethod[x];
+					strResp += ", Avg = ";
+					strResp += s.uResponseSizeByMethod[x] / (s.uResponseCountByMethod[x] == 0 ? 1 : s.uResponseCountByMethod[x]);
 					strResp += "\n";
 				}
 				strResp += "\n";
