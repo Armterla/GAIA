@@ -1623,6 +1623,7 @@ namespace GAIA
 					nn.pszValue = this->requestvalue(n.pszValue);
 					m_nodes.push_back(nn);
 				}
+				m_sStringLen = src.m_sStringLen;
 				m_bSorted = src.m_bSorted;
 				return *this;
 			}

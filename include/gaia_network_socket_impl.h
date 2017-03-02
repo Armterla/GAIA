@@ -831,14 +831,17 @@ namespace GAIA
 			if(!this->IsCreated())
 				return GAIA::False;
 			m_bBinded = bBinded;
-			return GAIA::False;
+			return GAIA::True;
 		}
 
 		GINL GAIA::BL Socket::SetConnected(GAIA::BL bConnected)
 		{
-			GAST(this->IsCreated());
-			if(!this->IsCreated())
-				return GAIA::False;
+			if(bConnected)
+			{
+				GAST(this->IsCreated());
+				if(!this->IsCreated())
+					return GAIA::False;
+			}
 			m_bConnected = bConnected;
 			return GAIA::True;
 		}

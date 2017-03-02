@@ -1083,7 +1083,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL RequestCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sUrlAndHeadLen, GAIA::GVOID** p, GAIA::NUM& sSize);
+			GAIA::BL RequestCache(const GAIA::CH* pszKey, GAIA::NUM sKeyLen, GAIA::NETWORK::HttpHead& resphead, GAIA::GVOID** p, GAIA::NUM& sSize);
 
 			/*!
 				@brief
@@ -1094,7 +1094,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL RequestCache(const GAIA::NETWORK::HttpURL& url, GAIA::NETWORK::HttpHead& httphead, GAIA::GVOID** p, GAIA::NUM& sSize);
+			GAIA::BL RequestCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& reqhead, GAIA::NETWORK::HttpHead& resphead, GAIA::GVOID** p, GAIA::NUM& sSize);
 
 			/*!
 				@brief
@@ -1105,7 +1105,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL ReleaseCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sUrlAndHeadLen);
+			GAIA::BL ReleaseCache(const GAIA::CH* pszKey, GAIA::NUM sKeyLen);
 
 			/*!
 				@brief
@@ -1116,7 +1116,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL ReleaseCache(const GAIA::NETWORK::HttpURL& url, GAIA::NETWORK::HttpHead& httphead);
+			GAIA::BL ReleaseCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& reqhead);
 
 			/*!
 				@brief
@@ -1127,7 +1127,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL UpdateCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sUrlAndHeadLen, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime = GINVALID);
+			GAIA::BL UpdateCache(const GAIA::CH* pszKey, GAIA::NUM sKeyLen, const GAIA::NETWORK::HttpHead& resphead, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime = GINVALID);
 
 			/*!
 				@brief
@@ -1138,7 +1138,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL UpdateCache(const GAIA::NETWORK::HttpURL& url, GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime = GINVALID);
+			GAIA::BL UpdateCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& reqhead, const GAIA::NETWORK::HttpHead& resphead, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime = GINVALID);
 
 			/*!
 				@brief
@@ -1188,11 +1188,12 @@ namespace GAIA
 			class CacheNode : public GAIA::Base
 			{
 			public:
-				GINL GAIA::N32 compare(const CacheNode& src) const{return strUrlAndHead.compare(src.strUrlAndHead);}
+				GINL GAIA::N32 compare(const CacheNode& src) const{return strKey.compare(src.strKey);}
 				GCLASS_COMPARE_BYCOMPARE(CacheNode)
 
 			public:
-				GAIA::CTN::AString strUrlAndHead;
+				GAIA::CTN::AString strKey;
+				GAIA::NETWORK::HttpHead resphead;
 				GAIA::CTN::Buffer* buf;
 				GAIA::U64 uRegistTime;
 				GAIA::U64 uEffectTime;

@@ -494,8 +494,7 @@ namespace GAIA
 							l.Response(GAIA::NETWORK::HTTP_CODE_OK, &resphead, buf.fptr(), buf.write_size());
 							l.Close();
 
-							GAIA::NETWORK::HttpHead emptyhead;
-							this->GetServer().UpdateCache(url, emptyhead, buf.fptr(), buf.write_size());
+							this->GetServer().UpdateCache(url, httphead, resphead, buf.fptr(), buf.write_size());
 						}
 						else
 						{
@@ -690,7 +689,8 @@ namespace GAIA
 				for(GAIA::CTN::Set<CacheNode>::it it = m_cache.frontit(); !it.empty(); )
 				{
 					CacheNode& cn = *it;
-					gdel cn.buf;
+					if(cn.buf != GNIL)
+						gdel cn.buf;
 				}
 			}
 
@@ -818,7 +818,26 @@ namespace GAIA
 						sDataSize = pSock->m_pRecvBufSwap->write_size();
 					}
 
+					// Response by cache.
+					GAIA::BL bResponsedByCache = GAIA::False;
+					{
+						if(pSock->m_method == GAIA::NETWORK::HTTP_METHOD_GET || pSock->m_method == GAIA::NETWORK::HTTP_METHOD_HEAD)
+						{
+							GAIA::GVOID* pCache;
+							GAIA::NUM sCacheSize;
+							GAIA::NETWORK::HttpHead resphead;
+							if(this->RequestCache(pSock->m_url, pSock->m_head, resphead, &pCache, sCacheSize))
+							{
+								pLink->Response(GAIA::NETWORK::HTTP_CODE_OK, &resphead, pCache, sCacheSize);
+								pLink->Close();
+								this->ReleaseCache(pSock->m_url, pSock->m_head);
+								bResponsedByCache = GAIA::True;
+							}
+						}
+					}
+
 					// Callback.
+					if(!bResponsedByCache)
 					{
 						GAIA::SYNC::AutolockR al(m_rwCBS);
 						GAIA::BL bResponsed = GAIA::False;
@@ -1011,115 +1030,134 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		GAIA::BL HttpServer::RequestCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sUrlAndHeadLen, GAIA::GVOID** p, GAIA::NUM& sSize)
+		GAIA::BL HttpServer::RequestCache(const GAIA::CH* pszKey, GAIA::NUM sKeyLen, GAIA::NETWORK::HttpHead& resphead, GAIA::GVOID** p, GAIA::NUM& sSize)
 		{
-			GPCHR_NULLSTR_RET(pszUrlAndHead, GAIA::False);
+			GPCHR_NULLSTR_RET(pszKey, GAIA::False);
 			GPCHR_NULL_RET(p, GAIA::False);
 			m_rwCache.EnterRead();
-			if(sUrlAndHeadLen == GINVALID)
-				sUrlAndHeadLen = GAIA::ALGO::gstrlen(pszUrlAndHead);
+			if(sKeyLen == GINVALID)
+				sKeyLen = GAIA::ALGO::gstrlen(pszKey);
 			CacheNode n;
-			n.strUrlAndHead.proxy(pszUrlAndHead, sUrlAndHeadLen, 0);
+			n.strKey.proxy(pszKey, sKeyLen, 0);
 			CacheNode* pFinded = m_cache.find(n);
-			n.strUrlAndHead.proxy(GNIL, 0, 0);
+			n.strKey.proxy(GNIL, 0, 0);
 			if(pFinded == GNIL)
 			{
 				m_rwCache.LeaveRead();
 				return GAIA::False;
 			}
-			if(pFinded->uRegistTime + pFinded->uEffectTime < GAIA::TIME::gmt_time())
+			if(pFinded->uEffectTime != GINVALID && pFinded->uRegistTime + pFinded->uEffectTime < GAIA::TIME::gmt_time())
 			{
 				m_rwCache.LeaveRead();
 				return GAIA::False;
 			}
 			pFinded->nRefCount++;
-			*p = (GAIA::GVOID*)pFinded->buf->fptr();
-			sSize = pFinded->buf->write_size();
+			resphead = pFinded->resphead;
+			if(pFinded->buf != GNIL)
+			{
+				*p = (GAIA::GVOID*)pFinded->buf->fptr();
+				sSize = pFinded->buf->write_size();
+			}
+			else
+			{
+				*p = GNIL;
+				sSize = 0;
+			}
 			return GAIA::True;
 		}
 
-		GAIA::BL HttpServer::RequestCache(const GAIA::NETWORK::HttpURL& url, GAIA::NETWORK::HttpHead& httphead, GAIA::GVOID** p, GAIA::NUM& sSize)
+		GAIA::BL HttpServer::RequestCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& reqhead, GAIA::NETWORK::HttpHead& resphead, GAIA::GVOID** p, GAIA::NUM& sSize)
 		{
 			GAST(!url.Empty());
-			httphead.Optimize();
+			GAIA::NETWORK::HttpHead prachead = reqhead;
+			prachead.Optimize();
 			GAIA::NUM sUrlLength;
 			const GAIA::CH* pszUrl = url.ToString(&sUrlLength);
-			if(!httphead.Empty())
+			if(!prachead.Empty())
 			{
-				GAIA::NUM sHeadLength = httphead.GetStringLength();
+				GAIA::NUM sHeadLength = prachead.GetStringLength();
 				GAIA::CTN::ACharsString strTemp;
-				strTemp.resize(sUrlLength + sHeadLength);
+				strTemp.resize(sUrlLength + sHeadLength + 1);
 				GAIA::ALGO::gmemcpy(strTemp.fptr(), pszUrl, sUrlLength);
 				GAIA::NUM sHeadResultSize;
 				GAIA::BL bHeadResult;
-				httphead.ToString(strTemp.fptr() + sUrlLength, sHeadLength, &sHeadResultSize, &bHeadResult);
+				prachead.ToString(strTemp.fptr() + sUrlLength, sHeadLength + 1, &sHeadResultSize, &bHeadResult);
 				GAST(sHeadResultSize == sHeadLength);
 				GAST(bHeadResult);
-				return this->RequestCache(strTemp.fptr(), strTemp.size(), p, sSize);
+				strTemp.resize(strTemp.size() - 1);
+				return this->RequestCache(strTemp.fptr(), strTemp.size(), resphead, p, sSize);
 			}
 			else
-				return this->RequestCache(pszUrl, sUrlLength, p, sSize);
+				return this->RequestCache(pszUrl, sUrlLength, resphead, p, sSize);
 		}
 
-		GAIA::BL HttpServer::ReleaseCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sUrlAndHeadLen)
+		GAIA::BL HttpServer::ReleaseCache(const GAIA::CH* pszKey, GAIA::NUM sKeyLen)
 		{
-			GPCHR_NULLSTR_RET(pszUrlAndHead, GAIA::False);
-			if(sUrlAndHeadLen == GINVALID)
-				sUrlAndHeadLen = GAIA::ALGO::gstrlen(pszUrlAndHead);
+			GPCHR_NULLSTR_RET(pszKey, GAIA::False);
+			if(sKeyLen == GINVALID)
+				sKeyLen = GAIA::ALGO::gstrlen(pszKey);
 			CacheNode n;
-			n.strUrlAndHead.proxy(pszUrlAndHead, sUrlAndHeadLen, 0);
+			n.strKey.proxy(pszKey, sKeyLen, 0);
 			CacheNode* pFinded = m_cache.find(n);
-			n.strUrlAndHead.proxy(GNIL, 0, 0);
+			n.strKey.proxy(GNIL, 0, 0);
 			if(pFinded == GNIL)
 				return GAIA::False;
 			pFinded->nRefCount--;
-			if(pFinded->nRefCount == 0)
-			{
-				gdel pFinded->buf;
-				m_cache.erase(*pFinded);
-			}
+			GAST(pFinded->nRefCount >= 0);
 			m_rwCache.LeaveRead();
 			return GAIA::True;
 		}
 
-		GAIA::BL HttpServer::ReleaseCache(const GAIA::NETWORK::HttpURL& url, GAIA::NETWORK::HttpHead& httphead)
+		GAIA::BL HttpServer::ReleaseCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& reqhead)
 		{
 			GAST(!url.Empty());
-			httphead.Optimize();
+			GAIA::NETWORK::HttpHead prachead = reqhead;
+			prachead.Optimize();
 			GAIA::NUM sUrlLength;
 			const GAIA::CH* pszUrl = url.ToString(&sUrlLength);
-			if(!httphead.Empty())
+			if(!prachead.Empty())
 			{
-				GAIA::NUM sHeadLength = httphead.GetStringLength();
+				GAIA::NUM sHeadLength = prachead.GetStringLength();
 				GAIA::CTN::ACharsString strTemp;
-				strTemp.resize(sUrlLength + sHeadLength);
+				strTemp.resize(sUrlLength + sHeadLength + 1);
 				GAIA::ALGO::gmemcpy(strTemp.fptr(), pszUrl, sUrlLength);
 				GAIA::NUM sHeadResultSize;
 				GAIA::BL bHeadResult;
-				httphead.ToString(strTemp.fptr() + sUrlLength, sHeadLength, &sHeadResultSize, &bHeadResult);
+				prachead.ToString(strTemp.fptr() + sUrlLength, sHeadLength + 1, &sHeadResultSize, &bHeadResult);
 				GAST(sHeadResultSize == sHeadLength);
 				GAST(bHeadResult);
+				strTemp.resize(strTemp.size() - 1);
 				return this->ReleaseCache(strTemp.fptr(), strTemp.size());
 			}
 			else
 				return this->ReleaseCache(pszUrl, sUrlLength);
 		}
 
-		GAIA::BL HttpServer::UpdateCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sUrlAndHeadLen, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime)
+		GAIA::BL HttpServer::UpdateCache(const GAIA::CH* pszKey, GAIA::NUM sKeyLen, const GAIA::NETWORK::HttpHead& resphead, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime)
 		{
-			GPCHR_NULLSTR_RET(pszUrlAndHead, GAIA::False);
-			if(sUrlAndHeadLen == GINVALID)
-				sUrlAndHeadLen = GAIA::ALGO::gstrlen(pszUrlAndHead);
+			GPCHR_NULLSTR_RET(pszKey, GAIA::False);
+			if(sKeyLen == GINVALID)
+				sKeyLen = GAIA::ALGO::gstrlen(pszKey);
 			GAIA::SYNC::AutolockW al(m_rwCache);
 			CacheNode n;
-			n.strUrlAndHead.proxy(pszUrlAndHead, sUrlAndHeadLen, 0);
+			n.strKey.proxy(pszKey, sKeyLen, 0);
 			CacheNode* pFinded = m_cache.find(n);
-			n.strUrlAndHead.proxy(GNIL, 0, 0);
+			n.strKey.proxy(GNIL, 0, 0);
 			if(pFinded == GNIL)
 			{
-				n.strUrlAndHead.assign(pszUrlAndHead, sUrlAndHeadLen);
-				n.buf = gnew GAIA::CTN::Buffer;
-				n.buf->assign(p, sSize);
+				n.strKey.assign(pszKey, sKeyLen);
+				n.resphead = resphead;
+				if(p != GNIL)
+				{
+					GAST(sSize > 0);
+					n.buf = gnew GAIA::CTN::Buffer;
+					n.buf->assign(p, sSize);
+				}
+				else
+				{
+					GAST(sSize == 0);
+					n.buf = GNIL;
+				}
 				n.uRegistTime = GAIA::TIME::gmt_time();
 				n.uEffectTime = uEffectTime;
 				n.nRefCount = 0;
@@ -1129,32 +1167,35 @@ namespace GAIA
 			{
 				pFinded->uRegistTime = GAIA::TIME::gmt_time();
 				pFinded->uEffectTime = uEffectTime;
+				pFinded->resphead = resphead;
 				pFinded->buf->assign(p, sSize);
 			}
 			return GAIA::True;
 		}
 
-		GAIA::BL HttpServer::UpdateCache(const GAIA::NETWORK::HttpURL& url, GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime)
+		GAIA::BL HttpServer::UpdateCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& reqhead, const GAIA::NETWORK::HttpHead& resphead, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime)
 		{
 			GAST(!url.Empty());
-			httphead.Optimize();
+			GAIA::NETWORK::HttpHead prachead = reqhead;
+			prachead.Optimize();
 			GAIA::NUM sUrlLength;
 			const GAIA::CH* pszUrl = url.ToString(&sUrlLength);
-			if(!httphead.Empty())
+			if(!prachead.Empty())
 			{
-				GAIA::NUM sHeadLength = httphead.GetStringLength();
+				GAIA::NUM sHeadLength = prachead.GetStringLength();
 				GAIA::CTN::ACharsString strTemp;
-				strTemp.resize(sUrlLength + sHeadLength);
+				strTemp.resize(sUrlLength + sHeadLength + 1);
 				GAIA::ALGO::gmemcpy(strTemp.fptr(), pszUrl, sUrlLength);
 				GAIA::NUM sHeadResultSize;
 				GAIA::BL bHeadResult;
-				httphead.ToString(strTemp.fptr() + sUrlLength, sHeadLength, &sHeadResultSize, &bHeadResult);
+				prachead.ToString(strTemp.fptr() + sUrlLength, sHeadLength + 1, &sHeadResultSize, &bHeadResult);
 				GAST(sHeadResultSize == sHeadLength);
 				GAST(bHeadResult);
-				return this->UpdateCache(strTemp.fptr(), strTemp.size(), p, sSize, uEffectTime);
+				strTemp.resize(strTemp.size() - 1);
+				return this->UpdateCache(strTemp.fptr(), strTemp.size(), resphead, p, sSize, uEffectTime);
 			}
 			else
-				return this->UpdateCache(pszUrl, sUrlLength, p, sSize, uEffectTime);
+				return this->UpdateCache(pszUrl, sUrlLength, resphead, p, sSize, uEffectTime);
 		}
 
 		GAIA::BL HttpServer::RecycleCache()
@@ -1166,9 +1207,10 @@ namespace GAIA
 			for(GAIA::CTN::Set<CacheNode>::it it = m_cache.frontit(); !it.empty(); )
 			{
 				CacheNode& cn = *it;
-				if(cn.nRefCount == 0 && cn.uRegistTime + cn.uEffectTime < uCurrentTime)
+				if(cn.nRefCount == 0 && cn.uEffectTime != GINVALID && cn.uRegistTime + cn.uEffectTime < uCurrentTime)
 				{
-					gdel cn.buf;
+					if(cn.buf != GNIL)
+						gdel cn.buf;
 					it.erase();
 				}
 				else
