@@ -549,18 +549,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL Response(GAIA::NETWORK::HTTP_CODE httpcode, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p = GNIL, GAIA::NUM sSize = 0, const GAIA::U64& uCacheTime = GINVALID);
-
-			/*!
-				@brief
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GAIA::BL Response(GAIA::NETWORK::HTTP_CODE httpcode);
+			GAIA::BL Response(GAIA::NETWORK::HTTP_CODE httpcode, GAIA::NETWORK::HttpHead* pHttpHead = GNIL, const GAIA::GVOID* p = GNIL, GAIA::NUM sSize = 0);
 
 			/*!
 				@brief
@@ -1060,11 +1049,84 @@ namespace GAIA
 			*/
 			GINL const GAIA::NETWORK::HttpServerStatus& GetStatus() const{return m_status;}
 
-		private:
-			GAIA::BL RequestCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sHeadLen, GAIA::GVOID** p, GAIA::NUM& sSize);
-			GAIA::BL ReleaseCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sHeadLen);
-			GAIA::BL UpdateCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sHeadLen, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime = GINVALID);
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GAIA::BL RequestCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sUrlAndHeadLen, GAIA::GVOID** p, GAIA::NUM& sSize);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GAIA::BL RequestCache(const GAIA::NETWORK::HttpURL& url, GAIA::NETWORK::HttpHead& httphead, GAIA::GVOID** p, GAIA::NUM& sSize);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GAIA::BL ReleaseCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sUrlAndHeadLen);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GAIA::BL ReleaseCache(const GAIA::NETWORK::HttpURL& url, GAIA::NETWORK::HttpHead& httphead);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GAIA::BL UpdateCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sUrlAndHeadLen, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime = GINVALID);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GAIA::BL UpdateCache(const GAIA::NETWORK::HttpURL& url, GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime = GINVALID);
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::BL RecycleCache();
+
+		private:
 			GAIA::BL RecycleLink(GAIA::NETWORK::HttpServerLink& l);
 
 			GAIA::CTN::Buffer* RequestBuffer();

@@ -18,7 +18,9 @@ namespace TEST
 		virtual GAIA::BL OnRequest(GAIA::NETWORK::HttpServerLink& l, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize)
 		{
 			GAIA::NETWORK::HttpHead head;
-			l.Response(GAIA::NETWORK::HTTP_CODE_NOTFOUND, head, GAIA::NETWORK::HTTP_CODE_DESCRIPTION[GAIA::NETWORK::HTTP_CODE_NOTFOUND], GAIA::NETWORK::HTTP_CODE_DESCRIPTION_LENGTH[GAIA::NETWORK::HTTP_CODE_NOTFOUND]);
+			l.Response(GAIA::NETWORK::HTTP_CODE_NOTFOUND, GNIL,
+					   GAIA::NETWORK::HTTP_CODE_DESCRIPTION[GAIA::NETWORK::HTTP_CODE_NOTFOUND],
+					GAIA::NETWORK::HTTP_CODE_DESCRIPTION_LENGTH[GAIA::NETWORK::HTTP_CODE_NOTFOUND]);
 			l.Close();
 			return GAIA::True;
 		}
@@ -29,6 +31,7 @@ namespace TEST
 	extern GAIA::GVOID t_network_httpserver(GAIA::LOG::Log& logobj)
 	{
 		GAIA::NETWORK::HttpServerDesc descServer;
+		descServer.pszRootPath = "../testres/HTTPSERVER/";
 		descServer.reset();
 
 		GAIA::NETWORK::HttpServer svr;

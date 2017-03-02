@@ -523,6 +523,8 @@ namespace GAIA
 
 		/*!
 			@brief Http url management class.
+
+			@remarks This class support URL format like this : "protocol://hostname[:port]/path/[;parameters][?query]#fragment".
 		*/
 		class HttpURL : public GAIA::Base
 		{
@@ -717,6 +719,17 @@ namespace GAIA
 				if(!GCCAST(HttpURL*)(this)->analyze())
 					return GNIL;
 				return this->get_analyzed_node(m_fragment, psz, sMaxSize, pResultSize);
+			}
+
+			GINL GAIA::BL IsPure() const
+			{
+				if(m_fullparam.psz != GNIL)
+					return GAIA::False;
+				if(m_fullquery.psz != GNIL)
+					return GAIA::False;
+				if(m_fragment.psz != GNIL)
+					return GAIA::False;
+				return GAIA::True;
 			}
 
 			/*!
@@ -1423,7 +1436,7 @@ namespace GAIA
 			GINL const GAIA::CH* Get(const GAIA::CH* pszName) const
 			{
 				GAST(!GAIA::ALGO::gstremp(pszName));
-				GCCAST(HttpHead*)(this)->sortnodes();
+				GCCAST(HttpHead*)(this)->Optimize();
 				Node finder;
 				finder.pszName = pszName;
 				GAIA::NUM sFinded = m_nodes.binary_search(finder);
@@ -1582,6 +1595,23 @@ namespace GAIA
 
 				@remarks
 			*/
+			GINL GAIA::GVOID Optimize()
+			{
+				if(m_bSorted)
+					return;
+				m_nodes.sort();
+				m_bSorted = GAIA::True;
+			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL HttpHead& operator = (const HttpHead& src)
 			{
 				this->Reset();
@@ -1638,14 +1668,19 @@ namespace GAIA
 			*/
 			GINL GAIA::N32 compare(const HttpHead& src) const
 			{
-				GCCAST(HttpHead*)(this)->sortnodes();
-				GCCAST(HttpHead*)(&src)->sortnodes();
-				if(m_nodes.size() < src.m_nodes.size())
-					return -1;
-				else if(m_nodes.size() > src.m_nodes.size())
-					return +1;
-				for(GAIA::NUM x = 0; x < m_nodes.size(); ++x)
+				GCCAST(HttpHead*)(this)->Optimize();
+				GCCAST(HttpHead*)(&src)->Optimize();
+				for(GAIA::NUM x = 0; ; ++x)
 				{
+					if(x == m_nodes.size())
+					{
+						if(x == src.m_nodes.size())
+							break;
+						else
+							return -1;
+					}
+					else if(x == src.m_nodes.size())
+						return +1;
 					const Node& n1 = m_nodes[x];
 					const Node& n2 = src.m_nodes[x];
 					GAIA::N32 nCmp = n1.compare(n2);
@@ -1670,13 +1705,6 @@ namespace GAIA
 
 		private:
 			GINL GAIA::GVOID init(){m_sStringLen = 0; m_bSorted = GAIA::False;}
-			GINL GAIA::GVOID sortnodes()
-			{
-				if(m_bSorted)
-					return;
-				m_nodes.sort();
-				m_bSorted = GAIA::True;
-			}
 			GINL GAIA::GVOID increase_string_len(const Node& n)
 			{
 				m_sStringLen += GAIA::ALGO::gstrlen(n.pszName);
