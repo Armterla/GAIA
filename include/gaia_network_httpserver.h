@@ -651,7 +651,16 @@ namespace GAIA
 
 				@remarks
 			*/
-			virtual GAIA::BL OnRequest(GAIA::NETWORK::HttpServerLink& l, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize){return GAIA::False;}
+			virtual GAIA::BL OnRequest(
+					GAIA::NETWORK::HttpServerLink& l,
+					GAIA::NETWORK::HTTP_METHOD method,
+					const GAIA::NETWORK::HttpURL& url,
+					const GAIA::NETWORK::HttpHead& httphead,
+					const GAIA::GVOID* p,
+					GAIA::NUM sSize)
+			{
+				return GAIA::False;
+			}
 
 		private:
 			GINL GAIA::GVOID init()
@@ -664,6 +673,22 @@ namespace GAIA
 		private:
 			GAIA::NETWORK::HttpServer* m_pSvr;
 			GAIA::NETWORK::HttpServerStatus m_status;
+		};
+
+		class HttpServerCallBack_StaticFile : public GAIA::NETWORK::HttpServerCallBack
+		{
+		public:
+			HttpServerCallBack_StaticFile(GAIA::NETWORK::HttpServer& svr);
+			virtual ~HttpServerCallBack_StaticFile();
+
+		protected:
+			virtual GAIA::BL OnRequest(
+					GAIA::NETWORK::HttpServerLink& l,
+					GAIA::NETWORK::HTTP_METHOD method,
+					const GAIA::NETWORK::HttpURL& url,
+					const GAIA::NETWORK::HttpHead& httphead,
+					const GAIA::GVOID* p,
+					GAIA::NUM sSize);
 		};
 
 		class HttpServerWorkThread;

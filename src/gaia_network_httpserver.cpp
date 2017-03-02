@@ -1,6 +1,8 @@
 #include <gaia_type.h>
 #include <gaia_assert.h>
 #include <gaia_sync_base.h>
+#include <gaia_fsys_file.h>
+#include <gaia_fsys_dir.h>
 #include <gaia_network_httpserver.h>
 
 #include <gaia_assert_impl.h>
@@ -380,12 +382,15 @@ namespace GAIA
 			// Write head.
 			if(pHttpHead != GNIL && !pHttpHead->Empty())
 			{
-				pBuf->resize_keep(pBuf->write_size() + pHttpHead->GetStringLength());
+				GAIA::NUM sFirstLineSize = pBuf->write_size();
+				pBuf->resize_keep(sFirstLineSize + pHttpHead->GetStringLength() + 1);
 				GAIA::NUM sResultSize;
 				GAIA::BL bSuccess;
-				pHttpHead->ToString((GAIA::CH*)pBuf->fptr(), pHttpHead->GetStringLength(), &sResultSize, &bSuccess);
+				pHttpHead->ToString((GAIA::CH*)pBuf->fptr() + sFirstLineSize, pHttpHead->GetStringLength() + 1, &sResultSize, &bSuccess);
 				GAST(sResultSize == pHttpHead->GetStringLength());
 				GAST(bSuccess);
+				pBuf->resize_keep(pBuf->write_size() - 1);
+				GAST(pBuf->write_size() == sFirstLineSize + pHttpHead->GetStringLength());
 			}
 			pBuf->write("\n", 1);
 
@@ -414,10 +419,140 @@ namespace GAIA
 		HttpServerCallBack::HttpServerCallBack(GAIA::NETWORK::HttpServer& svr)
 		{
 			this->init();
+			m_pSvr = &svr;
 		}
 
 		HttpServerCallBack::~HttpServerCallBack()
 		{
+		}
+
+		HttpServerCallBack_StaticFile::HttpServerCallBack_StaticFile(GAIA::NETWORK::HttpServer& svr)
+			: HttpServerCallBack(svr)
+		{
+		}
+
+		HttpServerCallBack_StaticFile::~HttpServerCallBack_StaticFile()
+		{
+		}
+
+		BL HttpServerCallBack_StaticFile::OnRequest(HttpServerLink& l, HTTP_METHOD method, const HttpURL& url, const HttpHead& httphead, const GVOID* p, NUM sSize)
+		{
+			if(!url.IsPure())
+				return GAIA::False;
+
+			if(method != GAIA::NETWORK::HTTP_METHOD_GET &&
+			   method != GAIA::NETWORK::HTTP_METHOD_HEAD)
+				return GAIA::False;
+
+			GAIA::NETWORK::HttpHead resphead;
+			GAIA::CTN::AChars strResp;
+
+			// Calculate file url.
+			const GAIA::CH* pszURL = url.ToString();
+			GAIA::CTN::TCharsString strFileURL = this->GetServer().GetDesc().pszRootPath;
+			if(GAIA::ALGO::gstrcmpnil(pszURL, "/") == 0)
+				strFileURL += "index.html";
+			else
+				strFileURL += pszURL;
+
+			// Check file exist.
+			GAIA::FSYS::Dir dir;
+			if(!dir.ExistFile(strFileURL))
+			{
+				strResp = "GAIA HTTP SERVER CODE : ";
+				strResp += GAIA::NETWORK::HTTP_CODE_STRING[GAIA::NETWORK::HTTP_CODE_NOTFOUND];
+				strResp += " ";
+				strResp += GAIA::NETWORK::HTTP_CODE_DESCRIPTION[GAIA::NETWORK::HTTP_CODE_NOTFOUND];
+				strResp += " ";
+				strResp += "[Not Exist This File]";
+
+				GAIA::CH szContentLen[32];
+				GAIA::ALGO::castv(strResp.size(), szContentLen, sizeof(szContentLen));
+				resphead.Set(GAIA::NETWORK::HTTP_HEADNAME_CONTENTLENGTH, szContentLen);
+				resphead.Set(GAIA::NETWORK::HTTP_HEADNAME_CONTENTTYPE, "text/plain; charset=UTF-8");
+
+				l.Response(GAIA::NETWORK::HTTP_CODE_NOTFOUND, &resphead, strResp.fptr(), strResp.size());
+				l.Close();
+			}
+			else if(method == GAIA::NETWORK::HTTP_METHOD_GET)
+			{
+				GAIA::FSYS::File f;
+				if(f.Open(strFileURL, GAIA::FSYS::File::OPEN_TYPE_READ))
+				{
+					GAIA::N64 nFileSize = f.Size();
+					if(nFileSize < 1024 * 128)
+					{
+						GAIA::CTN::Buffer buf;
+						buf.resize(nFileSize);
+						if(f.Read(buf.fptr(), buf.write_size()) == nFileSize)
+						{
+							GAIA::CH szContentLen[32];
+							GAIA::ALGO::castv(nFileSize, szContentLen, sizeof(szContentLen));
+							resphead.Set(GAIA::NETWORK::HTTP_HEADNAME_CONTENTLENGTH, szContentLen);
+							resphead.Set(GAIA::NETWORK::HTTP_HEADNAME_CONTENTTYPE, "text/html; charset=UTF-8");
+
+							l.Response(GAIA::NETWORK::HTTP_CODE_OK, &resphead, buf.fptr(), buf.write_size());
+							l.Close();
+
+							GAIA::NETWORK::HttpHead emptyhead;
+							this->GetServer().UpdateCache(url, emptyhead, buf.fptr(), buf.write_size());
+						}
+						else
+						{
+							strResp = "GAIA HTTP SERVER CODE : ";
+							strResp += GAIA::NETWORK::HTTP_CODE_STRING[GAIA::NETWORK::HTTP_CODE_SERVICEUNAVAILABLE];
+							strResp += " ";
+							strResp += GAIA::NETWORK::HTTP_CODE_DESCRIPTION[GAIA::NETWORK::HTTP_CODE_SERVICEUNAVAILABLE];
+							strResp += " ";
+							strResp += "[Read file failed]";
+
+							GAIA::CH szContentLen[32];
+							GAIA::ALGO::castv(strResp.size(), szContentLen, sizeof(szContentLen));
+							resphead.Set(GAIA::NETWORK::HTTP_HEADNAME_CONTENTLENGTH, szContentLen);
+							resphead.Set(GAIA::NETWORK::HTTP_HEADNAME_CONTENTTYPE, "text/plain; charset=UTF-8");
+
+							l.Response(GAIA::NETWORK::HTTP_CODE_NOTFOUND, &resphead, strResp.fptr(), strResp.size());
+							l.Close();
+						}
+					}
+					else
+					{
+						strResp = "GAIA HTTP SERVER CODE : ";
+						strResp += GAIA::NETWORK::HTTP_CODE_STRING[GAIA::NETWORK::HTTP_CODE_REQUESTENTITYTOOLARGE];
+						strResp += " ";
+						strResp += GAIA::NETWORK::HTTP_CODE_DESCRIPTION[GAIA::NETWORK::HTTP_CODE_REQUESTENTITYTOOLARGE];
+						strResp += " ";
+						strResp += "[File too large]";
+
+						GAIA::CH szContentLen[32];
+						GAIA::ALGO::castv(strResp.size(), szContentLen, sizeof(szContentLen));
+						resphead.Set(GAIA::NETWORK::HTTP_HEADNAME_CONTENTLENGTH, szContentLen);
+						resphead.Set(GAIA::NETWORK::HTTP_HEADNAME_CONTENTTYPE, "text/plain; charset=UTF-8");
+
+						l.Response(GAIA::NETWORK::HTTP_CODE_NOTFOUND, &resphead, strResp.fptr(), strResp.size());
+						l.Close();
+					}
+				}
+				else
+				{
+					strResp = "GAIA HTTP SERVER CODE : ";
+					strResp += GAIA::NETWORK::HTTP_CODE_STRING[GAIA::NETWORK::HTTP_CODE_NOTFOUND];
+					strResp += " ";
+					strResp += GAIA::NETWORK::HTTP_CODE_DESCRIPTION[GAIA::NETWORK::HTTP_CODE_NOTFOUND];
+					strResp += " ";
+					strResp += "[Open file failed]";
+
+					GAIA::CH szContentLen[32];
+					GAIA::ALGO::castv(strResp.size(), szContentLen, sizeof(szContentLen));
+					resphead.Set(GAIA::NETWORK::HTTP_HEADNAME_CONTENTLENGTH, szContentLen);
+					resphead.Set(GAIA::NETWORK::HTTP_HEADNAME_CONTENTTYPE, "text/plain; charset=UTF-8");
+
+					l.Response(GAIA::NETWORK::HTTP_CODE_NOTFOUND, &resphead, strResp.fptr(), strResp.size());
+					l.Close();
+				}
+			}
+
+			return GAIA::True;
 		}
 
 		HttpServer::HttpServer()
@@ -686,11 +821,18 @@ namespace GAIA
 					// Callback.
 					{
 						GAIA::SYNC::AutolockR al(m_rwCBS);
+						GAIA::BL bResponsed = GAIA::False;
 						for(GAIA::NUM x = 0; x < m_cbs.size(); ++x)
 						{
 							GAIA::NETWORK::HttpServerCallBack* cb = m_cbs[x];
 							if(cb->OnRequest(*pLink, pSock->m_method, pSock->m_url, pSock->m_head, pData, sDataSize))
+							{
+								bResponsed = GAIA::True;
 								break;
+							}
+						}
+						if(!bResponsed)
+						{
 						}
 					}
 
@@ -885,6 +1027,11 @@ namespace GAIA
 				m_rwCache.LeaveRead();
 				return GAIA::False;
 			}
+			if(pFinded->uRegistTime + pFinded->uEffectTime < GAIA::TIME::gmt_time())
+			{
+				m_rwCache.LeaveRead();
+				return GAIA::False;
+			}
 			pFinded->nRefCount++;
 			*p = (GAIA::GVOID*)pFinded->buf->fptr();
 			sSize = pFinded->buf->write_size();
@@ -897,15 +1044,21 @@ namespace GAIA
 			httphead.Optimize();
 			GAIA::NUM sUrlLength;
 			const GAIA::CH* pszUrl = url.ToString(&sUrlLength);
-			GAIA::NUM sHeadLength = httphead.GetStringLength();
-			GAIA::CTN::ACharsString strTemp;
-			strTemp.resize(sUrlLength + sHeadLength);
-			GAIA::ALGO::gmemcpy(strTemp.fptr(), pszUrl, sUrlLength);
-			GAIA::NUM sHeadResultSize;
-			GAIA::BL bHeadResult;
-			httphead.ToString(strTemp.fptr() + sUrlLength, sHeadLength, &sHeadResultSize, &bHeadResult);
-			GAST(bHeadResult);
-			return this->RequestCache(strTemp.fptr(), strTemp.size(), p, sSize);
+			if(!httphead.Empty())
+			{
+				GAIA::NUM sHeadLength = httphead.GetStringLength();
+				GAIA::CTN::ACharsString strTemp;
+				strTemp.resize(sUrlLength + sHeadLength);
+				GAIA::ALGO::gmemcpy(strTemp.fptr(), pszUrl, sUrlLength);
+				GAIA::NUM sHeadResultSize;
+				GAIA::BL bHeadResult;
+				httphead.ToString(strTemp.fptr() + sUrlLength, sHeadLength, &sHeadResultSize, &bHeadResult);
+				GAST(sHeadResultSize == sHeadLength);
+				GAST(bHeadResult);
+				return this->RequestCache(strTemp.fptr(), strTemp.size(), p, sSize);
+			}
+			else
+				return this->RequestCache(pszUrl, sUrlLength, p, sSize);
 		}
 
 		GAIA::BL HttpServer::ReleaseCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sUrlAndHeadLen)
@@ -921,7 +1074,10 @@ namespace GAIA
 				return GAIA::False;
 			pFinded->nRefCount--;
 			if(pFinded->nRefCount == 0)
+			{
+				gdel pFinded->buf;
 				m_cache.erase(*pFinded);
+			}
 			m_rwCache.LeaveRead();
 			return GAIA::True;
 		}
@@ -932,15 +1088,21 @@ namespace GAIA
 			httphead.Optimize();
 			GAIA::NUM sUrlLength;
 			const GAIA::CH* pszUrl = url.ToString(&sUrlLength);
-			GAIA::NUM sHeadLength = httphead.GetStringLength();
-			GAIA::CTN::ACharsString strTemp;
-			strTemp.resize(sUrlLength + sHeadLength);
-			GAIA::ALGO::gmemcpy(strTemp.fptr(), pszUrl, sUrlLength);
-			GAIA::NUM sHeadResultSize;
-			GAIA::BL bHeadResult;
-			httphead.ToString(strTemp.fptr() + sUrlLength, sHeadLength, &sHeadResultSize, &bHeadResult);
-			GAST(bHeadResult);
-			return this->ReleaseCache(strTemp.fptr(), strTemp.size());
+			if(!httphead.Empty())
+			{
+				GAIA::NUM sHeadLength = httphead.GetStringLength();
+				GAIA::CTN::ACharsString strTemp;
+				strTemp.resize(sUrlLength + sHeadLength);
+				GAIA::ALGO::gmemcpy(strTemp.fptr(), pszUrl, sUrlLength);
+				GAIA::NUM sHeadResultSize;
+				GAIA::BL bHeadResult;
+				httphead.ToString(strTemp.fptr() + sUrlLength, sHeadLength, &sHeadResultSize, &bHeadResult);
+				GAST(sHeadResultSize == sHeadLength);
+				GAST(bHeadResult);
+				return this->ReleaseCache(strTemp.fptr(), strTemp.size());
+			}
+			else
+				return this->ReleaseCache(pszUrl, sUrlLength);
 		}
 
 		GAIA::BL HttpServer::UpdateCache(const GAIA::CH* pszUrlAndHead, GAIA::NUM sUrlAndHeadLen, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime)
@@ -956,13 +1118,19 @@ namespace GAIA
 			if(pFinded == GNIL)
 			{
 				n.strUrlAndHead.assign(pszUrlAndHead, sUrlAndHeadLen);
+				n.buf = gnew GAIA::CTN::Buffer;
 				n.buf->assign(p, sSize);
 				n.uRegistTime = GAIA::TIME::gmt_time();
 				n.uEffectTime = uEffectTime;
 				n.nRefCount = 0;
+				m_cache.insert(n);
 			}
 			else
+			{
+				pFinded->uRegistTime = GAIA::TIME::gmt_time();
+				pFinded->uEffectTime = uEffectTime;
 				pFinded->buf->assign(p, sSize);
+			}
 			return GAIA::True;
 		}
 
@@ -972,15 +1140,21 @@ namespace GAIA
 			httphead.Optimize();
 			GAIA::NUM sUrlLength;
 			const GAIA::CH* pszUrl = url.ToString(&sUrlLength);
-			GAIA::NUM sHeadLength = httphead.GetStringLength();
-			GAIA::CTN::ACharsString strTemp;
-			strTemp.resize(sUrlLength + sHeadLength);
-			GAIA::ALGO::gmemcpy(strTemp.fptr(), pszUrl, sUrlLength);
-			GAIA::NUM sHeadResultSize;
-			GAIA::BL bHeadResult;
-			httphead.ToString(strTemp.fptr() + sUrlLength, sHeadLength, &sHeadResultSize, &bHeadResult);
-			GAST(bHeadResult);
-			return this->UpdateCache(strTemp.fptr(), strTemp.size(), p, sSize, uEffectTime);
+			if(!httphead.Empty())
+			{
+				GAIA::NUM sHeadLength = httphead.GetStringLength();
+				GAIA::CTN::ACharsString strTemp;
+				strTemp.resize(sUrlLength + sHeadLength);
+				GAIA::ALGO::gmemcpy(strTemp.fptr(), pszUrl, sUrlLength);
+				GAIA::NUM sHeadResultSize;
+				GAIA::BL bHeadResult;
+				httphead.ToString(strTemp.fptr() + sUrlLength, sHeadLength, &sHeadResultSize, &bHeadResult);
+				GAST(sHeadResultSize == sHeadLength);
+				GAST(bHeadResult);
+				return this->UpdateCache(strTemp.fptr(), strTemp.size(), p, sSize, uEffectTime);
+			}
+			else
+				return this->UpdateCache(pszUrl, sUrlLength, p, sSize, uEffectTime);
 		}
 
 		GAIA::BL HttpServer::RecycleCache()
