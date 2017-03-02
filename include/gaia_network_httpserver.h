@@ -24,19 +24,41 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		/*!
+			@brief Current supported HTTP protocal version.
+		*/
 		static const GAIA::CH* HTTP_VERSION_STRING = "HTTP/1.1";
 
 		/*!
-			@brief
+			@brief HttpServer's access mode.
+
+				If you set HttpServer use BLACK mode, all requests in BLACK list will be deny.
+				If you set HttpServer use WHITE mode, all requests not in WHITE list will be deny.
+				If you set HttpServer use NONE mode, all requests will be accepted.
 		*/
 		GAIA_ENUM_BEGIN(HTTP_SERVER_BLACKWHITE_MODE)
-			HTTP_SERVER_BLACKWHITE_MODE_BLACK, // Default value.
+			/*!
+				@brief Specify the BLACK mode, it is the default mode.
+			*/
+			HTTP_SERVER_BLACKWHITE_MODE_BLACK,
+			/*!
+				@brief Specify the WHITE mode.
+			*/
 			HTTP_SERVER_BLACKWHITE_MODE_WHITE,
+			/*!
+				@brief Specify the NONE mode.
+			*/
 			HTTP_SERVER_BLACKWHITE_MODE_NONE,
 		GAIA_ENUM_END(HTTP_SERVER_BLACKWHITE_MODE)
 
 		/*!
-			@brief
+			@brief HttpServer create description.
+
+			@see HttpServer::Create
+
+			@remarks This class didn't have default constructor,
+				so allocate a object of current class,
+				all member variables are not initialized.
 		*/
 		class HttpServerDesc : public GAIA::Base
 		{
@@ -55,13 +77,7 @@ namespace GAIA
 		public:
 
 			/*!
-				@brief
-
-				@param
-
-				@return
-
-				@remarks
+				@brief Reset current structure to default value.
 			*/
 			GINL GAIA::GVOID reset()
 			{
@@ -82,13 +98,11 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Check current desc is valid or not.
 
-				@param
+					If not valid, you can't use it for HttpServer::Create's parameter.
 
-				@return
-
-				@remarks
+				@return If valid, return GAIA::True, or return GAIA::False.
 			*/
 			GINL GAIA::BL check() const
 			{
@@ -118,22 +132,27 @@ namespace GAIA
 		public:
 
 			/*!
-				@brief
+				@brief Specify network thread count.
+
+					Default value is DEFAULT_NETWORK_THREAD_COUNT.
+					You can call HttpServerDesc::reset function to reset to default value.
+
+				@see DEFAULT_NETWORK_THREAD_COUNT.
 			*/
 			GAIA::NUM sNetworkThreadCount;
 
 			/*!
-				@brief
+				@brief Specify work thread count.
 			*/
 			GAIA::NUM sWorkThreadCount;
 
 			/*!
-				@brief
+				@brief Specify HttpServer's root path.
 			*/
 			const GAIA::CH* pszRootPath;
 
 			/*!
-				@brief
+				@brief Specify HttpServer's max connection count at same time.
 			*/
 			GAIA::NUM sMaxConnCount;
 
@@ -214,49 +233,34 @@ namespace GAIA
 				uRequestCount = 0;
 				uResponseCount = 0;
 
-				uRequestPutCount = 0;
-				uRequestPostCount = 0;
-				uRequestGetCount = 0;
-				uRequestHeadCount = 0;
-				uRequestDeleteCount = 0;
-				uRequestOptionsCount = 0;
-				uRequestTraceCount = 0;
-				uRequestConnectCount = 0;
-
-				uResponsePutCount = 0;
-				uResponsePostCount = 0;
-				uResponseGetCount = 0;
-				uResponseHeadCount = 0;
-				uResponseDeleteCount = 0;
-				uResponseOptionsCount = 0;
-				uResponseTraceCount = 0;
-				uResponseConnectCount = 0;
+				uRequestPieceCount = 0;
+				uResponsePieceCount = 0;
 
 				uRequestSize = 0;
 				uResponseSize = 0;
 
-				uRequestPutSize = 0;
-				uRequestPostSize = 0;
-				uRequestGetSize = 0;
-				uRequestHeadSize = 0;
-				uRequestDeleteSize = 0;
-				uRequestOptionsSize = 0;
-				uRequestTraceSize = 0;
-				uRequestConnectSize = 0;
+				GAST(sizeofarray(uRequestCountByMethod) == sizeofarray(uResponseCountByMethod));
+				GAST(sizeofarray(uRequestCountByMethod) == sizeofarray(uRequestPieceCountByMethod));
+				GAST(sizeofarray(uRequestCountByMethod) == sizeofarray(uResponsePieceCountByMethod));
+				GAST(sizeofarray(uRequestCountByMethod) == sizeofarray(uRequestSizeByMethod));
+				GAST(sizeofarray(uRequestCountByMethod) == sizeofarray(uResponseSizeByMethod));
+				for(GAIA::NUM x = 0; x < sizeofarray(uRequestCountByMethod); ++x)
+				{
+					uRequestCountByMethod[x] = 0;
+					uResponseCountByMethod[x] = 0;
+					uRequestPieceCountByMethod[x] = 0;
+					uResponsePieceCountByMethod[x] = 0;
+					uRequestSizeByMethod[x] = 0;
+					uResponseSizeByMethod[x] = 0;
+				}
 
-				uResponsePutSize = 0;
-				uResponsePostSize = 0;
-				uResponseGetSize = 0;
-				uResponseHeadSize = 0;
-				uResponseDeleteSize = 0;
-				uResponseOptionsSize = 0;
-				uResponseTraceSize = 0;
-				uResponseConnectSize = 0;
+				for(GAIA::NUM x = 0; x < sizeofarray(uResponseCountByCode); ++x)
+					uResponseCountByCode[x] = 0;
 
-				for(GAIA::NUM x = 0; x < sizeofarray(uSuccessCountByCode); ++x)
-					uSuccessCountByCode[x] = 0;
-				for(GAIA::NUM x = 0; x < sizeofarray(uFailedCountByCode); ++x)
-					uFailedCountByCode[x] = 0;
+				uHitResponseCacheCount = 0;
+				uHitResponseCacheSize = 0;
+				uNotHitResponseCacheCount = 0;
+				uNotResponseCount = 0;
 			}
 
 		public:
@@ -294,82 +298,12 @@ namespace GAIA
 			/*!
 				@brief
 			*/
-			GAIA::U64 uRequestPutCount;
+			GAIA::U64 uRequestPieceCount;
 
 			/*!
 				@brief
 			*/
-			GAIA::U64 uRequestPostCount;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uRequestGetCount;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uRequestHeadCount;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uRequestDeleteCount;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uRequestOptionsCount;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uRequestTraceCount;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uRequestConnectCount;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uResponsePutCount;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uResponsePostCount;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uResponseGetCount;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uResponseHeadCount;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uResponseDeleteCount;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uResponseOptionsCount;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uResponseTraceCount;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uResponseConnectCount;
+			GAIA::U64 uResponsePieceCount;
 
 			/*!
 				@brief
@@ -384,92 +318,57 @@ namespace GAIA
 			/*!
 				@brief
 			*/
-			GAIA::U64 uRequestPutSize;
+			GAIA::U64 uRequestCountByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
 
 			/*!
 				@brief
 			*/
-			GAIA::U64 uRequestPostSize;
+			GAIA::U64 uResponseCountByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
 
 			/*!
 				@brief
 			*/
-			GAIA::U64 uRequestGetSize;
+			GAIA::U64 uRequestPieceCountByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
 
 			/*!
 				@brief
 			*/
-			GAIA::U64 uRequestHeadSize;
+			GAIA::U64 uResponsePieceCountByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
 
 			/*!
 				@brief
 			*/
-			GAIA::U64 uRequestDeleteSize;
+			GAIA::U64 uRequestSizeByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
 
 			/*!
 				@brief
 			*/
-			GAIA::U64 uRequestOptionsSize;
+			GAIA::U64 uResponseSizeByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
 
 			/*!
 				@brief
 			*/
-			GAIA::U64 uRequestTraceSize;
+			GAIA::U64 uResponseCountByCode[GAIA::NETWORK::HTTP_CODE_MAXENUMCOUNT];
 
 			/*!
 				@brief
 			*/
-			GAIA::U64 uRequestConnectSize;
+			GAIA::U64 uHitResponseCacheCount;
 
 			/*!
 				@brief
 			*/
-			GAIA::U64 uResponsePutSize;
+			GAIA::U64 uHitResponseCacheSize;
 
 			/*!
 				@brief
 			*/
-			GAIA::U64 uResponsePostSize;
+			GAIA::U64 uNotHitResponseCacheCount;
 
 			/*!
 				@brief
 			*/
-			GAIA::U64 uResponseGetSize;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uResponseHeadSize;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uResponseDeleteSize;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uResponseOptionsSize;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uResponseTraceSize;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uResponseConnectSize;
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uSuccessCountByCode[GAIA::NETWORK::HTTP_CODE_MAXENUMCOUNT];
-
-			/*!
-				@brief
-			*/
-			GAIA::U64 uFailedCountByCode[GAIA::NETWORK::HTTP_CODE_MAXENUMCOUNT];
+			GAIA::U64 uNotResponseCount;
 		};
 
 		class HttpAsyncSocket;
@@ -571,6 +470,28 @@ namespace GAIA
 
 				@remarks
 			*/
+			GINL GAIA::NUM GetRequestTimes() const{return m_sRequestTimes;}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL GAIA::NUM GetResponseTimes() const{return m_sResponseTimes;}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::N32 compare(const HttpServerLink& src) const
 			{
 				GAST(m_addrPeer.check());
@@ -587,10 +508,14 @@ namespace GAIA
 				m_addrPeer.reset();
 				m_addrListen.reset();
 				m_uAcceptTime = GINVALID;
+				m_sRequestTimes = 0;
+				m_sResponseTimes = 0;
 			}
 			GINL GAIA::GVOID SetPeerAddr(const GAIA::NETWORK::Addr& addrPeer){m_addrPeer = addrPeer;}
 			GINL GAIA::GVOID SetListenAddr(const GAIA::NETWORK::Addr& addrListen){m_addrListen = addrListen;}
 			GINL GAIA::GVOID SetAcceptTime(GAIA::U64 uTime){m_uAcceptTime = uTime;}
+			GINL GAIA::GVOID SetRequestTimes(GAIA::NUM sRequestTimes){m_sRequestTimes = sRequestTimes;}
+			GINL GAIA::GVOID SetResponseTimes(GAIA::NUM sResponseTimes){m_sResponseTimes = sResponseTimes;}
 
 		private:
 			GAIA::NETWORK::HttpServer* m_pSvr;
@@ -598,6 +523,8 @@ namespace GAIA
 			GAIA::NETWORK::Addr m_addrPeer;
 			GAIA::NETWORK::Addr m_addrListen;
 			GAIA::U64 m_uAcceptTime;
+			GAIA::NUM m_sRequestTimes;
+			GAIA::NUM m_sResponseTimes;
 		};
 
 		class HttpServerCallBack : public GAIA::RefObject

@@ -569,6 +569,17 @@ namespace GAIA
 
 				@remarks
 			*/
+			GINL GAIA::BL Size() const{return m_url.size();}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GINL GAIA::GVOID Reset(){m_url.clear(); this->clear_analyzed();}
 
 			/*!

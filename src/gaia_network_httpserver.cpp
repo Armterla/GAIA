@@ -395,7 +395,8 @@ namespace GAIA
 			pBuf->write("\n", 1);
 
 			// Send.
-			m_pSock->Send(pBuf->fptr(), pBuf->write_size());
+			GAIA::NUM sSendedHeadSize = pBuf->write_size();
+			m_pSock->Send(pBuf->fptr(), sSendedHeadSize);
 			m_pSvr->ReleaseBuffer(pBuf);
 
 			// Write body.
@@ -406,6 +407,21 @@ namespace GAIA
 			}
 			else
 				GAST(sSize == 0);
+
+			// Statistics.
+			GAIA::NETWORK::HttpServerStatus& s = m_pSvr->GetStatus();
+			if(m_sResponseTimes++ == 0)
+			{
+				s.uResponseCount++;
+				s.uResponseSize += sSendedHeadSize;
+				s.uResponseCountByMethod[m_pSock->m_method]++;
+				s.uResponseSizeByMethod[m_pSock->m_method] += sSendedHeadSize;
+			}
+			s.uResponsePieceCount++;
+			s.uResponseSize += sSize;
+			s.uResponsePieceCountByMethod[m_pSock->m_method]++;
+			s.uResponseSizeByMethod[m_pSock->m_method] += sSize;
+			s.uResponseCountByCode[httpcode]++;
 
 			return GAIA::True;
 		}
@@ -832,7 +848,12 @@ namespace GAIA
 								pLink->Close();
 								this->ReleaseCache(pSock->m_url, pSock->m_head);
 								bResponsedByCache = GAIA::True;
+
+								m_status.uHitResponseCacheCount++;
+								m_status.uHitResponseCacheSize += resphead.GetStringLength() + sCacheSize;
 							}
+							else
+								m_status.uNotHitResponseCacheCount++;
 						}
 					}
 
@@ -846,12 +867,26 @@ namespace GAIA
 							GAIA::NETWORK::HttpServerCallBack* cb = m_cbs[x];
 							if(cb->OnRequest(*pLink, pSock->m_method, pSock->m_url, pSock->m_head, pData, sDataSize))
 							{
+								if(pLink->GetRequestTimes() == 0)
+								{
+									m_status.uRequestCount++;
+									m_status.uRequestSize += pSock->m_url.Size();
+									m_status.uRequestSize += pSock->m_head.GetStringLength();
+									m_status.uRequestCountByMethod[pSock->m_method]++;
+									m_status.uRequestSizeByMethod[pSock->m_method] += pSock->m_url.Size();
+									m_status.uRequestSizeByMethod[pSock->m_method] += pSock->m_head.GetStringLength();
+								}
+								m_status.uRequestPieceCount++;
+								m_status.uRequestSize += sDataSize;
+								m_status.uRequestPieceCountByMethod[pSock->m_method]++;
+								pLink->SetRequestTimes(pLink->GetRequestTimes() + 1);
 								bResponsed = GAIA::True;
 								break;
 							}
 						}
 						if(!bResponsed)
 						{
+							m_status.uNotResponseCount++;
 						}
 					}
 
