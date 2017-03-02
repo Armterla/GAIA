@@ -451,7 +451,7 @@ namespace GAIA
 		{
 		}
 
-		BL HttpServerCallBack_StaticFile::OnRequest(HttpServerLink& l, HTTP_METHOD method, const HttpURL& url, const HttpHead& httphead, const GVOID* p, NUM sSize)
+		BL HttpServerCallBack_StaticFile::OnRequest(GAIA::NETWORK::HttpServerLink& l, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& httphead, const GAIA::GVOID* p, GAIA::NUM sSize)
 		{
 			if(!url.IsPure())
 				return GAIA::False;
@@ -659,7 +659,7 @@ namespace GAIA
 				}
 				strResp += "\n";
 
-				strResp += "\tResponseSize = "; strResp += s.uResponseSize; strResp += "\n\n";
+				strResp += "\tResponseSize = "; strResp += s.uResponseSize; strResp += "\n";
 				for(GAIA::NUM x = 1; x < sizeofarray(s.uResponseSizeByMethod); ++x)
 				{
 					strResp += "\t\t";

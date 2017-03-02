@@ -601,6 +601,9 @@ namespace GAIA
 			GAIA::NETWORK::HttpServerStatus m_status;
 		};
 
+		/*!
+			@brief
+		*/
 		class HttpServerCallBack_StaticFile : public GAIA::NETWORK::HttpServerCallBack
 		{
 		public:
@@ -617,6 +620,9 @@ namespace GAIA
 					GAIA::NUM sSize);
 		};
 
+		/*!
+			@brief
+		*/
 		class HttpServerCallBack_Status : public GAIA::NETWORK::HttpServerCallBack
 		{
 		public:
