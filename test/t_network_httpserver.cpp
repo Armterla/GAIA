@@ -75,8 +75,25 @@ namespace TEST
 			{
 				TAST(svr.IsBegin());
 
-				GAIA::NETWORK::Addr addrService1 = "127.0.0.1:9800";
-				GAIA::NETWORK::Addr addrService2 = "127.0.0.1:9801";
+				GAIA::NETWORK::Addr addrLocal;
+				GAIA::CH szHostName[128];
+				GAIA::NETWORK::GetHostName(szHostName, sizeof(szHostName));
+				GAIA::CTN::Vector<GAIA::NETWORK::IP> listHostIP;
+				GAIA::NETWORK::GetHostIPList(szHostName, listHostIP);
+
+				GAIA::NETWORK::Addr addrService1, addrService2;
+				if(listHostIP.empty())
+				{
+					addrService1 = "127.0.0.1:9800";
+					addrService2 = "127.0.0.1:9801";
+				}
+				else
+				{
+					addrService2.ip = addrService1.ip = listHostIP[0];
+					addrService1.uPort = 9800;
+					addrService2.uPort = 9801;
+				}
+
 				TAST(svr.OpenAddr(addrService1));
 				TAST(svr.OpenAddr(addrService2));
 				TAST(!svr.OpenAddr(addrService1));
