@@ -251,6 +251,79 @@ namespace GAIA
 			*pDst = '\0';
 			return GAIA::True;
 		}
+		template<typename _DataType> _DataType* deltatime2string(GAIA::U64 uTime, _DataType* pszDst, GAIA::NUM sMaxResultLen = GINVALID, GAIA::BL* pResult = GNIL)
+		{
+			// Convert format like ddd_hh-mm-ss_ms_us.
+
+			GAST(pszDst != GNIL);
+			GAST(sMaxResultLen == GINVALID || sMaxResultLen > 0);
+
+			GAIA::U64 us = uTime % 1000;
+			uTime -= us;
+			uTime /= 1000;
+
+			GAIA::U64 ms = uTime % 1000;
+			uTime -= ms;
+			uTime /= 1000;
+
+			GAIA::U64 s = uTime % 60;
+			uTime -= s;
+			uTime /= 60;
+
+			GAIA::U64 m = uTime % 60;
+			uTime -= m;
+			uTime /= 60;
+
+			GAIA::U64 h = uTime % 24;
+			uTime -= h;
+			uTime /= 24;
+
+			GAIA::U64 d = uTime;
+
+			GAIA::CH szTemp[64];
+			_DataType* p = szTemp;
+
+			GAIA::ALGO::castv(d, p, szTemp + sizeof(szTemp) - p);
+			p += GAIA::ALGO::gstrlen(p);
+			*p++ = '_';
+
+			GAIA::ALGO::castv(h, p, szTemp + sizeof(szTemp) - p);
+			p += GAIA::ALGO::gstrlen(p);
+			*p++ = ':';
+
+			GAIA::ALGO::castv(m, p, szTemp + sizeof(szTemp) - p);
+			p += GAIA::ALGO::gstrlen(p);
+			*p++ = ':';
+
+			GAIA::ALGO::castv(s, p, szTemp + sizeof(szTemp) - p);
+			p += GAIA::ALGO::gstrlen(p);
+			*p++ = '_';
+
+			GAIA::ALGO::castv(ms, p, szTemp + sizeof(szTemp) - p);
+			p += GAIA::ALGO::gstrlen(p);
+			*p++ = '_';
+
+			GAIA::ALGO::castv(us, p, szTemp + sizeof(szTemp) - p);
+			p += GAIA::ALGO::gstrlen(p);
+
+			if(pResult != GNIL)
+				*pResult = GAIA::True;
+			if(sMaxResultLen != GINVALID)
+			{
+				if(p - szTemp >= sMaxResultLen)
+				{
+					if(pResult != GNIL)
+						*pResult = GAIA::False;
+					if(sMaxResultLen > 1)
+						GAIA::ALGO::gstrcpy(pszDst, szTemp, sMaxResultLen - 1);
+				}
+				GAIA::ALGO::gstrcpy(pszDst, szTemp);
+			}
+			else
+				GAIA::ALGO::gstrcpy(pszDst, szTemp);
+
+			return pszDst;
+		}
 		class Time : public GAIA::Base
 		{
 		public:

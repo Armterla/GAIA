@@ -1,4 +1,4 @@
-﻿#ifndef	 __GAIA_NETWORK_HTTPSERVER_H__
+#ifndef	 __GAIA_NETWORK_HTTPSERVER_H__
 #define	 __GAIA_NETWORK_HTTPSERVER_H__
 
 #include "gaia_type.h"
@@ -105,6 +105,13 @@ namespace GAIA
 				uMaxResponseCountPerMinute = DEFAULT_MAX_RESPONSE_COUNT_PER_MINUTE;
 				GAIA::ALGO::gstrcpy(szHttpVer, GAIA::NETWORK::HTTP_VERSION_STRING);
 				sHttpVerLen = GAIA::ALGO::gstrlen(szHttpVer);
+				bEnableSocketTCPNoDelay = GAIA::True;
+				bEnableSocketNoBlock = GAIA::False;
+				bEnableSocketReuseAddr = GAIA::True;
+				nListenSocketSendBufferSize = GINVALID;
+				nListenSocketRecvBufferSize = GINVALID;
+				nAcceptedSocketSendBufferSize = GINVALID;
+				nAcceptedSocketRecvBufferSize = GINVALID;
 			}
 
 			/*!
@@ -135,6 +142,14 @@ namespace GAIA
 				if(sHttpVerLen <= 0)
 					return GAIA::False;
 				if(GAIA::ALGO::gstrlen(szHttpVer) != sHttpVerLen)
+					return GAIA::False;
+				if(nListenSocketSendBufferSize != GINVALID && nListenSocketSendBufferSize <= 0)
+					return GAIA::False;
+				if(nListenSocketRecvBufferSize != GINVALID && nListenSocketRecvBufferSize <= 0)
+					return GAIA::False;
+				if(nAcceptedSocketSendBufferSize != GINVALID && nAcceptedSocketSendBufferSize <= 0)
+					return GAIA::False;
+				if(nAcceptedSocketRecvBufferSize != GINVALID && nAcceptedSocketRecvBufferSize <= 0)
 					return GAIA::False;
 				return GAIA::True;
 			}
@@ -229,10 +244,45 @@ namespace GAIA
 				@brief Specify the http version string's length, default value is strlen("HTTP/1.1").
 			*/
 			GAIA::NUM sHttpVerLen;
+
+			/*!
+				@brief Specify the socket use TCP NO-DELAY mode, default is GAIA::False.
+			*/
+			GAIA::BL bEnableSocketTCPNoDelay;
+
+			/*!
+				@brief Specify the socket use NO-BLOCK mode, default is GAIA::False.
+			*/
+			GAIA::BL bEnableSocketNoBlock;
+
+			/*!
+				@brief Specify the socket RE-USE-ADDRESS mode, default is GAIA::False.
+			*/
+			GAIA::BL bEnableSocketReuseAddr;
+
+			/*!
+				@brief Specify the listen socket's send buffer size in bytes, default is GINVALID means use system default setting.
+			*/
+			GAIA::N32 nListenSocketSendBufferSize;
+
+			/*!
+				@brief Specify the listen socket's receive buffer size in bytes, default is GINVALID means use system default setting.
+			*/
+			GAIA::N32 nListenSocketRecvBufferSize;
+
+			/*!
+				@brief Specify the accepted socket send buffer size in bytes, default is GINVALID means use system default setting.
+			*/
+			GAIA::N32 nAcceptedSocketSendBufferSize;
+
+			/*!
+				@brief Specify the accepted socket's receive buffer size in bytes, default is GINVALID means use system default setting.
+			*/
+			GAIA::N32 nAcceptedSocketRecvBufferSize;
 		};
 
 		/*!
-			@brief Http server's status.
+			@brief Http server's status description class.
 		*/
 		class HttpServerStatus : public GAIA::Base
 		{
@@ -245,6 +295,14 @@ namespace GAIA
 			*/
 			GINL GAIA::GVOID reset()
 			{
+				uServerStartupTime = 0;
+
+				uLinkLifeTime = 0;
+				uLinkLifeCount = 0;
+
+				uCallBackExecuteTime = 0;
+				uCallBackExecuteCount = 0;
+
 				uRequestAnalyzeFailedCount = 0;
 				uRequestDenyByBWCount = 0;
 				uRequestDenyByMaxConnCount = 0;
@@ -284,6 +342,33 @@ namespace GAIA
 			}
 
 		public:
+
+			/*!
+				@brief Specify the server startup GMT time in microseconds.
+
+					When you call HttpServer::Begin, this time will be filled.
+			*/
+			GAIA::U64 uServerStartupTime;
+
+			/*!
+				@brief Specify the link's life time.
+			*/
+			GAIA::U64 uLinkLifeTime;
+
+			/*!
+				@brief Specify the link's life dispatch count.
+			*/
+			GAIA::U64 uLinkLifeCount;
+
+			/*!
+				@brief Specify HttpServerCallBack's OnRequest be execute time in microseconds.
+			*/
+			GAIA::U64 uCallBackExecuteTime;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uCallBackExecuteCount;
 
 			/*!
 				@brief
@@ -389,6 +474,32 @@ namespace GAIA
 				@brief
 			*/
 			GAIA::U64 uNotResponseCount;
+		};
+
+		/*!
+			@brief
+		*/
+		class HttpServerBlackWhiteNode : public GAIA::Base
+		{
+		public:
+			GINL GAIA::N32 compare(const GAIA::NETWORK::HttpServerBlackWhiteNode& src) const{return ip.compare(src.ip);}
+			GCLASS_COMPARE_BYCOMPARE(HttpServerBlackWhiteNode)
+
+		public:
+			/*!
+				@brief
+			*/
+			GAIA::NETWORK::IP ip;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uRegistTime; // Real time in microseconds.
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uEffectTime; // Relative time in microseconds.
 		};
 
 		class HttpAsyncSocket;
@@ -567,17 +678,6 @@ namespace GAIA
 			*/
 			GINL GAIA::NETWORK::HttpServer& GetServer() const{return *m_pSvr;}
 
-			/*!
-				@brief
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL HttpServerStatus& GetStatus(){return m_status;}
-
 		public:
 			/*!
 				@brief
@@ -616,12 +716,10 @@ namespace GAIA
 			GINL GAIA::GVOID init()
 			{
 				m_pSvr = GNIL;
-				m_status.reset();
 			}
 
 		private:
 			GAIA::NETWORK::HttpServer* m_pSvr;
-			GAIA::NETWORK::HttpServerStatus m_status;
 		};
 
 		/*!
@@ -1016,6 +1114,28 @@ namespace GAIA
 
 				@remarks
 			*/
+			GAIA::NUM GetBlackListSize() const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GAIA::BL CollectBlackList(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerBlackWhiteNode>& listResult) const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::GVOID AddWhiteList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uTime = GINVALID);
 
 			/*!
@@ -1050,6 +1170,28 @@ namespace GAIA
 				@remarks
 			*/
 			GAIA::BL IsInWhiteList(const GAIA::NETWORK::IP& ip) const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GAIA::NUM GetWhiteListSize() const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GAIA::BL CollectWhiteList(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerBlackWhiteNode>& listResult) const;
 
 			/*!
 				@brief
@@ -1169,17 +1311,6 @@ namespace GAIA
 			}
 
 		private:
-			class BWNode : public GAIA::Base // White and black node.
-			{
-			public:
-				GINL GAIA::N32 compare(const BWNode& src) const{return ip.compare(src.ip);}
-				GCLASS_COMPARE_BYCOMPARE(BWNode)
-
-			public:
-				GAIA::NETWORK::IP ip;
-				GAIA::U64 uRegistTime; // Real time in microseconds.
-				GAIA::U64 uEffectTime; // Relative time in microseconds.
-			};
 
 			class CacheNode : public GAIA::Base
 			{
@@ -1218,9 +1349,9 @@ namespace GAIA
 
 			GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE m_blackwhitemode;
 			GAIA::SYNC::LockRW m_rwBlackList;
-			GAIA::CTN::Set<BWNode> m_BlackList;
+			GAIA::CTN::Set<GAIA::NETWORK::HttpServerBlackWhiteNode> m_BlackList;
 			GAIA::SYNC::LockRW m_rwWhiteList;
-			GAIA::CTN::Set<BWNode> m_WhiteList;
+			GAIA::CTN::Set<GAIA::NETWORK::HttpServerBlackWhiteNode> m_WhiteList;
 
 			GAIA::SYNC::LockRW m_rwCache;
 			GAIA::CTN::Set<CacheNode> m_cache;

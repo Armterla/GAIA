@@ -49,6 +49,13 @@ namespace TEST
 		GAIA::NETWORK::HttpServerDesc descServer;
 		descServer.reset();
 		descServer.pszRootPath = "../testres/HTTPSERVER/";
+		descServer.bEnableSocketTCPNoDelay = GAIA::True;
+		descServer.bEnableSocketNoBlock = GAIA::True;
+		descServer.bEnableSocketReuseAddr = GAIA::True;
+		descServer.nListenSocketSendBufferSize = 1024 * 64;
+		descServer.nListenSocketRecvBufferSize = 1024 * 64;
+		descServer.nAcceptedSocketSendBufferSize = 1024 * 64;
+		descServer.nAcceptedSocketRecvBufferSize = 1024 * 64;
 
 		GAIA::NETWORK::HttpServer svr;
 		HttpServerCallBackForTest cb1(svr), cb2(svr), cb3(svr);
@@ -69,14 +76,46 @@ namespace TEST
 			TAST(!svr.RegistCallBack(cbi));
 			TAST(!svr.RegistCallBack(cbsf));
 
+			svr.AddBlackList("192.168.12.34", 1000 * 1000 * 3600);
+			svr.AddBlackList("192.168.12.43", 1000 * 1000 * 3600);
+			svr.AddWhiteList("192.168.21.34", 1000 * 1000 * 3600);
+			svr.AddWhiteList("192.168.21.43", 1000 * 1000 * 3600);
+
+			TAST(svr.IsInBlackList("192.168.12.34"));
+			TAST(svr.IsInBlackList("192.168.12.43"));
+			TAST(svr.IsInWhiteList("192.168.21.34"));
+			TAST(svr.IsInWhiteList("192.168.21.43"));
+
+			TAST(!svr.IsInWhiteList("192.168.21.34"));
+			TAST(!svr.IsInWhiteList("192.168.21.43"));
+			TAST(!svr.IsInBlackList("192.168.12.34"));
+			TAST(!svr.IsInBlackList("192.168.12.43"));
+
 			TAST(svr.IsCreated());
 			TAST(!svr.IsBegin());
 			TAST(svr.Begin());
 			{
 				TAST(svr.IsBegin());
 
-				GAIA::NETWORK::Addr addrService1 = "127.0.0.1:9800";
-				GAIA::NETWORK::Addr addrService2 = "127.0.0.1:9801";
+				GAIA::NETWORK::Addr addrLocal;
+				GAIA::CH szHostName[128];
+				GAIA::NETWORK::GetHostName(szHostName, sizeof(szHostName));
+				GAIA::CTN::Vector<GAIA::NETWORK::IP> listHostIP;
+				GAIA::NETWORK::GetHostIPList(szHostName, listHostIP);
+
+				GAIA::NETWORK::Addr addrService1, addrService2;
+				if(listHostIP.empty())
+				{
+					addrService1 = "127.0.0.1:9800";
+					addrService2 = "127.0.0.1:9801";
+				}
+				else
+				{
+					addrService2.ip = addrService1.ip = listHostIP[0];
+					addrService1.uPort = 9800;
+					addrService2.uPort = 9801;
+				}
+
 				TAST(svr.OpenAddr(addrService1));
 				TAST(svr.OpenAddr(addrService2));
 				TAST(!svr.OpenAddr(addrService1));
@@ -94,6 +133,14 @@ namespace TEST
 			}
 			TAST(svr.End());
 			TAST(svr.IsCreated());
+
+			svr.RemoveBlackList("192.168.12.34");
+			svr.RemoveBlackList("192.168.12.43");
+			svr.RemoveWhiteList("192.168.21.34");
+			svr.RemoveWhiteList("192.168.21.43");
+
+			svr.RemoveBlackListAll();
+			svr.RemoveWhiteListAll();
 
 			TAST(svr.UnregistCallBack(cb1));
 			TAST(svr.UnregistCallBack(cb2));
