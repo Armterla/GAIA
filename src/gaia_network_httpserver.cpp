@@ -629,12 +629,12 @@ namespace GAIA
 				strResp += "\tServerWorkTime = "; strResp += szWorkTime; strResp += "\n\n";
 
 				strResp += "\tLinkLifeCount = "; strResp += s.uLinkLifeCount; strResp += "\n";
-				strResp += "\tAvgLinkLifeTime = "; strResp += s.uLinkLifeTime / (s.uLinkLifeCount == 0 ? 1 : s.uLinkLifeCount); strResp += "(us)\n";
-				strResp += "\tTotalLinkLifeTime = "; strResp += s.uLinkLifeTime; strResp += "(us)\n\n";
+				strResp += "\tLinkLifeAvgTime = "; strResp += s.uLinkLifeTime / (s.uLinkLifeCount == 0 ? 1 : s.uLinkLifeCount); strResp += "(us)\n";
+				strResp += "\tLinkLifeTotalTime = "; strResp += s.uLinkLifeTime; strResp += "(us)\n\n";
 
 				strResp += "\tCallBackExecuteCount = "; strResp += s.uCallBackExecuteCount; strResp += "\n";
-				strResp += "\tCallBackExecuteTime = "; strResp += s.uCallBackExecuteTime; strResp += "(us)\n";
 				strResp += "\tCallBackExecuteAvgTime = "; strResp += s.uCallBackExecuteTime / (s.uCallBackExecuteCount == 0 ? 1 : s.uCallBackExecuteCount); strResp += "(us)\n";
+				strResp += "\tCallBackExecuteTotalTime = "; strResp += s.uCallBackExecuteTime; strResp += "(us)\n";
 
 				strResp += "\tRequestAnalyzeFailedCount = "; strResp += s.uRequestAnalyzeFailedCount; strResp += "\n";
 				strResp += "\tRequestDenyByBWCount = "; strResp += s.uRequestDenyByBWCount; strResp += "\n";
