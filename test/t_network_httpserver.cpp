@@ -49,6 +49,13 @@ namespace TEST
 		GAIA::NETWORK::HttpServerDesc descServer;
 		descServer.reset();
 		descServer.pszRootPath = "../testres/HTTPSERVER/";
+		descServer.bEnableSocketTCPNoDelay = GAIA::True;
+		descServer.bEnableSocketNoBlock = GAIA::True;
+		descServer.bEnableSocketReuseAddr = GAIA::True;
+		descServer.nListenSocketSendBufferSize = 1024 * 64;
+		descServer.nListenSocketRecvBufferSize = 1024 * 64;
+		descServer.nAcceptedSocketSendBufferSize = 1024 * 64;
+		descServer.nAcceptedSocketRecvBufferSize = 1024 * 64;
 
 		GAIA::NETWORK::HttpServer svr;
 		HttpServerCallBackForTest cb1(svr), cb2(svr), cb3(svr);

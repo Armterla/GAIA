@@ -48,8 +48,29 @@ namespace GAIA
 			virtual GAIA::GVOID Create()
 			{
 				GAIA::NETWORK::AsyncSocket::Create();
-				this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
-				this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEADDR, GAIA::True);
+
+				const GAIA::NETWORK::HttpServerDesc& descSvr = m_pSvr->GetDesc();
+				if(descSvr.bEnableSocketTCPNoDelay)
+					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY, GAIA::True);
+				if(descSvr.bEnableSocketNoBlock)
+					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
+				if(descSvr.bEnableSocketReuseAddr)
+					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEADDR, GAIA::True);
+
+				if(m_bListenSocket)
+				{
+					if(descSvr.nListenSocketSendBufferSize != GINVALID)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, descSvr.nListenSocketSendBufferSize);
+					if(descSvr.nListenSocketRecvBufferSize != GINVALID)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, descSvr.nListenSocketRecvBufferSize);
+				}
+				else
+				{
+					if(descSvr.nAcceptedSocketSendBufferSize != GINVALID)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, descSvr.nAcceptedSocketSendBufferSize);
+					if(descSvr.nAcceptedSocketRecvBufferSize != GINVALID)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, descSvr.nAcceptedSocketRecvBufferSize);
+				}
 			}
 
 			virtual GAIA::N32 Send(const GAIA::GVOID* p, GAIA::N32 nSize)
@@ -207,6 +228,7 @@ namespace GAIA
 			GINL GAIA::GVOID init()
 			{
 				m_pSvr = GNIL;
+				m_bListenSocket = GAIA::False;
 				m_pLink = GNIL;
 				m_pRecvBuf = GNIL;
 				m_pRecvBufSwap = GNIL;
@@ -216,6 +238,7 @@ namespace GAIA
 
 		private:
 			GAIA::NETWORK::HttpServer* m_pSvr;
+			GAIA::BL m_bListenSocket;
 			GAIA::NETWORK::HttpServerLink* m_pLink;
 			GAIA::SYNC::Lock m_lr;
 			GAIA::CTN::Buffer* m_pRecvBuf;
@@ -758,6 +781,13 @@ namespace GAIA
 				strResp += "\tMaxResponseCountPerMinute = "; strResp += descSvr.uMaxResponseCountPerMinute; strResp += "\n";
 				strResp += "\tEnableAutoResponseStaticResource = "; strResp += descSvr.bEnableAutoResponseStaticResource; strResp += "\n";
 				strResp += "\tHttpVersion = "; strResp += descSvr.sHttpVerLen; strResp += "\n";
+				strResp += "\tEnableSocketTCPNoDelay = "; strResp += descSvr.bEnableSocketTCPNoDelay; strResp += "\n";
+				strResp += "\tEnableSocketNoBlock = "; strResp += descSvr.bEnableSocketNoBlock; strResp += "\n";
+				strResp += "\tEnableSocketReuseAddr = "; strResp += descSvr.bEnableSocketReuseAddr; strResp += "\n";
+				strResp += "\tListenSocketSendBufferSize = "; strResp += descSvr.nListenSocketSendBufferSize; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, descSvr.nListenSocketSendBufferSize); strResp += "\n";
+				strResp += "\tListenSocketRecvBufferSize = "; strResp += descSvr.nListenSocketRecvBufferSize; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, descSvr.nListenSocketRecvBufferSize); strResp += "\n";
+				strResp += "\tAcceptedSocketSendBufferSize = "; strResp += descSvr.nAcceptedSocketSendBufferSize; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, descSvr.nAcceptedSocketSendBufferSize); strResp += "\n";
+				strResp += "\tAcceptedSocketRecvBufferSize = "; strResp += descSvr.nAcceptedSocketRecvBufferSize; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, descSvr.nAcceptedSocketRecvBufferSize); strResp += "\n";
 				strResp += "\n";
 
 				strResp += "[GAIA ASYNC NETWORK]\n\n";

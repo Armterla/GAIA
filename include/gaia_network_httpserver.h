@@ -106,6 +106,13 @@ namespace GAIA
 				bEnableAutoResponseStaticResource = GAIA::True;
 				GAIA::ALGO::gstrcpy(szHttpVer, GAIA::NETWORK::HTTP_VERSION_STRING);
 				sHttpVerLen = GAIA::ALGO::gstrlen(szHttpVer);
+				bEnableSocketTCPNoDelay = GAIA::True;
+				bEnableSocketNoBlock = GAIA::False;
+				bEnableSocketReuseAddr = GAIA::True;
+				nListenSocketSendBufferSize = GINVALID;
+				nListenSocketRecvBufferSize = GINVALID;
+				nAcceptedSocketSendBufferSize = GINVALID;
+				nAcceptedSocketRecvBufferSize = GINVALID;
 			}
 
 			/*!
@@ -136,6 +143,14 @@ namespace GAIA
 				if(sHttpVerLen <= 0)
 					return GAIA::False;
 				if(GAIA::ALGO::gstrlen(szHttpVer) != sHttpVerLen)
+					return GAIA::False;
+				if(nListenSocketSendBufferSize != GINVALID && nListenSocketSendBufferSize <= 0)
+					return GAIA::False;
+				if(nListenSocketRecvBufferSize != GINVALID && nListenSocketRecvBufferSize <= 0)
+					return GAIA::False;
+				if(nAcceptedSocketSendBufferSize != GINVALID && nAcceptedSocketSendBufferSize <= 0)
+					return GAIA::False;
+				if(nAcceptedSocketRecvBufferSize != GINVALID && nAcceptedSocketRecvBufferSize <= 0)
 					return GAIA::False;
 				return GAIA::True;
 			}
@@ -216,6 +231,41 @@ namespace GAIA
 				@brief
 			*/
 			GAIA::NUM sHttpVerLen;
+
+			/*!
+				@brief
+			*/
+			GAIA::BL bEnableSocketTCPNoDelay;
+
+			/*!
+				@brief
+			*/
+			GAIA::BL bEnableSocketNoBlock;
+
+			/*!
+				@brief
+			*/
+			GAIA::BL bEnableSocketReuseAddr;
+
+			/*!
+				@brief
+			*/
+			GAIA::N32 nListenSocketSendBufferSize;
+
+			/*!
+				@brief
+			*/
+			GAIA::N32 nListenSocketRecvBufferSize;
+
+			/*!
+				@brief
+			*/
+			GAIA::N32 nAcceptedSocketSendBufferSize;
+
+			/*!
+				@brief
+			*/
+			GAIA::N32 nAcceptedSocketRecvBufferSize;
 		};
 
 		/*!
