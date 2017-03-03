@@ -291,6 +291,9 @@ namespace GAIA
 				uLinkLifeTime = 0;
 				uLinkLifeCount = 0;
 
+				uCallBackExecuteTime = 0;
+				uCallBackExecuteCount = 0;
+
 				uRequestAnalyzeFailedCount = 0;
 				uRequestDenyByBWCount = 0;
 				uRequestDenyByMaxConnCount = 0;
@@ -345,6 +348,16 @@ namespace GAIA
 				@brief
 			*/
 			GAIA::U64 uLinkLifeCount;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uCallBackExecuteTime;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uCallBackExecuteCount;
 
 			/*!
 				@brief

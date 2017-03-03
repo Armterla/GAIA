@@ -632,6 +632,10 @@ namespace GAIA
 				strResp += "\tAvgLinkLifeTime = "; strResp += s.uLinkLifeTime / (s.uLinkLifeCount == 0 ? 1 : s.uLinkLifeCount); strResp += "(us)\n";
 				strResp += "\tTotalLinkLifeTime = "; strResp += s.uLinkLifeTime; strResp += "(us)\n\n";
 
+				strResp += "\tCallBackExecuteCount = "; strResp += s.uCallBackExecuteCount; strResp += "\n";
+				strResp += "\tCallBackExecuteTime = "; strResp += s.uCallBackExecuteTime; strResp += "(us)\n";
+				strResp += "\tCallBackExecuteAvgTime = "; strResp += s.uCallBackExecuteTime / (s.uCallBackExecuteCount == 0 ? 1 : s.uCallBackExecuteCount); strResp += "(us)\n";
+
 				strResp += "\tRequestAnalyzeFailedCount = "; strResp += s.uRequestAnalyzeFailedCount; strResp += "\n";
 				strResp += "\tRequestDenyByBWCount = "; strResp += s.uRequestDenyByBWCount; strResp += "\n";
 				strResp += "\tRequestDenyByMaxConnCount = "; strResp += s.uRequestDenyByMaxConnCount; strResp += "\n";
@@ -1155,8 +1159,12 @@ namespace GAIA
 						for(GAIA::NUM x = 0; x < m_cbs.size(); ++x)
 						{
 							GAIA::NETWORK::HttpServerCallBack* cb = m_cbs[x];
+							GAIA::U64 uCurrentTime = GAIA::TIME::tick_time();
 							if(cb->OnRequest(*pLink, pSock->m_method, pSock->m_url, pSock->m_head, pData, sDataSize))
 							{
+								GAIA::U64 uAfterOnRequestTime = GAIA::TIME::tick_time();
+								m_status.uCallBackExecuteCount++;
+								m_status.uCallBackExecuteTime += uAfterOnRequestTime - uCurrentTime;
 								if(pLink->GetRequestTimes() == 0)
 								{
 									m_status.uRequestCount++;
@@ -1172,6 +1180,12 @@ namespace GAIA
 								pLink->SetRequestTimes(pLink->GetRequestTimes() + 1);
 								bResponsed = GAIA::True;
 								break;
+							}
+							else
+							{
+								GAIA::U64 uAfterOnRequestTime = GAIA::TIME::tick_time();
+								m_status.uCallBackExecuteCount++;
+								m_status.uCallBackExecuteTime += uAfterOnRequestTime - uCurrentTime;
 							}
 						}
 						if(!bResponsed)
