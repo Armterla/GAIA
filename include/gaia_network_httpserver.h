@@ -238,6 +238,9 @@ namespace GAIA
 			{
 				uServerStartupTime = 0;
 
+				uLinkLifeTime = 0;
+				uLinkLifeCount = 0;
+
 				uRequestAnalyzeFailedCount = 0;
 				uRequestDenyByBWCount = 0;
 				uRequestDenyByMaxConnCount = 0;
@@ -282,6 +285,16 @@ namespace GAIA
 				@brief
 			*/
 			GAIA::U64 uServerStartupTime;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uLinkLifeTime;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uLinkLifeCount;
 
 			/*!
 				@brief

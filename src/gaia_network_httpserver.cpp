@@ -1,6 +1,9 @@
 #include <gaia_type.h>
 #include <gaia_assert.h>
 #include <gaia_sync_base.h>
+#ifdef GAIA_DEBUG_MEMORYLEAK
+#	include <gaia_msys_leakdetector.h>
+#endif
 #include <gaia_fsys_file.h>
 #include <gaia_fsys_dir.h>
 #include <gaia_network_httpserver.h>
@@ -590,17 +593,21 @@ namespace GAIA
 
 			GAIA::CH szPath[32];
 			url.GetPath(szPath, sizeof(szPath));
-			if(GAIA::ALGO::gstrcmp(szPath, "/httpinfo") != 0)
-				return GAIA::False;
+			GAIA::CH szStorage[64];
 
-			const GAIA::NETWORK::HttpServerStatus& s = this->GetServer().GetStatus();
+			if(GAIA::ALGO::gstrequal(szPath, "/httpinfo"))
 			{
 				strResp += "[GAIA HTTP SERVER STATUS]\n\n";
+				const GAIA::NETWORK::HttpServerStatus& s = this->GetServer().GetStatus();
 
 				GAIA::U64 uWorkTime = GAIA::TIME::gmt_time() - this->GetServer().GetStatus().uServerStartupTime;
 				GAIA::CH szWorkTime[64];
 				GAIA::TIME::deltatime2string(uWorkTime, szWorkTime);
-				strResp += "\tServerWorkTime = "; strResp += szWorkTime; strResp += "\n";
+				strResp += "\tServerWorkTime = "; strResp += szWorkTime; strResp += "\n\n";
+
+				strResp += "\tLinkLifeCount = "; strResp += s.uLinkLifeCount; strResp += "\n";
+				strResp += "\tAvgLinkLifeTime = "; strResp += s.uLinkLifeTime / (s.uLinkLifeCount == 0 ? 1 : s.uLinkLifeCount); strResp += "(us)\n";
+				strResp += "\tTotalLinkLifeTime = "; strResp += s.uLinkLifeTime; strResp += "(us)\n\n";
 
 				strResp += "\tRequestAnalyzeFailedCount = "; strResp += s.uRequestAnalyzeFailedCount; strResp += "\n";
 				strResp += "\tRequestDenyByBWCount = "; strResp += s.uRequestDenyByBWCount; strResp += "\n";
@@ -652,7 +659,9 @@ namespace GAIA
 				strResp += "\n";
 
 				strResp += "\tRequestSize = "; strResp += s.uRequestSize;
+				strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, s.uRequestSize);
 				strResp += ", Avg = "; strResp += s.uRequestSize / (s.uRequestCount == 0 ? 1 : s.uRequestCount);
+				strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, s.uRequestSize / (s.uRequestCount == 0 ? 1 : s.uRequestCount));
 				strResp += "\n";
 				for(GAIA::NUM x = 1; x < sizeofarray(s.uRequestSizeByMethod); ++x)
 				{
@@ -660,14 +669,18 @@ namespace GAIA
 					strResp += GAIA::NETWORK::HTTP_METHOD_STRING[x];
 					strResp += " = ";
 					strResp += s.uRequestSizeByMethod[x];
+					strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, s.uRequestSizeByMethod[x]);
 					strResp += ", Avg = ";
 					strResp += s.uRequestSizeByMethod[x] / (s.uRequestCountByMethod[x] == 0 ? 1 : s.uRequestCountByMethod[x]);
+					strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, s.uRequestSizeByMethod[x] / (s.uRequestCountByMethod[x] == 0 ? 1 : s.uRequestCountByMethod[x]));
 					strResp += "\n";
 				}
 				strResp += "\n";
 
 				strResp += "\tResponseSize = "; strResp += s.uResponseSize;
+				strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, s.uResponseSize);
 				strResp += ", Avg = "; strResp += s.uResponseSize / (s.uResponseCount == 0 ? 1 : s.uResponseCount);
+				strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, s.uResponseSize / (s.uResponseCount == 0 ? 1 : s.uResponseCount));
 				strResp += "\n";
 				for(GAIA::NUM x = 1; x < sizeofarray(s.uResponseSizeByMethod); ++x)
 				{
@@ -675,8 +688,10 @@ namespace GAIA
 					strResp += GAIA::NETWORK::HTTP_METHOD_STRING[x];
 					strResp += " = ";
 					strResp += s.uResponseSizeByMethod[x];
+					strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, s.uResponseSizeByMethod[x]);
 					strResp += ", Avg = ";
 					strResp += s.uResponseSizeByMethod[x] / (s.uResponseCountByMethod[x] == 0 ? 1 : s.uResponseCountByMethod[x]);
+					strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, s.uResponseSizeByMethod[x] / (s.uResponseCountByMethod[x] == 0 ? 1 : s.uResponseCountByMethod[x]));
 					strResp += "\n";
 				}
 				strResp += "\n";
@@ -736,9 +751,9 @@ namespace GAIA
 				strResp += "\tMaxConnCount = "; strResp += descSvr.sMaxConnCount; strResp += "\n";
 				strResp += "\tMaxConnTime = "; strResp += descSvr.uMaxConnTime; strResp += "\n";
 				strResp += "\tMaxHalfConnTime = "; strResp += descSvr.uMaxHarfConnTime; strResp += "\n";
-				strResp += "\tMaxDynamicCacheSize = "; strResp += descSvr.uMaxDynamicCacheSize; strResp += "\n";
+				strResp += "\tMaxDynamicCacheSize = "; strResp += descSvr.uMaxDynamicCacheSize; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, descSvr.uMaxDynamicCacheSize); strResp += "\n";
 				strResp += "\tMaxDynamicCacheCount = "; strResp += descSvr.uMaxDynamicCacheCount; strResp += "\n";
-				strResp += "\tMaxStaticCacheSize = "; strResp += descSvr.uMaxStaticCacheSize; strResp += "\n";
+				strResp += "\tMaxStaticCacheSize = "; strResp += descSvr.uMaxStaticCacheSize; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, descSvr.uMaxStaticCacheSize); strResp += "\n";
 				strResp += "\tMaxStaticCacheCount = "; strResp += descSvr.uMaxStaticCacheCount; strResp += "\n";
 				strResp += "\tMaxResponseCountPerMinute = "; strResp += descSvr.uMaxResponseCountPerMinute; strResp += "\n";
 				strResp += "\tEnableAutoResponseStaticResource = "; strResp += descSvr.bEnableAutoResponseStaticResource; strResp += "\n";
@@ -758,7 +773,33 @@ namespace GAIA
 				strResp += "\tGAIA Compile Time = "; strResp += GAIA_VERSION_COMPILEDATE; strResp += " "; strResp += GAIA_VERSION_COMPILETIME; strResp += "\n";
 				strResp += "\tGAIA Last Modify Time = "; strResp += GAIA_VERSION_LASTMODIFYTIME; strResp += "\n";
 				strResp += "\n";
+
+				strResp += "[MEMORY INFO]\n\n";
+			#ifdef GAIA_DEBUG_MEMORYLEAK
+				const GAIA::MSYS::LeakDetector::Status& memstatus = g_gaia_leakdetector.globalstatus();
+				strResp += "\tAllocSize = "; strResp += memstatus.nAllocSizeSum; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, memstatus.nAllocSizeSum); strResp += "\n";
+				strResp += "\tAllocCount = "; strResp += memstatus.nAllocTimesSum; strResp += "\n";
+				strResp += "\tReleaseSize = "; strResp += memstatus.nReleaseSizeSum; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, memstatus.nReleaseSizeSum); strResp += "\n";
+				strResp += "\tReleaseCount = "; strResp += memstatus.nReleaseTimesSum; strResp += "\n";
+				strResp += "\tMinAllocSize = "; strResp += memstatus.nMinAllocSize; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, memstatus.nMinAllocSize); strResp += "\n";
+				strResp += "\tMaxAllocSize = "; strResp += memstatus.nMaxAllocSize; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, memstatus.nMaxAllocSize); strResp += "\n";
+				strResp += "\tNotReleaseSize = "; strResp += memstatus.nAllocSizeSum - memstatus.nReleaseSizeSum; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, memstatus.nAllocSizeSum - memstatus.nReleaseSizeSum); strResp += "\n";
+				strResp += "\tNotReleaseCount = "; strResp += memstatus.nAllocTimesSum - memstatus.nReleaseTimesSum; strResp += "\n";
+			#else
+				strResp += "GAIA_DEBUG_MEMORYLEAK is not define, so can't collect memory infomation.\n";
+			#endif
+				strResp += "\n";
 			}
+			else if(GAIA::ALGO::gstrequal(szPath, "/httpblacklist"))
+			{
+
+			}
+			else if(GAIA::ALGO::gstrequal(szPath, "/httpwhitelist"))
+			{
+
+			}
+			else
+				return GAIA::False;
 
 			GAIA::CH szContentLen[32];
 			GAIA::ALGO::castv(strResp.size(), szContentLen, sizeof(szContentLen));
@@ -1482,6 +1523,10 @@ namespace GAIA
 				if(!m_links_bypeeraddr.erase(GAIA::CTN::Ref<GAIA::NETWORK::HttpServerLink>(&l)))
 					return GAIA::False;
 			}
+
+			//
+			m_status.uLinkLifeCount++;
+			m_status.uLinkLifeTime += GAIA::TIME::gmt_time() - l.GetAcceptTime();
 
 			// Drop.
 			l.drop_ref();
