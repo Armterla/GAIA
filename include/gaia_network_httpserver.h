@@ -465,6 +465,32 @@ namespace GAIA
 			GAIA::U64 uNotResponseCount;
 		};
 
+		/*!
+			@brief
+		*/
+		class HttpServerBlackWhiteNode : public GAIA::Base
+		{
+		public:
+			GINL GAIA::N32 compare(const GAIA::NETWORK::HttpServerBlackWhiteNode& src) const{return ip.compare(src.ip);}
+			GCLASS_COMPARE_BYCOMPARE(HttpServerBlackWhiteNode)
+
+		public:
+			/*!
+				@brief
+			*/
+			GAIA::NETWORK::IP ip;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uRegistTime; // Real time in microseconds.
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uEffectTime; // Relative time in microseconds.
+		};
+
 		class HttpAsyncSocket;
 		class HttpAsyncDispatcher;
 
@@ -1086,6 +1112,28 @@ namespace GAIA
 
 				@remarks
 			*/
+			GAIA::NUM GetBlackListSize() const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GAIA::BL CollectBlackList(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerBlackWhiteNode>& listResult) const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
 			GAIA::GVOID AddWhiteList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uTime = GINVALID);
 
 			/*!
@@ -1120,6 +1168,28 @@ namespace GAIA
 				@remarks
 			*/
 			GAIA::BL IsInWhiteList(const GAIA::NETWORK::IP& ip) const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GAIA::NUM GetWhiteListSize() const;
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GAIA::BL CollectWhiteList(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerBlackWhiteNode>& listResult) const;
 
 			/*!
 				@brief
@@ -1239,17 +1309,6 @@ namespace GAIA
 			}
 
 		private:
-			class BWNode : public GAIA::Base // White and black node.
-			{
-			public:
-				GINL GAIA::N32 compare(const BWNode& src) const{return ip.compare(src.ip);}
-				GCLASS_COMPARE_BYCOMPARE(BWNode)
-
-			public:
-				GAIA::NETWORK::IP ip;
-				GAIA::U64 uRegistTime; // Real time in microseconds.
-				GAIA::U64 uEffectTime; // Relative time in microseconds.
-			};
 
 			class CacheNode : public GAIA::Base
 			{
@@ -1288,9 +1347,9 @@ namespace GAIA
 
 			GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE m_blackwhitemode;
 			GAIA::SYNC::LockRW m_rwBlackList;
-			GAIA::CTN::Set<BWNode> m_BlackList;
+			GAIA::CTN::Set<GAIA::NETWORK::HttpServerBlackWhiteNode> m_BlackList;
 			GAIA::SYNC::LockRW m_rwWhiteList;
-			GAIA::CTN::Set<BWNode> m_WhiteList;
+			GAIA::CTN::Set<GAIA::NETWORK::HttpServerBlackWhiteNode> m_WhiteList;
 
 			GAIA::SYNC::LockRW m_rwCache;
 			GAIA::CTN::Set<CacheNode> m_cache;

@@ -826,11 +826,41 @@ namespace GAIA
 			}
 			else if(GAIA::ALGO::gstrequal(szPath, "/httpblacklist"))
 			{
-
+				strResp += "[GAIA HTTP SERVER BLACK LIST]\n\n";
+				GAIA::CTN::Vector<GAIA::NETWORK::HttpServerBlackWhiteNode> listResult;
+				this->GetServer().CollectBlackList(listResult);
+				strResp += "\tBlack list count = "; strResp += listResult.size(); strResp += "\n";
+				for(GAIA::NUM x = 0; x < listResult.size(); ++x)
+				{
+					GAIA::NETWORK::HttpServerBlackWhiteNode& n = listResult[x];
+					GAIA::CH szIP[32];
+					n.ip.tostring(szIP);
+					strResp += "\t[";
+					strResp += x + 1;
+					strResp += "] IP = "; strResp += szIP;
+					strResp += ", RegistTime = "; strResp += n.uRegistTime;
+					strResp += ", EffectTime = "; strResp += n.uEffectTime;
+					strResp += "\n";
+				}
 			}
 			else if(GAIA::ALGO::gstrequal(szPath, "/httpwhitelist"))
 			{
-
+				strResp += "[GAIA HTTP SERVER WHITE LIST]\n\n";
+				GAIA::CTN::Vector<GAIA::NETWORK::HttpServerBlackWhiteNode> listResult;
+				this->GetServer().CollectWhiteList(listResult);
+				strResp += "\tWhite list count = "; strResp += listResult.size(); strResp += "\n";
+				for(GAIA::NUM x = 0; x < listResult.size(); ++x)
+				{
+					GAIA::NETWORK::HttpServerBlackWhiteNode& n = listResult[x];
+					GAIA::CH szIP[32];
+					n.ip.tostring(szIP);
+					strResp += "\t[";
+					strResp += x + 1;
+					strResp += "] IP = "; strResp += szIP;
+					strResp += ", RegistTime = "; strResp += n.uRegistTime;
+					strResp += ", EffectTime = "; strResp += n.uEffectTime;
+					strResp += "\n";
+				}
 			}
 			else
 				return GAIA::False;
@@ -1300,7 +1330,7 @@ namespace GAIA
 		{
 			GPCHR_FALSE(ip.check());
 			GAIA::SYNC::AutolockW al(m_rwBlackList);
-			BWNode n;
+			GAIA::NETWORK::HttpServerBlackWhiteNode n;
 			n.ip = ip;
 			n.uRegistTime = GAIA::TIME::gmt_time();
 			n.uEffectTime = uTime;
@@ -1311,7 +1341,7 @@ namespace GAIA
 		{
 			GPCHR_FALSE(ip.check());
 			GAIA::SYNC::AutolockW al(m_rwBlackList);
-			BWNode n;
+			GAIA::NETWORK::HttpServerBlackWhiteNode n;
 			n.ip = ip;
 			m_BlackList.erase(n);
 		}
@@ -1326,10 +1356,24 @@ namespace GAIA
 		{
 			GPCHR_FALSE_RET(ip.check(), GAIA::False);
 			GAIA::SYNC::AutolockR al(GCCAST(HttpServer*)(this)->m_rwBlackList);
-			BWNode n;
+			GAIA::NETWORK::HttpServerBlackWhiteNode n;
 			n.ip = ip;
 			if(m_BlackList.find(n) == GNIL)
 				return GAIA::False;
+			return GAIA::True;
+		}
+
+		GAIA::NUM HttpServer::GetBlackListSize() const
+		{
+			GAIA::SYNC::AutolockR al(GCCAST(HttpServer*)(this)->m_rwBlackList);
+			return m_BlackList.size();
+		}
+
+		GAIA::BL HttpServer::CollectBlackList(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerBlackWhiteNode>& listResult) const
+		{
+			GAIA::SYNC::AutolockR al(GCCAST(HttpServer*)(this)->m_rwBlackList);
+			for(GAIA::CTN::Set<GAIA::NETWORK::HttpServerBlackWhiteNode>::const_it it = m_WhiteList.const_frontit(); !it.empty(); ++it)
+				listResult.push_back(*it);
 			return GAIA::True;
 		}
 
@@ -1337,7 +1381,7 @@ namespace GAIA
 		{
 			GPCHR_FALSE(ip.check());
 			GAIA::SYNC::AutolockW al(m_rwWhiteList);
-			BWNode n;
+			GAIA::NETWORK::HttpServerBlackWhiteNode n;
 			n.ip = ip;
 			n.uRegistTime = GAIA::TIME::gmt_time();
 			n.uEffectTime = uTime;
@@ -1348,7 +1392,7 @@ namespace GAIA
 		{
 			GPCHR_FALSE(ip.check());
 			GAIA::SYNC::AutolockW al(m_rwWhiteList);
-			BWNode n;
+			GAIA::NETWORK::HttpServerBlackWhiteNode n;
 			n.ip = ip;
 			m_WhiteList.erase(n);
 		}
@@ -1363,10 +1407,24 @@ namespace GAIA
 		{
 			GPCHR_FALSE_RET(ip.check(), GAIA::False);
 			GAIA::SYNC::AutolockR al(GCCAST(HttpServer*)(this)->m_rwWhiteList);
-			BWNode n;
+			GAIA::NETWORK::HttpServerBlackWhiteNode n;
 			n.ip = ip;
 			if(m_WhiteList.find(n) == GNIL)
 				return GAIA::False;
+			return GAIA::True;
+		}
+
+		GAIA::NUM HttpServer::GetWhiteListSize() const
+		{
+			GAIA::SYNC::AutolockR al(GCCAST(HttpServer*)(this)->m_rwWhiteList);
+			return m_WhiteList.size();
+		}
+
+		GAIA::BL HttpServer::CollectWhiteList(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerBlackWhiteNode>& listResult) const
+		{
+			GAIA::SYNC::AutolockR al(GCCAST(HttpServer*)(this)->m_rwWhiteList);
+			for(GAIA::CTN::Set<GAIA::NETWORK::HttpServerBlackWhiteNode>::const_it it = m_BlackList.const_frontit(); !it.empty(); ++it)
+				listResult.push_back(*it);
 			return GAIA::True;
 		}
 

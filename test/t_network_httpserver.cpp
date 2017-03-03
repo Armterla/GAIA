@@ -76,6 +76,21 @@ namespace TEST
 			TAST(!svr.RegistCallBack(cbi));
 			TAST(!svr.RegistCallBack(cbsf));
 
+			svr.AddBlackList("192.168.12.34", 1000 * 1000 * 3600);
+			svr.AddBlackList("192.168.12.43", 1000 * 1000 * 3600);
+			svr.AddWhiteList("192.168.21.34", 1000 * 1000 * 3600);
+			svr.AddWhiteList("192.168.21.43", 1000 * 1000 * 3600);
+
+			TAST(svr.IsInBlackList("192.168.12.34"));
+			TAST(svr.IsInBlackList("192.168.12.43"));
+			TAST(svr.IsInWhiteList("192.168.21.34"));
+			TAST(svr.IsInWhiteList("192.168.21.43"));
+
+			TAST(!svr.IsInWhiteList("192.168.21.34"));
+			TAST(!svr.IsInWhiteList("192.168.21.43"));
+			TAST(!svr.IsInBlackList("192.168.12.34"));
+			TAST(!svr.IsInBlackList("192.168.12.43"));
+
 			TAST(svr.IsCreated());
 			TAST(!svr.IsBegin());
 			TAST(svr.Begin());
@@ -118,6 +133,14 @@ namespace TEST
 			}
 			TAST(svr.End());
 			TAST(svr.IsCreated());
+
+			svr.RemoveBlackList("192.168.12.34");
+			svr.RemoveBlackList("192.168.12.43");
+			svr.RemoveWhiteList("192.168.21.34");
+			svr.RemoveWhiteList("192.168.21.43");
+
+			svr.RemoveBlackListAll();
+			svr.RemoveWhiteListAll();
 
 			TAST(svr.UnregistCallBack(cb1));
 			TAST(svr.UnregistCallBack(cb2));
