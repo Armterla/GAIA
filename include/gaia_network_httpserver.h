@@ -1,4 +1,4 @@
-﻿#ifndef	 __GAIA_NETWORK_HTTPSERVER_H__
+#ifndef	 __GAIA_NETWORK_HTTPSERVER_H__
 #define	 __GAIA_NETWORK_HTTPSERVER_H__
 
 #include "gaia_type.h"
@@ -183,93 +183,93 @@ namespace GAIA
 			GAIA::NUM sMaxConnCount;
 
 			/*!
-				@brief
+				@brief Specify the max connection count.
 			*/
 			GAIA::U64 uMaxConnTime;
 
 			/*!
-				@brief
+				@brief Specify the max harf connection count.
 			*/
 			GAIA::U64 uMaxHarfConnTime;
 
 			/*!
-				@brief
+				@brief Specify the dynamic cache size in bytes.
 			*/
 			GAIA::U64 uMaxDynamicCacheSize;
 
 			/*!
-				@brief
+				@brief Specify the dynamic cache count.
 			*/
 			GAIA::U64 uMaxDynamicCacheCount;
 
 			/*!
-				@brief
+				@brief Specify the static cache size in bytes.
 			*/
 			GAIA::U64 uMaxStaticCacheSize;
 
 			/*!
-				@brief
+				@brief Specify the static cache count.
 			*/
 			GAIA::U64 uMaxStaticCacheCount;
 
 			/*!
-				@brief
+				@brief Specify the max response count per minute.
 			*/
 			GAIA::U64 uMaxResponseCountPerMinute;
 
 			/*!
-				@brief
+				@brief Enable auto response for pure static resource request.
 			*/
 			GAIA::BL bEnableAutoResponseStaticResource;
 
 			/*!
-				@brief
+				@brief Specify the http version.
 			*/
 			GAIA::CH szHttpVer[16];
 
 			/*!
-				@brief
+				@brief Specify the http version's string length.
 			*/
 			GAIA::NUM sHttpVerLen;
 
 			/*!
-				@brief
+				@brief Specify the socket use TCP NO-DELAY mode, default is GAIA::False.
 			*/
 			GAIA::BL bEnableSocketTCPNoDelay;
 
 			/*!
-				@brief
+				@brief Specify the socket use NO-BLOCK mode, default is GAIA::False.
 			*/
 			GAIA::BL bEnableSocketNoBlock;
 
 			/*!
-				@brief
+				@brief Specify the socket RE-USE-ADDRESS mode, default is GAIA::False.
 			*/
 			GAIA::BL bEnableSocketReuseAddr;
 
 			/*!
-				@brief
+				@brief Specify the listen socket's send buffer size in bytes, default is GINVALID means use system default setting.
 			*/
 			GAIA::N32 nListenSocketSendBufferSize;
 
 			/*!
-				@brief
+				@brief Specify the listen socket's receive buffer size in bytes, default is GINVALID means use system default setting.
 			*/
 			GAIA::N32 nListenSocketRecvBufferSize;
 
 			/*!
-				@brief
+				@brief Specify the accepted socket send buffer size in bytes, default is GINVALID means use system default setting.
 			*/
 			GAIA::N32 nAcceptedSocketSendBufferSize;
 
 			/*!
-				@brief
+				@brief Specify the accepted socket's receive buffer size in bytes, default is GINVALID means use system default setting.
 			*/
 			GAIA::N32 nAcceptedSocketRecvBufferSize;
 		};
 
 		/*!
-			@brief
+			@brief Http server's status description class.
 		*/
 		class HttpServerStatus : public GAIA::Base
 		{
@@ -335,22 +335,24 @@ namespace GAIA
 		public:
 
 			/*!
-				@brief
+				@brief Specify the server startup GMT time in microseconds.
+
+					When you call HttpServer::Begin, this time will be filled.
 			*/
 			GAIA::U64 uServerStartupTime;
 
 			/*!
-				@brief
+				@brief Specify the link's life time.
 			*/
 			GAIA::U64 uLinkLifeTime;
 
 			/*!
-				@brief
+				@brief Specify the link's life dispatch count.
 			*/
 			GAIA::U64 uLinkLifeCount;
 
 			/*!
-				@brief
+				@brief Specify HttpServerCallBack's OnRequest be execute time in microseconds.
 			*/
 			GAIA::U64 uCallBackExecuteTime;
 
