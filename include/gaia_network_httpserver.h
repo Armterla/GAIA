@@ -236,6 +236,8 @@ namespace GAIA
 			*/
 			GINL GAIA::GVOID reset()
 			{
+				uServerStartupTime = 0;
+
 				uRequestAnalyzeFailedCount = 0;
 				uRequestDenyByBWCount = 0;
 				uRequestDenyByMaxConnCount = 0;
@@ -275,6 +277,11 @@ namespace GAIA
 			}
 
 		public:
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uServerStartupTime;
 
 			/*!
 				@brief
@@ -567,17 +574,6 @@ namespace GAIA
 			*/
 			GINL GAIA::NETWORK::HttpServer& GetServer() const{return *m_pSvr;}
 
-			/*!
-				@brief
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL HttpServerStatus& GetStatus(){return m_status;}
-
 		public:
 			/*!
 				@brief
@@ -616,12 +612,10 @@ namespace GAIA
 			GINL GAIA::GVOID init()
 			{
 				m_pSvr = GNIL;
-				m_status.reset();
 			}
 
 		private:
 			GAIA::NETWORK::HttpServer* m_pSvr;
-			GAIA::NETWORK::HttpServerStatus m_status;
 		};
 
 		/*!

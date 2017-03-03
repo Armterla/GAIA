@@ -595,7 +595,12 @@ namespace GAIA
 
 			const GAIA::NETWORK::HttpServerStatus& s = this->GetServer().GetStatus();
 			{
-				strResp = "[GAIA HTTP SERVER STATUS]\n\n";
+				strResp += "[GAIA HTTP SERVER STATUS]\n\n";
+
+				GAIA::U64 uWorkTime = GAIA::TIME::gmt_time() - this->GetServer().GetStatus().uServerStartupTime;
+				GAIA::CH szWorkTime[64];
+				GAIA::TIME::deltatime2string(uWorkTime, szWorkTime);
+				strResp += "\tServerWorkTime = "; strResp += szWorkTime; strResp += "\n";
 
 				strResp += "\tRequestAnalyzeFailedCount = "; strResp += s.uRequestAnalyzeFailedCount; strResp += "\n";
 				strResp += "\tRequestDenyByBWCount = "; strResp += s.uRequestDenyByBWCount; strResp += "\n";
@@ -948,6 +953,9 @@ namespace GAIA
 				HttpServerWorkThread* pThread = m_listWorkThreads[x];
 				pThread->Start();
 			}
+
+			//
+			m_status.uServerStartupTime = GAIA::TIME::gmt_time();
 
 			m_bBegin = GAIA::True;
 			return GAIA::True;
