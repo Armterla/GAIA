@@ -736,7 +736,6 @@ namespace GAIA
 				strResp += "\tMaxStaticCacheSize = "; strResp += descSvr.uMaxStaticCacheSize; strResp += "\n";
 				strResp += "\tMaxStaticCacheCount = "; strResp += descSvr.uMaxStaticCacheCount; strResp += "\n";
 				strResp += "\tMaxResponseCountPerMinute = "; strResp += descSvr.uMaxResponseCountPerMinute; strResp += "\n";
-				strResp += "\tEnableAutoResponseStaticResource = "; strResp += descSvr.bEnableAutoResponseStaticResource; strResp += "\n";
 				strResp += "\tHttpVersion = "; strResp += descSvr.sHttpVerLen; strResp += "\n";
 				strResp += "\n";
 

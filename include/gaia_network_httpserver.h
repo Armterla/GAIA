@@ -80,9 +80,9 @@ namespace GAIA
 			static const GAIA::U64 DEFAULT_MAX_CONN_TIME = (GAIA::U64)1000 * 1000 * 3600 * 24;
 			static const GAIA::U64 DEFAULT_MAX_HALFCONN_TIME = 1000 * 1000 * 10;
 			static const GAIA::U64 DEFAULT_MAX_DYNAMIC_CACHE_SIZE = 1024 * 1024 * 1024;
-			static const GAIA::U64 DEFAULT_MAX_DYNAMIC_CACHE_COUNT = 1024 * 1024;
+			static const GAIA::U64 DEFAULT_MAX_DYNAMIC_CACHE_COUNT = 1024 * 100;
 			static const GAIA::U64 DEFAULT_MAX_STATIC_CACHE_SIZE = 1024 * 1024 * 10;
-			static const GAIA::U64 DEFAULT_MAX_STATIC_CACHE_COUNT = 1024 * 1024;
+			static const GAIA::U64 DEFAULT_MAX_STATIC_CACHE_COUNT = 1024 * 100;
 			static const GAIA::U64 DEFAULT_MAX_RESPONSE_COUNT_PER_MINUTE = 100000;
 
 		public:
@@ -103,7 +103,6 @@ namespace GAIA
 				uMaxStaticCacheSize = DEFAULT_MAX_STATIC_CACHE_SIZE;
 				uMaxStaticCacheCount = DEFAULT_MAX_STATIC_CACHE_COUNT;
 				uMaxResponseCountPerMinute = DEFAULT_MAX_RESPONSE_COUNT_PER_MINUTE;
-				bEnableAutoResponseStaticResource = GAIA::True;
 				GAIA::ALGO::gstrcpy(szHttpVer, GAIA::NETWORK::HTTP_VERSION_STRING);
 				sHttpVerLen = GAIA::ALGO::gstrlen(szHttpVer);
 			}
@@ -153,86 +152,96 @@ namespace GAIA
 			GAIA::NUM sNetworkThreadCount;
 
 			/*!
-				@brief Specify work thread count.
+				@brief Specify work thread count, default value is DEFAULT_WORK_THREAD_COUNT.
+
+				@see DEFAULT_WORK_THREAD_COUNT.
 			*/
 			GAIA::NUM sWorkThreadCount;
 
 			/*!
-				@brief Specify HttpServer's root path.
+				@brief Specify HttpServer's root path, default value is "".
 			*/
 			const GAIA::CH* pszRootPath;
 
 			/*!
-				@brief Specify HttpServer's max connection count at same time.
+				@brief Specify HttpServer's max connection count at same time, default value is DEFAULT_MAX_CONN_COUNT.
+
+				@see DEFAULT_MAX_CONN_COUNT.
 			*/
 			GAIA::NUM sMaxConnCount;
 
 			/*!
-				@brief
+				@brief Specify the connection's max transfer time, default value is DEFAULT_MAX_CONN_TIME.
+
+				@see DEFAULT_MAX_CONN_TIME.
 			*/
 			GAIA::U64 uMaxConnTime;
 
 			/*!
-				@brief
+				@brief Specify tht connection's max pending time.(Connected but not send any data to HttpServer)
+					Default value is DEFAULT_MAX_HALFCONN_TIME.
+
+				@see DEFAULT_MAX_HALFCONN_TIME.
 			*/
 			GAIA::U64 uMaxHarfConnTime;
 
 			/*!
-				@brief
+				@brief Specify the max dynamic cache size in bytes, default value is DEFAUL_MAX_DYNAMIC_CACHE_SIZE.
+
+				@see DEFAULT_MAX_DYNAMIC_CACHE_SIZE.
 			*/
 			GAIA::U64 uMaxDynamicCacheSize;
 
 			/*!
-				@brief
+				@brief Specify the max dynamic cache count, default value is DEFAULT_MAX_DYNAMIC_CACHE_COUNT.
+
+				@see DEFAULT_MAX_DYNAMIC_CACHE_COUNT.
 			*/
 			GAIA::U64 uMaxDynamicCacheCount;
 
 			/*!
-				@brief
+				@brief Specify the max static cache size in bytes, default value is DEFAULT_STATIC_CACHE_SIZE.
+
+				@see DEFAULT_STATIC_CACHE_SIZE.
 			*/
 			GAIA::U64 uMaxStaticCacheSize;
 
 			/*!
-				@brief
+				@brief Specify the max static cache count, default value is DEFAULT_STATIC_CACHE_COUNT.
+
+				@see DEFAULT_STATIC_CACHE_COUNT.
 			*/
 			GAIA::U64 uMaxStaticCacheCount;
 
 			/*!
-				@brief
+				@brief Specify the max response count per minute, default value is DEFAULT_MAX_RESPONSE_COUNT_PER_MINUTE.
+
+				@see DEFAULT_MAX_RESPONSE_COUNT_PER_MINUTE.
 			*/
 			GAIA::U64 uMaxResponseCountPerMinute;
 
 			/*!
-				@brief
-			*/
-			GAIA::BL bEnableAutoResponseStaticResource;
-
-			/*!
-				@brief
+				@brief Specify the http version, default value is "HTTP/1.1".
 			*/
 			GAIA::CH szHttpVer[16];
 
 			/*!
-				@brief
+				@brief Specify the http version string's length, default value is strlen("HTTP/1.1").
 			*/
 			GAIA::NUM sHttpVerLen;
 		};
 
 		/*!
-			@brief
+			@brief Http server's status.
 		*/
 		class HttpServerStatus : public GAIA::Base
 		{
 		public:
 
 			/*!
-				@brief
+				@brief Reset the HttpServerStatus to default value.
 
-				@param
-
-				@return
-
-				@remarks
+				@remarks All member variables are be filled by zero.
 			*/
 			GINL GAIA::GVOID reset()
 			{
@@ -398,6 +407,8 @@ namespace GAIA
 
 			/*!
 				@brief Constructor.
+
+				@param svr [in] Specify the HttpServer.
 			*/
 			HttpServerLink(GAIA::NETWORK::HttpServer& svr);
 
@@ -407,57 +418,46 @@ namespace GAIA
 			~HttpServerLink();
 
 			/*!
-				@brief
+				@brief Get http server.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return HttpServer.
 			*/
 			GINL GAIA::NETWORK::HttpServer& GetServer() const{return *m_pSvr;}
 
 			/*!
-				@brief
+				@brief Get peer address.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return peer address.
 			*/
 			GINL const GAIA::NETWORK::Addr& GetPeerAddr() const{return m_addrPeer;}
 
 			/*!
-				@brief
+				@brief Get which listen socket address the HttpServerLink come from.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return the listen socket address.
 			*/
 			GINL const GAIA::NETWORK::Addr& GetListenAddr() const{return m_addrListen;}
 
 			/*!
-				@brief
+				@brief Get the time that the HttpServerLink's socket be accepted.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return the accept time by microseconds.
 			*/
 			GINL const GAIA::U64& GetAcceptTime() const{return m_uAcceptTime;}
 
 			/*!
-				@brief
+				@brief Response peer by http protocal.
 
-				@param
+				@param httpcode [in] Specify the http code.
+					If success, return HTTP_CODE_OK, if failed by resource not found, return HTTP_CODE_NOTFOUND.
 
-				@return
+				@param pHttpHead [in] Specify the http response head information, if current response not have a header, it will be filled by GNIL.
 
-				@remarks
+				@param p [in] Specify the http body's data buffer.
+
+				@param sSize [in] Specify the body's data buffer size.
+
+				@return If response operation is executed successfully, return GAIA::True, or return GAIA::False.
 			*/
 			GAIA::BL Response(GAIA::NETWORK::HTTP_CODE httpcode, GAIA::NETWORK::HttpHead* pHttpHead = GNIL, const GAIA::GVOID* p = GNIL, GAIA::NUM sSize = 0);
 
