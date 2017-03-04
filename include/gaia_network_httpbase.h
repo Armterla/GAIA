@@ -1,3 +1,15 @@
+/*!
+	@brief Http base type and class declaration file.
+
+	Components in current file.
+		1. Http code list, include code enum list, code name list, code description list, and code description length list.
+		2. Http header name list.
+		3. Class HttpURL.
+		4. Class HttpHead.
+
+	All components could be used for http client or http server, so i write a independence file for it.
+*/
+
 #ifndef	 __GAIA_NETWORK_HTTPBASE_H__
 #define	 __GAIA_NETWORK_HTTPBASE_H__
 
@@ -550,46 +562,37 @@ namespace GAIA
 			GINL ~HttpURL(){}
 
 			/*!
-				@brief
+				@brief Check current HttpURL object is empty or not.
 
-				@param
-
-				@return
-
-				@remarks
-			*/
+				@return If curren HttpURL object is empty, return GAIA::True, or will return GAIA::False.
++			*/
 			GINL GAIA::BL Empty() const{return m_url.empty();}
 
 			/*!
-				@brief
+				@brief Get URL's string length in chars.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return the URL's string length.
 			*/
 			GINL GAIA::BL Size() const{return m_url.size();}
 
 			/*!
-				@brief
+				@brief Reset URL to empty.
 
-				@param
-
-				@return
-
-				@remarks
+				@remarks It will clear URL analyzed information too.
 			*/
 			GINL GAIA::GVOID Reset(){m_url.clear(); this->clear_analyzed();}
 
 			/*!
-				@brief
+				@brief File HttpURL object by a URL string.
 
-				@param
+				@param psz [in] Specify the URL string. It can't be GNIL.
 
-				@return
+				@param pLength [in] Specify the URL string's length. If this parameter is GNIL, 
+					all characters will be used until to '\0'.
 
 				@remarks
+					This function will clear old URL analyzed information, and didn't genereta new URL analyzed information about 
+					parameter psz.
 			*/
 			GINL GAIA::BL FromString(const GAIA::CH* psz, const GAIA::NUM* pLength = GNIL)
 			{
@@ -601,17 +604,15 @@ namespace GAIA
 				else
 					m_url = psz;
 				this->clear_analyzed();
-				return GAIA::True;
 			}
 
 			/*!
-				@brief
+				@brief Get current HttpURL's string.
 
-				@param
+				@param pLength [out] Used for saving the URL string's length(without '\0').
+					If this paramter is GNIL, it will be ignored.
 
-				@return
-
-				@remarks
+				@return Return the HttpURL's string. If current HttpURL string is empty, it will return "".
 			*/
 			GINL const GAIA::CH* ToString(GAIA::NUM* pLength = GNIL) const
 			{
@@ -621,13 +622,16 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get protocal in HttpURL.
 
-				@param
+				@param psz [out] Used for saving the protocal string.
 
-				@return
+				@param nMaxSize [in] Specify parameter psz's max size in characters.
+					If it is GINVALID, means parameter psz's buffer size is enough.
 
-				@remarks
+				@param pResultSize [out] Used for saving the result protocal string's size in characters.
+
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
 			*/
 			GINL GAIA::CH* GetProtocal(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
@@ -637,13 +641,16 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get host name in HttpURL.
 
-				@param
+				@param psz [out] Used for saving the host name string.
 
-				@return
+				@param nMaxSize [in] Specify parameter psz's max size in characters.
+					If it is GINVALID, means parameter psz's buffer size is enough.
 
-				@remarks
+				@param pResultSize [out] Use for saving the result protocal string's size in characters.
+
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
 			*/
 			GINL GAIA::CH* GetHostName(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
@@ -653,13 +660,14 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get port in HttpURL.
 
-				@param
+				@param psz [out] Used for saving the port name string.
 
-				@return
+				@param nMaxSize [in] Specify parameter psz's max size in characters.
+					If it is GINVALID, means parameter psz's buffer size is enough.
 
-				@remarks
+				@param pResultSize [out] Used for saving the result port string's size in characters.
 			*/
 			GINL GAIA::CH* GetPort(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
@@ -1246,24 +1254,32 @@ namespace GAIA
 			GINL ~HttpHead(){this->Reset();}
 
 			/*!
-				@brief
+				@brief Check HttpHead is empty or not.
 
-				@param
-
-				@return
+				@return If HttpHead is empty, return GAIA::True, or return GAIA::False.
 
 				@remarks
 			*/
 			GINL GAIA::BL Empty() const{return this->Size() == 0;}
 
 			/*!
-				@brief
+				@brief Fill a HttpHead with a string.
 
-				@param
+				@param psz [in] Specify the string buffer.
 
-				@return
+				@param pLength [in] Specify the string length in characters.
+					If could be GNIL, it means all string which specified by parameter psz are used until to '\0'.
+
+				@return If the string which specified by parameter psz's format is correct, current function will return GAIA::True,
+					or will return GAIA::False.
 
 				@remarks
+					Support head format like this : 
+						a: b\r\n
+						c: d\r\n
+						e: f\r\n
+					The space(' ') after the values is not nessesary.
+					The last \r\n is nessesary.
 			*/
 			GINL GAIA::BL FromString(const GAIA::CH* psz, const GAIA::NUM* pLength = GNIL)
 			{
@@ -1324,7 +1340,7 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief 
 
 				@param
 
