@@ -52,7 +52,10 @@ namespace GAIA
 		GAIA_ENUM_END(HTTP_SERVER_BLACKWHITE_MODE)
 
 		/*!
-			@brief
+			@brief HttpServer's access mode's string list.
+
+				You can use a enum of HTTP_SERVER_BLACKWHITE_MODE as a array's index
+				for current list, then you can get the enum's name.
 		*/
 		static const GAIA::CH* HTTP_SERVER_BLACKWHITE_MODE_STRING[] =
 		{
@@ -366,17 +369,17 @@ namespace GAIA
 			GAIA::U64 uCallBackExecuteTime;
 
 			/*!
-				@brief
+				@brief Specify HttpServerCallBack's OnRequest's execute count.
 			*/
 			GAIA::U64 uCallBackExecuteCount;
 
 			/*!
-				@brief
+				@brief Specify HttpServer analyze request failed count.
 			*/
 			GAIA::U64 uRequestAnalyzeFailedCount;
 
 			/*!
-				@brief
+				@brief Specify HttpServer reject requests count for black white access deny.
 			*/
 			GAIA::U64 uRequestDenyByBWCount;
 
@@ -391,22 +394,22 @@ namespace GAIA
 			GAIA::U64 uRequestDenyByMaxHalfConnCount;
 
 			/*!
-				@brief
+				@brief Specify HttpServer's total request count.
 			*/
 			GAIA::U64 uRequestCount;
 
 			/*!
-				@brief
+				@brief Specify HttpServer's total response count.
 			*/
 			GAIA::U64 uResponseCount;
 
 			/*!
-				@brief
+				@brief Specify HttpServer's total request piese count.
 			*/
 			GAIA::U64 uRequestPieceCount;
 
 			/*!
-				@brief
+				@brief Specify HttpServer's total response piece count.
 			*/
 			GAIA::U64 uResponsePieceCount;
 
@@ -477,7 +480,8 @@ namespace GAIA
 		};
 
 		/*!
-			@brief
+			@brief HttpServer's black white node.
+				It record a ip address info, and used for reject requests.
 		*/
 		class HttpServerBlackWhiteNode : public GAIA::Base
 		{
@@ -506,7 +510,8 @@ namespace GAIA
 		class HttpAsyncDispatcher;
 
 		/*!
-			@brief
+			@brief HttpServer links class.
+				It used to query a link state and response a request.
 		*/
 		class HttpServerLink : public GAIA::RefObject
 		{
@@ -721,7 +726,6 @@ namespace GAIA
 				@param sSize [in] Specify the body bufer's size, it could be zero when a request didn't have a body.
 
 				@return
-
 					If the request is be dispatched by the HttpServerCallBack's sub class(HttpServer's user derived),
 					HttpServer's user will return GAIA::True, and then HttpServer will 
 					not callback next HttpServerCallBack's OnRequest which be registed to 
@@ -733,6 +737,7 @@ namespace GAIA
 					
 
 				@remarks
+					This function will be callbacked on multi thread.
 			*/
 			virtual GAIA::BL OnRequest(
 					GAIA::NETWORK::HttpServerLink& l,
@@ -975,9 +980,10 @@ namespace GAIA
 
 				@param addr [in] Specify a network address to open service.
 
-				@return
+				@return If success return GAIA::True, or will return GAIA::False.
 
 				@remarks
+					This function will open a listen tcp socket for http service.
 			*/
 			GAIA::BL OpenAddr(const GAIA::NETWORK::Addr& addr);
 
@@ -986,53 +992,45 @@ namespace GAIA
 
 				@param addr [in] Specify a network address to close service.
 
-				@return
+				@return If success return GAIA::True, or will return GAIA::False.
 
 				@remarks
+					This function will close a listen tcp socket which used for http service.
 			*/
 			GAIA::BL CloseAddr(const GAIA::NETWORK::Addr& addr);
 
 			/*!
 				@brief Close all openned network address which provide Http service.
 
-				@param
-
-				@return
+				@return If exist address be closed return GAIA::True, or will return GAIA::False.
 
 				@remarks
+					This function will close all listen tcp socket which used for http service.
 			*/
 			GAIA::BL CloseAddrAll();
 
 			/*!
 				@brief Check the network address is openned or not.
 
-				@param
+				@param addr [in] Specify the address for checkup.
 
 				@return If the network address which provide Http service is openned, return GAIA::True, or will return GAIA::False.
-
-				@remarks
 			*/
 			GAIA::BL IsOpennedAddr(const GAIA::NETWORK::Addr& addr) const;
 
 			/*!
 				@brief Get openned network address count. (PS:The network address provide Http service)
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return the address count for openned network address which are used for http service.
 			*/
 			GAIA::NUM GetOpennedAddrCount() const;
 
 			/*!
 				@brief Collect openned network address list. (PS: The network addresses provide Http service)
 
-				@param
+				@param listResult [out] Used for saving openned addresses.
 
-				@return
-
-				@remarks
+				@return If collect success, return GAIA::True, or will return GAIA::False.
 			*/
 			GAIA::BL CollectOpennedAddr(GAIA::CTN::Vector<GAIA::NETWORK::Addr>& listResult);
 
@@ -1081,29 +1079,25 @@ namespace GAIA
 			GAIA::BL IsEnableStaticResponseCache() const;
 
 			/*!
-				@brief
+				@brief Set HttpServer's black white access mode.
 
-				@param
+				@param mode [in] Specify black white mode.
 
-				@return
-
-				@remarks
+				@see GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE.
 			*/
 			GAIA::GVOID SetBlackWhiteMode(GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE mode);
 
 			/*!
-				@brief
+				@brief Get HttpServer's black white access mode.
 
-				@param
+				@return Return black white mode.
 
-				@return
-
-				@remarks
+				@see GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE.
 			*/
 			GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE GetBlackWhiteMode() const;
 
 			/*!
-				@brief
+				@brief Add a ip to black list.
 
 				@param
 
@@ -1114,7 +1108,7 @@ namespace GAIA
 			GAIA::GVOID AddBlackList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uTime = GINVALID);
 
 			/*!
-				@brief
+				@brief Remove a ip from black list.
 
 				@param
 
@@ -1125,7 +1119,7 @@ namespace GAIA
 			GAIA::GVOID RemoveBlackList(const GAIA::NETWORK::IP& ip);
 
 			/*!
-				@brief
+				@brief Remove all ip addresses from black list.
 
 				@param
 
@@ -1136,7 +1130,7 @@ namespace GAIA
 			GAIA::GVOID RemoveBlackListAll();
 
 			/*!
-				@brief
+				@brief Check a ip in black list or not.
 
 				@param
 
@@ -1147,7 +1141,7 @@ namespace GAIA
 			GAIA::BL IsInBlackList(const GAIA::NETWORK::IP& ip) const;
 
 			/*!
-				@brief
+				@brief Get count of ip addresses in black list.
 
 				@param
 
@@ -1158,7 +1152,7 @@ namespace GAIA
 			GAIA::NUM GetBlackListSize() const;
 
 			/*!
-				@brief
+				@brief Collect all ip addresses in black list.
 
 				@param
 
@@ -1169,7 +1163,7 @@ namespace GAIA
 			GAIA::BL CollectBlackList(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerBlackWhiteNode>& listResult) const;
 
 			/*!
-				@brief
+				@brief Add a ip to white list.
 
 				@param
 
@@ -1180,7 +1174,7 @@ namespace GAIA
 			GAIA::GVOID AddWhiteList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uTime = GINVALID);
 
 			/*!
-				@brief
+				@brief Remove a ip from white list.
 
 				@param
 
@@ -1191,7 +1185,7 @@ namespace GAIA
 			GAIA::GVOID RemoveWhiteList(const GAIA::NETWORK::IP& ip);
 
 			/*!
-				@brief
+				@brief Remove all ip addresses from white list.
 
 				@param
 
@@ -1202,7 +1196,7 @@ namespace GAIA
 			GAIA::GVOID RemoveWhiteListAll();
 
 			/*!
-				@brief
+				@brief Check a ip in white list or not.
 
 				@param
 
@@ -1213,7 +1207,7 @@ namespace GAIA
 			GAIA::BL IsInWhiteList(const GAIA::NETWORK::IP& ip) const;
 
 			/*!
-				@brief
+				@brief Get count of ip addresses in white list.
 
 				@param
 
@@ -1224,7 +1218,7 @@ namespace GAIA
 			GAIA::NUM GetWhiteListSize() const;
 
 			/*!
-				@brief
+				@brief Collect all ip addresses in white list.
 
 				@param
 
@@ -1235,11 +1229,9 @@ namespace GAIA
 			GAIA::BL CollectWhiteList(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerBlackWhiteNode>& listResult) const;
 
 			/*!
-				@brief
+				@brief Get server status.
 
-				@param
-
-				@return
+				@return Return server status.
 
 				@remarks
 			*/

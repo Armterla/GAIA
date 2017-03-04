@@ -202,7 +202,7 @@ namespace TEST
 
 			TAST(hu.Empty());
 			TAST(hu1.Empty());
-			TAST(hu2.Empty());
+			TAST(hu2.Empty());	
 		}
 
 		// HttpHead test.
@@ -301,7 +301,7 @@ namespace TEST
 			static const GAIA::CH HEAD_SAMPLE[] = "a: 1\r\nb: 2\r\nc: 3\r\n";
 			h = HEAD_SAMPLE;
 			h.FromString(HEAD_SAMPLE);
-			if(h.GetStringLength() != sizeof(HEAD_SAMPLE) - 1)
+			if(h.GetStringSize() != sizeof(HEAD_SAMPLE) - 1)
 				TERROR;
 			GAIA::CH szTemp[256];
 			GAIA::NUM sResultSize;
@@ -314,6 +314,24 @@ namespace TEST
 
 			TAST(h.FromString("a:1\r\n"));
 			TAST(!h.FromString("a=1\r\n"));
+
+			h = "";
+			TAST(h.Empty());
+			TAST(h.Size() == 0);
+			TAST(h.GetStringSize() == 0);
+			if(h.ToString(szTemp, sizeof(szTemp), &sResultSize, &bResult) != szTemp)
+				TERROR;
+			if(GAIA::ALGO::gstrlen(szTemp) != 0)
+				TERROR;
+
+			h = GNIL;
+			TAST(h.Empty());
+			TAST(h.Size() == 0);
+			TAST(h.GetStringSize() == 0);
+			if(h.ToString(szTemp, sizeof(szTemp), &sResultSize, &bResult) != szTemp)
+				TERROR;
+			if(GAIA::ALGO::gstrlen(szTemp) != 0)
+				TERROR;
 		}
 	}
 }

@@ -409,14 +409,14 @@ namespace GAIA
 			if(pHttpHead != GNIL && !pHttpHead->Empty())
 			{
 				GAIA::NUM sFirstLineSize = pBuf->write_size();
-				pBuf->resize_keep(sFirstLineSize + pHttpHead->GetStringLength() + 1);
+				pBuf->resize_keep(sFirstLineSize + pHttpHead->GetStringSize() + 1);
 				GAIA::NUM sResultSize;
 				GAIA::BL bSuccess;
-				pHttpHead->ToString((GAIA::CH*)pBuf->fptr() + sFirstLineSize, pHttpHead->GetStringLength() + 1, &sResultSize, &bSuccess);
-				GAST(sResultSize == pHttpHead->GetStringLength());
+				pHttpHead->ToString((GAIA::CH*)pBuf->fptr() + sFirstLineSize, pHttpHead->GetStringSize() + 1, &sResultSize, &bSuccess);
+				GAST(sResultSize == pHttpHead->GetStringSize());
 				GAST(bSuccess);
 				pBuf->resize_keep(pBuf->write_size() - 1);
-				GAST(pBuf->write_size() == sFirstLineSize + pHttpHead->GetStringLength());
+				GAST(pBuf->write_size() == sFirstLineSize + pHttpHead->GetStringSize());
 			}
 			pBuf->write("\n", 1);
 
@@ -1173,7 +1173,7 @@ namespace GAIA
 								bResponsedByCache = GAIA::True;
 
 								m_status.uHitResponseCacheCount++;
-								m_status.uHitResponseCacheSize += resphead.GetStringLength() + sCacheSize;
+								m_status.uHitResponseCacheSize += resphead.GetStringSize() + sCacheSize;
 							}
 							else
 								m_status.uNotHitResponseCacheCount++;
@@ -1198,10 +1198,10 @@ namespace GAIA
 								{
 									m_status.uRequestCount++;
 									m_status.uRequestSize += pSock->m_url.Size();
-									m_status.uRequestSize += pSock->m_head.GetStringLength();
+									m_status.uRequestSize += pSock->m_head.GetStringSize();
 									m_status.uRequestCountByMethod[pSock->m_method]++;
 									m_status.uRequestSizeByMethod[pSock->m_method] += pSock->m_url.Size();
-									m_status.uRequestSizeByMethod[pSock->m_method] += pSock->m_head.GetStringLength();
+									m_status.uRequestSizeByMethod[pSock->m_method] += pSock->m_head.GetStringSize();
 								}
 								m_status.uRequestPieceCount++;
 								m_status.uRequestSize += sDataSize;
@@ -1472,7 +1472,7 @@ namespace GAIA
 			const GAIA::CH* pszUrl = url.ToString(&sUrlLength);
 			if(!prachead.Empty())
 			{
-				GAIA::NUM sHeadLength = prachead.GetStringLength();
+				GAIA::NUM sHeadLength = prachead.GetStringSize();
 				GAIA::CTN::ACharsString strTemp;
 				strTemp.resize(sUrlLength + sHeadLength + 1);
 				GAIA::ALGO::gmemcpy(strTemp.fptr(), pszUrl, sUrlLength);
@@ -1514,7 +1514,7 @@ namespace GAIA
 			const GAIA::CH* pszUrl = url.ToString(&sUrlLength);
 			if(!prachead.Empty())
 			{
-				GAIA::NUM sHeadLength = prachead.GetStringLength();
+				GAIA::NUM sHeadLength = prachead.GetStringSize();
 				GAIA::CTN::ACharsString strTemp;
 				strTemp.resize(sUrlLength + sHeadLength + 1);
 				GAIA::ALGO::gmemcpy(strTemp.fptr(), pszUrl, sUrlLength);
@@ -1579,7 +1579,7 @@ namespace GAIA
 			const GAIA::CH* pszUrl = url.ToString(&sUrlLength);
 			if(!prachead.Empty())
 			{
-				GAIA::NUM sHeadLength = prachead.GetStringLength();
+				GAIA::NUM sHeadLength = prachead.GetStringSize();
 				GAIA::CTN::ACharsString strTemp;
 				strTemp.resize(sUrlLength + sHeadLength + 1);
 				GAIA::ALGO::gmemcpy(strTemp.fptr(), pszUrl, sUrlLength);

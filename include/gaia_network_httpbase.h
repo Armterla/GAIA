@@ -536,7 +536,8 @@ namespace GAIA
 		/*!
 			@brief Http url management class.
 
-			@remarks This class support URL format like this : "protocol://hostname[:port]/path/[;parameters][?query]#fragment".
+			@remarks This class support URL format like this :
+				"protocol://hostname[:port]/path[/path1][/][;parameters][?query][#fragment]".
 		*/
 		class HttpURL : public GAIA::Base
 		{
@@ -587,19 +588,19 @@ namespace GAIA
 
 				@param psz [in] Specify the URL string. It can't be GNIL.
 
-				@param pLength [in] Specify the URL string's length. If this parameter is GNIL, 
-					all characters will be used until to '\0'.
+				@param pSize [in] Specify the URL string's size in characters(without '\0').
+					If this parameter is GNIL, all characters will be used until to '\0'.
 
 				@remarks
 					This function will clear old URL analyzed information, and didn't genereta new URL analyzed information about 
 					parameter psz.
 			*/
-			GINL GAIA::BL FromString(const GAIA::CH* psz, const GAIA::NUM* pLength = GNIL)
+			GINL GAIA::BL FromString(const GAIA::CH* psz, const GAIA::NUM* pSize = GNIL)
 			{
-				if(pLength != GNIL)
+				if(pSize != GNIL)
 				{
-					GAST(*pLength <= GAIA::ALGO::gstrlen(psz));
-					m_url.assign(psz, *pLength);
+					GAST(*pSize <= GAIA::ALGO::gstrlen(psz));
+					m_url.assign(psz, *pSize);
 				}
 				else
 					m_url = psz;
@@ -609,15 +610,15 @@ namespace GAIA
 			/*!
 				@brief Get current HttpURL's string.
 
-				@param pLength [out] Used for saving the URL string's length(without '\0').
+				@param pResultSize [out] Used for saving the URL string's size in characters(without '\0').
 					If this paramter is GNIL, it will be ignored.
 
 				@return Return the HttpURL's string. If current HttpURL string is empty, it will return "".
 			*/
-			GINL const GAIA::CH* ToString(GAIA::NUM* pLength = GNIL) const
+			GINL const GAIA::CH* ToString(GAIA::NUM* pResultSize = GNIL) const
 			{
-				if(pLength != GNIL)
-					*pLength = m_url.size();
+				if(pResultSize != GNIL)
+					*pResultSize = m_url.size();
 				return m_url.fptr();
 			}
 
@@ -629,7 +630,7 @@ namespace GAIA
 				@param nMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
 
-				@param pResultSize [out] Used for saving the result protocal string's size in characters.
+				@param pResultSize [out] Used for saving the result protocal string's size in characters(without '\0').
 
 				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
 			*/
@@ -648,7 +649,7 @@ namespace GAIA
 				@param nMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
 
-				@param pResultSize [out] Use for saving the result protocal string's size in characters.
+				@param pResultSize [out] Use for saving the result protocal string's size in characters(without '\0').
 
 				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
 			*/
@@ -667,7 +668,7 @@ namespace GAIA
 				@param nMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
 
-				@param pResultSize [out] Used for saving the result port string's size in characters.
+				@param pResultSize [out] Used for saving the result port string's size in characters(without '\0').
 			*/
 			GINL GAIA::CH* GetPort(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
@@ -677,7 +678,7 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get the path string in HttpURL.
 
 				@param
 
@@ -693,7 +694,7 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get the full parameters string in HttpURL.
 
 				@param
 
@@ -709,7 +710,7 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get the full queries string in HttpURL.
 
 				@param
 
@@ -725,7 +726,7 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get the fragment string in HttpURL.
 
 				@param
 
@@ -740,6 +741,11 @@ namespace GAIA
 				return this->get_analyzed_node(m_fragment, psz, sMaxSize, pResultSize);
 			}
 
+			/*!
+				@brief Check HttpURL is a pure URL or not.
+
+				@return If HttpURL is a pure URL return GAIA::True, or will return GAIA::False.
+			*/
 			GINL GAIA::BL IsPure() const
 			{
 				if(m_fullparam.psz != GNIL)
@@ -752,7 +758,7 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get parameter count in HttpURL's full parameter string.
 
 				@param
 
@@ -812,7 +818,7 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get query count in HttpURL's full queries string.
 
 				@param
 
@@ -900,7 +906,7 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Deep copy from another HttpURL object.
 
 				@param
 
@@ -918,7 +924,7 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Fill content by a URL string, it like HttpURL::FromString.
 
 				@param
 
@@ -935,7 +941,7 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Default convert current HttpURL to a ascii URL string.
 
 				@param
 
@@ -946,7 +952,7 @@ namespace GAIA
 			GINL operator const GAIA::CH*(){return m_url.fptr();}
 
 			/*!
-				@brief
+				@brief Compare current HttpURL object with a ascii URL string.
 
 				@param
 
@@ -957,7 +963,7 @@ namespace GAIA
 			GINL GAIA::N32 compare(const GAIA::CH* psz) const{return m_url.compare(psz);}
 
 			/*!
-				@brief
+				@brief Compare current HttpURL object with another HttpURL object.
 
 				@param
 
@@ -1267,7 +1273,7 @@ namespace GAIA
 
 				@param psz [in] Specify the string buffer.
 
-				@param pLength [in] Specify the string length in characters.
+				@param pSize [in] Specify the string size in characters(without '\0').
 					If could be GNIL, it means all string which specified by parameter psz are used until to '\0'.
 
 				@return If the string which specified by parameter psz's format is correct, current function will return GAIA::True,
@@ -1281,7 +1287,7 @@ namespace GAIA
 					The space(' ') after the values is not nessesary.
 					The last \r\n is nessesary.
 			*/
-			GINL GAIA::BL FromString(const GAIA::CH* psz, const GAIA::NUM* pLength = GNIL)
+			GINL GAIA::BL FromString(const GAIA::CH* psz, const GAIA::NUM* pSize = GNIL)
 			{
 				this->Reset();
 				if(GAIA::ALGO::gstremp(psz))
@@ -1292,7 +1298,7 @@ namespace GAIA
 				GAIA::CTN::ACharsString strValue;
 				while(*p != '\0')
 				{
-					if(pLength != GNIL && p - psz == *pLength)
+					if(pSize != GNIL && p - psz == *pSize)
 						break;
 					if(strName.empty() && *p == ':') // Name end.
 					{
@@ -1348,25 +1354,45 @@ namespace GAIA
 
 				@remarks
 			*/
-			GINL GAIA::NUM GetStringLength() const{return m_sStringLen;}
+			GINL GAIA::NUM GetStringSize() const{return m_sStringLen;}
 
 			/*!
-				@brief
+				@brief Convert HttpHead's content to string.
+					String type like : "a:b\r\nc:d\r\n".
 
-				@param
+				@param psz [out] Used for saving the result string.
 
-				@return
+				@param sMaxSize [in] Specify parameter psz's size in characters.
+					If sMaxSize is equal GINVALID, it means parameter psz's max buffer size is enough.
+
+				@param pResultSize [out] Used for saving the result string's size in characters(without '\0').
+					If it is GNIL, this parameter will be ignored.
+
+				@param pResult [out] Used for saving result, if success, it will be filled GAIA::True, or will be filled GAIA::False.
+					If it is GNIL, this parameter will be ignored.
+
+				@return Return the parameter psz.
+					If current HttpHead is empty, parameter psz will equal to "".
 
 				@remarks
+					You could get the result size by HttpHead::GetStringSize before call this function.
 			*/
 			GINL GAIA::CH* ToString(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL, GAIA::BL* pResult = GNIL) const
 			{
 				GAST(psz != GNIL);
 				GAST(sMaxSize == GINVALID || sMaxSize > 0);
-				GAIA::CH* p = psz;
-				GAIA::NUM sSize = 0;
 				if(pResult != GNIL)
 					*pResult = GAIA::True;
+				if(this->Empty())
+				{
+					GAST(m_sStringLen == 0);
+					*psz = '\0';
+					if(pResultSize != GNIL)
+						*pResultSize = 0;
+					return psz;
+				}
+				GAIA::CH* p = psz;
+				GAIA::NUM sSize = 0;
 				for(GAIA::NUM x = 0; x < m_nodes.size(); ++x)
 				{
 					const Node& n = m_nodes[x];
@@ -1383,7 +1409,10 @@ namespace GAIA
 				}
 				*p++ = '\0';
 				if(pResultSize != GNIL)
+				{
+					GAST(sSize == this->GetStringSize());
 					*pResultSize = sSize;
+				}
 				return psz;
 			}
 
