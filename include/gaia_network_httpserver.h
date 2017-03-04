@@ -573,11 +573,9 @@ namespace GAIA
 			GAIA::BL Response(GAIA::NETWORK::HTTP_CODE httpcode, GAIA::NETWORK::HttpHead* pHttpHead = GNIL, const GAIA::GVOID* p = GNIL, GAIA::NUM sSize = 0);
 
 			/*!
-				@brief
+				@brief Close the link.
 
-				@param
-
-				@return
+				@return If close success, return GAIA::True, or return GAIA::False.
 
 				@remarks
 			*/
@@ -606,13 +604,14 @@ namespace GAIA
 			GINL GAIA::NUM GetResponseTimes() const{return m_sResponseTimes;}
 
 			/*!
-				@brief
+				@brief Compare two HttpServerLink.
 
-				@param
+				@param Specify the second operator for compare.
 
-				@return
-
-				@remarks
+				@return 
+					If current HttpServerLink below paramter src, return -1.
+					If current HttpServerLink equal paramter src, return 0.
+					If current HttpServerLink above param src, return +1.
 			*/
 			GINL GAIA::N32 compare(const HttpServerLink& src) const
 			{
@@ -649,6 +648,20 @@ namespace GAIA
 			GAIA::NUM m_sResponseTimes;
 		};
 
+		/*!
+			@brief HttpServer callback base class.
+
+			@remarks
+				The HttpServer's user have responsibility to derive a sub class from HttpServerCallBack,
+				and the sub class's OnRequest virtual function will be called by HttpServer, the user 
+				will get client request information in OnRequest virtual function.
+
+				Current class derived from GAIA::RefObject, so the object will be managed by thread-safe 
+				reference count.
+
+				If you not need use this class's object later, and the class is allocated in Heap,
+				You will call GAIA::RefObject::drop_ref() to decrease the reference count.
+		*/
 		class HttpServerCallBack : public GAIA::RefObject
 		{
 			friend class HttpServerLink;
@@ -659,6 +672,8 @@ namespace GAIA
 		public:
 			/*!
 				@brief Constructor.
+
+				@param svr [in] Specify the HttpServer.
 			*/
 			HttpServerCallBack(GAIA::NETWORK::HttpServer& svr);
 
@@ -668,36 +683,54 @@ namespace GAIA
 			virtual ~HttpServerCallBack();
 
 			/*!
-				@brief
+				@brief Get the HttpServer.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return HttpServer.
 			*/
 			GINL GAIA::NETWORK::HttpServer& GetServer() const{return *m_pSvr;}
 
 		public:
 			/*!
-				@brief
+				@brief Get HttpServerCallBack's name.
 
-				@param
-
-				@return
+				@return Return the HttpServerCallBack's name.
 
 				@remarks
+					If HttpServer's user not overwrite this method, the system could work well as well.
+					But we recommanded overwrite it and return a const string such as class's name,
+					because the HttpServer could use it for debug reason.
 			*/
 			virtual const GAIA::CH* GetName() const{return "HttpServerCallBack";}
 
 		protected:
 
 			/*!
-				@brief
+				@brief OnRequst call back.
 
-				@param
+				@param l [in] Specify the link.
+					You could consider it as a http tcp socket.
+
+				@param method [in] Specify the http method, such as GET, HEAD, POST, PUT and etc.
+
+				@param url [in] Specify the url which will be requested, it specified by client.
+
+				@param httphead [in] Specify the http head info which specified by client.
+
+				@param p [in] Specify the body buffer's pointer, it could be GNIL when a request didn't have a body.
+
+				@param sSize [in] Specify the body bufer's size, it could be zero when a request didn't have a body.
 
 				@return
+
+					If the request is be dispatched by the HttpServerCallBack's sub class(HttpServer's user derived),
+					HttpServer's user will return GAIA::True, and then HttpServer will 
+					not callback next HttpServerCallBack's OnRequest which be registed to 
+					HttpServer(By HttpServer::RegistCallBack).
+
+					If the request can't be dispatched by current HttpServerCallBack's sub class(HttpServer's user derived),
+					HttpServer's user will return GAIA::False, and then HttpServer will
+					 callback next HttpServerCallBack's OnRequest member function.
+					
 
 				@remarks
 			*/
@@ -723,7 +756,12 @@ namespace GAIA
 		};
 
 		/*!
-			@brief
+			@brief HttpServerCallBack's sub class for response static resource.
+
+			@remarks
+				If a request is a pure request, it will be consider as a pure request, 
+				and current class will try to load the resource file from disk, and response the file
+				to client.
 		*/
 		class HttpServerCallBackForStaticResource : public GAIA::NETWORK::HttpServerCallBack
 		{
@@ -745,7 +783,13 @@ namespace GAIA
 		};
 
 		/*!
-			@brief
+			@brief HttpServerCallBack's sub class for response HttpServer informations.
+
+			@remarks
+				It support url like these:
+					1. http://hostaddress:port/httpinfo. (It used to get the http informations)
+					2. http://hostaddress:port/httpblacklist. (It used to get the black list)
+					3. http://hostaddress:port/httpwhitelist. (It used to get the white list)
 		*/
 		class HttpServerCallBackForInfo : public GAIA::NETWORK::HttpServerCallBack
 		{
@@ -767,6 +811,10 @@ namespace GAIA
 		};
 
 		class HttpServerWorkThread;
+
+		/*!
+			@brief Http server class.
+		*/
 		class HttpServer : public GAIA::Base
 		{
 			friend class HttpServerLink;
@@ -787,139 +835,132 @@ namespace GAIA
 			~HttpServer();
 
 			/*!
-				@brief
+				@brief Regist a HttpServerCallBack's object to HttpServer.
 
-				@param
+				@param cb [in] Specify the HttpServerCallBack's object to registed.
 
-				@return
+				@return If success, return GAIA::True, or return GAIA::False.
 
 				@remarks
+					Regist a same object twice will cause failed.
 			*/
 			GAIA::BL RegistCallBack(GAIA::NETWORK::HttpServerCallBack& cb);
 
 			/*!
-				@brief
+				@brief Unregist a HttpServerCallBack's object from HttpServer.
 
-				@param
-
-				@return
+				@return If success, return GAIA::True, or will return GAIA::False.
 
 				@remarks
 			*/
 			GAIA::BL UnregistCallBack(GAIA::NETWORK::HttpServerCallBack& cb);
 
 			/*!
-				@brief
+				@brief Unregist all HttpServerCallBack's object from HttpServer.
 
-				@param
-
-				@return
+				@return If succcess, return GAIA::True, or return GAIA::False.
 
 				@remarks
 			*/
 			GAIA::BL UnregistCallBackAll();
 
 			/*!
-				@brief
+				@brief Check a HttpServerCallBack's object is registed or not.
 
-				@param
+				@param cb [in] Specify a HttpServerCallBack's object to check.
 
-				@return
+				@return If parameter cb is registed, return GAIA::True, or will return GAIA::False.
 
 				@remarks
 			*/
 			GAIA::BL IsRegistedCallBack(GAIA::NETWORK::HttpServerCallBack& cb);
 
 			/*!
-				@brief
+				@brief Collect all regist HttpServerCallBack's objects.
 
-				@param
+				@param listResult [in] Used to save the collect result.
 
-				@return
+				@return If collect any HttpServerCallBack's object, return GAIA::True, or will return GAIA::False.
 
 				@remarks
 			*/
 			GAIA::BL CollectCallBack(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerCallBack*>& listResult);
 
 			/*!
-				@brief
+				@brief Create HttpServer.
 
-				@param
+				@param desc [in] Specify HttpServer's descripion structure.
 
-				@return
+				@return If create success, return GAIA::True, or will return GAIA::False.
 
 				@remarks
+
+				@see HttpServerDesc.
 			*/
 			GAIA::BL Create(const GAIA::NETWORK::HttpServerDesc& desc);
 
 			/*!
-				@brief
+				@brief Destroy current HttpServer.
 
-				@param
-
-				@return
+				@return If Destroy success, return GAIA::True, or will return GAIA::False.
 
 				@remarks
 			*/
 			GAIA::BL Destroy();
 
 			/*!
-				@brief
+				@brief Check current HttpServer is created or not.
 
-				@param
-
-				@return
+				@return If current HttpServer is created, return GAIA::True, or will return GAIA::False.
 
 				@remarks
 			*/
 			GAIA::BL IsCreated() const{return m_bCreated;}
 
 			/*!
-				@brief
+				@brief Get current HttpServer's description structure.
 
-				@param
-
-				@return
+				@return Return the description structure.
 
 				@remarks
+
+				@see HttpServerDesc.
 			*/
 			const GAIA::NETWORK::HttpServerDesc& GetDesc() const{return m_desc;}
 
 			/*!
-				@brief
+				@brief Begin the service of current HttpServer.
 
 				@param
 
-				@return
+				@return If begin service successfully, return GAIA::True, or will return GAIA::False.
 
 				@remarks
 			*/
 			GAIA::BL Begin();
 
 			/*!
-				@brief
+				@brief End the service of current HttpServer.
 
 				@param
 
-				@return
+				@return If end service successfully, return GAIA::True, or will return GAIA::False.
 
 				@remarks
 			*/
 			GAIA::BL End();
 
 			/*!
-				@brief
+				@brief Check the service of current HttpServer is began or not.
 
-				@param
-
-				@return
+				@return If the service of current HttpServer is began, return GAIA::True, or will return GAIA::False.
 
 				@remarks
 			*/
 			GAIA::BL IsBegin() const{return m_bBegin;}
 
 			/*!
-				@brief
+				@brief Execute HttpServer.
 
 				@param
 
@@ -930,9 +971,9 @@ namespace GAIA
 			GAIA::BL Execute();
 
 			/*!
-				@brief
+				@brief Open a address for Http provide Http service.
 
-				@param
+				@param addr [in] Specify a network address to open service.
 
 				@return
 
@@ -941,9 +982,9 @@ namespace GAIA
 			GAIA::BL OpenAddr(const GAIA::NETWORK::Addr& addr);
 
 			/*!
-				@brief
+				@brief Close a openned address which provide Http service.
 
-				@param
+				@param addr [in] Specify a network address to close service.
 
 				@return
 
@@ -952,7 +993,7 @@ namespace GAIA
 			GAIA::BL CloseAddr(const GAIA::NETWORK::Addr& addr);
 
 			/*!
-				@brief
+				@brief Close all openned network address which provide Http service.
 
 				@param
 
@@ -963,18 +1004,18 @@ namespace GAIA
 			GAIA::BL CloseAddrAll();
 
 			/*!
-				@brief
+				@brief Check the network address is openned or not.
 
 				@param
 
-				@return
+				@return If the network address which provide Http service is openned, return GAIA::True, or will return GAIA::False.
 
 				@remarks
 			*/
 			GAIA::BL IsOpennedAddr(const GAIA::NETWORK::Addr& addr) const;
 
 			/*!
-				@brief
+				@brief Get openned network address count. (PS:The network address provide Http service)
 
 				@param
 
@@ -985,7 +1026,7 @@ namespace GAIA
 			GAIA::NUM GetOpennedAddrCount() const;
 
 			/*!
-				@brief
+				@brief Collect openned network address list. (PS: The network addresses provide Http service)
 
 				@param
 
