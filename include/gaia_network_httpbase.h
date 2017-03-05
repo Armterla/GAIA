@@ -961,12 +961,14 @@ namespace GAIA
 			/*!
 				@brief Get port in HttpURL.
 
-				@param psz [out] Used for saving the port name string.
+				@param psz [out] Used for saving the port string.
 
 				@param nMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
 
 				@param pResultSize [out] Used for saving the result port string's size in characters(without '\0').
+
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
 			*/
 			GINL GAIA::CH* GetPort(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
@@ -978,11 +980,14 @@ namespace GAIA
 			/*!
 				@brief Get the path string in HttpURL.
 
-				@param
+				@param psz [out] Used for saving the paths string.
 
-				@return
+				@param nMaxSize [in] Specify parameter psz's max size in characters.
+					If it is GINVALID, means parameter psz's buffer size is enough.
 
-				@remarks
+				@param pResultSize [out] Used for saving the result paths string's size in characters(without '\0').
+
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
 			*/
 			GINL GAIA::CH* GetPath(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
@@ -994,11 +999,14 @@ namespace GAIA
 			/*!
 				@brief Get the full parameters string in HttpURL.
 
-				@param
+				@param psz [out] Used for saving the parameters string.
 
-				@return
+				@param nMaxSize [in] Specify parameter psz's max size in characters.
+					If it is GINVALID, means parameter psz's buffer size is enough.
 
-				@remarks
+				@param pResultSize [out] Used for saving the result parameters string's size in characters(without '\0').
+
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
 			*/
 			GINL GAIA::CH* GetFullParam(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
@@ -1010,11 +1018,14 @@ namespace GAIA
 			/*!
 				@brief Get the full queries string in HttpURL.
 
-				@param
+				@param psz [out] Used for saving the queries string.
 
-				@return
+				@param nMaxSize [in] Specify parameter psz's max size in characters.
+					If it is GINVALID, means parameter psz's buffer size is enough.
 
-				@remarks
+				@param pResultSize [out] Used for saving the result queries string's size in characters(without '\0').
+
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
 			*/
 			GINL GAIA::CH* GetFullQuery(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
@@ -1026,11 +1037,14 @@ namespace GAIA
 			/*!
 				@brief Get the fragment string in HttpURL.
 
-				@param
+				@param psz [out] Used for saving the fragment string.
 
-				@return
+				@param nMaxSize [in] Specify parameter psz's max size in characters.
+					If it is GINVALID, means parameter psz's buffer size is enough.
 
-				@remarks
+				@param pResultSize [out] Used for saving the result fragment string's size in characters(without '\0').
+
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
 			*/
 			GINL GAIA::CH* GetFragment(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
@@ -1058,11 +1072,7 @@ namespace GAIA
 			/*!
 				@brief Get parameter count in HttpURL's full parameter string.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return parameter count of parameter string.
 			*/
 			GINL GAIA::NUM GetParamCount() const
 			{
@@ -1072,13 +1082,18 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get the parameter in HttpURL's full parameter string.
 
-				@param
+				@param sIndex [in] Specify the parameter's index.
 
-				@return
+				@param psz [out] Used for saving the parameter.
 
-				@remarks
+				@param nMaxSize [in] Specify parameter psz's max size in characters.
+					If it is GINVALID, means parameter psz's buffer size is enough.
+
+				@param pResultSize [out] Used for saving the result parameter's size in characters(without '\0').
+
+				@return If get the parameter successfully, return GAIA::True, or will return GAIA::False.
 			*/
 			GINL GAIA::BL GetParam(GAIA::NUM sIndex, GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
@@ -1094,13 +1109,11 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Check the parameter exist or not in the HttpURL's full parameter string.
 
-				@param
+				@param psz [in] Specify the parameter name.
 
-				@return
-
-				@remarks
+				@return If exist return GAIA::True, or will return GAIA::False.
 			*/
 			GINL GAIA::BL ExistParam(const GAIA::CH* psz) const
 			{
@@ -1118,11 +1131,7 @@ namespace GAIA
 			/*!
 				@brief Get query count in HttpURL's full queries string.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return queries count of queries string.
 			*/
 			GINL GAIA::NUM GetQueryCount() const
 			{
@@ -1134,11 +1143,21 @@ namespace GAIA
 			/*!
 				@brief
 
-				@param
+				@param pszName [out] Used for saving the query name string.
 
-				@return
+				@param pszValue [out] Used for saving the query value string.
 
-				@remarks
+				@param nMaxNameSize [in] Specify parameter pszName's max size in characters.
+					If it is GINVALID, means parameter pszName's buffer size is enough.
+
+				@param nMaxValueSize [in] Specify parameter pszValue's max size in characters.
+					If it is GINVALID, means parameter pszValue's buffer size is enough.
+
+				@param pNameResultSize [out] Used for saving the result query's name size in characters(without '\0').
+
+				@param pValueResultSize [out] Used for saving the result query's value size in characters(without '\0').
+
+				@return If get the query successfully, return GAIA::True, or will return GAIA::False.
 			*/
 			GINL GAIA::BL GetQuery(GAIA::NUM sIndex, GAIA::CH* pszName, GAIA::CH* pszValue, GAIA::NUM sMaxNameSize = GINVALID, GAIA::NUM sMaxValueSize = GINVALID, GAIA::NUM* pNameResultSize = GNIL, GAIA::NUM* pValueResultSize = GNIL) const
 			{
@@ -1156,15 +1175,20 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get the query value by query name.
 
-				@param
+				@param pszName [in] Specify the query's name.
 
-				@return
+				@param pszValue [out] Used for saving the query value.
 
-				@remarks
+				@param nMaxValueSize [in] Specify parameter pszValue's max size in characters.
+					If it is GINVALID, means parameter pszValue's buffer size is enough.
+
+				@param pValueResultSize [out] Used for saving the result query's value size in characters(without '\0').
+
+				@return If get query value sucessfully, return pszValue, or will return GNIL.
 			*/
-			GINL GAIA::CH* GetQueryByName(const GAIA::CH* pszName, GAIA::CH* pszValue, GAIA::NUM sMaxValueSize, GAIA::NUM* pValueResultSize = GNIL) const
+			GINL GAIA::CH* GetQueryByName(const GAIA::CH* pszName, GAIA::CH* pszValue, GAIA::NUM sMaxValueSize = GINVALID, GAIA::NUM* pValueResultSize = GNIL) const
 			{
 				if(!GCCAST(HttpURL*)(this)->Analyze())
 					return GNIL;
@@ -1182,13 +1206,11 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Check the query exist or not.
 
-				@param
+				@param pszName [in] Specify the query's name.
 
-				@return
-
-				@remarks
+				@return If the query exist, return GAIA::True, or will return GAIA::False.
 			*/
 			GINL GAIA::BL ExistQuery(const GAIA::CH* pszName) const
 			{
@@ -1206,11 +1228,9 @@ namespace GAIA
 			/*!
 				@brief Deep copy from another HttpURL object.
 
-				@param
+				@param src [in] Specify the copy source.
 
-				@return
-
-				@remarks
+				@return Return current object's reference.
 			*/
 			GINL HttpURL& operator = (const HttpURL& src)
 			{
@@ -1224,11 +1244,11 @@ namespace GAIA
 			/*!
 				@brief Fill content by a URL string, it like HttpURL::FromString.
 
-				@param
+				@param psz [in] Specify a URL string.
 
-				@return
+				@return Return current object's reference.
 
-				@remarks
+				@see HttpURL::FromString
 			*/
 			GINL HttpURL& operator = (const GAIA::CH* psz)
 			{
@@ -1241,33 +1261,31 @@ namespace GAIA
 			/*!
 				@brief Default convert current HttpURL to a ascii URL string.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return the URL string. If current HttpURL is empty, return "".
 			*/
 			GINL operator const GAIA::CH*(){return m_url.fptr();}
 
 			/*!
 				@brief Compare current HttpURL object with a ascii URL string.
 
-				@param
+				@param psz [in] Specify another operate value.
 
 				@return
-
-				@remarks
+					If current HttpURL below parameter psz, return -1.
+					If current HttpURL above parameter psz, return +1.
+					If current HttpURL equal parameter psz, return 0.
 			*/
 			GINL GAIA::N32 compare(const GAIA::CH* psz) const{return m_url.compare(psz);}
 
 			/*!
 				@brief Compare current HttpURL object with another HttpURL object.
 
-				@param
+				@param src [in] Specify another operate value.
 
 				@return
-
-				@remarks
+					If current HttpURL below parameter src, return -1.
+					If current HttpURL above parameter src, return +1.
+					If current HttpURL equal parameter src, return 0.
 			*/
 			GINL GAIA::N32 compare(const HttpURL& src) const{return m_url.compare(src.m_url);}
 			GCLASS_COMPARE_BYCOMPAREPTR(GAIA::CH)
