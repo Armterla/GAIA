@@ -20,8 +20,9 @@ namespace TEST
 			static const GAIA::CH* TEST_URL3 = "127.0.0.1/index.html";
 			static const GAIA::CH* TEST_URL4 = "127.0.0.1:1234/path1/path2/path3?a=1&b=2&c=3";
 			static const GAIA::CH* TEST_URL5 = "127.0.0.1/path/";
-			static const GAIA::CH* TEST_URL6 = "http://www.abc.com:4567/path1/path2/path3;param1;param2;param3?a=1&b=2&c=3#frag";
-			static const GAIA::CH* TEST_URL7 = "https://www.abc.com:4567/path1/path2/path3;param1;param2;param3?a=1&b=2&c=3#frag";
+			static const GAIA::CH* TEST_URL6 = "127.0.0.1/";
+			static const GAIA::CH* TEST_URL7 = "http://www.abc.com:4567/path1/path2/path3;param1;param2;param3?a=1&b=2&c=3#frag";
+			static const GAIA::CH* TEST_URL8 = "https://www.abc.com:4567/path1/path2/path3;param1;param2;param3?a=1&b=2&c=3#frag";
 
 			GAIA::NETWORK::HttpURL hu;
 
@@ -55,10 +56,16 @@ namespace TEST
 			if(hu.GetHostName(szHostName) == GNIL || !GAIA::ALGO::gstrequal(szHostName, "127.0.0.1"))
 				TERROR;
 
+			hu.FromString(TEST_URL6);
+			if(!hu.Analyze())
+				TERROR;
+			if(hu.GetHostName(szHostName) == GNIL || !GAIA::ALGO::gstrequal(szHostName, "127.0.0.1"))
+				TERROR;
+
 			hu.Reset();
 
 			TAST(hu.Empty());
-			hu = TEST_URL6;
+			hu = TEST_URL7;
 			TAST(!hu.Empty());
 
 			GAIA::NUM sPracSize;
@@ -224,14 +231,14 @@ namespace TEST
 
 			GAIA::NETWORK::HttpURL hu1 = hu;
 			TAST(hu1 == hu);
-			TAST(hu1 == TEST_URL6);
+			TAST(hu1 == TEST_URL7);
 
-			GAIA::NETWORK::HttpURL hu2 = TEST_URL7;
+			GAIA::NETWORK::HttpURL hu2 = TEST_URL8;
 			TAST(hu2 != hu);
-			TAST(hu2 != TEST_URL6);
+			TAST(hu2 != TEST_URL7);
 
 			const GAIA::CH* pszURL = hu;
-			if(!GAIA::ALGO::gstrequal(pszURL, TEST_URL6))
+			if(!GAIA::ALGO::gstrequal(pszURL, TEST_URL7))
 				TERROR;
 
 			hu.Reset();
