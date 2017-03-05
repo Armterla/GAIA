@@ -15,12 +15,50 @@ namespace TEST
 			GAIA::CH szFullQuery[32];
 			GAIA::CH szFragment[32];
 
-			const GAIA::CH* TEST_URL1 = "http://www.abc.com:4567/path1/path2/path3/param1;param2;param3;?a=1&b=2&c=3#frag";
-			const GAIA::CH* TEST_URL2 = "https://www.abc.com:4567/path1/path2/path3/param1;param2;param3;?a=1&b=2&c=3#frag";
+			static const GAIA::CH* TEST_URL1 = "127.0.0.1";
+			static const GAIA::CH* TEST_URL2 = "127.0.0.1:1234";
+			static const GAIA::CH* TEST_URL3 = "127.0.0.1/index.html";
+			static const GAIA::CH* TEST_URL4 = "127.0.0.1:1234/path1/path2/path3?a=1&b=2&c=3";
+			static const GAIA::CH* TEST_URL5 = "127.0.0.1/path/";
+			static const GAIA::CH* TEST_URL6 = "http://www.abc.com:4567/path1/path2/path3;param1;param2;param3?a=1&b=2&c=3#frag";
+			static const GAIA::CH* TEST_URL7 = "https://www.abc.com:4567/path1/path2/path3;param1;param2;param3?a=1&b=2&c=3#frag";
 
 			GAIA::NETWORK::HttpURL hu;
+
+			hu.FromString(TEST_URL1);
+			if(!hu.Analyze())
+				TERROR;
+			if(hu.GetHostName(szHostName) == GNIL || !GAIA::ALGO::gstrequal(szHostName, "127.0.0.1"))
+				TERROR;
+
+			hu.FromString(TEST_URL2);
+			if(!hu.Analyze())
+				TERROR;
+			if(hu.GetHostName(szHostName) == GNIL || !GAIA::ALGO::gstrequal(szHostName, "127.0.0.1"))
+				TERROR;
+
+			hu.FromString(TEST_URL3);
+			if(!hu.Analyze())
+				TERROR;
+			if(hu.GetHostName(szHostName) == GNIL || !GAIA::ALGO::gstrequal(szHostName, "127.0.0.1"))
+				TERROR;
+
+			hu.FromString(TEST_URL4);
+			if(!hu.Analyze())
+				TERROR;
+			if(hu.GetHostName(szHostName) == GNIL || !GAIA::ALGO::gstrequal(szHostName, "127.0.0.1"))
+				TERROR;
+
+			hu.FromString(TEST_URL5);
+			if(!hu.Analyze())
+				TERROR;
+			if(hu.GetHostName(szHostName) == GNIL || !GAIA::ALGO::gstrequal(szHostName, "127.0.0.1"))
+				TERROR;
+
+			hu.Reset();
+
 			TAST(hu.Empty());
-			hu = TEST_URL1;
+			hu = TEST_URL6;
 			TAST(!hu.Empty());
 
 			GAIA::NUM sPracSize;
@@ -47,16 +85,16 @@ namespace TEST
 
 			if(hu.GetPath(szPath, sizeof(szPath), &sPracSize) != szPath)
 				TERROR;
-			if(!GAIA::ALGO::gstrequal(szPath, "/path1/path2/path3/"))
+			if(!GAIA::ALGO::gstrequal(szPath, "/path1/path2/path3"))
 				TERROR;
-			if(sPracSize != sizeof("/path1/path2/path3/") - 1)
+			if(sPracSize != sizeof("/path1/path2/path3") - 1)
 				TERROR;
 
 			if(hu.GetFullParam(szFullParam, sizeof(szFullParam), &sPracSize) != szFullParam)
 				TERROR;
-			if(!GAIA::ALGO::gstrequal(szFullParam, "param1;param2;param3;"))
+			if(!GAIA::ALGO::gstrequal(szFullParam, "param1;param2;param3"))
 				TERROR;
-			if(sPracSize != sizeof("param1;param2;param3;") - 1)
+			if(sPracSize != sizeof("param1;param2;param3") - 1)
 				TERROR;
 
 			if(hu.GetFullQuery(szFullQuery, sizeof(szFullQuery), &sPracSize) != szFullQuery)
@@ -186,14 +224,14 @@ namespace TEST
 
 			GAIA::NETWORK::HttpURL hu1 = hu;
 			TAST(hu1 == hu);
-			TAST(hu1 == TEST_URL1);
+			TAST(hu1 == TEST_URL6);
 
-			GAIA::NETWORK::HttpURL hu2 = TEST_URL2;
+			GAIA::NETWORK::HttpURL hu2 = TEST_URL7;
 			TAST(hu2 != hu);
-			TAST(hu2 != TEST_URL1);
+			TAST(hu2 != TEST_URL6);
 
 			const GAIA::CH* pszURL = hu;
-			if(!GAIA::ALGO::gstrequal(pszURL, TEST_URL1))
+			if(!GAIA::ALGO::gstrequal(pszURL, TEST_URL6))
 				TERROR;
 
 			hu.Reset();

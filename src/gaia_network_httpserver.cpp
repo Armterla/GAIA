@@ -182,8 +182,7 @@ namespace GAIA
 								GAIA::NUM sUrlLen = sUrlEndPos - sUrlBeginPos;
 								if(sUrlLen <= 0)
 									break;
-								if(!m_url.FromString((const GAIA::CH*)m_pRecvBuf->fptr() + sUrlBeginPos, &sUrlLen))
-									break;
+								m_url.FromString((const GAIA::CH*)m_pRecvBuf->fptr() + sUrlBeginPos, &sUrlLen);
 
 								// Analyze http version.
 								GAIA::NUM sVerBeginPos = sUrlEndPos + 1;

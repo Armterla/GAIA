@@ -86,10 +86,10 @@ namespace TEST
 			TAST(svr.IsInWhiteList("192.168.21.34"));
 			TAST(svr.IsInWhiteList("192.168.21.43"));
 
-			TAST(!svr.IsInWhiteList("192.168.21.34"));
-			TAST(!svr.IsInWhiteList("192.168.21.43"));
-			TAST(!svr.IsInBlackList("192.168.12.34"));
-			TAST(!svr.IsInBlackList("192.168.12.43"));
+			TAST(!svr.IsInBlackList("192.168.21.34"));
+			TAST(!svr.IsInBlackList("192.168.21.43"));
+			TAST(!svr.IsInWhiteList("192.168.12.34"));
+			TAST(!svr.IsInWhiteList("192.168.12.43"));
 
 			TAST(svr.IsCreated());
 			TAST(!svr.IsBegin());

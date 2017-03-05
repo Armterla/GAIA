@@ -595,7 +595,7 @@ namespace GAIA
 					This function will clear old URL analyzed information, and didn't genereta new URL analyzed information about 
 					parameter psz.
 			*/
-			GINL GAIA::BL FromString(const GAIA::CH* psz, const GAIA::NUM* pSize = GNIL)
+			GINL GAIA::GVOID FromString(const GAIA::CH* psz, const GAIA::NUM* pSize = GNIL)
 			{
 				if(pSize != GNIL)
 				{
@@ -623,384 +623,12 @@ namespace GAIA
 			}
 
 			/*!
-				@brief Get protocal in HttpURL.
+				@brief Analyze the URL string.
 
-				@param psz [out] Used for saving the protocal string.
-
-				@param nMaxSize [in] Specify parameter psz's max size in characters.
-					If it is GINVALID, means parameter psz's buffer size is enough.
-
-				@param pResultSize [out] Used for saving the result protocal string's size in characters(without '\0').
-
-				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
+				@return If the URL string content not exist any error and analyzed successfully, return GAIA::True,
+					or will return GAIA::False.
 			*/
-			GINL GAIA::CH* GetProtocal(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
-			{
-				if(!GCCAST(HttpURL*)(this)->analyze())
-					return GNIL;
-				return this->get_analyzed_node(m_protocal, psz, sMaxSize, pResultSize);
-			}
-
-			/*!
-				@brief Get host name in HttpURL.
-
-				@param psz [out] Used for saving the host name string.
-
-				@param nMaxSize [in] Specify parameter psz's max size in characters.
-					If it is GINVALID, means parameter psz's buffer size is enough.
-
-				@param pResultSize [out] Use for saving the result protocal string's size in characters(without '\0').
-
-				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
-			*/
-			GINL GAIA::CH* GetHostName(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
-			{
-				if(!GCCAST(HttpURL*)(this)->analyze())
-					return GNIL;
-				return this->get_analyzed_node(m_hostname, psz, sMaxSize, pResultSize);
-			}
-
-			/*!
-				@brief Get port in HttpURL.
-
-				@param psz [out] Used for saving the port name string.
-
-				@param nMaxSize [in] Specify parameter psz's max size in characters.
-					If it is GINVALID, means parameter psz's buffer size is enough.
-
-				@param pResultSize [out] Used for saving the result port string's size in characters(without '\0').
-			*/
-			GINL GAIA::CH* GetPort(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
-			{
-				if(!GCCAST(HttpURL*)(this)->analyze())
-					return GNIL;
-				return this->get_analyzed_node(m_port, psz, sMaxSize, pResultSize);
-			}
-
-			/*!
-				@brief Get the path string in HttpURL.
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL GAIA::CH* GetPath(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
-			{
-				if(!GCCAST(HttpURL*)(this)->analyze())
-					return GNIL;
-				return this->get_analyzed_node(m_path, psz, sMaxSize, pResultSize);
-			}
-
-			/*!
-				@brief Get the full parameters string in HttpURL.
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL GAIA::CH* GetFullParam(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
-			{
-				if(!GCCAST(HttpURL*)(this)->analyze())
-					return GNIL;
-				return this->get_analyzed_node(m_fullparam, psz, sMaxSize, pResultSize);
-			}
-
-			/*!
-				@brief Get the full queries string in HttpURL.
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL GAIA::CH* GetFullQuery(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
-			{
-				if(!GCCAST(HttpURL*)(this)->analyze())
-					return GNIL;
-				return this->get_analyzed_node(m_fullquery, psz, sMaxSize, pResultSize);
-			}
-
-			/*!
-				@brief Get the fragment string in HttpURL.
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL GAIA::CH* GetFragment(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
-			{
-				if(!GCCAST(HttpURL*)(this)->analyze())
-					return GNIL;
-				return this->get_analyzed_node(m_fragment, psz, sMaxSize, pResultSize);
-			}
-
-			/*!
-				@brief Check HttpURL is a pure URL or not.
-
-				@return If HttpURL is a pure URL return GAIA::True, or will return GAIA::False.
-			*/
-			GINL GAIA::BL IsPure() const
-			{
-				if(m_fullparam.psz != GNIL)
-					return GAIA::False;
-				if(m_fullquery.psz != GNIL)
-					return GAIA::False;
-				if(m_fragment.psz != GNIL)
-					return GAIA::False;
-				return GAIA::True;
-			}
-
-			/*!
-				@brief Get parameter count in HttpURL's full parameter string.
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL GAIA::NUM GetParamCount() const
-			{
-				if(!GCCAST(HttpURL*)(this)->analyze())
-					return 0;
-				return m_params.size();
-			}
-
-			/*!
-				@brief
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL GAIA::BL GetParam(GAIA::NUM sIndex, GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
-			{
-				if(!GCCAST(HttpURL*)(this)->analyze())
-					return GAIA::False;
-				if(sIndex < 0 || sIndex >= m_params.size())
-					return GAIA::False;
-				const Node& n = m_params[sIndex];
-				GAIA::CH* pszResult = this->get_analyzed_node(n, psz, sMaxSize, pResultSize);
-				if(pszResult == GNIL)
-					return GAIA::False;
-				return GAIA::True;
-			}
-
-			/*!
-				@brief
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL GAIA::BL ExistParam(const GAIA::CH* psz) const
-			{
-				if(!GCCAST(HttpURL*)(this)->analyze())
-					return GAIA::False;
-				for(GAIA::NUM x = 0; x < m_params.size(); ++x)
-				{
-					const Node& n = m_params[x];
-					if(GAIA::ALGO::gstrcmp(n.psz, psz, n.sLen) == 0)
-						return GAIA::True;
-				}
-				return GAIA::False;
-			}
-
-			/*!
-				@brief Get query count in HttpURL's full queries string.
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL GAIA::NUM GetQueryCount() const
-			{
-				if(!GCCAST(HttpURL*)(this)->analyze())
-					return 0;
-				return m_queries.size() / 2;
-			}
-
-			/*!
-				@brief
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL GAIA::BL GetQuery(GAIA::NUM sIndex, GAIA::CH* pszName, GAIA::CH* pszValue, GAIA::NUM sMaxNameSize = GINVALID, GAIA::NUM sMaxValueSize = GINVALID, GAIA::NUM* pNameResultSize = GNIL, GAIA::NUM* pValueResultSize = GNIL) const
-			{
-				if(!GCCAST(HttpURL*)(this)->analyze())
-					return GAIA::False;
-				if(sIndex < 0 || sIndex >= m_queries.size())
-					return GAIA::False;
-				const Node& nname = m_queries[sIndex * 2];
-				GAIA::CH* pszResultName = this->get_analyzed_node(nname, pszName, sMaxNameSize, pNameResultSize);
-				if(pszResultName == GNIL)
-					return GAIA::False;
-				const Node& nvalue = m_queries[sIndex * 2 + 1];
-				GAIA::CH* pszResultValue = this->get_analyzed_node(nvalue, pszValue, sMaxValueSize, pValueResultSize);
-				return GAIA::True;
-			}
-
-			/*!
-				@brief
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL GAIA::CH* GetQueryByName(const GAIA::CH* pszName, GAIA::CH* pszValue, GAIA::NUM sMaxValueSize, GAIA::NUM* pValueResultSize = GNIL) const
-			{
-				if(!GCCAST(HttpURL*)(this)->analyze())
-					return GNIL;
-				GAST(m_queries.size() % 2 == 0);
-				for(GAIA::NUM x = 0; x < m_queries.size(); x += 2)
-				{
-					const Node& nname = m_queries[x];
-					if(GAIA::ALGO::gstrcmp(nname.psz, pszName, nname.sLen) == 0)
-					{
-						const Node& nvalue = m_queries[x + 1];
-						return this->get_analyzed_node(nvalue, pszValue, sMaxValueSize, pValueResultSize);
-					}
-				}
-				return GNIL;
-			}
-
-			/*!
-				@brief
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL GAIA::BL ExistQuery(const GAIA::CH* pszName) const
-			{
-				if(!GCCAST(HttpURL*)(this)->analyze())
-					return GAIA::False;
-				for(GAIA::NUM x = 0; x < m_queries.size(); x += 2)
-				{
-					const Node& nname = m_queries[x];
-					if(GAIA::ALGO::gstrcmp(nname.psz, pszName, nname.sLen) == 0)
-						return GAIA::True;
-				}
-				return GAIA::False;
-			}
-
-			/*!
-				@brief Deep copy from another HttpURL object.
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL HttpURL& operator = (const HttpURL& src)
-			{
-				if(m_url == src.m_url)
-					return *this;
-				m_url = src.m_url;
-				this->clear_analyzed();
-				return *this;
-			}
-
-			/*!
-				@brief Fill content by a URL string, it like HttpURL::FromString.
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL HttpURL& operator = (const GAIA::CH* psz)
-			{
-				if(m_url == psz)
-					return *this;
-				this->FromString(psz);
-				return *this;
-			}
-
-			/*!
-				@brief Default convert current HttpURL to a ascii URL string.
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL operator const GAIA::CH*(){return m_url.fptr();}
-
-			/*!
-				@brief Compare current HttpURL object with a ascii URL string.
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL GAIA::N32 compare(const GAIA::CH* psz) const{return m_url.compare(psz);}
-
-			/*!
-				@brief Compare current HttpURL object with another HttpURL object.
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GINL GAIA::N32 compare(const HttpURL& src) const{return m_url.compare(src.m_url);}
-			GCLASS_COMPARE_BYCOMPAREPTR(GAIA::CH)
-			GCLASS_COMPARE_BYCOMPARE(HttpURL)
-
-		private:
-			class Node : public GAIA::Base
-			{
-			public:
-				GINL GAIA::GVOID reset(){psz = GNIL; sLen = 0;}
-			public:
-				const GAIA::CH* psz;
-				GAIA::NUM sLen;
-			};
-
-		private:
-			GINL GAIA::GVOID init(){this->clear_analyzed();}
-			GINL GAIA::GVOID clear_analyzed()
-			{
-				m_protocal.reset();
-				m_hostname.reset();
-				m_port.reset();
-				m_path.reset();
-				m_fullparam.reset();
-				m_fullquery.reset();
-				m_fragment.reset();
-				m_params.clear();
-				m_queries.clear();
-				m_bAnalyzed = GAIA::False;
-			}
-			GINL GAIA::BL analyze()
+			GINL GAIA::BL Analyze()
 			{
 				if(m_bAnalyzed)
 					return GAIA::True;
@@ -1008,75 +636,167 @@ namespace GAIA
 					return GAIA::False;
 
 				// Local variable declarations.
-				GAIA::NUM sProtocalBegin, sProtocalEnd;
-				GAIA::NUM sHostNameBegin, sHostNameEnd;
-				GAIA::NUM sPortBegin, sPortEnd;
-				GAIA::NUM sPathBegin, sPathEnd;
-				GAIA::NUM sFullParamBegin, sFullParamEnd;
-				GAIA::NUM sFullQueryBegin, sFullQueryEnd;
-				GAIA::NUM sFragmentBegin, sFragmentEnd;
+				GAIA::NUM sProtocalBegin = GINVALID, sProtocalEnd = GINVALID;
+				GAIA::NUM sHostNameBegin = GINVALID, sHostNameEnd = GINVALID;
+				GAIA::NUM sPortBegin = GINVALID, sPortEnd = GINVALID;
+				GAIA::NUM sPathBegin = GINVALID, sPathEnd = GINVALID;
+				GAIA::NUM sFullParamBegin = GINVALID, sFullParamEnd = GINVALID;
+				GAIA::NUM sFullQueryBegin = GINVALID, sFullQueryEnd = GINVALID;
+				GAIA::NUM sFragmentBegin = GINVALID, sFragmentEnd = GINVALID;
 
 				GAIA::NUM sUrlSize = m_url.size();
+				const GAIA::CH* pszUrl = m_url.fptr();
 
 				// Partition analyze.
 				{
-					// Protocal.
-					sProtocalBegin = 0;
-					sProtocalEnd = m_url.find("://");
-					if(sProtocalEnd == GINVALID)
-						sProtocalEnd = 0;
-
-					// HostName.
-					sHostNameBegin = ((sProtocalEnd == 0) ? (0) : (sProtocalEnd + sizeof("://") - 1));
-
-					// Port.
-					sPortBegin = m_url.find(':', sHostNameBegin);
-					sPortEnd = GINVALID;
-					if(sPortBegin == GINVALID)
+					for(GAIA::NUM x = 0; x < sUrlSize; ++x)
 					{
-						sHostNameEnd = m_url.find('/', sHostNameBegin);
-						if(sHostNameEnd == GINVALID)
-							sHostNameEnd = sUrlSize;
-					}
-					else
-					{
-						sHostNameEnd = sPortBegin;
-						sPortBegin++;
-						if(sPortBegin < sUrlSize)
+						if(pszUrl[x] == ':')
 						{
-							sPortEnd = m_url.find('/', sPortBegin);
-							if(sPortEnd == GINVALID)
-								sPortEnd = sUrlSize;
+							if(sHostNameBegin == GINVALID)
+							{
+								if(x + 2 < sUrlSize && pszUrl[x + 1] == '/' && pszUrl[x + 2] == '/')
+								{
+									GAST(sProtocalBegin == GINVALID);
+									GAST(sProtocalEnd == GINVALID);
+									sProtocalBegin = 0;
+									sProtocalEnd = x;
+									sHostNameBegin = x + 3;
+									x += 2;
+								}
+								else
+								{
+									sHostNameBegin = 0;
+									sHostNameEnd = x;
+									GAST(sPortBegin == GINVALID);
+									sPortBegin = x + 1;
+								}
+							}
+							else
+							{
+								if(sPortBegin == GINVALID)
+								{
+									sPortBegin = x + 1;
+									GAST(sHostNameEnd == GINVALID);
+									sHostNameEnd = x;
+								}
+							}
+						}
+						else if(pszUrl[x] == '/')
+						{
+							if(sHostNameEnd == GINVALID)
+								sHostNameEnd = x;
+							else
+							{
+								if(sPortBegin != GINVALID && sPortEnd == GINVALID)
+									sPortEnd = x;
+							}
+							if(sPathBegin == GINVALID)
+								sPathBegin = x;
+						}
+						else if(pszUrl[x] == ';')
+						{
+							if(sPathEnd == GINVALID)
+								sPathEnd = x;
+							if(sFullParamBegin == GINVALID)
+								sFullParamBegin = x + 1;
+						}
+						else if(pszUrl[x] == '?')
+						{
+							if(sPathEnd == GINVALID)
+								sPathEnd = x;
+							if(sFullParamBegin != GINVALID && sFullParamEnd == GINVALID)
+								sFullParamEnd = x;
+							if(sFullQueryBegin == GINVALID)
+								sFullQueryBegin = x + 1;
+						}
+						else if(pszUrl[x] == '#')
+						{
+							if(sPathEnd == GINVALID)
+								sPathEnd = x;
+							if(sFullParamBegin != GINVALID && sFullParamEnd == GINVALID)
+								sFullParamEnd = x;
+							if(sFullQueryBegin != GINVALID && sFullQueryEnd == GINVALID)
+								sFullQueryEnd = x;
+							if(sFragmentBegin == GINVALID)
+								sFragmentBegin = x + 1;
 						}
 					}
 
-					// Path.
-					sPathBegin = ((sPortEnd != GINVALID) ? sPortEnd : sHostNameEnd);
-					sPathEnd = m_url.rfind('/');
-					if(sPathEnd == GINVALID || sPathEnd <= sPathBegin)
+					//
+					if(sHostNameBegin == GINVALID && sHostNameEnd != GINVALID)
+					{
+						GAST(sProtocalBegin == GINVALID);
+						GAST(sProtocalEnd == GINVALID);
+						sHostNameBegin = 0;
+					}
+
+					// Close end index.
+					if(sProtocalBegin != GINVALID && sProtocalEnd == GINVALID)
+						sProtocalEnd = sUrlSize;
+					if(sHostNameBegin != GINVALID && sHostNameEnd == GINVALID)
+						sHostNameEnd = sUrlSize;
+					if(sPortBegin != GINVALID && sPortEnd == GINVALID)
+						sPortEnd = sUrlSize;
+					if(sPathBegin != GINVALID && sPathEnd == GINVALID)
 						sPathEnd = sUrlSize;
-					else
-						sPathEnd = sPathEnd + 1;
-
-					// Full param.
-					sFullParamBegin = sPathEnd;
-					sFullParamEnd = m_url.find('?', sFullParamBegin);
-					if(sFullParamEnd == GINVALID)
+					if(sFullParamBegin != GINVALID && sFullParamEnd == GINVALID)
 						sFullParamEnd = sUrlSize;
-
-					// Full query.
-					sFullQueryBegin = sFullParamEnd + 1;
-					sFullQueryEnd = m_url.rfind('#');
-					if(sFullQueryEnd == GINVALID || sFullQueryEnd <= sFullQueryBegin)
+					if(sFullQueryBegin != GINVALID && sFullQueryEnd == GINVALID)
 						sFullQueryEnd = sUrlSize;
+					if(sFragmentBegin != GINVALID && sFragmentEnd == GINVALID)
+						sFragmentEnd = sUrlSize;
 
-					// Fragment.
-					sFragmentBegin = sFullQueryEnd + 1;
-					sFragmentEnd = sUrlSize;
+					// If URL is a host address only, like "www.google.com" or "127.0.0.1".
+					if(sProtocalBegin == GINVALID &&
+					   sHostNameBegin == GINVALID &&
+					   sPortBegin == GINVALID &&
+					   sPathBegin == GINVALID &&
+					   sFullParamBegin == GINVALID &&
+					   sFullQueryBegin == GINVALID &&
+					   sFragmentBegin == GINVALID)
+					{
+						sHostNameBegin = 0;
+						sHostNameEnd = sUrlSize;
+					}
 				}
 
 				// Checkup.
 				{
+					GAIA::NUM listOffset[] =
+					{
+						sProtocalBegin, sProtocalEnd,
+						sHostNameBegin, sHostNameEnd,
+						sPortBegin, sPortEnd,
+						sPathBegin, sPathEnd,
+						sFullParamBegin, sFullParamEnd,
+						sFullQueryBegin, sFullQueryEnd,
+						sFragmentBegin, sFragmentEnd,
+					};
+					GAST(sizeofarray(listOffset) % 2 == 0);
+					GAIA::NUM sLastValue = 0;
+					for(GAIA::NUM x = 0; x < sizeofarray(listOffset); x += 2)
+					{
+						if(listOffset[x] == GINVALID)
+						{
+							if(listOffset[x + 1] != GINVALID)
+								return GAIA::False;
+							listOffset[x] = sLastValue;
+							listOffset[x + 1] = sLastValue;
+						}
+						else
+						{
+							if(listOffset[x + 1] == GINVALID)
+								return GAIA::False;
+							sLastValue = listOffset[x + 1];
+						}
+					}
+					for(GAIA::NUM x = 1; x < sizeofarray(listOffset); ++x)
+					{
+						if(listOffset[x - 1] > listOffset[x])
+							return GAIA::False;
+					}
+
 					if(sProtocalBegin >= 0 && sProtocalEnd <= sUrlSize && sProtocalBegin < sProtocalEnd)
 					{
 						m_protocal.psz = m_url.fptr() + sProtocalBegin;
@@ -1199,6 +919,385 @@ namespace GAIA
 				m_bAnalyzed = GAIA::True;
 				return GAIA::True;
 			}
+
+			/*!
+				@brief Get protocal in HttpURL.
+
+				@param psz [out] Used for saving the protocal string.
+
+				@param nMaxSize [in] Specify parameter psz's max size in characters.
+					If it is GINVALID, means parameter psz's buffer size is enough.
+
+				@param pResultSize [out] Used for saving the result protocal string's size in characters(without '\0').
+
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
+			*/
+			GINL GAIA::CH* GetProtocal(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return GNIL;
+				return this->get_analyzed_node(m_protocal, psz, sMaxSize, pResultSize);
+			}
+
+			/*!
+				@brief Get host name in HttpURL.
+
+				@param psz [out] Used for saving the host name string.
+
+				@param nMaxSize [in] Specify parameter psz's max size in characters.
+					If it is GINVALID, means parameter psz's buffer size is enough.
+
+				@param pResultSize [out] Use for saving the result protocal string's size in characters(without '\0').
+
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
+			*/
+			GINL GAIA::CH* GetHostName(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return GNIL;
+				return this->get_analyzed_node(m_hostname, psz, sMaxSize, pResultSize);
+			}
+
+			/*!
+				@brief Get port in HttpURL.
+
+				@param psz [out] Used for saving the port name string.
+
+				@param nMaxSize [in] Specify parameter psz's max size in characters.
+					If it is GINVALID, means parameter psz's buffer size is enough.
+
+				@param pResultSize [out] Used for saving the result port string's size in characters(without '\0').
+			*/
+			GINL GAIA::CH* GetPort(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return GNIL;
+				return this->get_analyzed_node(m_port, psz, sMaxSize, pResultSize);
+			}
+
+			/*!
+				@brief Get the path string in HttpURL.
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL GAIA::CH* GetPath(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return GNIL;
+				return this->get_analyzed_node(m_path, psz, sMaxSize, pResultSize);
+			}
+
+			/*!
+				@brief Get the full parameters string in HttpURL.
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL GAIA::CH* GetFullParam(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return GNIL;
+				return this->get_analyzed_node(m_fullparam, psz, sMaxSize, pResultSize);
+			}
+
+			/*!
+				@brief Get the full queries string in HttpURL.
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL GAIA::CH* GetFullQuery(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return GNIL;
+				return this->get_analyzed_node(m_fullquery, psz, sMaxSize, pResultSize);
+			}
+
+			/*!
+				@brief Get the fragment string in HttpURL.
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL GAIA::CH* GetFragment(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return GNIL;
+				return this->get_analyzed_node(m_fragment, psz, sMaxSize, pResultSize);
+			}
+
+			/*!
+				@brief Check HttpURL is a pure URL or not.
+
+				@return If HttpURL is a pure URL return GAIA::True, or will return GAIA::False.
+			*/
+			GINL GAIA::BL IsPure() const
+			{
+				if(m_fullparam.psz != GNIL)
+					return GAIA::False;
+				if(m_fullquery.psz != GNIL)
+					return GAIA::False;
+				if(m_fragment.psz != GNIL)
+					return GAIA::False;
+				return GAIA::True;
+			}
+
+			/*!
+				@brief Get parameter count in HttpURL's full parameter string.
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL GAIA::NUM GetParamCount() const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return 0;
+				return m_params.size();
+			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL GAIA::BL GetParam(GAIA::NUM sIndex, GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return GAIA::False;
+				if(sIndex < 0 || sIndex >= m_params.size())
+					return GAIA::False;
+				const Node& n = m_params[sIndex];
+				GAIA::CH* pszResult = this->get_analyzed_node(n, psz, sMaxSize, pResultSize);
+				if(pszResult == GNIL)
+					return GAIA::False;
+				return GAIA::True;
+			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL GAIA::BL ExistParam(const GAIA::CH* psz) const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return GAIA::False;
+				for(GAIA::NUM x = 0; x < m_params.size(); ++x)
+				{
+					const Node& n = m_params[x];
+					if(GAIA::ALGO::gstrcmp(n.psz, psz, n.sLen) == 0)
+						return GAIA::True;
+				}
+				return GAIA::False;
+			}
+
+			/*!
+				@brief Get query count in HttpURL's full queries string.
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL GAIA::NUM GetQueryCount() const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return 0;
+				return m_queries.size() / 2;
+			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL GAIA::BL GetQuery(GAIA::NUM sIndex, GAIA::CH* pszName, GAIA::CH* pszValue, GAIA::NUM sMaxNameSize = GINVALID, GAIA::NUM sMaxValueSize = GINVALID, GAIA::NUM* pNameResultSize = GNIL, GAIA::NUM* pValueResultSize = GNIL) const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return GAIA::False;
+				if(sIndex < 0 || sIndex >= m_queries.size())
+					return GAIA::False;
+				const Node& nname = m_queries[sIndex * 2];
+				GAIA::CH* pszResultName = this->get_analyzed_node(nname, pszName, sMaxNameSize, pNameResultSize);
+				if(pszResultName == GNIL)
+					return GAIA::False;
+				const Node& nvalue = m_queries[sIndex * 2 + 1];
+				GAIA::CH* pszResultValue = this->get_analyzed_node(nvalue, pszValue, sMaxValueSize, pValueResultSize);
+				return GAIA::True;
+			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL GAIA::CH* GetQueryByName(const GAIA::CH* pszName, GAIA::CH* pszValue, GAIA::NUM sMaxValueSize, GAIA::NUM* pValueResultSize = GNIL) const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return GNIL;
+				GAST(m_queries.size() % 2 == 0);
+				for(GAIA::NUM x = 0; x < m_queries.size(); x += 2)
+				{
+					const Node& nname = m_queries[x];
+					if(GAIA::ALGO::gstrcmp(nname.psz, pszName, nname.sLen) == 0)
+					{
+						const Node& nvalue = m_queries[x + 1];
+						return this->get_analyzed_node(nvalue, pszValue, sMaxValueSize, pValueResultSize);
+					}
+				}
+				return GNIL;
+			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL GAIA::BL ExistQuery(const GAIA::CH* pszName) const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return GAIA::False;
+				for(GAIA::NUM x = 0; x < m_queries.size(); x += 2)
+				{
+					const Node& nname = m_queries[x];
+					if(GAIA::ALGO::gstrcmp(nname.psz, pszName, nname.sLen) == 0)
+						return GAIA::True;
+				}
+				return GAIA::False;
+			}
+
+			/*!
+				@brief Deep copy from another HttpURL object.
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL HttpURL& operator = (const HttpURL& src)
+			{
+				if(m_url == src.m_url)
+					return *this;
+				m_url = src.m_url;
+				this->clear_analyzed();
+				return *this;
+			}
+
+			/*!
+				@brief Fill content by a URL string, it like HttpURL::FromString.
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL HttpURL& operator = (const GAIA::CH* psz)
+			{
+				if(m_url == psz)
+					return *this;
+				this->FromString(psz);
+				return *this;
+			}
+
+			/*!
+				@brief Default convert current HttpURL to a ascii URL string.
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL operator const GAIA::CH*(){return m_url.fptr();}
+
+			/*!
+				@brief Compare current HttpURL object with a ascii URL string.
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL GAIA::N32 compare(const GAIA::CH* psz) const{return m_url.compare(psz);}
+
+			/*!
+				@brief Compare current HttpURL object with another HttpURL object.
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GINL GAIA::N32 compare(const HttpURL& src) const{return m_url.compare(src.m_url);}
+			GCLASS_COMPARE_BYCOMPAREPTR(GAIA::CH)
+			GCLASS_COMPARE_BYCOMPARE(HttpURL)
+
+		private:
+			class Node : public GAIA::Base
+			{
+			public:
+				GINL GAIA::GVOID reset(){psz = GNIL; sLen = 0;}
+			public:
+				const GAIA::CH* psz;
+				GAIA::NUM sLen;
+			};
+
+		private:
+			GINL GAIA::GVOID init(){this->clear_analyzed();}
+			GINL GAIA::GVOID clear_analyzed()
+			{
+				m_protocal.reset();
+				m_hostname.reset();
+				m_port.reset();
+				m_path.reset();
+				m_fullparam.reset();
+				m_fullquery.reset();
+				m_fragment.reset();
+				m_params.clear();
+				m_queries.clear();
+				m_bAnalyzed = GAIA::False;
+			}
 			GINL GAIA::CH* get_analyzed_node(const Node& n, GAIA::CH* psz, GAIA::NUM sMaxSize, GAIA::NUM* pResultSize) const
 			{
 				if(psz == GNIL)
@@ -1210,7 +1309,7 @@ namespace GAIA
 				}
 				else
 				{
-					if(n.sLen >= sMaxSize)
+					if(sMaxSize != GINVALID && n.sLen >= sMaxSize)
 						return GNIL;
 					if(pResultSize != GNIL)
 						*pResultSize = n.sLen;
