@@ -732,9 +732,9 @@ namespace GAIA
 				}
 				strResp += "\n";
 
-				strResp += "\tHitCacheCount = "; strResp += s.uHitCacheCount; strResp += "\n";
-				strResp += "\tHitCacheSize = "; strResp += s.uHitCacheSize; strResp += "\n";
-				strResp += "\tNotHitCacheCount = "; strResp += s.uNotHitCacheCount; strResp += "\n";
+				strResp += "\tHitResponseCacheCount = "; strResp += s.uHitResponseCacheCount; strResp += "\n";
+				strResp += "\tHitResponseCacheSize = "; strResp += s.uHitResponseCacheSize; strResp += "\n";
+				strResp += "\tNotHitResponseCacheCount = "; strResp += s.uNotHitResponseCacheCount; strResp += "\n";
 				strResp += "\tNotResponseCount = "; strResp += s.uNotResponseCount; strResp += "\n";
 				strResp += "\n";
 
@@ -752,8 +752,7 @@ namespace GAIA
 				strResp += "\n";
 
 				strResp += "[GAIA HTTP SERVER WORK STATE]\n\n";
-				strResp += "\tEnableDynamicResponseCache = "; strResp += this->GetServer().IsEnableDynamicResponseCache(); strResp += "\n";
-				strResp += "\tEnableStaticResponseCache = "; strResp += this->GetServer().IsEnableStaticResponseCache(); strResp += "\n";
+				strResp += "\tEnableResponseCache = "; strResp += this->GetServer().IsEnableResponseCache(); strResp += "\n";
 				strResp += "\tBlackWhiteMode = "; strResp += GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE_STRING[this->GetServer().GetBlackWhiteMode()]; strResp += "\n";
 				strResp += "\n";
 
@@ -1171,11 +1170,11 @@ namespace GAIA
 								this->ReleaseCache(pSock->m_url, pSock->m_head);
 								bResponsedByCache = GAIA::True;
 
-								m_status.uHitCacheCount++;
-								m_status.uHitCacheSize += resphead.GetStringSize() + sCacheSize;
+								m_status.uHitResponseCacheCount++;
+								m_status.uHitResponseCacheSize += resphead.GetStringSize() + sCacheSize;
 							}
 							else
-								m_status.uNotHitCacheCount++;
+								m_status.uNotHitResponseCacheCount++;
 						}
 					}
 
@@ -1294,24 +1293,14 @@ namespace GAIA
 			return m_disp->CollectListenSocket(listResult);
 		}
 
-		GAIA::GVOID HttpServer::EnableDynamicResponseCache(GAIA::BL bEnable)
+		GAIA::GVOID HttpServer::EnableResponseCache(GAIA::BL bEnable)
 		{
-			m_bEnableDynamicResponseCache = bEnable;
+			m_bEnableResponseCache = bEnable;
 		}
 
-		GAIA::BL HttpServer::IsEnableDynamicResponseCache() const
+		GAIA::BL HttpServer::IsEnableResponseCache() const
 		{
-			return m_bEnableDynamicResponseCache;
-		}
-
-		GAIA::GVOID HttpServer::EnableStaticResponseCache(GAIA::BL bEnable)
-		{
-			m_bEnableStaticResponseCache = bEnable;
-		}
-
-		GAIA::BL HttpServer::IsEnableStaticResponseCache() const
-		{
-			return m_bEnableStaticResponseCache;
+			return m_bEnableResponseCache;
 		}
 
 		GAIA::GVOID HttpServer::SetBlackWhiteMode(GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE mode)
@@ -1438,6 +1427,8 @@ namespace GAIA
 		{
 			GPCHR_NULLSTR_RET(pszKey, GAIA::False);
 			GPCHR_NULL_RET(p, GAIA::False);
+			if(!this->IsEnableResponseCache())
+				return GAIA::False;
 			m_rwCache.EnterRead();
 			if(sKeyLen == GINVALID)
 				sKeyLen = GAIA::ALGO::gstrlen(pszKey);
@@ -1473,6 +1464,8 @@ namespace GAIA
 		GAIA::BL HttpServer::RequestCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& reqhead, GAIA::NETWORK::HttpHead& resphead, GAIA::GVOID** p, GAIA::NUM& sSize)
 		{
 			GAST(!url.Empty());
+			if(!this->IsEnableResponseCache())
+				return GAIA::False;
 			GAIA::NETWORK::HttpHead prachead = reqhead;
 			prachead.Optimize();
 			GAIA::NUM sUrlLength;
@@ -1540,6 +1533,8 @@ namespace GAIA
 		GAIA::BL HttpServer::UpdateCache(const GAIA::CH* pszKey, GAIA::NUM sKeyLen, const GAIA::NETWORK::HttpHead& resphead, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime)
 		{
 			GPCHR_NULLSTR_RET(pszKey, GAIA::False);
+			if(!this->IsEnableResponseCache())
+				return GAIA::False;
 			if(sKeyLen == GINVALID)
 				sKeyLen = GAIA::ALGO::gstrlen(pszKey);
 			GAIA::SYNC::AutolockW al(m_rwCache);
@@ -1580,6 +1575,8 @@ namespace GAIA
 		GAIA::BL HttpServer::UpdateCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& reqhead, const GAIA::NETWORK::HttpHead& resphead, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime)
 		{
 			GAST(!url.Empty());
+			if(!this->IsEnableResponseCache())
+				return GAIA::False;
 			GAIA::NETWORK::HttpHead prachead = reqhead;
 			prachead.Optimize();
 			GAIA::NUM sUrlLength;

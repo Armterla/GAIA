@@ -338,9 +338,9 @@ namespace GAIA
 				for(GAIA::NUM x = 0; x < sizeofarray(uResponseCountByCode); ++x)
 					uResponseCountByCode[x] = 0;
 
-				uHitCacheCount = 0;
-				uHitCacheSize = 0;
-				uNotHitCacheCount = 0;
+				uHitResponseCacheCount = 0;
+				uHitResponseCacheSize = 0;
+				uNotHitResponseCacheCount = 0;
 				uNotResponseCount = 0;
 			}
 
@@ -384,12 +384,12 @@ namespace GAIA
 			GAIA::U64 uRequestDenyByBWCount;
 
 			/*!
-				@brief
+				@brief Specify the max connection count to deny the request.
 			*/
 			GAIA::U64 uRequestDenyByMaxConnCount;
 
 			/*!
-				@brief
+				@brief Specify the max half connection count to deny the request.
 			*/
 			GAIA::U64 uRequestDenyByMaxHalfConnCount;
 
@@ -461,17 +461,17 @@ namespace GAIA
 			/*!
 				@brief Specify hit cache count.
 			*/
-			GAIA::U64 uHitCacheCount;
+			GAIA::U64 uHitResponseCacheCount;
 
 			/*!
 				@brief Specify hit cache size.
 			*/
-			GAIA::U64 uHitCacheSize;
+			GAIA::U64 uHitResponseCacheSize;
 
 			/*!
 				@brief Specify not hit cache count.
 			*/
-			GAIA::U64 uNotHitCacheCount;
+			GAIA::U64 uNotHitResponseCacheCount;
 
 			/*!
 				@brief Specify not response count.
@@ -589,29 +589,21 @@ namespace GAIA
 
 				@return If close success, return GAIA::True, or return GAIA::False.
 
-				@remarks
+				@remarks If you response request complete, you must call this function manually.
 			*/
 			GAIA::BL Close();
 
 			/*!
-				@brief
+				@brief Get link's current request times in the link's life.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return request times.
 			*/
 			GINL GAIA::NUM GetRequestTimes() const{return m_sRequestTimes;}
 
 			/*!
-				@brief
+				@brief Get link's current reponse times in the link's life.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return response times.
 			*/
 			GINL GAIA::NUM GetResponseTimes() const{return m_sResponseTimes;}
 
@@ -862,8 +854,6 @@ namespace GAIA
 				@brief Unregist a HttpServerCallBack's object from HttpServer.
 
 				@return If success, return GAIA::True, or will return GAIA::False.
-
-				@remarks
 			*/
 			GAIA::BL UnregistCallBack(GAIA::NETWORK::HttpServerCallBack& cb);
 
@@ -871,8 +861,6 @@ namespace GAIA
 				@brief Unregist all HttpServerCallBack's object from HttpServer.
 
 				@return If succcess, return GAIA::True, or return GAIA::False.
-
-				@remarks
 			*/
 			GAIA::BL UnregistCallBackAll();
 
@@ -882,8 +870,6 @@ namespace GAIA
 				@param cb [in] Specify a HttpServerCallBack's object to check.
 
 				@return If parameter cb is registed, return GAIA::True, or will return GAIA::False.
-
-				@remarks
 			*/
 			GAIA::BL IsRegistedCallBack(GAIA::NETWORK::HttpServerCallBack& cb);
 
@@ -893,8 +879,6 @@ namespace GAIA
 				@param listResult [in] Used to save the collect result.
 
 				@return If collect any HttpServerCallBack's object, return GAIA::True, or will return GAIA::False.
-
-				@remarks
 			*/
 			GAIA::BL CollectCallBack(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerCallBack*>& listResult);
 
@@ -905,8 +889,6 @@ namespace GAIA
 
 				@return If create success, return GAIA::True, or will return GAIA::False.
 
-				@remarks
-
 				@see HttpServerDesc.
 			*/
 			GAIA::BL Create(const GAIA::NETWORK::HttpServerDesc& desc);
@@ -916,7 +898,7 @@ namespace GAIA
 
 				@return If Destroy success, return GAIA::True, or will return GAIA::False.
 
-				@remarks
+				@remarks If current HttpServer is began, currect function call will end it by HttpServer::End function.
 			*/
 			GAIA::BL Destroy();
 
@@ -924,8 +906,6 @@ namespace GAIA
 				@brief Check current HttpServer is created or not.
 
 				@return If current HttpServer is created, return GAIA::True, or will return GAIA::False.
-
-				@remarks
 			*/
 			GAIA::BL IsCreated() const{return m_bCreated;}
 
@@ -934,51 +914,46 @@ namespace GAIA
 
 				@return Return the description structure.
 
-				@remarks
-
 				@see HttpServerDesc.
 			*/
 			const GAIA::NETWORK::HttpServerDesc& GetDesc() const{return m_desc;}
 
 			/*!
-				@brief Begin the service of current HttpServer.
+				@brief Begin(Startup) the service of current HttpServer.
 
-				@param
+				@return If current HttpServer is not begin, and startup service successfully,
+					return GAIA::True, or will return GAIA::False.
 
-				@return If begin service successfully, return GAIA::True, or will return GAIA::False.
-
-				@remarks
+				@remarks Current function will startup the network threads and work threads.
 			*/
 			GAIA::BL Begin();
 
 			/*!
-				@brief End the service of current HttpServer.
+				@brief End(Shutdown) the service of current HttpServer.
 
-				@param
+				@return If end service successfully, return GAIA::True,
+					or will return GAIA::False.
 
-				@return If end service successfully, return GAIA::True, or will return GAIA::False.
-
-				@remarks
+				@remarks Current function will shutdown the network threads and work threads.
 			*/
 			GAIA::BL End();
 
 			/*!
-				@brief Check the service of current HttpServer is began or not.
+				@brief Check the service of current HttpServer is began(Startuped) or not.
 
-				@return If the service of current HttpServer is began, return GAIA::True, or will return GAIA::False.
-
-				@remarks
+				@return If the service of current HttpServer is began,
+					return GAIA::True, or will return GAIA::False.
 			*/
 			GAIA::BL IsBegin() const{return m_bBegin;}
 
 			/*!
 				@brief Execute HttpServer.
 
-				@param
-
-				@return
+				@return If exist some task to dispatch, and be dispatched, return GAIA::True,
+					or will return GAIA::False.
 
 				@remarks
+					Call this function will cause HttpServerCallBack::OnRequest be callback.
 			*/
 			GAIA::BL Execute();
 
@@ -1042,48 +1017,18 @@ namespace GAIA
 			GAIA::BL CollectOpennedAddr(GAIA::CTN::Vector<GAIA::NETWORK::Addr>& listResult);
 
 			/*!
-				@brief
+				@brief Enable or disable response cache.
 
-				@param
-
-				@return
-
-				@remarks
+				@param bEnable [in] Enable or disable.
 			*/
-			GAIA::GVOID EnableDynamicResponseCache(GAIA::BL bEnable);
+			GAIA::GVOID EnableResponseCache(GAIA::BL bEnable);
 
 			/*!
-				@brief
+				@brief Check response cache is enabled or disabled.
 
-				@param
-
-				@return
-
-				@remarks
+				@return If enabled, return GAIA::True, or will return GAIA::False.
 			*/
-			GAIA::BL IsEnableDynamicResponseCache() const;
-
-			/*!
-				@brief
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GAIA::GVOID EnableStaticResponseCache(GAIA::BL bEnable);
-
-			/*!
-				@brief
-
-				@param
-
-				@return
-
-				@remarks
-			*/
-			GAIA::BL IsEnableStaticResponseCache() const;
+			GAIA::BL IsEnableResponseCache() const;
 
 			/*!
 				@brief Set HttpServer's black white access mode.
@@ -1219,68 +1164,145 @@ namespace GAIA
 			GINL GAIA::NETWORK::HttpServerStatus& GetStatus(){return m_status;}
 
 			/*!
-				@brief
+				@brief Request a cache data by a string key.
 
-				@param
+				@param pszKey [in] Specify the cache data's string key.
 
-				@return
+				@param sKeyLen [in] Specify the key's length in characters(With out '\0').
+					This parameter could be GINVALID when the parameter pszKey ended with '\0'.
+
+				@param resqhead [out] Used for saving the response head.
+
+				@param p [out] Used for saving the body's pointer.
+					If the cache did not have a body, this parameter will be filled by GNIL.
+
+				@param sSize [out] Used for saving the body's size in bytes.
+					If the cache did not have a body, this parameter will be filled by 0.
+
+				@return If request the cache successfully, return GAIA::True,
+					or will return GAIA::False.
 
 				@remarks
+					Cache is managed by reference count, call this function will cause reference count increase 1,
+					when a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.
+
+					If current function return GAIA::True, current function will lock cache system's read-lock,
+					the HttpServer's user have responsibility to call HttpServer::ReleaseCache to release it(decrease reference count).
+					If not do it like above, the HttpServer will deadlock or memory leak.
 			*/
 			GAIA::BL RequestCache(const GAIA::CH* pszKey, GAIA::NUM sKeyLen, GAIA::NETWORK::HttpHead& resphead, GAIA::GVOID** p, GAIA::NUM& sSize);
 
 			/*!
-				@brief
+				@brief Request a cache data by a url and request head.
 
-				@param
+				@param url [in] Specify the cache's url.
 
-				@return
+				@param reqhead [in] Specify the cache's head.
+
+				@param resphead [out] Used for saving the response head.
+
+				@param p [out] Used for saving the body's pointer.
+					If the cache did not have a body, this parameter will be filled by GNIL.
+
+				@param sSize [out] Used for saving the body's size in bytes.
+					If the cache did not have a body, this parameter will be filled by 0.
+
+				@return If request the cache successfully, return GAIA::True,
+					or will return GAIA::False.
 
 				@remarks
+					Cache is managed by reference count, call this function will cause reference count increase 1,
+					when a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.
+
+					If current function return GAIA::True, current function will lock cache system's read-lock,
+					the HttpServer's user have responsibility to call HttpServer::ReleaseCache to release it(decrease reference count).
+					If not do it like above, the HttpServer will deadlock or memory leak.
 			*/
 			GAIA::BL RequestCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& reqhead, GAIA::NETWORK::HttpHead& resphead, GAIA::GVOID** p, GAIA::NUM& sSize);
 
 			/*!
-				@brief
+				@brief Release a cache by a string key.
 
-				@param
+				@param pszKey [in] Specify the cache data's string key.
 
-				@return
+				@param sKeyLen [in] Specify the key's length in characters(With out '\0').
+					This parameter could be GINVALID when the parameter pszKey ended with '\0'.
+
+				@return If release the cache successfully, return GAIA::True,
+					or will return GAIA::False.
 
 				@remarks
+					Cache is managed by reference count, call this function will cause reference count decrease 1,
+					When a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.
+
+					If current function return GAIA::True, current function had release the cache system's read-lock
+					which is locked by HttpServer::RequestCache.
 			*/
 			GAIA::BL ReleaseCache(const GAIA::CH* pszKey, GAIA::NUM sKeyLen);
 
 			/*!
-				@brief
+				@brief Release a cache by url and request head.
 
-				@param
+				@param url [in] Specify the cache's url.
 
-				@return
+				@param reqhead [in] Specify the cache's head.
+
+				@return If release the cache successfully, return GAIA::True,
+					or will return GAIA::False.
 
 				@remarks
+					Cache is managed by reference count, call this function will cause reference count decrease 1,
+					When a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.
+
+					If current function return GAIA::True, current function had release the cache system's read-lock
+					which is locked by HttpServer::RequestCache.
 			*/
 			GAIA::BL ReleaseCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& reqhead);
 
 			/*!
-				@brief
+				@brief Update or insert a cache by a string key.
 
-				@param
+				@param pszKey [in] Specify the cache data's string key.
 
-				@return
+				@param sKeyLen [in] Specify the key's length in characters(With out '\0').
+					This parameter could be GINVALID when the parameter pszKey ended with '\0'.
+
+				@param resphead [in] Specify the cache's response head.
+
+				@param p [in] Specify the cache's body.
+
+				@param sSize [in] Specify the cache's body size in bytes.
+
+				@param uEffectTime [in] Specify the cache take effect time in microseconds.
+
+				@return If update or insert the cache successfully, return GAIA::True,
+					or will return GAIA::False.
 
 				@remarks
+					If the cache data is not exist which specified by parameter pszKey,
+					current function will insert the cache data.
 			*/
 			GAIA::BL UpdateCache(const GAIA::CH* pszKey, GAIA::NUM sKeyLen, const GAIA::NETWORK::HttpHead& resphead, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime = GINVALID);
 
 			/*!
-				@brief
+				@brief Update or insert a cache by url and request head.
 
-				@param
+				@param url [in] Specify the cache's url.
 
-				@return
+				@param reqhead [in] Specify the cache's head.
+
+				@param p [in] Specify the cache's body.
+
+				@param sSize [in] Specify the cache's body size in bytes.
+
+				@param uEffectTime [in] Specify the cache take effect time in microseconds.
+
+				@return If update or insert the cache successfully, return GAIA::True,
+					or will return GAIA::False.
 
 				@remarks
+					If the cache data is not exist which specified by parameter url and reqhead,
+					current function will insert the cache data.
 			*/
 			GAIA::BL UpdateCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& reqhead, const GAIA::NETWORK::HttpHead& resphead, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime = GINVALID);
 
@@ -1297,7 +1319,6 @@ namespace GAIA
 
 				@return Return the AsyncDispatcher.
 			*/
-
 			GAIA::NETWORK::HttpAsyncDispatcher* GetAsyncDispatcher() const{return m_disp;}
 
 		private:
@@ -1311,8 +1332,7 @@ namespace GAIA
 				m_desc.reset();
 				m_bCreated = GAIA::False;
 				m_bBegin = GAIA::False;
-				m_bEnableDynamicResponseCache = GAIA::True;
-				m_bEnableStaticResponseCache = GAIA::True;
+				m_bEnableResponseCache = GAIA::True;
 				m_blackwhitemode = GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE_BLACK;
 				m_disp = GNIL;
 				m_status.reset();
@@ -1352,8 +1372,7 @@ namespace GAIA
 			GAIA::SYNC::LockRW m_rwRCLinks; // RC means request complete.
 			__LinkQueueType m_rclinks; // RC means request complete.
 
-			GAIA::BL m_bEnableDynamicResponseCache;
-			GAIA::BL m_bEnableStaticResponseCache;
+			GAIA::BL m_bEnableResponseCache;
 
 			GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE m_blackwhitemode;
 			GAIA::SYNC::LockRW m_rwBlackList;
