@@ -857,7 +857,7 @@ namespace GAIA
 								else
 								{
 									n.psz = pLast;
-									n.sLen = p - pLast;
+									n.sLen = (GAIA::NUM)(p - pLast);
 								}
 								m_params.push_back(n);
 								pLast = p + 1;
@@ -868,7 +868,7 @@ namespace GAIA
 						{
 							Node n;
 							n.psz = pLast;
-							n.sLen = p - pLast;
+							n.sLen = (GAIA::NUM)(p - pLast);
 							m_params.push_back(n);
 						}
 					}
@@ -892,7 +892,7 @@ namespace GAIA
 								else
 								{
 									n.psz = pLast;
-									n.sLen = p - pLast;
+									n.sLen = (GAIA::NUM)(p - pLast);
 								}
 								m_queries.push_back(n);
 								if(*p == '&' && m_queries.size() % 2 != 0)
@@ -907,7 +907,7 @@ namespace GAIA
 						{
 							Node n;
 							n.psz = pLast;
-							n.sLen = p - pLast;
+							n.sLen = (GAIA::NUM)(p - pLast);
 							m_queries.push_back(n);
 							if(m_queries.size() % 2 != 0)
 								m_queries.push_back(n);
@@ -925,7 +925,7 @@ namespace GAIA
 
 				@param psz [out] Used for saving the protocal string.
 
-				@param nMaxSize [in] Specify parameter psz's max size in characters.
+				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
 
 				@param pResultSize [out] Used for saving the result protocal string's size in characters(without '\0').
@@ -944,7 +944,7 @@ namespace GAIA
 
 				@param psz [out] Used for saving the host name string.
 
-				@param nMaxSize [in] Specify parameter psz's max size in characters.
+				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
 
 				@param pResultSize [out] Use for saving the result protocal string's size in characters(without '\0').
@@ -963,7 +963,7 @@ namespace GAIA
 
 				@param psz [out] Used for saving the port string.
 
-				@param nMaxSize [in] Specify parameter psz's max size in characters.
+				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
 
 				@param pResultSize [out] Used for saving the result port string's size in characters(without '\0').
@@ -982,7 +982,7 @@ namespace GAIA
 
 				@param psz [out] Used for saving the paths string.
 
-				@param nMaxSize [in] Specify parameter psz's max size in characters.
+				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
 
 				@param pResultSize [out] Used for saving the result paths string's size in characters(without '\0').
@@ -1001,7 +1001,7 @@ namespace GAIA
 
 				@param psz [out] Used for saving the parameters string.
 
-				@param nMaxSize [in] Specify parameter psz's max size in characters.
+				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
 
 				@param pResultSize [out] Used for saving the result parameters string's size in characters(without '\0').
@@ -1020,7 +1020,7 @@ namespace GAIA
 
 				@param psz [out] Used for saving the queries string.
 
-				@param nMaxSize [in] Specify parameter psz's max size in characters.
+				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
 
 				@param pResultSize [out] Used for saving the result queries string's size in characters(without '\0').
@@ -1039,7 +1039,7 @@ namespace GAIA
 
 				@param psz [out] Used for saving the fragment string.
 
-				@param nMaxSize [in] Specify parameter psz's max size in characters.
+				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
 
 				@param pResultSize [out] Used for saving the result fragment string's size in characters(without '\0').
@@ -1088,7 +1088,7 @@ namespace GAIA
 
 				@param psz [out] Used for saving the parameter.
 
-				@param nMaxSize [in] Specify parameter psz's max size in characters.
+				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
 
 				@param pResultSize [out] Used for saving the result parameter's size in characters(without '\0').
@@ -1147,10 +1147,10 @@ namespace GAIA
 
 				@param pszValue [out] Used for saving the query value string.
 
-				@param nMaxNameSize [in] Specify parameter pszName's max size in characters.
+				@param sMaxNameSize [in] Specify parameter pszName's max size in characters.
 					If it is GINVALID, means parameter pszName's buffer size is enough.
 
-				@param nMaxValueSize [in] Specify parameter pszValue's max size in characters.
+				@param sMaxValueSize [in] Specify parameter pszValue's max size in characters.
 					If it is GINVALID, means parameter pszValue's buffer size is enough.
 
 				@param pNameResultSize [out] Used for saving the result query's name size in characters(without '\0').
@@ -1170,7 +1170,7 @@ namespace GAIA
 				if(pszResultName == GNIL)
 					return GAIA::False;
 				const Node& nvalue = m_queries[sIndex * 2 + 1];
-				GAIA::CH* pszResultValue = this->get_analyzed_node(nvalue, pszValue, sMaxValueSize, pValueResultSize);
+				this->get_analyzed_node(nvalue, pszValue, sMaxValueSize, pValueResultSize);
 				return GAIA::True;
 			}
 
@@ -1181,7 +1181,7 @@ namespace GAIA
 
 				@param pszValue [out] Used for saving the query value.
 
-				@param nMaxValueSize [in] Specify parameter pszValue's max size in characters.
+				@param sMaxValueSize [in] Specify parameter pszValue's max size in characters.
 					If it is GINVALID, means parameter pszValue's buffer size is enough.
 
 				@param pValueResultSize [out] Used for saving the result query's value size in characters(without '\0').
@@ -1422,7 +1422,7 @@ namespace GAIA
 							this->Reset();
 							return GAIA::False;
 						}
-						strName.assign(pLast, p - pLast);
+						strName.assign(pLast, (GAIA::NUM)(p - pLast));
 						p += 1;
 						pLast = p;
 					}
@@ -1435,7 +1435,7 @@ namespace GAIA
 							this->Reset();
 							return GAIA::False;
 						}
-						strValue.assign(pLast, p - pLast);
+						strValue.assign(pLast, (GAIA::NUM)(p - pLast));
 						this->Set(strName.fptr(), strValue.fptr());
 						strName.clear();
 						strValue.clear();
@@ -1454,7 +1454,7 @@ namespace GAIA
 						this->Reset();
 						return GAIA::False;
 					}
-					strValue.assign(pLast, p - pLast);
+					strValue.assign(pLast, (GAIA::NUM)(p - pLast));
 					this->Set(strName.fptr(), strValue.fptr());
 				}
 				return GAIA::True;
@@ -1710,8 +1710,6 @@ namespace GAIA
 				@brief Get Name-Value pair count in current HttpHead.
 
 				@return Return Name-Value pair count.
-
-				@remarks
 			*/
 			GINL GAIA::NUM Size() const{return m_nodes.size();}
 
@@ -1754,9 +1752,9 @@ namespace GAIA
 
 				@param sIndex [in] Specify the Name-Value pair's index, it belong [0, this->size).
 
-				@param pszName [out] Used for saving Name-Value pair's name.
+				@param ppName [out] Used for saving Name-Value pair's name.
 
-				@param pszValue [out] Used for saving Name-Value pair's value.
+				@param ppValue [out] Used for saving Name-Value pair's value.
 
 				@return If Name-Value pair is exist which specified by parameter index,
 					current function call will success, and return GAIA::True,
@@ -1852,8 +1850,6 @@ namespace GAIA
 					If current HttpHead object below parameter src, return -1.
 					If current HttpHead object above parameter src, return +1.
 					If current HttpHead object equal parameter src, return 0.
-
-				@remarks
 			*/
 			GINL GAIA::N32 compare(const HttpHead& src) const
 			{

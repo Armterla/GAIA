@@ -37,7 +37,7 @@ namespace GAIA
 		/*!
 			@brief Sleep current thread by microseconds.
 
-			@param uMilliSeconds [in] Specify the sleep time in microseconds.
+			@param uMicroSeconds [in] Specify the sleep time in microseconds.
 
 			@return Return the time practice sleeped in microseconds.
 		*/

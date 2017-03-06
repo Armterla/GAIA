@@ -280,9 +280,6 @@ namespace GAIA
 		}
 		GAIA::BL SUDPSocket::Execute(GAIA::U64 uDeltaTime, GAIA::BL bSend, GAIA::BL bRecv, GAIA::BL bResend, GAIA::BL bRerecv, GAIA::BL bTimeout)
 		{
-			GAST(uDeltaTime >= 0);
-			if(uDeltaTime < 0)
-				GTHROW(InvalidParam);
 			if(!this->IsCreated())
 				GTHROW(Illegal);
 

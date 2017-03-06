@@ -19,7 +19,7 @@ namespace GAIA
 		/*!
 			@brief multi-bytes encoded chars convert to wide-chars.
 
-			@param pSrc [in] Specify the source multi-bytes encoded chars.
+			@param pszSrc [in] Specify the source multi-bytes encoded chars.
 
 			@param src_size_in_bytes [in] Specify the source multi-bytes encoded chars length(unit by bytes).
 
