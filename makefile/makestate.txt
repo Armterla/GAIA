@@ -3,16 +3,27 @@
     [Windows]
 
         VS2013-32            ------------    0.0.1 build.1
+        VS2013-32 Debug      ------------    0.0.1 build.1
+
         VS2013-64            ------------    0.0.1 build.1
+        VS2013-64 Debug      ------------    0.0.1 build.1
+
         VS2015-32            ------------    0.0.1 build.1
+        VS2015-32 Debug      ------------    0.0.1 build.1
+
         VS2015-64            ------------    0.0.1 build.1
+        VS2015-64 Debug      ------------    0.0.1 build.1
 
         Qt5.7 for Win32      ------------    
+        Qt5.7 for Win32 Debug------------    
 
     [Mac OSX]
 
         Qt5.7 For Mac        ------------    0.0.1 build.1
+        Qt5.7 For Mac Debug  ------------    0.0.1 build.1
+
         Xcode                ------------    0.0.1 build.1
+        Xcode Debug          ------------    0.0.1 build.1
 
     [iOS]
         
