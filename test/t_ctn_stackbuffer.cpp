@@ -109,5 +109,21 @@ namespace TEST
 			TERROR;
 		if(b.readx<GAIA::U8>() != '8')
 			TERROR;
+		b.clear();
+		b.write("HelloWorld", GAIA::ALGO::gstrlen("HelloWorld"));
+		if(b.find(_T("Hello"), GAIA::ALGO::gstrlen(_T("Hello")), 0) != 0)
+			TERROR;
+		if(b.find(_T("HelloWorld"), GAIA::ALGO::gstrlen(_T("HelloWorld")), 0) != 0)
+			TERROR;
+		if(b.find(_T("Wo"), GAIA::ALGO::gstrlen(_T("Wo")), 0) != 5)
+			TERROR;
+		if(!b.startwith("Hello", GAIA::ALGO::gstrlen("Hello")))
+			TERROR;
+		if(b.startwith("World", GAIA::ALGO::gstrlen("World")))
+			TERROR;
+		if(!b.endwith("World", GAIA::ALGO::gstrlen("World")))
+			TERROR;
+		if(b.endwith("Hello", GAIA::ALGO::gstrlen("World")))
+			TERROR;
 	}
 }

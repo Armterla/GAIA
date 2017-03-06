@@ -46,10 +46,22 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			__AVLType::it ittemp = avl.findit(x);
+			if(ittemp.empty())
+			{
+				TERROR;
+				break;
+			}
 		}
 		for(__AVLType::_datatype x = 0; x < ELEMENT_SIZE; ++x)
 		{
 			if((*(const __AVLType*)&avl).find(x) == GNIL)
+			{
+				TERROR;
+				break;
+			}
+			__AVLType::const_it cittemp = avl.const_findit(x);
+			if(cittemp.empty())
 			{
 				TERROR;
 				break;

@@ -375,12 +375,14 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
 			}
-			GINL _SizeType rfind(const _DataType& t, const _SizeType& index = 0) const
+			GINL _SizeType rfind(const _DataType& t, _SizeType index = GINVALID) const
 			{
 				if(this->empty())
 					return (_SizeType)GINVALID;
 				if(index >= this->size())
 					return (_SizeType)GINVALID;
+				else if(index == GINVALID)
+					index = this->size() - 1;
 				const _DataType* pFinded = GAIA::ALGO::rfind(this->fptr(), this->fptr() + index, t);
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;
@@ -429,6 +431,26 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				return GSCAST(_SizeType)(pFinded - this->fptr());
 			}
+			GINL it binary_searchit(const _DataType& t)
+			{
+				it iter;
+				_SizeType findedidx = this->binary_search(t);
+				if(findedidx == GINVALID)
+					return iter;
+				iter.m_pContainer = this;
+				iter.m_index = findedidx;
+				return iter;
+			}
+			GINL const_it const_binary_searchit(const _DataType& t) const
+			{
+				const_it iter;
+				_SizeType findedidx = this->binary_search(t);
+				if(findedidx == GINVALID)
+					return iter;
+				iter.m_pContainer = this;
+				iter.m_index = findedidx;
+				return iter;
+			}
 			GINL GAIA::GVOID relocation(const _SizeType& srcindex, const _SizeType& dstindex)
 			{
 				GPCHR_TRUE(srcindex < 0 || srcindex >= this->size());
@@ -451,6 +473,26 @@ namespace GAIA
 				}
 			}
 			GINL GAIA::GVOID swap(const _SizeType& index1, const _SizeType& index2){GAIA::ALGO::swap(this->operator[](index1), this->operator[](index2));}
+			GINL it findit(const _DataType& t, const _SizeType& index = 0)
+			{
+				it iter;
+				_SizeType findedidx = this->find(t, index);
+				if(findedidx == GINVALID)
+					return iter;
+				iter.m_pContainer = this;
+				iter.m_index = findedidx;
+				return iter;
+			}
+			GINL const_it const_findit(const _DataType& t, const _SizeType& index = 0) const
+			{
+				const_it iter;
+				_SizeType findedidx = this->find(t, index);
+				if(findedidx == GINVALID)
+					return iter;
+				iter.m_pContainer = this;
+				iter.m_index = findedidx;
+				return iter;
+			}
 			GINL it upper_equal(const _DataType& t)
 			{
 				it iter;

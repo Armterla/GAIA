@@ -443,6 +443,56 @@ namespace GAIA
 			}
 			return GNIL;
 		}
+		template<typename _DataType1, typename _DataType2, typename _DataType3>
+		_DataType1 gstrstr(_DataType1 p1, _DataType2 p2, _DataType3 size)
+		{
+			GAST(!!p1);
+			GAST(!!p2);
+			_DataType3 p2size = GAIA::ALGO::gstrlen(p2);
+			_DataType1 p1head = p1;
+			_DataType3 p1validsize = size - p2size;
+			while(*p1 != '\0' && p1 - p1head <= p1validsize)
+			{
+				_DataType1 po = p1;
+				_DataType2 p = p2;
+				while(*p != '\0')
+				{
+					if(*p != *po)
+						break;
+					++po;
+					++p;
+				}
+				if(p - p2 == p2size)
+					return p1;
+				++p1;
+			}
+			return GNIL;
+		}
+		template<typename _DataType1, typename _DataType2, typename _DataType3>
+		_DataType1 gstristr(_DataType1 p1, _DataType2 p2, _DataType3 size)
+		{
+			GAST(!!p1);
+			GAST(!!p2);
+			_DataType3 p2size = GAIA::ALGO::gstrlen(p2);
+			_DataType1 p1head = p1;
+			_DataType3 p1validsize = size - p2size;
+			while(*p1 != '\0' && p1 - p1head <= p1validsize)
+			{
+				_DataType1 po = p1;
+				_DataType2 p = p2;
+				while(*p != '\0')
+				{
+					if(GAIA::ALGO::tolower(*p) != GAIA::ALGO::tolower(*po))
+						break;
+					++po;
+					++p;
+				}
+				if(p - p2 == p2size)
+					return p1;
+				++p1;
+			}
+			return GNIL;
+		}
 		template<typename _DataType1, typename _DataType2>
 		_DataType1* gstrwrd(const _DataType1* p1, const _DataType2* p2)
 		{
@@ -1059,14 +1109,14 @@ namespace GAIA
 		GAIA::BL castv(const GAIA::F32& v, _CharType* p, const _SizeType& size)
 		{
 			GAIA::ALGO::real2str(v, p);
-			GAST(GAIA::ALGO::gstrlen(p) < size);
+			GAST(GAIA::ALGO::gstrlen(p) < (GAIA::NUM)size);
 			return GAIA::True;
 		}
 		template<typename _CharType, typename _SizeType>
 		GAIA::BL castv(const GAIA::F64& v, _CharType* p, const _SizeType& size)
 		{
 			GAIA::ALGO::real2str(v, p);
-			GAST(GAIA::ALGO::gstrlen(p) < size);
+			GAST(GAIA::ALGO::gstrlen(p) < (GAIA::NUM)size);
 			return GAIA::True;
 		}
 		template<typename _CharType, typename _SizeType>
@@ -1080,14 +1130,14 @@ namespace GAIA
 		GAIA::BL castv(const X128& v, _CharType* p, const _SizeType& size)
 		{
 			GAIA::ALGO::hex2str((const GAIA::U8*)&v, sizeof(v), p);
-			GAST(GAIA::ALGO::gstrlen(p) < size);
+			GAST(GAIA::ALGO::gstrlen(p) < (GAIA::NUM)size);
 			return GAIA::True;
 		}
 		template<typename _ValueType, typename _CharType, typename _SizeType>
 		GAIA::BL castv(const _ValueType& v, _CharType* p, const _SizeType& size)
 		{
 			GAIA::ALGO::int2str(v, p);
-			GAST(GAIA::ALGO::gstrlen(p) < size);
+			GAST(GAIA::ALGO::gstrlen(p) < (GAIA::NUM)size);
 			return GAIA::True;
 		}
 		class acasts

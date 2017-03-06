@@ -266,9 +266,9 @@ namespace GAIA
 
 			return buf.write_size();
 		}
-		GAIA::N32 SUDPSocket::GetFileDescriptor() const
+		GAIA::N32 SUDPSocket::GetFD() const
 		{
-			return m_sock.GetFileDescriptor();
+			return m_sock.GetFD();
 		}
 		GAIA::BL SUDPSocket::GetGlobalAddress(GAIA::NETWORK::Addr& addr)
 		{
@@ -280,9 +280,6 @@ namespace GAIA
 		}
 		GAIA::BL SUDPSocket::Execute(GAIA::U64 uDeltaTime, GAIA::BL bSend, GAIA::BL bRecv, GAIA::BL bResend, GAIA::BL bRerecv, GAIA::BL bTimeout)
 		{
-			GAST(uDeltaTime >= 0);
-			if(uDeltaTime < 0)
-				GTHROW(InvalidParam);
 			if(!this->IsCreated())
 				GTHROW(Illegal);
 

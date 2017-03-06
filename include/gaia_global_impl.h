@@ -71,13 +71,13 @@ DefaultGAIALogCallBack g_gaia_log_callback;
 	GAIA::SYNC::Lock g_gaia_lr_stringptrpool;
 	GAIA::SYNC::Lock g_gaia_lr_wstringptrpool;
 	GAIA::SYNC::Lock g_gaia_lr_bufferpool;
-	GAIA::CTN::StaticStringPtrPool<GAIA::CH> g_gaia_staticstringptrpool;
-	GAIA::CTN::StaticStringPtrPool<GAIA::WCH> g_gaia_staticwstringptrpool;
-	GAIA::CTN::StaticBufferPool g_gaia_staticbufferpool;
-	GAIA::CTN::StringPtrPool<GAIA::CH> g_gaia_stringptrpool;
-	GAIA::CTN::StringPtrPool<GAIA::WCH> g_gaia_wstringptrpool;
-	GAIA::CTN::BufferPool g_gaia_bufferpool;
 #endif
+GAIA::CTN::StaticStringPtrPool<GAIA::CH> g_gaia_staticstringptrpool;
+GAIA::CTN::StaticStringPtrPool<GAIA::WCH> g_gaia_staticwstringptrpool;
+GAIA::CTN::StaticBufferPool g_gaia_staticbufferpool;
+GAIA::CTN::StringPtrPool<GAIA::CH> g_gaia_stringptrpool;
+GAIA::CTN::StringPtrPool<GAIA::WCH> g_gaia_wstringptrpool;
+GAIA::CTN::BufferPool g_gaia_bufferpool;
 const GAIA::CH* gaia_alloc_staticstring(const GAIA::CH* psz)
 {
 #if GAIA_THREADSAFE == GAIA_THREADSAFE_ON
@@ -144,6 +144,64 @@ GAIA::BL gaia_release_buffer(const GAIA::GVOID* p, GAIA::NUM sSize)
 
 /* PerfCollector. */
 GAIA::DBG::PerfCollector g_gaia_perf;
+
+GAIA::GVOID gaia_reset_global_variables()
+{
+	g_gaia_log.Destroy();
+	g_gaia_log_callback.reset();
+	g_gaia_perf.Reset();
+
+	// Release global pool.
+	{
+		// Static string ptr pool.
+		{
+		#if GAIA_THREADSAFE == GAIA_THREADSAFE_ON
+			GAIA::SYNC::Autolock al(g_gaia_lr_staticstringptrpool);
+		#endif
+			g_gaia_staticstringptrpool.destroy();
+		}
+
+		// Static wstring ptr pool.
+		{
+		#if GAIA_THREADSAFE == GAIA_THREADSAFE_ON
+			GAIA::SYNC::Autolock al(g_gaia_lr_staticwstringptrpool);
+		#endif
+			g_gaia_staticwstringptrpool.destroy();
+		}
+
+		// Static buffer pool.
+		{
+		#if GAIA_THREADSAFE == GAIA_THREADSAFE_ON
+			GAIA::SYNC::Autolock al(g_gaia_lr_staticbufferpool);
+		#endif
+			g_gaia_staticbufferpool.destroy();
+		}
+
+		// Dynamic string ptr pool.
+		{
+		#if GAIA_THREADSAFE == GAIA_THREADSAFE_ON
+			GAIA::SYNC::Autolock al(g_gaia_lr_stringptrpool);
+		#endif
+			g_gaia_stringptrpool.destroy();
+		}
+
+		// Dynamic wstring ptr pool.
+		{
+		#if GAIA_THREADSAFE == GAIA_THREADSAFE_ON
+			GAIA::SYNC::Autolock al(g_gaia_lr_wstringptrpool);
+		#endif
+			g_gaia_wstringptrpool.destroy();
+		}
+
+		// Dynamic buffer pool.
+		{
+		#if GAIA_THREADSAFE == GAIA_THREADSAFE_ON
+			GAIA::SYNC::Autolock al(g_gaia_lr_bufferpool);
+		#endif
+			g_gaia_bufferpool.destroy();
+		}
+	}
+}
 
 #ifndef GAIA_DEBUG_CATCHEXCEPTION
 	GAIA::ECT::Ect e(GNIL, 0, GNIL);

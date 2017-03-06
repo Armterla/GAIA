@@ -1,4 +1,4 @@
-#ifndef		__GAIA_NETWORK_BASE_H__
+﻿#ifndef		__GAIA_NETWORK_BASE_H__
 #define		__GAIA_NETWORK_BASE_H__
 
 #include "gaia_type.h"
@@ -46,7 +46,7 @@ namespace GAIA
 		/*!
 			@brief Convert GAIA Addr to socket sockaddr_in.
 		*/
-		GINL GAIA::GVOID addr2saddr(const GAIA::NETWORK::Addr& a, GAIA::GVOID* sa);
+		GINL GAIA::GVOID addr2saddr(const GAIA::NETWORK::Addr& a, GAIA::GVOID* sa, GAIA::N32 nFamily);
 
 		/*!
 			@brief Convert sockaddr_in to GAIA Addr.

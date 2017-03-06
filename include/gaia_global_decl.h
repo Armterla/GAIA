@@ -10,9 +10,9 @@
 #include "gaia_algo_string.h"
 #include "gaia_ctn_charsstring.h"
 #include "gaia_time.h"
-#include "gaia_dbg_perf.h"
 #include "gaia_fsys_file.h"
 #include "gaia_log.h"
+#include "gaia_dbg_perf.h"
 
 /* Global std stream. */
 extern GAIA::STREAM::STDStream g_gaia_stdstream;
@@ -66,8 +66,8 @@ public:
 		const GAIA::TCH* pszLog)
 	{
 		/* Parameter checkup. */
-		GPCHR_NULLSTR_RET(pszLog, GAIA::False);
-		GAST(type < GAIA::LOG::Log::TYPE_MAXENUMCOUNT);
+		if(GAIA::ALGO::gstremp(pszLog))
+			return GAIA::False;
 		if(type >= GAIA::LOG::Log::TYPE_MAXENUMCOUNT)
 			return GAIA::False;
 
@@ -152,11 +152,6 @@ extern GAIA::BL gaia_release_buffer(const GAIA::GVOID* p, GAIA::NUM sSize);
 extern GAIA::DBG::PerfCollector g_gaia_perf;
 
 /* Global variable management. */
-inline GAIA::GVOID gaia_reset_global_variables()
-{
-	g_gaia_log.Destroy();
-	g_gaia_log_callback.reset();
-	g_gaia_perf.Reset();
-}
+extern GAIA::GVOID gaia_reset_global_variables();
 
 #endif

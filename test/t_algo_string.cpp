@@ -5,6 +5,71 @@ namespace TEST
 {
 	extern GAIA::GVOID t_algo_string(GAIA::LOG::Log& logobj)
 	{
+		/* strlen */
+		{
+			if(GAIA::ALGO::gstrlen("HelloWorld") != 10)
+				TERROR;
+		}
+
+		/* strcmp */
+		{
+			if(GAIA::ALGO::gstrcmp("HelloWorld", "HelloWorld") != 0)
+				TERROR;
+			if(GAIA::ALGO::gstrcmp("HelloWorld", "HelloKitty") <= 0)
+				TERROR;
+			if(GAIA::ALGO::gstricmp("HelloWorld", "helloworld") != 0)
+				TERROR;
+			if(GAIA::ALGO::gstricmp("HelloWorld", "hellokitty") <= 0)
+				TERROR;
+		}
+
+		/* strstr */
+		{
+			const GAIA::CH* pszFinded = GAIA::ALGO::gstrstr("HelloWorld", "oW");
+			if(pszFinded == GNIL)
+				TERROR;
+			else if(pszFinded[0] != 'o' || pszFinded[1] != 'W')
+				TERROR;
+
+			pszFinded = GAIA::ALGO::gstristr("HelloWorld", "ow");
+			if(pszFinded == GNIL)
+				TERROR;
+			else if(pszFinded[0] != 'o' || pszFinded[1] != 'W')
+				TERROR;
+
+			pszFinded = GAIA::ALGO::gstrstr("HelloWorld", "oW", 10);
+			if(pszFinded == GNIL)
+				TERROR;
+			else if(pszFinded[0] != 'o' || pszFinded[1] != 'W')
+				TERROR;
+
+			pszFinded = GAIA::ALGO::gstrstr("HelloWorld", "oW", 6);
+			if(pszFinded == GNIL)
+				TERROR;
+			else if(pszFinded[0] != 'o' || pszFinded[1] != 'W')
+				TERROR;
+
+			pszFinded = GAIA::ALGO::gstrstr("He\0lloWorld", "oW", 10);
+			if(pszFinded != GNIL)
+				TERROR;
+
+			pszFinded = GAIA::ALGO::gstristr("HelloWorld", "ow", 10);
+			if(pszFinded == GNIL)
+				TERROR;
+			else if(pszFinded[0] != 'o' || pszFinded[1] != 'W')
+				TERROR;
+
+			pszFinded = GAIA::ALGO::gstristr("HelloWorld", "ow", 6);
+			if(pszFinded == GNIL)
+				TERROR;
+			else if(pszFinded[0] != 'o' || pszFinded[1] != 'W')
+				TERROR;
+
+			pszFinded = GAIA::ALGO::gstristr("He\0lloWorld", "ow", 10);
+			if(pszFinded != GNIL)
+				TERROR;
+		}
+
 		/* start and end with */
 		{
 			if(!GAIA::ALGO::gstrstartwith("Hello World", "Hello"))

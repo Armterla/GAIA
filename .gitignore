@@ -19,5 +19,7 @@ Doxygen/
 Doxygen/html/
 
 .DS_Store
+*.xcuserstate
+
 build*qt*/
 *.pro.user

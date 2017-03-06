@@ -153,12 +153,36 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			__ArrayVectorType::it ittemp = av.binary_searchit(*cit);
+			if(ittemp.empty())
+			{
+				TERROR;
+				break;
+			}
+			__ArrayVectorType::const_it cittemp = av.const_binary_searchit(*cit);
+			if(cittemp.empty())
+			{
+				TERROR;
+				break;
+			}
 			if(av.find(*cit, 0) == GINVALID)
 			{
 				TERROR;
 				break;
 			}
 			if(av.rfind(*cit, av.size() - 1) == GINVALID)
+			{
+				TERROR;
+				break;
+			}
+			ittemp = av.findit(*cit);
+			if(ittemp.empty())
+			{
+				TERROR;
+				break;
+			}
+			cittemp = av.const_findit(*cit);
+			if(cittemp.empty())
 			{
 				TERROR;
 				break;

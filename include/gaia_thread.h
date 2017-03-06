@@ -11,6 +11,7 @@
 #	include <windows.h>
 #else
 #	include <pthread.h>
+#	include <signal.h>
 #endif
 
 namespace GAIA
@@ -157,7 +158,7 @@ namespace GAIA
 	#if GAIA_OS == GAIA_OS_WINDOWS
 		GINL static DWORD WINAPI gaia_native_thread_procedure(GAIA::GVOID* p){Thread* pThread = GSCAST(Thread*)(p); pThread->Run(); return 0;}
 	#else
-		GINL static GAIA::GVOID* gaia_native_thread_procedure(GAIA::GVOID* p){Thread* pThread = GSCAST(Thread*)(p); pThread->Run(); pthread_exit(0);}
+		GINL static GAIA::GVOID* gaia_native_thread_procedure(GAIA::GVOID* p){signal(SIGPIPE, SIG_IGN); Thread* pThread = GSCAST(Thread*)(p); pThread->Run(); pthread_exit(0);}
 	#endif
 	}
 }

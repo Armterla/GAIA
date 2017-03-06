@@ -120,7 +120,6 @@ namespace GAIA
 				GAIA::TIME::Time logtime;
 				logtime.localtime();
 				GAIA::SYNC::Autolock al(m_lock);
-				GAST(!m_bCallBacking);
 				if(m_bCallBacking)
 					return GAIA::False;
 				if(m_nodes.capacity() == 0)

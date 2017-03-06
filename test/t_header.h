@@ -159,6 +159,11 @@ namespace TEST
 		GAIA::BL bOutputTime = GAIA::False;
 		GAIA::U64 uTimeBegin = 0, uTimeEnd = 0;
 
+		logobj << "GAIA VERSION : " << GAIA_VERSION_STRING << logobj.End();
+		logobj << "GAIA COMPILE TIME : " << GAIA_VERSION_COMPILEDATE << " " << GAIA_VERSION_COMPILETIME << logobj.End();
+		logobj << "GAIA LAST MODIFIED TIME : " << GAIA_VERSION_LASTMODIFYTIME << logobj.End();
+		logobj << "\n" << logobj.End();
+
 		// Every test procedure.
 		TTEXT("[GAIA PLATFORM TEST BEGIN]");
 		{
@@ -312,6 +317,7 @@ namespace TEST
 	}
 
 	// GAIA performance test proc.
+	extern GAIA::GVOID tperf_msys_heapesg(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID tperf_ctn(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID tperf_ctn_avltree(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID tperf_ctn_dmpgraph(GAIA::LOG::Log& logobj);
@@ -324,6 +330,8 @@ namespace TEST
 		// Every test procedure.
 		TTEXT("[GAIA PERF TEST BEGIN]");
 		{
+			TITEM("MSys: HeapESG test begin!"); tperf_msys_heapesg(logobj); TITEM("End"); TTEXT("\t");
+
 			TITEM("Container: Ctn perf test begin!"); tperf_ctn(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Container: AVLTree perf test begin!"); tperf_ctn_avltree(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Container: DmpGraph perf test begin!"); tperf_ctn_dmpgraph(logobj); TITEM("End"); TTEXT("\t");

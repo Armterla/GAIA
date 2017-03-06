@@ -213,7 +213,7 @@ namespace GAIA
 			/*!
 				@brief Set SUDPSocket datagram resend time in microseconds.
 
-				@param uResendTime [in] Specify the resend time in microseconds. Default value is 1 * 1000 * 1000(1 second).
+				@param uResentTime [in] Specify the resend time in microseconds. Default value is 1 * 1000 * 1000(1 second).
 
 				@remarks If parameter uResendTime equal zero, will reset resend time to default.
 			*/
@@ -310,7 +310,7 @@ namespace GAIA
 
 				@return Return the socket file descriptor.
 			*/
-			GAIA::N32 GetFileDescriptor() const;
+			GAIA::N32 GetFD() const;
 
 			/*!
 				@brief Get socket global address.
@@ -375,8 +375,6 @@ namespace GAIA
 
 				@exception
 					GAIA::ECT::EctInvalidParam If pAddr not GNIL and it is a invalid network address.
-
-				@exception
 			*/
 			GAIA::BL ResetConnection(const GAIA::NETWORK::Addr* pAddr = GNIL, GAIA::BL bSend = GAIA::True, GAIA::BL bRecv = GAIA::True);
 

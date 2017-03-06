@@ -97,6 +97,8 @@ namespace GAIA
 			GINL GAIA::BL erase(const _DataType& t){return m_avltree.erase(t);}
 			GINL _DataType* find(const _DataType& t){return m_avltree.find(t);}
 			GINL const _DataType* find(const _DataType& t) const{return m_avltree.find(t);}
+			GINL it findit(const _DataType& t){it ret; ret.m_iter = m_avltree.findit(t); return ret;}
+			GINL const_it const_findit(const _DataType& t) const{const_it ret; ret.m_iter = m_avltree.const_findit(t); return ret;}
 			GINL it upper_equal(const _DataType& t){it ret; ret.m_iter = m_avltree.upper_equal(t); return ret;}
 			GINL it lower_equal(const _DataType& t){it ret; ret.m_iter = m_avltree.lower_equal(t); return ret;}
 			GINL const_it upper_equal(const _DataType& t) const{const_it ret; ret.m_iter = m_avltree.upper_equal(t); return ret;}

@@ -31,6 +31,14 @@
 			GINL GAIA::BL operator > (const type& src) const{return this->compare(src) > 0;}\
 			GINL GAIA::BL operator < (const type& src) const{return this->compare(src) < 0;}
 
+#define GCLASS_COMPARE_BYCOMPAREPTR(type) \
+			GINL GAIA::BL operator == (const type* src) const{return this->compare(src) == 0;}\
+			GINL GAIA::BL operator != (const type* src) const{return this->compare(src) != 0;}\
+			GINL GAIA::BL operator >= (const type* src) const{return this->compare(src) >= 0;}\
+			GINL GAIA::BL operator <= (const type* src) const{return this->compare(src) <= 0;}\
+			GINL GAIA::BL operator > (const type* src) const{return this->compare(src) > 0;}\
+			GINL GAIA::BL operator < (const type* src) const{return this->compare(src) < 0;}
+
 #define GCLASS_COMPAREEX(t, k, type) \
 			GINL GAIA::BL operator == (const type& src) const{return (t) == (src.k);}\
 			GINL GAIA::BL operator != (const type& src) const{return (t) != (src.k);}\
@@ -329,6 +337,22 @@
 #	define GWAR g_gaia_invalidlog
 #	define GERR g_gaia_invalidlog
 #	define GEND g_gaia_invalidlog
+#endif
+
+#ifdef GAIA_DEBUG_PERF
+#	define GPERF(name) GAIA::DBG::PerfCollectorAuto pca(g_gaia_perf, name, GINVALID)
+#	define GPERFBEGIN(name) g_gaia_perf.Begin(name)
+#	define GPERFEND(name) g_gaia_perf.End(name)
+#	define GPERFEX(name, instanceid) GAIA::DBG::PerfCollectorAuto pca(g_gaia_perf, name, instanceid)
+#	define GPERFBEGINEX(name, instanceid) g_gaia_perf.Begin(name, instanceid)
+#	define GPERFENDEX(name, instanceid) g_gaia_perf.End(name, instanceid)
+#else
+#	define GPERF(name)
+#	define GPERFBEGIN(name)
+#	define GPERFEND(name)
+#	define GPERFEX(name, instanceid)
+#	define GPERFBEGINEX(name, instanceid)
+#	define GPERFENDEX(name, instanceid)
 #endif
 
 #define GAIA_EXCEPTION(name) \

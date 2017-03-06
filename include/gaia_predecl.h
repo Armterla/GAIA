@@ -27,8 +27,9 @@ namespace GAIA
 		class HttpURL;
 		class HttpHead;
 		class HttpRequest;
-		class HttpResponse;
 		class Http;
+		class HttpServerLink;
+		class HttpServerCallBack;
 		class HttpServer;
 		class Client;
 		class Server;
@@ -36,6 +37,8 @@ namespace GAIA
 
 	namespace XML
 	{
+		class XMLReader;
+		class XMLWriter;
 		class XMLFactoryDesc;
 		class XMLFmt;
 		class XMLProp;
@@ -56,6 +59,8 @@ namespace GAIA
 
 	namespace JSON
 	{
+		class JsonReader;
+		class JsonWriter;
 		class JsonFactoryDesc;
 		class JsonProp;
 		class JsonNode;

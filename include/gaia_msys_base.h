@@ -59,6 +59,11 @@ namespace GAIA
 			}
 
 			/*!
+				@brief Desctructor.
+			*/
+			GINL virtual ~Heap(){}
+
+			/*!
 				@brief Allocate memory.
 			*/
 			virtual GAIA::GVOID* memory_alloc(const GAIA::UM& size) = 0;

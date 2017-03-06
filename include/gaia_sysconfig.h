@@ -166,6 +166,10 @@
 #	define GAIA_HEAP
 #endif
 
+#ifndef __GAIA_NO_LIMIT4G_HEAP__
+#	define GAIA_HEAP_LIMIT4G
+#endif
+
 #ifndef __GAIA_NO_HEAP_THREADSAFE__
 #	define GAIA_HEAP_THREADSAFE
 #endif

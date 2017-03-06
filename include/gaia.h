@@ -28,6 +28,8 @@
 #include	"gaia_sync_atomic.h"
 #include	"gaia_sync_lock.h"
 #include 	"gaia_sync_autolock.h"
+#include	"gaia_sync_lockpure.h"
+#include	"gaia_sync_autolockpure.h"
 #include	"gaia_sync_lockfree.h"
 #include	"gaia_sync_autolockfree.h"
 #include	"gaia_sync_lockrw.h"
@@ -143,8 +145,6 @@
 #include	"gaia_timer_timer.h"
 #include	"gaia_timer_realtimer.h"
 
-#include	"gaia_dbg_perf.h"
-
 #include	"gaia_thread.h"
 #include	"gaia_thread_pool.h"
 #include	"gaia_process.h"
@@ -176,6 +176,8 @@
 
 #include	"gaia_log.h"
 
+#include	"gaia_dbg_perf.h"
+
 #include	"gaia_ctn_accesser.h"
 
 #include 	"gaia_digit_crc.h"
@@ -191,6 +193,8 @@
 #include	"gaia_digit_diff.h"
 
 #include 	"gaia_xml_xmlbase.h"
+#include	"gaia_xml_xmlreader.h"
+#include	"gaia_xml_xmlwriter.h"
 #include 	"gaia_xml_xmlfactorydesc.h"
 #include 	"gaia_xml_xmlnode.h"
 #include 	"gaia_xml_xml.h"
@@ -203,6 +207,8 @@
 #include 	"gaia_html_htmlfactory.h"
 
 #include	"gaia_json_jsonbase.h"
+#include	"gaia_json_jsonreader.h"
+#include	"gaia_json_jsonwriter.h"
 #include	"gaia_json_jsonfactorydesc.h"
 #include	"gaia_json_jsonnode.h"
 #include	"gaia_json_json.h"
@@ -309,8 +315,7 @@
 */
 
 /*!
-	@mainpage Gods Index Page
-	
+	@mainpage Manual
 	@section sec_introduction Introduction
 		@subsection Feature
 		@subsection Setup

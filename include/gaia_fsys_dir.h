@@ -3,6 +3,7 @@
 
 #include "gaia_type.h"
 #include "gaia_assert.h"
+#include "gaia_algo_memory.h"
 #include "gaia_algo_string.h"
 #include "gaia_time.h"
 #include "gaia_fsys_filebase.h"

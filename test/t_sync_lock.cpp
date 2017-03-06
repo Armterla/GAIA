@@ -30,6 +30,30 @@ namespace TEST
 		GAIA::SYNC::Lock* m_pLock;
 		GAIA::U32* m_p;
 	};
+
+	class ThdLockPure : public GAIA::THREAD::Thread
+	{
+	public:
+		GINL ThdLockPure(){this->init();}
+		virtual GAIA::GVOID Run()
+		{
+			for(GAIA::NUM x = 0; x < 100; ++x)
+			{
+				GAIA::SYNC::AutolockPure al(*m_pLock);
+				for(GAIA::NUM y = 0; y < 10; ++y)
+				{
+					for(GAIA::NUM z = 0; z < 10; ++z)
+						*m_p += 1;
+				}
+			}
+		}
+		GINL GAIA::GVOID SetParam(GAIA::SYNC::LockPure* pLock, GAIA::U32* p){m_pLock = pLock; m_p = p;}
+	private:
+		GINL GAIA::GVOID init(){m_pLock = GNIL; m_p = GNIL;}
+	private:
+		GAIA::SYNC::LockPure* m_pLock;
+		GAIA::U32* m_p;
+	};
 	
 	class ThdLockW : public GAIA::THREAD::Thread
 	{
@@ -99,6 +123,25 @@ namespace TEST
 			GAIA::U32 u = 0;
 			ThdLock t[THREAD_COUNT];
 			
+			for(GAIA::NUM x = 0; x < THREAD_COUNT; ++x)
+				t[x].SetParam(&l, &u);
+			for(GAIA::NUM x = 0; x < THREAD_COUNT; ++x)
+				t[x].Start();
+			for(GAIA::NUM x = 0; x < THREAD_COUNT; ++x)
+				t[x].Wait();
+			if(u != THREAD_COUNT * 10000)
+				TERROR;
+		}
+
+		// LockPure test.
+		{
+			GAIA::SYNC::LockPure l;
+			l.Enter();
+			l.Leave();
+
+			GAIA::U32 u = 0;
+			ThdLockPure t[THREAD_COUNT];
+
 			for(GAIA::NUM x = 0; x < THREAD_COUNT; ++x)
 				t[x].SetParam(&l, &u);
 			for(GAIA::NUM x = 0; x < THREAD_COUNT; ++x)

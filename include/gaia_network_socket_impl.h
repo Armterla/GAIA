@@ -6,6 +6,7 @@
 #include "gaia_algo_memory.h"
 #include "gaia_network_ip.h"
 #include "gaia_network_addr.h"
+#include "gaia_network_base.h"
 #include "gaia_network_socket.h"
 
 #if GAIA_OS == GAIA_OS_WINDOWS
@@ -23,6 +24,7 @@
 #	include <sys/types.h>
 #	include <sys/socket.h>
 #	include <netinet/in.h>
+#	include <netinet/tcp.h>
 #	include <netdb.h>
 #endif
 
@@ -197,6 +199,8 @@ namespace GAIA
 		GINL Socket::Socket()
 		{
 			this->init();
+			m_addrBinded.reset();
+			m_addrPeer.reset();
 		}
 
 		GINL Socket::~Socket()
@@ -223,6 +227,7 @@ namespace GAIA
 				m_nSocket = (GAIA::N32)socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 			else
 				GTHROW(InvalidParam);
+			GAST(m_nSocket <= GAIA::N32MAX);
 
 			if(m_nSocket == GINVALID)
 				THROW_LASTERROR;
@@ -307,52 +312,6 @@ namespace GAIA
 			return m_nSocket != GINVALID;
 		}
 
-		GINL GAIA::NETWORK::Socket::SOCKET_TYPE Socket::GetType() const
-		{
-			if(!this->IsCreated())
-				GTHROW(Illegal);
-			return m_SockType;
-		}
-
-		GINL GAIA::GVOID Socket::Bind(const GAIA::NETWORK::Addr& addr)
-		{
-			if(!this->IsCreated())
-				GTHROW(Illegal);
-			if(m_bBinded)
-				GTHROW(Illegal);
-
-			sockaddr_in saddr;
-			zeromem(&saddr);
-			saddr.sin_family = AF_INET;
-
-			// Construct network ip.
-			if(!addr.ip.check())
-				saddr.sin_addr.s_addr = 0;
-			else
-				addr2saddr(addr, &saddr);
-
-			// Construct network port.
-			if(addr.uPort == 0)
-				saddr.sin_port = 0;
-			else
-				saddr.sin_port = port2sport((GAIA::U16)addr.uPort);
-
-			//
-			if(bind(m_nSocket, (sockaddr*)&saddr, sizeof(saddr)) == GINVALID)
-				THROW_LASTERROR;
-
-			//
-			m_bBinded = true;
-		}
-
-		GINL GAIA::BL Socket::IsBinded() const
-		{
-			if(!this->IsCreated())
-				GTHROW(Illegal);
-
-			return m_bBinded;
-		}
-
 		GINL GAIA::GVOID Socket::SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION op, const GAIA::CTN::Vari& v)
 		{
 			if(!this->IsCreated())
@@ -394,6 +353,26 @@ namespace GAIA
 						flags &= (~O_NONBLOCK);
 					fcntl(m_nSocket, F_SETFL, flags);
 				#endif
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY:
+				{
+					if(m_bTCPNoDelay == (GAIA::BL)v)
+						return;
+					m_bTCPNoDelay = (GAIA::BL)v;
+					GAIA::N32 nOption = m_bTCPNoDelay;
+					if(setsockopt(m_nSocket, IPPROTO_TCP, TCP_NODELAY, (GAIA::CH*)&nOption, sizeof(nOption)) != 0)
+						THROW_LASTERROR;
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_KEEPALIVE:
+				{
+					if(m_bKeepAlive == (GAIA::BL)v)
+						return;
+					m_bKeepAlive = (GAIA::BL)v;
+					GAIA::N32 nOption = m_bKeepAlive;
+					if(setsockopt(m_nSocket, SOL_SOCKET, SO_KEEPALIVE, (GAIA::CH*)&nOption, sizeof(nOption)) != 0)
+						THROW_LASTERROR;
 				}
 				break;
 			case GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEADDR:
@@ -457,12 +436,71 @@ namespace GAIA
 					v = (GAIA::BL)m_bReusePort;
 				}
 				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY:
+				{
+					v = (GAIA::BL)m_bTCPNoDelay;
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_KEEPALIVE:
+				{
+					v = (GAIA::BL)m_bKeepAlive;
+				}
+				break;
 			default:
 				GTHROW(InvalidParam);
 			}
 		}
 
-		GINL GAIA::GVOID Socket::Accept(Socket& sock)
+		GINL GAIA::NETWORK::Socket::SOCKET_TYPE Socket::GetType() const
+		{
+			if(!this->IsCreated())
+				GTHROW(Illegal);
+			return m_SockType;
+		}
+
+		GINL GAIA::GVOID Socket::Bind(const GAIA::NETWORK::Addr& addr)
+		{
+			if(!this->IsCreated())
+				GTHROW(Illegal);
+			if(m_bBinded)
+				GTHROW(Illegal);
+
+			sockaddr_in saddr;
+			zeromem(&saddr);
+
+			// Construct network ip.
+			if(!addr.ip.check())
+			{
+				saddr.sin_family = AF_INET;
+				saddr.sin_addr.s_addr = 0;
+			}
+			else
+				GAIA::NETWORK::addr2saddr(addr, &saddr, AF_INET);
+
+			// Construct network port.
+			if(addr.uPort == 0)
+				saddr.sin_port = 0;
+			else
+				saddr.sin_port = GAIA::NETWORK::port2sport((GAIA::U16)addr.uPort);
+
+			//
+			if(bind(m_nSocket, (sockaddr*)&saddr, sizeof(saddr)) == GINVALID)
+				THROW_LASTERROR;
+
+			//
+			m_addrBinded = addr;
+			m_bBinded = true;
+		}
+
+		GINL GAIA::BL Socket::IsBinded() const
+		{
+			if(!this->IsCreated())
+				GTHROW(Illegal);
+
+			return m_bBinded;
+		}
+
+		GINL GAIA::GVOID Socket::Accept(GAIA::NETWORK::Socket& sock)
 		{
 			if(sock.IsCreated())
 				GTHROW(InvalidParam);
@@ -477,6 +515,10 @@ namespace GAIA
 				THROW_LASTERROR;
 			sock.m_bBinded = true;
 			sock.m_bConnected = true;
+
+			GAIA::NETWORK::Addr addrPeer;
+			GAIA::NETWORK::saddr2addr(&newaddr, addrPeer);
+			this->SetPeerAddress(addrPeer);
 		}
 
 		GINL GAIA::GVOID Socket::Listen()
@@ -501,20 +543,21 @@ namespace GAIA
 			// Construct network address.
 			sockaddr_in saddr;
 			zeromem(&saddr);
-			saddr.sin_family = AF_INET;
-			addr2saddr(addr, &saddr);
+			GAIA::NETWORK::addr2saddr(addr, &saddr, AF_INET);
 
 			if(connect(m_nSocket, (sockaddr*)&saddr, sizeof(saddr)) == GINVALID)
 			{
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				GAIA::N32 nOSError = WSAGetLastError();
-				if(nOSError != WSAEWOULDBLOCK)
+				if(nOSError != WSAEWOULDBLOCK && nOSError != WSAEINPROGRESS)
 			#else
 				GAIA::N32 nOSError = errno;
-				if(nOSError != EWOULDBLOCK)
+				if(nOSError != EWOULDBLOCK && nOSError != EINPROGRESS)
 			#endif
 				THROW_LASTERROR;
 			}
+
+			this->SetPeerAddress(addr);
 
 			m_bConnected = true;
 		}
@@ -622,8 +665,7 @@ namespace GAIA
 
 			sockaddr_in saddr;
 			zeromem(&saddr);
-			saddr.sin_family = AF_INET;
-			addr2saddr(addr, &saddr);
+			GAIA::NETWORK::addr2saddr(addr, &saddr, AF_INET);
 
 		#if GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_UNIX
 			GAIA::N32 nSended = sendto(m_nSocket, (const GAIA::CH*)p, nSize, nFlag | MSG_NOSIGNAL, (sockaddr*)&saddr, sizeof(saddr));
@@ -667,9 +709,10 @@ namespace GAIA
 
 			sockaddr_in saddr;
 			zeromem(&saddr);
-			saddr.sin_family = AF_INET;
 			if(addr.check())
-				addr2saddr(addr, &saddr);
+				GAIA::NETWORK::addr2saddr(addr, &saddr, AF_INET);
+			else
+				saddr.sin_family = AF_INET;
 
 			socklen_t recvfrom_addr_len = sizeof(saddr);
 			GAIA::N32 nRecved = (GAIA::N32)recvfrom(m_nSocket, (GAIA::CH*)p, nSize, nFlag, (sockaddr*)&saddr, &recvfrom_addr_len);
@@ -689,14 +732,22 @@ namespace GAIA
 				THROW_LASTERROR;
 			}
 
-			saddr2addr(&saddr, addr);
+			GAIA::NETWORK::saddr2addr(&saddr, addr);
 
 			return nRecved;
 		}
 
-		GINL GAIA::N32 Socket::GetFileDescriptor() const
+		GINL GAIA::N32 Socket::GetFD() const
 		{
 			return m_nSocket;
+		}
+
+		GINL GAIA::BL Socket::GetBindedAddress(GAIA::NETWORK::Addr& addr)
+		{
+			if(!m_addrBinded.check())
+				return GAIA::False;
+			addr = m_addrBinded;
+			return GAIA::True;
 		}
 
 		GINL GAIA::BL Socket::GetGlobalAddress(GAIA::NETWORK::Addr& addr)
@@ -710,7 +761,7 @@ namespace GAIA
 			if(getpeername(m_nSocket, (sockaddr*)&saddr, &sock_addr_len) != 0)
 				return GAIA::False;
 
-			saddr2addr(&saddr, addr);
+			GAIA::NETWORK::saddr2addr(&saddr, addr);
 
 			return GAIA::True;
 		}
@@ -726,8 +777,16 @@ namespace GAIA
 			if(getsockname(m_nSocket, (sockaddr*)&saddr, &sock_addr_len) != 0)
 				return GAIA::False;
 
-			saddr2addr(&saddr, addr);
+			GAIA::NETWORK::saddr2addr(&saddr, addr);
 
+			return GAIA::True;
+		}
+
+		GINL GAIA::BL Socket::GetPeerAddress(GAIA::NETWORK::Addr& addr)
+		{
+			if(!m_addrPeer.check())
+				return GAIA::False;
+			addr = m_addrPeer;
 			return GAIA::True;
 		}
 
@@ -742,6 +801,55 @@ namespace GAIA
 			m_bNotBlock = GAIA::False;
 			m_bReuseAddr = GAIA::False;
 			m_bReusePort = GAIA::False;
+			m_bTCPNoDelay = GAIA::False;
+			m_bKeepAlive = GAIA::False;
+		}
+
+		GINL GAIA::BL Socket::SetFD(GAIA::N32 nFD)
+		{
+			GAST(nFD != GINVALID);
+			GAST(m_nSocket == GINVALID);
+			if(m_nSocket != GINVALID)
+				return GAIA::False;
+			m_nSocket = nFD;
+			return GAIA::True;
+		}
+
+		GINL GAIA::BL Socket::SetType(GAIA::NETWORK::Socket::SOCKET_TYPE type)
+		{
+			GAST(type != GAIA::NETWORK::Socket::SOCKET_TYPE_INVALID);
+			GAST(m_SockType == SOCKET_TYPE_INVALID);
+			if(m_SockType != SOCKET_TYPE_INVALID)
+				return GAIA::False;
+			m_SockType = type;
+			return GAIA::True;
+		}
+
+		GINL GAIA::BL Socket::SetBinded(GAIA::BL bBinded)
+		{
+			GAST(this->IsCreated());
+			if(!this->IsCreated())
+				return GAIA::False;
+			m_bBinded = bBinded;
+			return GAIA::True;
+		}
+
+		GINL GAIA::BL Socket::SetConnected(GAIA::BL bConnected)
+		{
+			if(bConnected)
+			{
+				GAST(this->IsCreated());
+				if(!this->IsCreated())
+					return GAIA::False;
+			}
+			m_bConnected = bConnected;
+			return GAIA::True;
+		}
+
+		GINL GAIA::GVOID Socket::SetPeerAddress(const GAIA::NETWORK::Addr& addr)
+		{
+			GAST(addr.check());
+			m_addrPeer = addr;
 		}
 	}
 }

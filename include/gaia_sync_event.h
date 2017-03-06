@@ -54,10 +54,10 @@ namespace GAIA
 				pthread_mutex_unlock(&m_mutex);
 			#endif
 			}
-			GINL GAIA::BL Wait(GAIA::U32 uMilliSecond)
+			GINL GAIA::BL Wait(GAIA::U32 uMilliSeconds)
 			{
 			#if GAIA_OS == GAIA_OS_WINDOWS
-				return ::WaitForSingleObject(m_hSem, uMilliSecond) == WAIT_OBJECT_0;
+				return ::WaitForSingleObject(m_hSem, uMilliSeconds) == WAIT_OBJECT_0;
 			#else
 				GAIA::BL ret = GAIA::False;
 				pthread_mutex_lock(&m_mutex);
@@ -65,7 +65,7 @@ namespace GAIA
 					++m_waitcnt;
 					if(m_waitcnt > 0)
 					{
-						if(uMilliSecond == 0xFFFFFFFF)
+						if(uMilliSeconds == 0xFFFFFFFF)
 						{
 							if(pthread_cond_wait(&m_cond, &m_mutex) == 0)
 								ret = GAIA::True;
@@ -75,8 +75,8 @@ namespace GAIA
 							timeval now;
 							gettimeofday(&now, GNIL);
 							timespec abstime;
-							abstime.tv_nsec = now.tv_usec * 1000 + (uMilliSecond % 1000) * 1000 * 1000;
-							abstime.tv_sec = now.tv_sec + uMilliSecond / 1000;
+							abstime.tv_nsec = now.tv_usec * 1000 + (uMilliSeconds % 1000) * 1000 * 1000;
+							abstime.tv_sec = now.tv_sec + uMilliSeconds / 1000;
 							abstime.tv_sec += abstime.tv_nsec / (1000 * 1000 * 1000);
 							abstime.tv_nsec = abstime.tv_nsec % (1000 * 1000 * 1000);
 							GAIA::N32 nWaitResult = pthread_cond_timedwait(&m_cond, &m_mutex, &abstime);

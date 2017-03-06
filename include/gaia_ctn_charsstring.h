@@ -251,31 +251,27 @@ namespace GAIA
 			GINL GAIA::GVOID resize(const _SizeType& size)
 			{
 				GAST(size >= 0);
-				if(size > m_chars.capacity())
+				if(size == this->size())
+					return;
+				else if(size > this->size())
 				{
-					m_chars.clear();
-					m_string.resize(size);
+					if(size > m_chars.capacity())
+					{
+						m_chars.clear();
+						m_string.resize(size);
+					}
+					else
+					{
+						m_string.destroy();
+						m_chars.resize(size);
+					}
 				}
 				else
 				{
-					m_string.clear();
-					m_chars.resize(size);
-				}
-			}
-			GINL GAIA::GVOID resize_keep(const _SizeType& size)
-			{
-				GAST(size >= 0);
-				if(size > m_chars.capacity())
-				{
-					if(m_string.capacity() == 0 && !m_chars.empty())
-						m_string = m_chars.fptr();
-					m_string.resize_keep(size);
-				}
-				else
-				{
-					if(m_string.capacity() != 0 && !m_string.empty())
-						m_chars = m_string.fptr();
-					m_chars.resize_keep(size);
+					if(m_string.capacity() != 0)
+						m_string.resize(size);
+					else
+						m_chars.resize(size);
 				}
 			}
 			GINL GAIA::GVOID reserve(const _SizeType& size)
@@ -290,6 +286,67 @@ namespace GAIA
 				{
 					m_string.destroy();
 					m_chars.clear();
+				}
+			}
+			GINL GAIA::GVOID resize_keep(const _SizeType& size)
+			{
+				GAST(size >= 0);
+				if(size == this->size())
+					return;
+				if(size > m_chars.capacity())
+				{
+					if(m_string.capacity() == 0 && !m_chars.empty())
+					{
+						m_string.reserve(size);
+						m_string.assign(m_chars.fptr(), m_chars.size());
+						m_string.resize(size);
+						m_chars.clear();
+					}
+					else
+					{
+						GAST(m_chars.empty());
+						m_string.resize_keep(size);
+					}
+				}
+				else
+				{
+					if(m_string.capacity() != 0 && !m_string.empty())
+					{
+						GAST(m_chars.empty());
+						m_chars.assign(m_string.fptr(), GAIA::ALGO::gmin(m_string.size(), size));
+					}
+					m_string.destroy();
+					m_chars.resize(size);
+				}
+			}
+			GINL GAIA::GVOID reserve_keep(const _SizeType& size)
+			{
+				GAST(size >= 0);
+				if(size == this->capacity())
+					return;
+				if(size > m_chars.capacity())
+				{
+					if(m_string.capacity() == 0 && !m_chars.empty())
+					{
+						m_string.reserve(size);
+						m_string.assign(m_chars.fptr(), m_chars.size());
+						m_string.resize(m_chars.size());
+						m_chars.clear();
+					}
+					else
+					{
+						GAST(m_chars.empty());
+						m_string.reserve_keep(size);
+					}
+				}
+				else
+				{
+					if(m_string.capacity() != 0 && !m_string.empty())
+					{
+						GAST(m_chars.empty());
+						m_chars.assign(m_string.fptr(), GAIA::ALGO::gmin(size, m_string.size()));
+					}
+					m_string.destroy();
 				}
 			}
 			GINL GAIA::GVOID clear(){m_chars.clear(); m_string.clear();}
@@ -310,7 +367,10 @@ namespace GAIA
 				if(size > m_chars.capacity())
 					m_string.assign(p, size);
 				else
+				{
 					m_chars.assign(p, size);
+					m_string.destroy();
+				}
 				return *this;
 			}
 			GINL _DataType* fptr(){if(m_string.capacity() != 0) return m_string.fptr(); return m_chars.fptr();}
@@ -508,19 +568,19 @@ namespace GAIA
 					return m_string.find(src, index);
 				return m_chars.find(src, index);
 			}
-			template<typename _ParamDataType> _SizeType rfind(const _ParamDataType& t, const _SizeType& index = 0) const
+			template<typename _ParamDataType> _SizeType rfind(const _ParamDataType& t, _SizeType index = GINVALID) const
 			{
 				if(m_string.capacity() != 0)
 					return m_string.rfind(t, index);
 				return m_chars.rfind(t, index);
 			}
-			template<typename _ParamDataType> _SizeType rfind(const _ParamDataType* p, const _SizeType& index = 0) const
+			template<typename _ParamDataType> _SizeType rfind(const _ParamDataType* p, _SizeType index = GINVALID) const
 			{
 				if(m_string.capacity() != 0)
 					return m_string.rfind(p, index);
 				return m_chars.rfind(p, index);
 			}
-			GINL _SizeType rfind(const __MyType& src, const _SizeType& index = 0) const
+			GINL _SizeType rfind(const __MyType& src, _SizeType index = GINVALID) const
 			{
 				if(m_string.capacity() != 0)
 					return m_string.rfind(src.fptr(), index);

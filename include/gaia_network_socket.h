@@ -16,6 +16,8 @@ namespace GAIA
 		*/
 		class Socket : public GAIA::Base
 		{
+			friend class AsyncSocket;
+
 		public:
 			/*!
 				@brief Socket type.
@@ -34,6 +36,8 @@ namespace GAIA
 				SOCKET_OPTION_NOBLOCK,
 				SOCKET_OPTION_REUSEADDR,
 				SOCKET_OPTION_REUSEPORT,
+				SOCKET_OPTION_TCPNODELAY,
+				SOCKET_OPTION_KEEPALIVE,
 			GAIA_ENUM_END(SOCKET_OPTION)
 
 			/*!
@@ -121,29 +125,6 @@ namespace GAIA
 			GINL GAIA::BL IsCreated() const;
 
 			/*!
-				@brief Get socket type.
-			*/
-			GINL GAIA::NETWORK::Socket::SOCKET_TYPE GetType() const;
-
-			/*!
-				@brief Bind socket to a network address, include IP and port.
-
-				@exception
-					GAIA::ECT::EctIllegal If socket is not created.
-
-				@exception
-					GAIA::ECT::EctNetwork If bind socket failed.
-			*/
-			GINL GAIA::GVOID Bind(const GAIA::NETWORK::Addr& addr);
-
-			/*!
-				@brief Check current socket is binded or not.
-
-				@return If the socket is bound, return GAIA::True, or return GAIA::False.
-			*/
-			GINL GAIA::BL IsBinded() const;
-
-			/*!
 				@brief Set socket option.
 
 				@exception
@@ -169,6 +150,29 @@ namespace GAIA
 			GINL GAIA::GVOID GetOption(GAIA::NETWORK::Socket::SOCKET_OPTION op, GAIA::CTN::Vari& v);
 
 			/*!
+				@brief Get socket type.
+			*/
+			GINL GAIA::NETWORK::Socket::SOCKET_TYPE GetType() const;
+
+			/*!
+				@brief Bind socket to a network address, include IP and port.
+
+				@exception
+					GAIA::ECT::EctIllegal If socket is not created.
+
+				@exception
+					GAIA::ECT::EctNetwork If bind socket failed.
+			*/
+			GINL GAIA::GVOID Bind(const GAIA::NETWORK::Addr& addr);
+
+			/*!
+				@brief Check current socket is binded or not.
+
+				@return If the socket is bound, return GAIA::True, or return GAIA::False.
+			*/
+			GINL GAIA::BL IsBinded() const;
+
+			/*!
 				@brief Accept a socket.(Stream socket only)
 
 				@exception
@@ -177,7 +181,7 @@ namespace GAIA
 				@exception
 					GAIA::ECT::EctNetwork If accept socket option failed.
 			*/
-			GINL GAIA::GVOID Accept(Socket& sock);
+			GINL GAIA::GVOID Accept(GAIA::NETWORK::Socket& sock);
 
 			/*!
 				@brief Listen socket.(Stream socket only)
@@ -253,7 +257,15 @@ namespace GAIA
 			/*!
 				@brief Get socket file descriptor.
 			*/
-			GINL GAIA::N32 GetFileDescriptor() const;
+			GINL GAIA::N32 GetFD() const;
+
+			/*!
+				@brief Get socket's bind address.
+
+				@return
+					If success return GAIA::True, or return GAIA::False;
+			*/
+			GINL GAIA::BL GetBindedAddress(GAIA::NETWORK::Addr& addr);
 
 			/*!
 				@brief Get socket's global address.
@@ -271,8 +283,21 @@ namespace GAIA
 			*/
 			GINL GAIA::BL GetLocalAddress(GAIA::NETWORK::Addr& addr);
 
+			/*!
+				@brief Get socket's peer address.
+
+				@return
+					If success return GAIA::True, or return GAIA::False.
+			*/
+			GINL GAIA::BL GetPeerAddress(GAIA::NETWORK::Addr& addr);
+
 		private:
 			GINL GAIA::GVOID init();
+			GINL GAIA::BL SetFD(GAIA::N32 nFD);
+			GINL GAIA::BL SetType(GAIA::NETWORK::Socket::SOCKET_TYPE type);
+			GINL GAIA::BL SetBinded(GAIA::BL bBinded);
+			GINL GAIA::BL SetConnected(GAIA::BL bConnected);
+			GINL GAIA::GVOID SetPeerAddress(const GAIA::NETWORK::Addr& addr);
 			GINL Socket(const Socket& src){}
 			GINL Socket& operator = (const Socket& src){return *this;}
 
@@ -281,11 +306,15 @@ namespace GAIA
 			GAIA::NETWORK::Socket::SOCKET_TYPE m_SockType;
 			GAIA::N32 m_nSendBufferSize;
 			GAIA::N32 m_nRecvBufferSize;
+			GAIA::NETWORK::Addr m_addrBinded;
+			GAIA::NETWORK::Addr m_addrPeer;
 			GAIA::BL m_bBinded : 1;
 			GAIA::BL m_bConnected : 1;
 			GAIA::BL m_bNotBlock : 1;
 			GAIA::BL m_bReuseAddr : 1;
 			GAIA::BL m_bReusePort : 1;
+			GAIA::BL m_bTCPNoDelay : 1;
+			GAIA::BL m_bKeepAlive : 1;
 		};
 	}
 }

@@ -1,0 +1,39 @@
+[MAKE STATE]
+
+    [Windows]
+
+        VS2013-32            ------------    
+        VS2013-32 Debug      ------------    
+
+        VS2013-64            ------------    
+        VS2013-64 Debug      ------------    
+
+        VS2015-32            ------------    
+        VS2015-32 Debug      ------------    
+
+        VS2015-64            ------------    
+        VS2015-64 Debug      ------------    
+
+        Qt5.7 for Win32      ------------    
+        Qt5.7 for Win32 Debug------------    
+
+    [Mac OSX]
+
+        Qt5.7 For Mac        ------------    
+        Qt5.7 For Mac Debug  ------------    
+
+        Xcode                ------------    
+        Xcode Debug          ------------    
+
+    [iOS]
+        
+        Xcode                ------------    
+
+    [Android platform]
+
+        NDK on Mac           ------------    
+        NDK on Win           ------------    
+
+    [Linux Ubuntu]
+
+        G++                  ------------    
