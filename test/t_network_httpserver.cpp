@@ -76,10 +76,10 @@ namespace TEST
 			TAST(!svr.RegistCallBack(cbi));
 			TAST(!svr.RegistCallBack(cbsf));
 
-			svr.AddBlackList("192.168.12.34", 1000 * 1000 * 3600);
-			svr.AddBlackList("192.168.12.43", 1000 * 1000 * 3600);
-			svr.AddWhiteList("192.168.21.34", 1000 * 1000 * 3600);
-			svr.AddWhiteList("192.168.21.43", 1000 * 1000 * 3600);
+			svr.AddBlackList("192.168.12.34", (GAIA::U64)1000 * 1000 * 3600);
+			svr.AddBlackList("192.168.12.43", (GAIA::U64)1000 * 1000 * 3600);
+			svr.AddWhiteList("192.168.21.34", (GAIA::U64)1000 * 1000 * 3600);
+			svr.AddWhiteList("192.168.21.43", (GAIA::U64)1000 * 1000 * 3600);
 
 			TAST(svr.IsInBlackList("192.168.12.34"));
 			TAST(svr.IsInBlackList("192.168.12.43"));

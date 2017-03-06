@@ -925,6 +925,9 @@
     <ClCompile Include="..\src\bignum.c">
       <Filter>GAIA\src</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\tperf_msys_heapesg.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\test\preheader.h">

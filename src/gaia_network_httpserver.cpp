@@ -367,12 +367,10 @@ namespace GAIA
 
 		HttpServerLink::~HttpServerLink()
 		{
-			GAST(m_pSock != GNIL);
 			if(m_pSock != GNIL)
 			{
 				if(m_pSock->IsCreated())
 				{
-					GAST(m_pSock->m_needsendsize == 0);
 					m_pSock->Shutdown();
 					m_pSock->Close();
 				}
@@ -455,6 +453,12 @@ namespace GAIA
 		{
 			m_pSock->m_bClosed = GAIA::True;
 			return GAIA::True;
+		}
+
+		GAIA::GVOID HttpServerLink::RefObjectDestruct()
+		{
+			GAST(m_pSock != GNIL);
+			GAST(m_pSock->m_needsendsize == 0);
 		}
 
 		HttpServerCallBack::HttpServerCallBack(GAIA::NETWORK::HttpServer& svr)

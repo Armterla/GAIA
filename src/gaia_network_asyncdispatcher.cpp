@@ -89,8 +89,6 @@ namespace GAIA
 
 		AsyncDispatcher::AsyncDispatcher()
 		{
-			GAST(sizeof(GAIA::GVOID*) == sizeof(GAIA::NM));
-			GAST(sizeof(GAIA::GVOID*) == sizeof(GAIA::UM));
 			this->init();
 		}
 
@@ -560,7 +558,7 @@ namespace GAIA
 							pCtx->pDataSocket->SetBinded(GAIA::True);
 							pCtx->pDataSocket->SetConnected(GAIA::True);
 
-							GAIA::NM nListenSock = pCtx->pListenSocket->GetFD();
+							GAIA::GVOID* nListenSock = (GAIA::GVOID*)(SIZE_T)pCtx->pListenSocket->GetFD();
 							GAIA::N32 nSetSockOptResult = setsockopt(
 									pCtx->pDataSocket->GetFD(), SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT,
 									(char*)&nListenSock, sizeof(nListenSock));

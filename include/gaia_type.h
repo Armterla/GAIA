@@ -42,18 +42,8 @@ namespace GAIA
 #define GCCAST(type) const_cast<type>
 
 	/* Integer type declaration. */
-#if GAIA_OS == GAIA_OS_WINDOWS
-#	if GAIA_MACHINE == GAIA_MACHINE32
-		typedef int NM;
-		typedef unsigned int UM;
-#	elif GAIA_MACHINE == GAIA_MACHINE64
-		typedef long long NM;
-		typedef unsigned long long UM;
-#	endif
-#else
 	typedef long NM;
 	typedef unsigned long UM;
-#endif
 	typedef bool BL;
 	typedef char N8;
 	typedef unsigned char U8;

@@ -625,6 +625,9 @@ namespace GAIA
 			}
 			GCLASS_COMPARE_BYCOMPARE(HttpServerLink)
 
+		protected:
+			virtual GAIA::GVOID RefObjectDestruct();
+
 		private:
 			GINL GAIA::GVOID init()
 			{

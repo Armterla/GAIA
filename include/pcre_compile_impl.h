@@ -6640,6 +6640,7 @@ for (;; ptr++)
       const pcre_uchar *name;
       pcre_uchar *slot;
 
+	  slot = NULL;
       switch (*(++ptr))
         {
         /* ------------------------------------------------------------ */
