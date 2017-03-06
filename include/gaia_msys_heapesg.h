@@ -118,7 +118,7 @@ namespace GAIA
 			#ifdef GAIA_HEAP_THREADSAFE
 				m_lr.Leave();
 			#endif
-				*GSCAST(ALLOC_SIZE_TYPE*)(pRet) = *GRCAST(ALLOC_SIZE_TYPE*)(&uSize);
+				*GSCAST(ALLOC_SIZE_TYPE*)(pRet) = *GRCAST(const ALLOC_SIZE_TYPE*)(&uSize);
 				pRet = GSCAST(GAIA::U8*)(pRet) + HEAP_BUFFER_HEADERSIZE;
 				GAST(((GAIA::U64)pRet) % sizeof(GAIA::GVOID*) == 0); // Must aligned by machine word length.
 				return pRet;
