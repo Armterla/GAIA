@@ -458,7 +458,6 @@ namespace GAIA
 		GAIA::GVOID HttpServerLink::RefObjectDestruct()
 		{
 			GAST(m_pSock != GNIL);
-			GAST(m_pSock->m_needsendsize == 0);
 		}
 
 		HttpServerCallBack::HttpServerCallBack(GAIA::NETWORK::HttpServer& svr)
