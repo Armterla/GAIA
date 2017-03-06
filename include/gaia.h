@@ -315,8 +315,7 @@
 */
 
 /*!
-	@mainpage Gods Index Page
-	
+	@mainpage Manual
 	@section sec_introduction Introduction
 		@subsection Feature
 		@subsection Setup
