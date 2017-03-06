@@ -926,6 +926,7 @@ namespace GAIA
 				pCB->drop_ref();
 			}
 			m_cbs.clear();
+			return GAIA::True;
 		}
 
 		GAIA::BL HttpServer::IsRegistedCallBack(GAIA::NETWORK::HttpServerCallBack& cb)
