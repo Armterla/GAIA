@@ -1141,7 +1141,7 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get query by a index.
 
 				@param pszName [out] Used for saving the query name string.
 
@@ -1248,7 +1248,7 @@ namespace GAIA
 
 				@return Return current object's reference.
 
-				@see HttpURL::FromString
+				@see HttpURL::FromString.
 			*/
 			GINL HttpURL& operator = (const GAIA::CH* psz)
 			{
@@ -1380,8 +1380,6 @@ namespace GAIA
 				@brief Check HttpHead is empty or not.
 
 				@return If HttpHead is empty, return GAIA::True, or return GAIA::False.
-
-				@remarks
 			*/
 			GINL GAIA::BL Empty() const{return this->Size() == 0;}
 
@@ -1463,13 +1461,18 @@ namespace GAIA
 			}
 
 			/*!
-				@brief 
+				@brief Get header's string size.
 
-				@param
-
-				@return
+				@return Return current header's string size.
 
 				@remarks
+					This string size is : (name length + value length + strlen(" :\r\n")) * (Name-Value pair count).
+					If the content are two Name-Value pair, the first one's name is "a", value is "1", the second one's name is "b", value is "2",
+					current function will return 12, it calculate by strlen("a: 1\r\nb: 2\r\n").
+
+					If you want convert HttpHead to a string, you perhaps need call this function first,
+					and then, you could allocate a buffer with certain and enough size.
+					After that, you will call HttpHead::ToString to fill the buffer.
 			*/
 			GINL GAIA::NUM GetStringSize() const{return m_sStringLen;}
 
@@ -1534,13 +1537,20 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Set a Name-Value pair to curernt header.
 
-				@param
+				@param pszName [in] Specify the name.
 
-				@return
+				@param pszValue [in] Specify the value.
 
-				@remarks
+				@param bNotExistFailed [in]
+					If bNotExistFailed is GAIA::True, and the Name-Value pair not exist in current header,
+					current function will failed and return GAIA::False.
+
+					If bNotExistFailed is GAIA::False, and Name-Value pair not exist in current header,
+					current function will insert a new Name-Value pair to current header.
+
+				@return If insert or update the Name-Value pair success, return GAIA::True, or will return GAIA::False.
 			*/
 			GINL GAIA::BL Set(const GAIA::CH* pszName, const GAIA::CH* pszValue, GAIA::BL bNotExistFailed = GAIA::False)
 			{
@@ -1598,13 +1608,17 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get the value by name.
 
-				@param
+				@param pszName [in] Specify the Name-Value pair's name.
 
-				@return
+				@return Return the value which name is parameter pszName.
+					If the Name-Value pair is not exist, return GNIL.
 
 				@remarks
+					If the Name-Value pair list in current HttpHead is not sorted,
+					current function will sort the Name-Value pair first and
+					call a binary search algorithm to find the result.
 			*/
 			GINL const GAIA::CH* Get(const GAIA::CH* pszName) const
 			{
@@ -1619,13 +1633,17 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Check the Name-Value pair exist or not.
 
-				@param
+				@param pszName [in] Specify the Name-Value pair's name.
 
-				@return
+				@return If the Name-Value pair exist in current header, return GAIA::True,
+					or will return GAIA::False.
 
 				@remarks
+					If the Name-Value pair list in current HttpHead is not sorted,
+					current function will sort the Name-Value pair first and
+					call a binary search algorithm to check the result.
 			*/
 			GINL GAIA::BL Exist(const GAIA::CH* pszName) const
 			{
@@ -1634,13 +1652,13 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Delete the Name-Value pair by name.
 
-				@param
+				@param pszName [in] Specify the Name-Value pair's name.
 
 				@return
-
-				@remarks
+					If delete Name-Value pair success, return GAIA::True.
+					If the Name-Value pair is not exist in current HttpHead, return GAIA::False.
 			*/
 			GINL GAIA::BL Delete(const GAIA::CH* pszName)
 			{
@@ -1674,13 +1692,7 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
-
-				@param
-
-				@return
-
-				@remarks
+				@brief Reset current HttpHead, all Name-Value pair will be clear.
 			*/
 			GINL GAIA::GVOID Reset()
 			{
@@ -1695,24 +1707,22 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get Name-Value pair count in current HttpHead.
 
-				@param
-
-				@return
+				@return Return Name-Value pair count.
 
 				@remarks
 			*/
 			GINL GAIA::NUM Size() const{return m_nodes.size();}
 
 			/*!
-				@brief
+				@brief Get the Name-Value pair's name by a index.
 
-				@param
+				@param sIndex [in] Specify the Name-Value pair's index, it belong [0, this->Size).
 
-				@return
-
-				@remarks
+				@return If Name-Value pair is exist which specified by parameter sIndex,
+					current function call will success, and return GAIA::True,
+					or will return GAIA::False.
 			*/
 			GINL const GAIA::CH* GetName(GAIA::NUM sIndex) const
 			{
@@ -1723,13 +1733,13 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get the Name-Value pair's value by a index.
 
-				@param
+				@param sIndex [in] Specify the Name-Value pair's index, it belong [0, this->size).
 
-				@return
-
-				@remarks
+				@return If Name-Value pair is exist which specified by parameter sIndex,
+					current function call will success, and return GAIA::True,
+					or will return GAIA::False.
 			*/
 			GINL const GAIA::CH* GetValue(GAIA::NUM sIndex) const
 			{
@@ -1740,13 +1750,17 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get the Name-Value pair's name and value by a index.
 
-				@param
+				@param sIndex [in] Specify the Name-Value pair's index, it belong [0, this->size).
 
-				@return
+				@param pszName [out] Used for saving Name-Value pair's name.
 
-				@remarks
+				@param pszValue [out] Used for saving Name-Value pair's value.
+
+				@return If Name-Value pair is exist which specified by parameter index,
+					current function call will success, and return GAIA::True,
+					or will return GAIA::False.
 			*/
 			GINL GAIA::BL GetNameAndValue(GAIA::NUM sIndex, GAIA::CH** ppName, GAIA::CH** ppValue) const
 			{
@@ -1760,13 +1774,10 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
-
-				@param
-
-				@return
+				@brief Sort Name-Value pair list.
 
 				@remarks
+					If current HttpHead's Name-Value pair list is sorted, current function will do nothing.
 			*/
 			GINL GAIA::GVOID Optimize()
 			{
@@ -1777,13 +1788,11 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Deep copy HttpHead from another.
 
-				@param
+				@param src [in] Specify another HttpHead object.
 
-				@return
-
-				@remarks
+				@return Return current HttpHead's reference.
 			*/
 			GINL HttpHead& operator = (const HttpHead& src)
 			{
@@ -1802,13 +1811,15 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Fill current HttpHead by a string.
 
-				@param
+				@param psz [in] Specify a string as source.
 
-				@return
+				@return Return current HttpHead's reference.
 
 				@remarks
+					The string which specified by parameter psz's format must like this:
+					"a: 1\r\na: 2\r\n", the ' ' is not nessesary.
 			*/
 			GINL HttpHead& operator = (const GAIA::CH* psz)
 			{
@@ -1817,13 +1828,14 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Compare current HttpHead object with a string.
 
-				@param
+				@param psz [in] Specify a string as source to compare.
 
 				@return
-
-				@remarks
+					If current HttpHead object below parameter psz, return -1.
+					If current HttpHead object above parameter psz, return +1.
+					If current HttpHead object equal parameter psz, return 0.
 			*/
 			GINL GAIA::N32 compare(const GAIA::CH* psz) const
 			{
@@ -1832,11 +1844,14 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Compare current HttpHead object with another.
 
-				@param
+				@param src [in] Specify another HttpHead.
 
 				@return
+					If current HttpHead object below parameter src, return -1.
+					If current HttpHead object above parameter src, return +1.
+					If current HttpHead object equal parameter src, return 0.
 
 				@remarks
 			*/
