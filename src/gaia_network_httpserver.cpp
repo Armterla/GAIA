@@ -732,9 +732,9 @@ namespace GAIA
 				}
 				strResp += "\n";
 
-				strResp += "\tHitResponseCacheCount = "; strResp += s.uHitResponseCacheCount; strResp += "\n";
-				strResp += "\tHitResponseCacheSize = "; strResp += s.uHitResponseCacheSize; strResp += "\n";
-				strResp += "\tNotHitResponseCacheCount = "; strResp += s.uNotHitResponseCacheCount; strResp += "\n";
+				strResp += "\tHitCacheCount = "; strResp += s.uHitCacheCount; strResp += "\n";
+				strResp += "\tHitCacheSize = "; strResp += s.uHitCacheSize; strResp += "\n";
+				strResp += "\tNotHitCacheCount = "; strResp += s.uNotHitCacheCount; strResp += "\n";
 				strResp += "\tNotResponseCount = "; strResp += s.uNotResponseCount; strResp += "\n";
 				strResp += "\n";
 
@@ -1171,11 +1171,11 @@ namespace GAIA
 								this->ReleaseCache(pSock->m_url, pSock->m_head);
 								bResponsedByCache = GAIA::True;
 
-								m_status.uHitResponseCacheCount++;
-								m_status.uHitResponseCacheSize += resphead.GetStringSize() + sCacheSize;
+								m_status.uHitCacheCount++;
+								m_status.uHitCacheSize += resphead.GetStringSize() + sCacheSize;
 							}
 							else
-								m_status.uNotHitResponseCacheCount++;
+								m_status.uNotHitCacheCount++;
 						}
 					}
 
@@ -1324,14 +1324,14 @@ namespace GAIA
 			return m_blackwhitemode;
 		}
 
-		GAIA::GVOID HttpServer::AddBlackList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uTime)
+		GAIA::GVOID HttpServer::AddBlackList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uEffectTime)
 		{
 			GPCHR_FALSE(ip.check());
 			GAIA::SYNC::AutolockW al(m_rwBlackList);
 			GAIA::NETWORK::HttpServerBlackWhiteNode n;
 			n.ip = ip;
 			n.uRegistTime = GAIA::TIME::gmt_time();
-			n.uEffectTime = uTime;
+			n.uEffectTime = uEffectTime;
 			m_BlackList.insert(n);
 		}
 
@@ -1370,19 +1370,23 @@ namespace GAIA
 		GAIA::BL HttpServer::CollectBlackList(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerBlackWhiteNode>& listResult) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(HttpServer*)(this)->m_rwBlackList);
+			GAIA::BL bExist = GAIA::False;
 			for(GAIA::CTN::Set<GAIA::NETWORK::HttpServerBlackWhiteNode>::const_it it = m_WhiteList.const_frontit(); !it.empty(); ++it)
+			{
 				listResult.push_back(*it);
-			return GAIA::True;
+				bExist = GAIA::True;
+			}
+			return bExist;
 		}
 
-		GAIA::GVOID HttpServer::AddWhiteList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uTime)
+		GAIA::GVOID HttpServer::AddWhiteList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uEffectTime)
 		{
 			GPCHR_FALSE(ip.check());
 			GAIA::SYNC::AutolockW al(m_rwWhiteList);
 			GAIA::NETWORK::HttpServerBlackWhiteNode n;
 			n.ip = ip;
 			n.uRegistTime = GAIA::TIME::gmt_time();
-			n.uEffectTime = uTime;
+			n.uEffectTime = uEffectTime;
 			m_WhiteList.insert(n);
 		}
 
@@ -1421,9 +1425,13 @@ namespace GAIA
 		GAIA::BL HttpServer::CollectWhiteList(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerBlackWhiteNode>& listResult) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(HttpServer*)(this)->m_rwWhiteList);
+			GAIA::BL bExist = GAIA::False;
 			for(GAIA::CTN::Set<GAIA::NETWORK::HttpServerBlackWhiteNode>::const_it it = m_BlackList.const_frontit(); !it.empty(); ++it)
+			{
 				listResult.push_back(*it);
-			return GAIA::True;
+				bExist = GAIA::True;
+			}
+			return bExist;
 		}
 
 		GAIA::BL HttpServer::RequestCache(const GAIA::CH* pszKey, GAIA::NUM sKeyLen, GAIA::NETWORK::HttpHead& resphead, GAIA::GVOID** p, GAIA::NUM& sSize)

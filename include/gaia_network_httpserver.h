@@ -338,9 +338,9 @@ namespace GAIA
 				for(GAIA::NUM x = 0; x < sizeofarray(uResponseCountByCode); ++x)
 					uResponseCountByCode[x] = 0;
 
-				uHitResponseCacheCount = 0;
-				uHitResponseCacheSize = 0;
-				uNotHitResponseCacheCount = 0;
+				uHitCacheCount = 0;
+				uHitCacheSize = 0;
+				uNotHitCacheCount = 0;
 				uNotResponseCount = 0;
 			}
 
@@ -414,67 +414,72 @@ namespace GAIA
 			GAIA::U64 uResponsePieceCount;
 
 			/*!
-				@brief
+				@brief Specify HttpServer's total request size in bytes.
 			*/
 			GAIA::U64 uRequestSize;
 
 			/*!
-				@brief
+				@brief Specify HttpServer's total response size in bytes.
 			*/
 			GAIA::U64 uResponseSize;
 
 			/*!
-				@brief
+				@brief Specify HttpServer's total request count by HTTP_METHOD catagory.
 			*/
 			GAIA::U64 uRequestCountByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
 
 			/*!
-				@brief
+				@brief Specify HttpServer's total response count by HTTP_METHOD catagory.
 			*/
 			GAIA::U64 uResponseCountByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
 
 			/*!
-				@brief
+				@brief Specify HttpServer's total request piese count by HTTP_METHOD catagory.
 			*/
 			GAIA::U64 uRequestPieceCountByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
 
 			/*!
-				@brief
+				@brief Specify HttpServer's total response piece count by HTTP_METHOD catagory.
 			*/
 			GAIA::U64 uResponsePieceCountByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
 
 			/*!
-				@brief
+				@brief Specify HttpServer's total request size in bytes by HTTP_METHOD catagory.
 			*/
 			GAIA::U64 uRequestSizeByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
 
 			/*!
-				@brief
+				@brief Specify HttpServer's total response size in bytes by HTTP_METHOD catagory.
 			*/
 			GAIA::U64 uResponseSizeByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
 
 			/*!
-				@brief
+				@brief Specify HttpServer's total response count by HTTP_CODE catagory.
 			*/
 			GAIA::U64 uResponseCountByCode[GAIA::NETWORK::HTTP_CODE_MAXENUMCOUNT];
 
 			/*!
-				@brief
+				@brief Specify hit cache count.
 			*/
-			GAIA::U64 uHitResponseCacheCount;
+			GAIA::U64 uHitCacheCount;
 
 			/*!
-				@brief
+				@brief Specify hit cache size.
 			*/
-			GAIA::U64 uHitResponseCacheSize;
+			GAIA::U64 uHitCacheSize;
 
 			/*!
-				@brief
+				@brief Specify not hit cache count.
 			*/
-			GAIA::U64 uNotHitResponseCacheCount;
+			GAIA::U64 uNotHitCacheCount;
 
 			/*!
-				@brief
+				@brief Specify not response count.
+
+				@details
+					If a request can't be dispatch by any sub class of HttpServerCallBack,
+					and there is no default response with error http code,
+					it will be record to this variable.
 			*/
 			GAIA::U64 uNotResponseCount;
 		};
@@ -491,17 +496,19 @@ namespace GAIA
 
 		public:
 			/*!
-				@brief
+				@brief Specify the IP address.
 			*/
 			GAIA::NETWORK::IP ip;
 
 			/*!
-				@brief
+				@brief Specify the regist time.
+					Regist time is the GMT time when you call HttpServer::AddBlackList or HttpServer::AddWhiteList.
 			*/
 			GAIA::U64 uRegistTime; // Real time in microseconds.
 
 			/*!
-				@brief
+				@brief Specify the effect time.
+					Effect time is the BlackWhiteNode take effect time after you call HttpServer::AddBlackList or HttpServer::AddWhiteList.
 			*/
 			GAIA::U64 uEffectTime; // Relative time in microseconds.
 		};
@@ -1099,132 +1106,108 @@ namespace GAIA
 			/*!
 				@brief Add a ip to black list.
 
-				@param
+				@param ip [in] Speicify a IP to add to black list.
 
-				@return
+				@return uEffectTime [in] Specify the take effect time in microseconds.
 
 				@remarks
+					If the node is not exist which specified by parameter ip, the node will be created to black lsit.
 			*/
-			GAIA::GVOID AddBlackList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uTime = GINVALID);
+			GAIA::GVOID AddBlackList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uEffectTime = GINVALID);
 
 			/*!
 				@brief Remove a ip from black list.
 
-				@param
+				@param ip [in] Specify a IP to remove.
 
-				@return
-
-				@remarks
+				@return If the parameter ip is exist in black list, current function call will success and return GAIA::True,
+					or will return GAIA::False.
 			*/
 			GAIA::GVOID RemoveBlackList(const GAIA::NETWORK::IP& ip);
 
 			/*!
 				@brief Remove all ip addresses from black list.
-
-				@param
-
-				@return
-
-				@remarks
 			*/
 			GAIA::GVOID RemoveBlackListAll();
 
 			/*!
 				@brief Check a ip in black list or not.
 
-				@param
+				@param ip [in] Specify a ip to check.
 
-				@return
-
-				@remarks
+				@return If the parameter ip is exist in black list, return GAIA::True,
+					or will return GAIA::False.
 			*/
 			GAIA::BL IsInBlackList(const GAIA::NETWORK::IP& ip) const;
 
 			/*!
 				@brief Get count of ip addresses in black list.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return the count of addresses in black list.
 			*/
 			GAIA::NUM GetBlackListSize() const;
 
 			/*!
 				@brief Collect all ip addresses in black list.
 
-				@param
+				@param listResult [out] Used for saving the black node list.
 
-				@return
-
-				@remarks
+				@return If there is exist black node to collect, return GAIA::True,
+					or will return GAIA::False.
 			*/
 			GAIA::BL CollectBlackList(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerBlackWhiteNode>& listResult) const;
 
 			/*!
 				@brief Add a ip to white list.
 
-				@param
+				@param ip [in] Specify a IP to add to white list.
 
-				@return
+				@param uEffectTime [in] Specify the take effect time in microseconds.
 
 				@remarks
+					If the node is not exist which specified by parameter ip, the node will be created to white list.
 			*/
-			GAIA::GVOID AddWhiteList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uTime = GINVALID);
+			GAIA::GVOID AddWhiteList(const GAIA::NETWORK::IP& ip, const GAIA::U64& uEffectTime = GINVALID);
 
 			/*!
 				@brief Remove a ip from white list.
 
-				@param
+				@param ip [in] Specify a IP to remove.
 
-				@return
-
-				@remarks
+				@return If the parameter ip is exist in white list, current function call will success and return GAIA::True,
+					or will return GAIA::False.
 			*/
 			GAIA::GVOID RemoveWhiteList(const GAIA::NETWORK::IP& ip);
 
 			/*!
 				@brief Remove all ip addresses from white list.
-
-				@param
-
-				@return
-
-				@remarks
 			*/
 			GAIA::GVOID RemoveWhiteListAll();
 
 			/*!
 				@brief Check a ip in white list or not.
 
-				@param
+				@param ip [in] Specify a IP to check.
 
-				@return
-
-				@remarks
+				@return If the parameter ip is exist in white list, return GAIA::True,
+					or will return GAIA::False.
 			*/
 			GAIA::BL IsInWhiteList(const GAIA::NETWORK::IP& ip) const;
 
 			/*!
 				@brief Get count of ip addresses in white list.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return the count of ip addresses in white list.
 			*/
 			GAIA::NUM GetWhiteListSize() const;
 
 			/*!
 				@brief Collect all ip addresses in white list.
 
-				@param
+				@param listResult [out] Used for saving the white node list.
 
-				@return
-
-				@remarks
+				@return If there is exist white node to collect, return GAIA::True,
+					or will return GAIA::False.
 			*/
 			GAIA::BL CollectWhiteList(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerBlackWhiteNode>& listResult) const;
 
@@ -1232,8 +1215,6 @@ namespace GAIA
 				@brief Get server status.
 
 				@return Return server status.
-
-				@remarks
 			*/
 			GINL GAIA::NETWORK::HttpServerStatus& GetStatus(){return m_status;}
 
@@ -1304,25 +1285,19 @@ namespace GAIA
 			GAIA::BL UpdateCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& reqhead, const GAIA::NETWORK::HttpHead& resphead, const GAIA::GVOID* p, GAIA::NUM sSize, GAIA::U64 uEffectTime = GINVALID);
 
 			/*!
-				@brief
+				@brief Recycle the cache data which are not need to used later.
 
-				@param
-
-				@return
-
-				@remarks
+				@return If there exist some cache data be recycled, return GAIA::True,
+					or will return GAIA::False.
 			*/
 			GAIA::BL RecycleCache();
 
 			/*!
-				@brief
+				@brief Get the AsyncDispatcher which derived from GAIA::NETWORK::AsyncDispatcher.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return the AsyncDispatcher.
 			*/
+
 			GAIA::NETWORK::HttpAsyncDispatcher* GetAsyncDispatcher() const{return m_disp;}
 
 		private:
