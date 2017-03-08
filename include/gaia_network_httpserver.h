@@ -821,6 +821,8 @@ namespace GAIA
 
 		/*!
 			@brief Http server class.
+
+			@remarks HttpServer is a thread-safe class.
 		*/
 		class HttpServer : public GAIA::Base
 		{
