@@ -188,6 +188,7 @@
 #include	"gaia_digit_crypt.h"
 #include	"gaia_digit_rc4.h"
 #include	"gaia_digit_des.h"
+#include	"gaia_digit_aes.h"
 #include	"gaia_digit_rsa.h"
 #include	"gaia_digit_zip.h"
 #include	"gaia_digit_diff.h"

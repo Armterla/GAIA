@@ -122,6 +122,7 @@ namespace TEST
 	extern GAIA::GVOID t_digit_regexp(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_base64(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_rc4(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_digit_aes(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_rsa(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_md5(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_sha1(GAIA::LOG::Log& logobj);
@@ -281,6 +282,7 @@ namespace TEST
 			TITEM("Digit: RegExp test begin!"); t_digit_regexp(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: Base64 test begin!"); t_digit_base64(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: RC4 test begin!"); t_digit_rc4(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Digit: AES test begin!"); t_digit_aes(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: RSA test begin!"); t_digit_rsa(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: MD5 test begin!"); t_digit_md5(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: SHA1 test begin!"); t_digit_sha1(logobj); TITEM("End"); TTEXT("\t");
