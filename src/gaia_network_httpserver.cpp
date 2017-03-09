@@ -250,16 +250,16 @@ namespace GAIA
 			GAIA::BL m_bClosed;
 		};
 
-		class HttpAsyncDispatcher : public GAIA::NETWORK::AsyncDispatcher
+		class HttpServerAsyncDispatcher : public GAIA::NETWORK::AsyncDispatcher
 		{
 		public:
-			HttpAsyncDispatcher(GAIA::NETWORK::HttpServer& svr)
+			HttpServerAsyncDispatcher(GAIA::NETWORK::HttpServer& svr)
 			{
 				this->init();
 				m_pSvr = &svr;
 			}
 
-			~HttpAsyncDispatcher()
+			~HttpServerAsyncDispatcher()
 			{
 			}
 
@@ -967,7 +967,7 @@ namespace GAIA
 				return GAIA::False;
 
 			// Create async dispatcher.
-			m_disp = gnew HttpAsyncDispatcher(*this);
+			m_disp = gnew HttpServerAsyncDispatcher(*this);
 			GAIA::NETWORK::AsyncDispatcherDesc descDisp;
 			descDisp.reset();
 			descDisp.sThreadCount = desc.sNetworkThreadCount;

@@ -514,7 +514,7 @@ namespace GAIA
 		};
 
 		class HttpAsyncSocket;
-		class HttpAsyncDispatcher;
+		class HttpServerAsyncDispatcher;
 
 		/*!
 			@brief HttpServer links class.
@@ -524,7 +524,7 @@ namespace GAIA
 		{
 			friend class HttpServer;
 			friend class HttpAsyncSocket;
-			friend class HttpAsyncDispatcher;
+			friend class HttpServerAsyncDispatcher;
 
 		public:
 
@@ -674,7 +674,7 @@ namespace GAIA
 			friend class HttpServerLink;
 			friend class HttpServer;
 			friend class HttpAsyncSocket;
-			friend class HttpAsyncDispatcher;
+			friend class HttpServerAsyncDispatcher;
 
 		public:
 			/*!
@@ -829,7 +829,7 @@ namespace GAIA
 			friend class HttpServerLink;
 			friend class HttpServerWorkThread;
 			friend class HttpAsyncSocket;
-			friend class HttpAsyncDispatcher;
+			friend class HttpServerAsyncDispatcher;
 
 		public:
 
@@ -1324,7 +1324,7 @@ namespace GAIA
 
 				@return Return the AsyncDispatcher.
 			*/
-			GAIA::NETWORK::HttpAsyncDispatcher* GetAsyncDispatcher() const{return m_disp;}
+			GAIA::NETWORK::HttpServerAsyncDispatcher* GetAsyncDispatcher() const{return m_disp;}
 
 		private:
 			GAIA::BL RecycleLink(GAIA::NETWORK::HttpServerLink& l);
@@ -1391,7 +1391,7 @@ namespace GAIA
 			GAIA::SYNC::Lock m_lrBufPool;
 			GAIA::CTN::Pool<GAIA::CTN::Buffer> m_bufpool;
 
-			GAIA::NETWORK::HttpAsyncDispatcher* m_disp;
+			GAIA::NETWORK::HttpServerAsyncDispatcher* m_disp;
 			GAIA::CTN::Vector<GAIA::NETWORK::HttpServerWorkThread*> m_listWorkThreads;
 			GAIA::NETWORK::HttpServerStatus m_status;
 		};
