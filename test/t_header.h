@@ -113,8 +113,14 @@ namespace TEST
 	extern GAIA::GVOID t_fsys_memfile(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_fsys_dir(GAIA::LOG::Log& logobj);
 
+	extern GAIA::GVOID t_xml_xmlreader(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_xml_xmlwriter(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_xml_xml(GAIA::LOG::Log& logobj);
+
 	extern GAIA::GVOID t_html_html(GAIA::LOG::Log& logobj);
+
+	extern GAIA::GVOID t_json_jsonreader(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_json_jsonwriter(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_json_json(GAIA::LOG::Log& logobj);
 
 	extern GAIA::GVOID t_log_log(GAIA::LOG::Log& logobj);
@@ -273,8 +279,12 @@ namespace TEST
 			TITEM("File: File test begin!"); t_fsys_file(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("File: MemFile test begin!"); t_fsys_memfile(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("File: Dir test begin!"); t_fsys_dir(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("File: XMLReader test begin!"); t_xml_xmlreader(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("File: XMLWriter test begin!"); t_xml_xmlwriter(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("File: XML test begin!"); t_xml_xml(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("File: HTML test begin!"); t_html_html(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("File: JsonReader test begin!"); t_json_jsonreader(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("File: JsonWriter test begin!"); t_json_jsonwriter(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("File: Json test begin!"); t_json_json(logobj); TITEM("End"); TTEXT("\t");
 			
 			TITEM("Log: Log test begin!"); t_log_log(logobj); TITEM("End"); TTEXT("\t");
