@@ -754,7 +754,7 @@ namespace GAIA
 
 		private:
 			GAIA::BL m_bCreated;
-			HttpDesc m_desc;
+			GAIA::NETWORK::HttpDesc m_desc;
 		};
 	}
 }
