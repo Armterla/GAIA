@@ -10,17 +10,21 @@ namespace GAIA
 {
 	namespace JSON
 	{
-		template<typename _DataType> class JsonWriter : public GAIA::Base
+		template<typename _DataType, typename _DepthType, _DepthType _MaxDepth> class BasicJsonWriter : public GAIA::Base
 		{
 		public:
 			typedef _DataType _datatype;
+			typedef _DepthType _depthtype;
 
 		public:
-			typedef JsonWriter<_DataType> __MyType;
+			static const _DepthType _maxdepth = _MaxDepth;
 
 		public:
-			GINL JsonWriter(){this->init();}
-			GINL ~JsonWriter(){}
+			typedef BasicJsonWriter<_DataType, _DepthType, _MaxDepth> __MyType;
+
+		public:
+			GINL BasicJsonWriter(){this->init();}
+			GINL ~BasicJsonWriter(){}
 
 			GINL GAIA::GVOID SetBuffer(GAIA::GVOID* p, GAIA::NUM sSize)
 			{
@@ -83,6 +87,8 @@ namespace GAIA
 			GAIA::JSON::JSON_NODE m_LastContainerNodeType;
 			GAIA::JSON::JSON_NODE m_LastNodeType;
 		};
+		class JsonWriterA : public BasicJsonWriter<GAIA::CH, GAIA::NUM, 64>{public:};
+		class JsonWriterW : public BasicJsonWriter<GAIA::WCH, GAIA::NUM, 64>{public:};
 	}
 }
 

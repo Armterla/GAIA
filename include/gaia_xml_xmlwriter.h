@@ -10,17 +10,21 @@ namespace GAIA
 {
 	namespace XML
 	{
-		template<typename _DataType> class XMLWriter : public GAIA::Base
+		template<typename _DataType, typename _DepthType, _DepthType _MaxDepth> class BasicXMLWriter : public GAIA::Base
 		{
 		public:
 			typedef _DataType _datatype;
+			typedef _DepthType _depthtype;
 
 		public:
-			typedef XMLWriter<_DataType> __MyType;
+			static const _DepthType _maxdepth = _MaxDepth;
 
 		public:
-			GINL XMLWriter(){this->init();}
-			GINL ~XMLWriter(){}
+			typedef BasicXMLWriter<_DataType, _DepthType, _MaxDepth> __MyType;
+
+		public:
+			GINL BasicXMLWriter(){this->init();}
+			GINL ~BasicXMLWriter(){}
 
 			GINL GAIA::GVOID SetBuffer(const GAIA::GVOID* p, GAIA::NUM sSize)
 			{
@@ -82,6 +86,8 @@ namespace GAIA
 			GAIA::XML::XML_NODE m_LastContainerNodeType;
 			GAIA::XML::XML_NODE m_LastNodeType;
 		};
+		class XMLWriterA : public BasicXMLWriter<GAIA::CH, GAIA::NUM, 64>{public:};
+		class XMLWriterW : public BasicXMLWriter<GAIA::WCH, GAIA::NUM, 64>{public:};
 	}
 }
 

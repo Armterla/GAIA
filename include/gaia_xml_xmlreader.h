@@ -10,17 +10,21 @@ namespace GAIA
 {
 	namespace XML
 	{
-		template<typename _DataType> class XMLReader : public GAIA::Base
+		template<typename _DataType, typename _DepthType, _DepthType _MaxDepth> class BasicXMLReader : public GAIA::Base
 		{
 		public:
 			typedef _DataType _datatype;
+			typedef _DepthType _depthtype;
 
 		public:
-			typedef XMLReader<_DataType> __MyType;
+			static const _DepthType _maxdepth = _MaxDepth;
 
 		public:
-			GINL XMLReader(){this->init();}
-			GINL ~XMLReader(){}
+			typedef BasicXMLReader<_DataType, _DepthType, _MaxDepth> __MyType;
+
+		public:
+			GINL BasicXMLReader(){this->init();}
+			GINL ~BasicXMLReader(){}
 
 			GINL GAIA::GVOID SetBuffer(const GAIA::GVOID* p, GAIA::NUM sSize)
 			{
@@ -60,6 +64,8 @@ namespace GAIA
 			const _DataType* m_pCursor;
 			GAIA::NUM m_sSize; // Size in bytes.
 		};
+		class XMLReaderA : public BasicXMLReader<GAIA::CH, GAIA::NUM, 64>{public:};
+		class XMLReaderW : public BasicXMLReader<GAIA::WCH, GAIA::NUM, 64>{public:};
 	}
 }
 

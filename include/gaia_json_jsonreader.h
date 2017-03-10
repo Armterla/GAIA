@@ -10,17 +10,21 @@ namespace GAIA
 {
 	namespace JSON
 	{
-		template<typename _DataType> class JsonReader : public GAIA::Base
+		template<typename _DataType, typename _DepthType, _DepthType _MaxDepth> class BasicJsonReader : public GAIA::Base
 		{
 		public:
 			typedef _DataType _datatype;
+			typedef _DepthType _depthtype;
 
 		public:
-			typedef JsonReader<_DataType> __MyType;
+			static const _DepthType _maxdepth = _MaxDepth;
 
 		public:
-			GINL JsonReader(){this->init();}
-			GINL ~JsonReader(){}
+			typedef BasicJsonReader<_DataType, _DepthType, _MaxDepth> __MyType;
+
+		public:
+			GINL BasicJsonReader(){this->init();}
+			GINL ~BasicJsonReader(){}
 
 			GINL GAIA::GVOID SetBuffer(const GAIA::GVOID* p, GAIA::NUM sSize)
 			{
@@ -60,6 +64,8 @@ namespace GAIA
 			const _DataType* m_pCursor;
 			GAIA::NUM m_sSize; // Size in bytes.
 		};
+		class JsonReaderA : public BasicJsonReader<GAIA::CH, GAIA::NUM, 64>{public:};
+		class JsonReaderW : public BasicJsonReader<GAIA::WCH, GAIA::NUM, 64>{public:};
 	}
 }
 

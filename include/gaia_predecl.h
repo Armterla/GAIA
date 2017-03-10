@@ -37,8 +37,6 @@ namespace GAIA
 
 	namespace XML
 	{
-		template<typename _DataType> class XMLReader;
-		template<typename _DataType> class XMLWriter;
 		class XMLFactoryDesc;
 		class XMLFmt;
 		class XMLProp;
@@ -59,8 +57,6 @@ namespace GAIA
 
 	namespace JSON
 	{
-		template<typename _DataType> class JsonReader;
-		template<typename _DataType> class JsonWriter;
 		class JsonFactoryDesc;
 		class JsonProp;
 		class JsonNode;
