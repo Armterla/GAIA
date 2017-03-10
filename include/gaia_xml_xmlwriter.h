@@ -40,8 +40,8 @@ namespace GAIA
 					m_pCursor = m_pFront;
 					m_sSize = sSize;
 				}
-				m_LastContainerNodeType = GAIA::JSON::JSON_NODE_INVALID;
-				m_LastNodeType = GAIA::JSON::JSON_NODE_INVALID;
+				m_LastContainerNodeType = GAIA::XML::XML_NODE_INVALID;
+				m_LastNodeType = GAIA::XML::XML_NODE_INVALID;
 			}
 			GINL const GAIA::GVOID* GetBuffer(GAIA::NUM& sSize) const
 			{
@@ -70,8 +70,8 @@ namespace GAIA
 			{
 				m_pFront = m_pBack = m_pCursor = GNIL;
 				m_sSize = 0;
-				m_LastContainerNodeType = GAIA::JSON::JSON_NODE_INVALID;
-				m_LastNodeType = GAIA::JSON::JSON_NODE_INVALID;
+				m_LastContainerNodeType = GAIA::XML::XML_NODE_INVALID;
+				m_LastNodeType = GAIA::XML::XML_NODE_INVALID;
 			}
 
 		private:
