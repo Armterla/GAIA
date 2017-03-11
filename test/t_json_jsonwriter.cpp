@@ -25,7 +25,7 @@ namespace TEST
 		// Depth1 test.
 		{
 			jw.SetBuffer(buf.fptr(), buf.write_size());
-			jw.BeginWriteNode(GAIA::JSON::JSON_NODE_CONTAINER);
+			jw.Begin(GAIA::JSON::JSON_NODE_CONTAINER);
 			{
 				for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 				{
@@ -38,11 +38,11 @@ namespace TEST
 					GAIA::CH szTempValue[32] = "Value";
 					GAIA::ALGO::gstrcat(szTempValue, szTempIndexX);
 
-					jw.WriteNode(GAIA::JSON::JSON_NODE_NAME, szTempName);
-					jw.WriteNode(GAIA::JSON::JSON_NODE_VALUE, szTempValue);
+					jw.Write(GAIA::JSON::JSON_NODE_NAME, szTempName);
+					jw.Write(GAIA::JSON::JSON_NODE_VALUE, szTempValue);
 				}
 			}
-			jw.EndWriteNode();
+			jw.End();
 
 			GAIA::NUM sWriteSize = jw.GetWriteSize();
 
@@ -57,7 +57,7 @@ namespace TEST
 		// Depth2 test.
 		{
 			jw.SetBuffer(buf.fptr(), buf.write_size());
-			jw.BeginWriteNode(GAIA::JSON::JSON_NODE_MULTICONTAINER);
+			jw.Begin(GAIA::JSON::JSON_NODE_MULTICONTAINER);
 			{
 				for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 				{
@@ -68,7 +68,7 @@ namespace TEST
 					GAIA::ALGO::gstrcat(szTempNode, szTempIndexX);
 
 
-					jw.BeginWriteNode(GAIA::JSON::JSON_NODE_CONTAINER, szTempNode);
+					jw.Begin(GAIA::JSON::JSON_NODE_CONTAINER, szTempNode);
 					{
 						for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
 						{
@@ -81,14 +81,14 @@ namespace TEST
 							GAIA::CH szTempValue[32] = "Value";
 							GAIA::ALGO::gstrcat(szTempValue, szTempIndexY);
 
-							jw.WriteNode(GAIA::JSON::JSON_NODE_NAME, szTempName);
-							jw.WriteNode(GAIA::JSON::JSON_NODE_VALUE, szTempValue);
+							jw.Write(GAIA::JSON::JSON_NODE_NAME, szTempName);
+							jw.Write(GAIA::JSON::JSON_NODE_VALUE, szTempValue);
 						}
 					}
-					jw.EndWriteNode();
+					jw.End();
 				}
 			}
-			jw.EndWriteNode();
+			jw.End();
 
 			GAIA::NUM sWriteSize = jw.GetWriteSize();
 

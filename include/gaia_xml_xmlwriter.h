@@ -28,31 +28,31 @@ namespace GAIA
 			GINL BasicXmlWriter(){this->init();}
 			GINL ~BasicXmlWriter(){}
 
-			GINL GAIA::GVOID SetBuffer(const GAIA::GVOID* p, _SizeType sSize)
+			GINL GAIA::GVOID SetBuffer(const GAIA::GVOID* p, _SizeType size)
 			{
 				if(p == GNIL)
 				{
-					GAST(sSize == 0);
+					GAST(size == 0);
 					m_pFront = m_pBack = m_pCursor = GNIL;
-					m_sSize = 0;
+					m_size = 0;
 				}
 				else
 				{
-					GAST(sSize > sizeof(_DataType));
+					GAST(size > sizeof(_DataType));
 					m_pFront = (_DataType*)p;
-					m_pBack = m_pFront + (sSize / sizeof(_DataType) - 1);
+					m_pBack = m_pFront + (size / sizeof(_DataType) - 1);
 					m_pCursor = m_pFront;
-					m_sSize = sSize;
+					m_size = size;
 				}
 				m_CNTCursor = GINVALID;
 				m_LastNNVT = GAIA::XML::XML_NODE_INVALID;
 			}
-			GINL const GAIA::GVOID* GetBuffer(_SizeType& sSize) const{sSize = m_sSize; return m_pFront;}
-			GINL _SizeType GetBufferSize() const{return m_sSize;}
+			GINL const GAIA::GVOID* GetBuffer(_SizeType& size) const{size = m_size; return m_pFront;}
+			GINL _SizeType GetBufferSize() const{return m_size;}
 			GINL _SizeType GetWriteSize() const{return (m_pCursor - m_pFront) * sizeof(_DataType);}
 			GINL _SizeType GetRemainSize() const{return this->GetBufferSize() - this->GetWriteSize();}
 
-			GINL GAIA::GVOID BeginWriteNode(GAIA::XML::XML_NODE nt, const _DataType* pszNodeName = GNIL, _SizeType sNodeNameLen = GINVALID)
+			GINL GAIA::GVOID Begin(GAIA::XML::XML_NODE nt, const _DataType* pszNodeName = GNIL, _SizeType nodenamelen = GINVALID)
 			{
 				GAST(nt > GAIA::XML::XML_NODE_INVALID && nt < GAIA::XML::XML_NODE_MAXENUMCOUNT);
 				if(pszNodeName != GNIL)
@@ -60,8 +60,8 @@ namespace GAIA
 					if(!GAIA::XML::XmlCheckNodeName(nt, pszNodeName))
 						GTHROW(InvalidParam);
 				}
-				if(sNodeNameLen == GINVALID && pszNodeName != GNIL)
-					sNodeNameLen = GAIA::ALGO::gstrlen(pszNodeName);
+				if(nodenamelen == GINVALID && pszNodeName != GNIL)
+					nodenamelen = GAIA::ALGO::gstrlen(pszNodeName);
 				if(m_LastNNVT == GAIA::XML::XML_NODE_NAME)
 					GTHROW(Illegal);
 				switch(nt)
@@ -76,8 +76,8 @@ namespace GAIA
 							this->write("<", sizeof("<") - 1);
 							NodeName& nn = m_NodeNameStack[m_CNTCursor];
 							nn.p = m_pCursor;
-							nn.len = sNodeNameLen;
-							this->write(pszNodeName, sNodeNameLen);
+							nn.len = nodenamelen;
+							this->write(pszNodeName, nodenamelen);
 
 						}
 						else
@@ -88,8 +88,8 @@ namespace GAIA
 							this->write("<", sizeof("<") - 1);
 							NodeName& nn = m_NodeNameStack[m_CNTCursor];
 							nn.p = m_pCursor;
-							nn.len = sNodeNameLen;
-							this->write(pszNodeName, sNodeNameLen);
+							nn.len = nodenamelen;
+							this->write(pszNodeName, nodenamelen);
 						}
 					}
 					break;
@@ -103,8 +103,8 @@ namespace GAIA
 							this->write("<", sizeof("<") - 1);
 							NodeName& nn = m_NodeNameStack[m_CNTCursor];
 							nn.p = m_pCursor;
-							nn.len = sNodeNameLen;
-							this->write(pszNodeName, sNodeNameLen);
+							nn.len = nodenamelen;
+							this->write(pszNodeName, nodenamelen);
 							this->write(">", sizeof(">") - 1);
 						}
 						else
@@ -115,8 +115,8 @@ namespace GAIA
 							this->write("<", sizeof("<") - 1);
 							NodeName& nn = m_NodeNameStack[m_CNTCursor];
 							nn.p = m_pCursor;
-							nn.len = sNodeNameLen;
-							this->write(pszNodeName, sNodeNameLen);
+							nn.len = nodenamelen;
+							this->write(pszNodeName, nodenamelen);
 							this->write(">", sizeof(">") - 1);
 						}
 					}
@@ -133,7 +133,7 @@ namespace GAIA
 				}
 				m_LastNNVT = GAIA::XML::XML_NODE_INVALID;
 			}
-			GINL GAIA::GVOID EndWriteNode()
+			GINL GAIA::GVOID End()
 			{
 				if(m_CNTCursor == GINVALID)
 					GTHROW(Illegal);
@@ -167,7 +167,7 @@ namespace GAIA
 				m_CNTCursor--;
 				m_LastNNVT = GAIA::XML::XML_NODE_INVALID;
 			}
-			GINL GAIA::GVOID WriteNode(GAIA::XML::XML_NODE nt, const _DataType* pszNodeName, _SizeType sNodeNameLen = GINVALID)
+			GINL GAIA::GVOID Write(GAIA::XML::XML_NODE nt, const _DataType* pszNodeName, _SizeType nodenamelen = GINVALID)
 			{
 				GAST(nt > GAIA::XML::XML_NODE_INVALID && nt < GAIA::XML::XML_NODE_MAXENUMCOUNT);
 				GAST(!GAIA::ALGO::gstremp(pszNodeName));
@@ -175,8 +175,8 @@ namespace GAIA
 					GTHROW(InvalidParam);
 				if(m_CNTCursor == GINVALID)
 					GTHROW(Illegal);
-				if(sNodeNameLen == GINVALID && pszNodeName != GNIL)
-					sNodeNameLen = GAIA::ALGO::gstrlen(pszNodeName);
+				if(nodenamelen == GINVALID && pszNodeName != GNIL)
+					nodenamelen = GAIA::ALGO::gstrlen(pszNodeName);
 				switch(nt)
 				{
 				case GAIA::XML::XML_NODE_CONTAINER:
@@ -191,7 +191,7 @@ namespace GAIA
 						   m_LastNNVT != GAIA::XML::XML_NODE_VALUE)
 							GTHROW(Illegal);
 						this->write(" ", sizeof(" ") - 1);
-						this->write(pszNodeName, sNodeNameLen);
+						this->write(pszNodeName, nodenamelen);
 						this->write("=\"", sizeof("=\"") - 1);
 						m_LastNNVT = GAIA::XML::XML_NODE_NAME;
 					}
@@ -200,7 +200,7 @@ namespace GAIA
 					{
 						if(m_LastNNVT != GAIA::XML::XML_NODE_NAME)
 							GTHROW(Illegal);
-						this->write(pszNodeName, sNodeNameLen);
+						this->write(pszNodeName, nodenamelen);
 						this->write("\"", sizeof("\"") - 1);
 						m_LastNNVT = GAIA::XML::XML_NODE_VALUE;
 					}
@@ -224,7 +224,7 @@ namespace GAIA
 			{
 				GAST(_MaxDepth > 0);
 				m_pFront = m_pBack = m_pCursor = GNIL;
-				m_sSize = 0;
+				m_size = 0;
 				m_CNTCursor = GINVALID;
 				m_LastNNVT = GAIA::XML::XML_NODE_INVALID;
 			}
@@ -242,7 +242,7 @@ namespace GAIA
 			_DataType* m_pFront;
 			_DataType* m_pBack; // Last valid character.
 			_DataType* m_pCursor;
-			_SizeType m_sSize; // Size in bytes.
+			_SizeType m_size; // Size in bytes.
 			GAIA::XML::XML_NODE m_LastCNT[_MaxDepth];
 			_DepthType m_CNTCursor;
 			GAIA::XML::XML_NODE m_LastNNVT; // NNVT means node name value type.

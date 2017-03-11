@@ -28,32 +28,32 @@ namespace GAIA
 			GINL BasicJsonWriter(){this->init();}
 			GINL ~BasicJsonWriter(){}
 
-			GINL GAIA::GVOID SetBuffer(GAIA::GVOID* p, _SizeType sSize)
+			GINL GAIA::GVOID SetBuffer(GAIA::GVOID* p, _SizeType size)
 			{
 				if(p == GNIL)
 				{
-					GAST(sSize == 0);
+					GAST(size == 0);
 					m_pFront = m_pBack = m_pCursor = GNIL;
-					m_sSize = 0;
+					m_size = 0;
 				}
 				else
 				{
-					GAST(sSize > sizeof(_DataType));
+					GAST(size > sizeof(_DataType));
 					m_pFront = (_DataType*)p;
-					m_pBack = m_pFront + (sSize / sizeof(_DataType) - 1);
+					m_pBack = m_pFront + (size / sizeof(_DataType) - 1);
 					m_pCursor = m_pFront;
-					m_sSize = sSize;
+					m_size = size;
 				}
 				m_CNTCursor = GINVALID;
 				m_LastNNVT = GAIA::JSON::JSON_NODE_INVALID;
 				m_bFirstNode = GAIA::True;
 			}
-			GINL GAIA::GVOID* GetBuffer(_SizeType& sSize) const{sSize = m_sSize; return m_pFront;}
-			GINL _SizeType GetBufferSize() const{return m_sSize;}
+			GINL GAIA::GVOID* GetBuffer(_SizeType& size) const{size = m_size; return m_pFront;}
+			GINL _SizeType GetBufferSize() const{return m_size;}
 			GINL _SizeType GetWriteSize() const{return (m_pCursor - m_pFront) * sizeof(_DataType);}
 			GINL _SizeType GetRemainSize() const{return this->GetBufferSize() - this->GetWriteSize();}
 
-			GINL GAIA::GVOID BeginWriteNode(GAIA::JSON::JSON_NODE nt, const _DataType* pszNodeName = GNIL, _SizeType sNodeNameLen = GINVALID)
+			GINL GAIA::GVOID Begin(GAIA::JSON::JSON_NODE nt, const _DataType* pszNodeName = GNIL, _SizeType nodenamelen = GINVALID)
 			{
 				GAST(nt > GAIA::JSON::JSON_NODE_INVALID && nt < GAIA::JSON::JSON_NODE_MAXENUMCOUNT);
 				if(pszNodeName != GNIL)
@@ -61,8 +61,8 @@ namespace GAIA
 					if(!GAIA::JSON::JsonCheckNodeName(nt, pszNodeName))
 						GTHROW(InvalidParam);
 				}
-				if(sNodeNameLen == GINVALID && pszNodeName != GNIL)
-					sNodeNameLen = GAIA::ALGO::gstrlen(pszNodeName);
+				if(nodenamelen == GINVALID && pszNodeName != GNIL)
+					nodenamelen = GAIA::ALGO::gstrlen(pszNodeName);
 				if(m_LastNNVT == GAIA::JSON::JSON_NODE_NAME)
 					GTHROW(Illegal);
 				switch(nt)
@@ -91,7 +91,7 @@ namespace GAIA
 								this->write("{\"", sizeof("{\"") - 1);
 							else
 								this->write("\"", sizeof("\"") - 1);
-							this->write(pszNodeName, sNodeNameLen);
+							this->write(pszNodeName, nodenamelen);
 							this->write("\":{", sizeof("\":{") - 1);
 						}
 					}
@@ -119,7 +119,7 @@ namespace GAIA
 								this->write("{\"", sizeof("{\"") - 1);
 							else
 								this->write("\"", sizeof("\"") - 1);
-							this->write(pszNodeName, sNodeNameLen);
+							this->write(pszNodeName, nodenamelen);
 							this->write("\":[", sizeof("\":[") - 1);
 						}
 					}
@@ -137,7 +137,7 @@ namespace GAIA
 				m_LastNNVT = GAIA::JSON::JSON_NODE_INVALID;
 				m_bFirstNode = GAIA::True;
 			}
-			GINL GAIA::GVOID EndWriteNode()
+			GINL GAIA::GVOID End()
 			{
 				if(m_CNTCursor == GINVALID)
 					GTHROW(Illegal);
@@ -175,7 +175,7 @@ namespace GAIA
 				m_LastNNVT = GAIA::JSON::JSON_NODE_INVALID;
 				m_bFirstNode = GAIA::False;
 			}
-			GINL GAIA::GVOID WriteNode(GAIA::JSON::JSON_NODE nt, const _DataType* pszNodeName, _SizeType sNodeNameLen = GINVALID)
+			GINL GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const _DataType* pszNodeName, _SizeType nodenamelen = GINVALID)
 			{
 				GAST(nt > GAIA::JSON::JSON_NODE_INVALID && nt < GAIA::JSON::JSON_NODE_MAXENUMCOUNT);
 				GAST(!GAIA::ALGO::gstremp(pszNodeName));
@@ -185,8 +185,8 @@ namespace GAIA
 					GTHROW(Illegal);
 				if(m_LastCNT[m_CNTCursor] != GAIA::JSON::JSON_NODE_CONTAINER)
 					GTHROW(Illegal);
-				if(sNodeNameLen == GINVALID && pszNodeName != GNIL)
-					sNodeNameLen = GAIA::ALGO::gstrlen(pszNodeName);
+				if(nodenamelen == GINVALID && pszNodeName != GNIL)
+					nodenamelen = GAIA::ALGO::gstrlen(pszNodeName);
 				switch(nt)
 				{
 				case GAIA::JSON::JSON_NODE_CONTAINER:
@@ -205,7 +205,7 @@ namespace GAIA
 						else
 							m_bFirstNode = GAIA::False;
 						this->write("\"", sizeof("\"") - 1);
-						this->write(pszNodeName, sNodeNameLen);
+						this->write(pszNodeName, nodenamelen);
 						this->write("\":", sizeof("\":") - 1);
 						m_LastNNVT = GAIA::JSON::JSON_NODE_NAME;
 					}
@@ -215,7 +215,7 @@ namespace GAIA
 						if(m_LastNNVT != GAIA::JSON::JSON_NODE_NAME)
 							GTHROW(Illegal);
 						this->write("\"", sizeof("\"") - 1);
-						this->write(pszNodeName, sNodeNameLen);
+						this->write(pszNodeName, nodenamelen);
 						this->write("\"", sizeof("\"") - 1);
 						m_LastNNVT = GAIA::JSON::JSON_NODE_VALUE;
 					}
@@ -231,7 +231,7 @@ namespace GAIA
 			{
 				GAST(_MaxDepth > 0);
 				m_pFront = m_pBack = m_pCursor = GNIL;
-				m_sSize = 0;
+				m_size = 0;
 				m_CNTCursor = GINVALID;
 				m_LastNNVT = GAIA::JSON::JSON_NODE_INVALID;
 				m_bFirstNode = GAIA::True;
@@ -250,7 +250,7 @@ namespace GAIA
 			_DataType* m_pFront;
 			_DataType* m_pBack; // Last valid character.
 			_DataType* m_pCursor;
-			_SizeType m_sSize; // Size in bytes.
+			_SizeType m_size; // Size in bytes.
 			GAIA::JSON::JSON_NODE m_LastCNT[_MaxDepth]; // CNT means container node type.
 			_DepthType m_CNTCursor;
 			GAIA::JSON::JSON_NODE m_LastNNVT; // NNVT means node name value type.

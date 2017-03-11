@@ -25,7 +25,7 @@ namespace TEST
 		// Depth1 test.
 		{
 			xw.SetBuffer(buf.fptr(), buf.write_size());
-			xw.BeginWriteNode(GAIA::XML::XML_NODE_CONTAINER, "RootNode");
+			xw.Begin(GAIA::XML::XML_NODE_CONTAINER, "RootNode");
 			{
 				for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 				{
@@ -38,11 +38,11 @@ namespace TEST
 					GAIA::CH szTempValue[32] = "Value";
 					GAIA::ALGO::gstrcat(szTempValue, szTempIndexX);
 
-					xw.WriteNode(GAIA::XML::XML_NODE_NAME, szTempName);
-					xw.WriteNode(GAIA::XML::XML_NODE_VALUE, szTempName);
+					xw.Write(GAIA::XML::XML_NODE_NAME, szTempName);
+					xw.Write(GAIA::XML::XML_NODE_VALUE, szTempName);
 				}
 			}
-			xw.EndWriteNode();
+			xw.End();
 
 			GAIA::NUM sWriteSize = xw.GetWriteSize();
 
@@ -57,7 +57,7 @@ namespace TEST
 		// Depth2 test.
 		{
 			xw.SetBuffer(buf.fptr(), buf.write_size());
-			xw.BeginWriteNode(GAIA::XML::XML_NODE_MULTICONTAINER, "RootNode");
+			xw.Begin(GAIA::XML::XML_NODE_MULTICONTAINER, "RootNode");
 			{
 				for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 				{
@@ -68,7 +68,7 @@ namespace TEST
 					GAIA::ALGO::gstrcat(szTempNode, szTempIndexX);
 
 
-					xw.BeginWriteNode(GAIA::XML::XML_NODE_CONTAINER, szTempNode);
+					xw.Begin(GAIA::XML::XML_NODE_CONTAINER, szTempNode);
 					{
 						for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
 						{
@@ -81,14 +81,14 @@ namespace TEST
 							GAIA::CH szTempValue[32] = "Value";
 							GAIA::ALGO::gstrcat(szTempValue, szTempIndexY);
 
-							xw.WriteNode(GAIA::XML::XML_NODE_NAME, szTempName);
-							xw.WriteNode(GAIA::XML::XML_NODE_VALUE, szTempValue);
+							xw.Write(GAIA::XML::XML_NODE_NAME, szTempName);
+							xw.Write(GAIA::XML::XML_NODE_VALUE, szTempValue);
 						}
 					}
-					xw.EndWriteNode();
+					xw.End();
 				}
 			}
-			xw.EndWriteNode();
+			xw.End();
 
 			GAIA::NUM sWriteSize = xw.GetWriteSize();
 

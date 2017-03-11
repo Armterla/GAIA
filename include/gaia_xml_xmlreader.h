@@ -27,42 +27,42 @@ namespace GAIA
 			GINL BasicXmlReader(){this->init();}
 			GINL ~BasicXmlReader(){}
 
-			GINL GAIA::GVOID SetBuffer(const GAIA::GVOID* p, GAIA::NUM sSize)
+			GINL GAIA::GVOID SetBuffer(const GAIA::GVOID* p, _SizeType size)
 			{
-				if(p == m_pFront && sSize == m_sSize)
+				if(p == m_pFront && size == m_size)
 					return;
 				if(p == GNIL)
 				{
-					GAST(sSize == 0);
+					GAST(size == 0);
 					m_pFront = m_pBack = m_pCursor = GNIL;
-					m_sSize = 0;
+					m_size = 0;
 				}
 				else
 				{
-					GAST(sSize > sizeof(_DataType));
+					GAST(size > sizeof(_DataType));
 					m_pFront = (const _DataType*)p;
-					m_pBack = m_pFront + (sSize / sizeof(_DataType) - 1);
+					m_pBack = m_pFront + (size / sizeof(_DataType) - 1);
 					m_pCursor = m_pFront;
-					m_sSize = sSize;
+					m_size = size;
 				}
 			}
-			GINL const GAIA::GVOID* GetBuffer(GAIA::NUM& sSize) const{sSize = m_sSize; return m_pFront;}
-			GINL GAIA::NUM GetBufferSize() const{return m_sSize;}
-			GINL GAIA::NUM GetReadSize() const{return (m_pCursor - m_pFront) * sizeof(_DataType);}
-			GINL GAIA::NUM GetRemainSize() const{return this->GetBufferSize() - this->GetReadSize();}
+			GINL const GAIA::GVOID* GetBuffer(_SizeType& size) const{size = m_size; return m_pFront;}
+			GINL _SizeType GetBufferSize() const{return m_size;}
+			GINL _SizeType GetReadSize() const{return (m_pCursor - m_pFront) * sizeof(_DataType);}
+			GINL _SizeType GetRemainSize() const{return this->GetBufferSize() - this->GetReadSize();}
 
 		private:
 			GINL GAIA::GVOID init()
 			{
 				m_pFront = m_pBack = m_pCursor = GNIL;
-				m_sSize = 0;
+				m_size = 0;
 			}
 
 		private:
 			const _DataType* m_pFront;
 			const _DataType* m_pBack; // Last valid character.
 			const _DataType* m_pCursor;
-			GAIA::NUM m_sSize; // Size in bytes.
+			_SizeType m_size; // Size in bytes.
 		};
 		class XmlReaderA : public BasicXmlReader<GAIA::CH, GAIA::NUM, GAIA::NUM, 32>{public:};
 		class XmlReaderW : public BasicXmlReader<GAIA::WCH, GAIA::NUM, GAIA::NUM, 32>{public:};
