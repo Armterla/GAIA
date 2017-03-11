@@ -22,7 +22,7 @@ namespace GAIA
 
 		static const GAIA::TCH JSON_DEFAULT_ROOT_NODE_NAME[] = _T("JSON_ROOT");
 
-		GINL GAIA::BL JSONCheckNodeName(GAIA::JSON::JSON_NODE nt, const GAIA::TCH* pszNodeName)
+		template<typename _DataType> GAIA::BL JsonCheckNodeName(GAIA::JSON::JSON_NODE nt, const _DataType* pszNodeName)
 		{
 			switch(nt)
 			{
@@ -30,7 +30,7 @@ namespace GAIA
 			case GAIA::JSON::JSON_NODE_MULTICONTAINER:
 			case GAIA::JSON::JSON_NODE_NAME:
 				{
-					const GAIA::TCH* p = pszNodeName;
+					const _DataType* p = pszNodeName;
 					while(*p != '\0')
 					{
 						if((*p >= 'a' && *p <= 'z') ||
@@ -45,7 +45,7 @@ namespace GAIA
 				break;
 			case GAIA::JSON::JSON_NODE_VALUE:
 				{
-					const GAIA::TCH* p = pszNodeName;
+					const _DataType* p = pszNodeName;
 					while(*p != '\0')
 					{
 						if(*p == '<' || *p == '>' || *p == '\"')
