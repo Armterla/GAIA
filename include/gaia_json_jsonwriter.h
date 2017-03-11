@@ -3,7 +3,6 @@
 
 #include "gaia_type.h"
 #include "gaia_assert.h"
-#include "gaia_algo_memory.h"
 #include "gaia_algo_string.h"
 #include "gaia_json_jsonbase.h"
 
@@ -53,7 +52,7 @@ namespace GAIA
 			GINL _SizeType GetWriteSize() const{return (m_pCursor - m_pFront) * sizeof(_DataType);}
 			GINL _SizeType GetRemainSize() const{return this->GetBufferSize() - this->GetWriteSize();}
 
-			GINL GAIA::GVOID Begin(GAIA::JSON::JSON_NODE nt, const _DataType* pszNodeName = GNIL, _SizeType nodenamelen = GINVALID)
+			GAIA::GVOID Begin(GAIA::JSON::JSON_NODE nt, const GAIA::CH* pszNodeName = GNIL, _SizeType nodenamelen = GINVALID)
 			{
 				GAST(nt > GAIA::JSON::JSON_NODE_INVALID && nt < GAIA::JSON::JSON_NODE_MAXENUMCOUNT);
 				if(pszNodeName != GNIL)
@@ -175,7 +174,7 @@ namespace GAIA
 				m_LastNNVT = GAIA::JSON::JSON_NODE_INVALID;
 				m_bFirstNode = GAIA::False;
 			}
-			GINL GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const _DataType* pszNodeName, _SizeType nodenamelen = GINVALID)
+			template<typename _ParamDataType> GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const _ParamDataType* pszNodeName, _SizeType nodenamelen = GINVALID)
 			{
 				GAST(nt > GAIA::JSON::JSON_NODE_INVALID && nt < GAIA::JSON::JSON_NODE_MAXENUMCOUNT);
 				GAST(!GAIA::ALGO::gstremp(pszNodeName));
@@ -225,6 +224,50 @@ namespace GAIA
 					break;
 				}
 			}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::BL& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::X128& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::U8& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::N8& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::U16& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::N16& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::U32& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::N32& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::N64& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::U64& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::F32& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::F64& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			__MyType& operator << (const GAIA::CH* p)
+			{
+				if(m_LastNNVT == GAIA::JSON::JSON_NODE_INVALID || m_LastNNVT == GAIA::JSON::JSON_NODE_VALUE)
+					this->Write(GAIA::JSON::JSON_NODE_NAME, p);
+				else if(m_LastNNVT == GAIA::JSON::JSON_NODE_NAME)
+					this->Write(GAIA::JSON::JSON_NODE_VALUE, p);
+				else
+					GASTFALSE;
+				return *this;
+			}
+			__MyType& operator << (const GAIA::WCH* p)
+			{
+				if(m_LastNNVT == GAIA::JSON::JSON_NODE_INVALID || m_LastNNVT == GAIA::JSON::JSON_NODE_VALUE)
+					this->Write(GAIA::JSON::JSON_NODE_NAME, p);
+				else if(m_LastNNVT == GAIA::JSON::JSON_NODE_NAME)
+					this->Write(GAIA::JSON::JSON_NODE_VALUE, p);
+				else
+					GASTFALSE;
+				return *this;
+			}
+			__MyType& operator << (const GAIA::BL& v){this->Write(GAIA::JSON::JSON_NODE_VALUE, v); return *this;}
+			__MyType& operator << (const GAIA::X128& v){this->Write(GAIA::JSON::JSON_NODE_VALUE, v); return *this;}
+			__MyType& operator << (const GAIA::U8& v){this->Write(GAIA::JSON::JSON_NODE_VALUE, v); return *this;}
+			__MyType& operator << (const GAIA::N8& v){this->Write(GAIA::JSON::JSON_NODE_VALUE, v); return *this;}
+			__MyType& operator << (const GAIA::U16& v){this->Write(GAIA::JSON::JSON_NODE_VALUE, v); return *this;}
+			__MyType& operator << (const GAIA::N16& v){this->Write(GAIA::JSON::JSON_NODE_VALUE, v); return *this;}
+			__MyType& operator << (const GAIA::U32& v){this->Write(GAIA::JSON::JSON_NODE_VALUE, v); return *this;}
+			__MyType& operator << (const GAIA::N32& v){this->Write(GAIA::JSON::JSON_NODE_VALUE, v); return *this;}
+			__MyType& operator << (const GAIA::U64& v){this->Write(GAIA::JSON::JSON_NODE_VALUE, v); return *this;}
+			__MyType& operator << (const GAIA::N64& v){this->Write(GAIA::JSON::JSON_NODE_VALUE, v); return *this;}
+			__MyType& operator << (const GAIA::F32& v){this->Write(GAIA::JSON::JSON_NODE_VALUE, v); return *this;}
+			__MyType& operator << (const GAIA::F64& v){this->Write(GAIA::JSON::JSON_NODE_VALUE, v); return *this;}
 
 		private:
 			GINL GAIA::GVOID init()
@@ -236,14 +279,14 @@ namespace GAIA
 				m_LastNNVT = GAIA::JSON::JSON_NODE_INVALID;
 				m_bFirstNode = GAIA::True;
 			}
-			GINL GAIA::GVOID write(const _DataType* p, _SizeType sSize) // sSize is valid character count.
+			template<typename _ParamDataType> GAIA::GVOID write(const _ParamDataType* p, _SizeType size) // parameter size is valid character count.
 			{
 				GAST(p != GNIL);
-				GAST(sSize > 0);
-				if(sSize * sizeof(_DataType) > this->GetRemainSize())
+				GAST(size > 0);
+				if(size * sizeof(_DataType) > this->GetRemainSize())
 					GTHROW(BufNotEnough);
-				GAIA::ALGO::gmemcpy(m_pCursor, p, sSize * sizeof(_DataType));
-				m_pCursor += sSize;
+				for(_SizeType x = 0; x < size; ++x)
+					*m_pCursor++ = p[x];
 			}
 
 		private:

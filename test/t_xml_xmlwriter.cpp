@@ -99,5 +99,47 @@ namespace TEST
 			if(strResult != "<RootNode><Node0 Prop0=\"Value0\" Prop1=\"Value1\" Prop2=\"Value2\"/><Node1 Prop0=\"Value0\" Prop1=\"Value1\" Prop2=\"Value2\"/><Node2 Prop0=\"Value0\" Prop1=\"Value1\" Prop2=\"Value2\"/></RootNode>")
 				TERROR;
 		}
+
+		// Template test.
+		{
+			xw.SetBuffer(buf.fptr(), buf.write_size());
+			xw.Begin(GAIA::XML::XML_NODE_MULTICONTAINER, "RootNode");
+			{
+				for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
+				{
+					GAIA::CH szTempIndexX[32];
+					GAIA::ALGO::castv(x, szTempIndexX, sizeof(szTempIndexX));
+
+					GAIA::CH szTempNode[32] = "Node";
+					GAIA::ALGO::gstrcat(szTempNode, szTempIndexX);
+
+
+					xw.Begin(GAIA::XML::XML_NODE_CONTAINER, szTempNode);
+					{
+						for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
+						{
+							GAIA::CH szTempIndexY[32];
+							GAIA::ALGO::castv(y, szTempIndexY, sizeof(szTempIndexY));
+
+							GAIA::WCH szTempName[32] = L"Prop";
+							GAIA::ALGO::gstrcat(szTempName, szTempIndexY);
+
+							xw << szTempName << y;
+						}
+					}
+					xw.End();
+				}
+			}
+			xw.End();
+
+			GAIA::NUM sWriteSize = xw.GetWriteSize();
+
+			GAIA::CTN::AString strResult;
+			strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
+			if(ENABLE_DEBUG_OUTPUT)
+				TLOG(strResult.fptr());
+			if(strResult != "<RootNode><Node0 Prop0=\"0\" Prop1=\"1\" Prop2=\"2\"/><Node1 Prop0=\"0\" Prop1=\"1\" Prop2=\"2\"/><Node2 Prop0=\"0\" Prop1=\"1\" Prop2=\"2\"/></RootNode>")
+				TERROR;
+		}
 	}
 }
