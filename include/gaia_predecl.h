@@ -37,28 +37,23 @@ namespace GAIA
 
 	namespace XML
 	{
-		class XMLFactoryDesc;
-		class XMLFmt;
-		class XMLProp;
-		class XMLNode;
-		class XML;
-		class XMLFactory;
+		class XmlFactoryDesc;
+		class XmlNode;
+		class Xml;
+		class XmlFactory;
 	}
 
 	namespace HTML
 	{
-		class HTMLFactoryDesc;
-		class HTMLFmt;
-		class HTMLProp;
-		class HTMLNode;
-		class HTML;
-		class HTMLFactory;
+		class HtmlFactoryDesc;
+		class HtmlNode;
+		class Html;
+		class HtmlFactory;
 	}
 
 	namespace JSON
 	{
 		class JsonFactoryDesc;
-		class JsonProp;
 		class JsonNode;
 		class Json;
 		class JsonFactory;

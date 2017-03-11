@@ -8,7 +8,7 @@ namespace GAIA
 {
 	namespace XML
 	{
-		class XMLFactoryDesc : public GAIA::Base
+		class XmlFactoryDesc : public GAIA::Base
 		{
 		public:
 			GINL GAIA::GVOID reset()

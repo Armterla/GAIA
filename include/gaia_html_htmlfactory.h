@@ -13,25 +13,25 @@ namespace GAIA
 {
 	namespace HTML
 	{
-		class HTMLFactory : public GAIA::Base
+		class HtmlFactory : public GAIA::Base
 		{
-			friend class HTML;
-			friend class HTMLNode;
+			friend class Html;
+			friend class HtmlNode;
 
 		public:
-			GINL HTMLFactory();
-			GINL ~HTMLFactory();
+			GINL HtmlFactory();
+			GINL ~HtmlFactory();
 
-			GINL GAIA::BL Create(const HTMLFactoryDesc& desc);
+			GINL GAIA::BL Create(const HtmlFactoryDesc& desc);
 			GINL GAIA::BL Destroy();
 			GINL GAIA::BL IsCreated() const;
-			GINL const HTMLFactoryDesc& GetDesc() const;
+			GINL const HtmlFactoryDesc& GetDesc() const;
 
-			GINL HTMLNode& CreateNode();
-			GINL HTML& CreateHTML();
+			GINL HtmlNode& CreateNode();
+			GINL Html& CreateHtml();
 
-			GINL GAIA::BL ReleaseNode(HTMLNode& node);
-			GINL GAIA::BL ReleaseHTML(HTML& html);
+			GINL GAIA::BL ReleaseNode(HtmlNode& node);
+			GINL GAIA::BL ReleaseHtml(Html& html);
 
 		private:
 			GINL const GAIA::TCH* AllocString(const GAIA::TCH* psz);
@@ -40,20 +40,20 @@ namespace GAIA
 			GINL GAIA::BL ReleaseStaticString(const GAIA::TCH* psz);
 
 		private:
-			HTMLFactoryDesc m_desc;
+			HtmlFactoryDesc m_desc;
 			GAIA::BL m_bCreated;
 
 			GAIA::SYNC::LockRW m_rwStringPool;
 			GAIA::SYNC::LockRW m_rwStaticStringPool;
 
 			GAIA::SYNC::LockRW m_rwNodePool;
-			GAIA::SYNC::LockRW m_rwHTMLPool;
+			GAIA::SYNC::LockRW m_rwHtmlPool;
 
 			GAIA::CTN::StringPtrPool<GAIA::TCH> m_strpool;
 			GAIA::CTN::StaticStringPtrPool<GAIA::TCH> m_sstrpool;
 
-			GAIA::CTN::Pool<HTMLNode> m_NodePool;
-			GAIA::CTN::Pool<HTML> m_HTMLPool;
+			GAIA::CTN::Pool<HtmlNode> m_NodePool;
+			GAIA::CTN::Pool<Html> m_HtmlPool;
 		};
 	}
 }

@@ -8,7 +8,7 @@ namespace TEST
 		static const GAIA::BL ENABLE_DEBUG_OUTPUT = GAIA::True;
 		static const GAIA::NUM SAMPLE_COUNT = 3;
 
-		GAIA::XML::XMLWriterA xw;
+		GAIA::XML::XmlWriterA xw;
 		GAIA::NUM sBufferSize;
 		if(xw.GetBuffer(sBufferSize) != GNIL)
 			TERROR;

@@ -14,23 +14,23 @@ namespace GAIA
 {
 	namespace XML
 	{
-		GINL XML::XML()
+		GINL Xml::Xml()
 		{
 			m_root.m_pszName = GAIA::XML::XML_DEFAULT_ROOT_NODE_NAME;
 			m_root.SetRoot(GAIA::True);
 			m_root.SetType(GAIA::XML::XML_NODE_CONTAINER);
 		}
-		GINL XML::~XML()
+		GINL Xml::~Xml()
 		{
 			this->Reset();
 		}
-		GINL GAIA::GVOID XML::Reset()
+		GINL GAIA::GVOID Xml::Reset()
 		{
 			if(m_root.m_pszName == GAIA::XML::XML_DEFAULT_ROOT_NODE_NAME)
 				m_root.m_pszName = GNIL;
 			m_root.Reset();
 		}
-		GINL GAIA::BL XML::LoadFromFile(const GAIA::TCH* pszFileName)
+		GINL GAIA::BL Xml::LoadFromFile(const GAIA::TCH* pszFileName)
 		{
 			GAST(!GAIA::ALGO::gstremp(pszFileName));
 			if(GAIA::ALGO::gstremp(pszFileName))
@@ -46,7 +46,7 @@ namespace GAIA
 
 			GAIA::CTN::Buffer buf;
 
-			GAIA::XML::XML::Cursor cur;
+			GAIA::XML::Xml::Cursor cur;
 			for(;;)
 			{
 				buf.resize(1024 * 64);
@@ -136,7 +136,7 @@ namespace GAIA
 
 			return GAIA::True;
 		}
-		GINL GAIA::BL XML::SaveToFile(const GAIA::TCH* pszFileName, GAIA::XML::XML_SAVE st)
+		GINL GAIA::BL Xml::SaveToFile(const GAIA::TCH* pszFileName, GAIA::XML::XML_SAVE st)
 		{
 			GAST(!GAIA::ALGO::gstremp(pszFileName));
 			if(GAIA::ALGO::gstremp(pszFileName))
@@ -163,7 +163,7 @@ namespace GAIA
 
 			return GAIA::True;
 		}
-		GINL GAIA::BL XML::LoadFromMem(const GAIA::TCH* pszSrc, const GAIA::NUM& sSize)
+		GINL GAIA::BL Xml::LoadFromMem(const GAIA::TCH* pszSrc, const GAIA::NUM& sSize)
 		{
 			GAST(pszSrc != GNIL);
 			if(pszSrc == GNIL)
@@ -175,7 +175,7 @@ namespace GAIA
 
 			return GAIA::True;
 		}
-		GINL GAIA::BL XML::SaveToMem(GAIA::TCH* pszDst, const GAIA::NUM& sSize, GAIA::XML::XML_SAVE st)
+		GINL GAIA::BL Xml::SaveToMem(GAIA::TCH* pszDst, const GAIA::NUM& sSize, GAIA::XML::XML_SAVE st)
 		{
 			GAST(pszDst != GNIL);
 			if(pszDst == GNIL)
@@ -193,15 +193,15 @@ namespace GAIA
 
 			return GAIA::True;
 		}
-		GINL XMLNode& XML::GetRootNode()
+		GINL XmlNode& Xml::GetRootNode()
 		{
 			return m_root;
 		}
-		GINL const XMLNode& XML::GetRootNode() const
+		GINL const XmlNode& Xml::GetRootNode() const
 		{
 			return m_root;
 		}
-		GINL GAIA::BL XML::BeginWriteNode(GAIA::XML::XML::Cursor& cur, GAIA::XML::XML_NODE nt, const GAIA::TCH* pszNodeName)
+		GINL GAIA::BL Xml::BeginWriteNode(GAIA::XML::Xml::Cursor& cur, GAIA::XML::XML_NODE nt, const GAIA::TCH* pszNodeName)
 		{
 			if(cur.pCurrentNode == GNIL)
 			{
@@ -211,8 +211,8 @@ namespace GAIA
 			}
 			else
 			{
-				GAIA::XML::XMLFactory* pFactory = this->GetFactory();
-				GAIA::XML::XMLNode* pNewNode = (pFactory != GNIL) ? (&pFactory->CreateNode()) : (gnew GAIA::XML::XMLNode);
+				GAIA::XML::XmlFactory* pFactory = this->GetFactory();
+				GAIA::XML::XmlNode* pNewNode = (pFactory != GNIL) ? (&pFactory->CreateNode()) : (gnew GAIA::XML::XmlNode);
 				pNewNode->SetType(nt);
 				pNewNode->SetName(pszNodeName);
 
@@ -228,14 +228,14 @@ namespace GAIA
 			}
 			return GAIA::True;
 		}
-		GINL GAIA::BL XML::EndWriteNode(GAIA::XML::XML::Cursor& cur)
+		GINL GAIA::BL Xml::EndWriteNode(GAIA::XML::Xml::Cursor& cur)
 		{
 			if(cur.pCurrentNode == GNIL)
 				return GAIA::False;
 			cur.pCurrentNode = cur.pCurrentNode->GetParent();
 			return GAIA::True;
 		}
-		GINL GAIA::BL XML::WriteNode(GAIA::XML::XML::Cursor& cur, GAIA::XML::XML_NODE nt, const GAIA::TCH* pszNodeName)
+		GINL GAIA::BL Xml::WriteNode(GAIA::XML::Xml::Cursor& cur, GAIA::XML::XML_NODE nt, const GAIA::TCH* pszNodeName)
 		{
 			if(!this->BeginWriteNode(cur, nt, pszNodeName))
 				return GAIA::False;
@@ -243,25 +243,25 @@ namespace GAIA
 				return GAIA::False;
 			return GAIA::True;
 		}
-		GINL const GAIA::TCH* XML::BeginReadNode(GAIA::XML::XML::Cursor& cur) const
+		GINL const GAIA::TCH* Xml::BeginReadNode(GAIA::XML::Xml::Cursor& cur) const
 		{
 			return GNIL;
 		}
-		GINL GAIA::BL XML::EndReadNode(GAIA::XML::XML::Cursor& cur) const
+		GINL GAIA::BL Xml::EndReadNode(GAIA::XML::Xml::Cursor& cur) const
 		{
 			return GAIA::True;
 		}
-		GINL const GAIA::TCH* XML::ReadNode(GAIA::XML::XML::Cursor& cur) const
+		GINL const GAIA::TCH* Xml::ReadNode(GAIA::XML::Xml::Cursor& cur) const
 		{
 			return GNIL;
 		}
-		GINL GAIA::GVOID XML::write_linebreak(GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f)
+		GINL GAIA::GVOID Xml::write_linebreak(GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f)
 		{
 			if(st != GAIA::XML::XML_SAVE_BESTREAD)
 				return;
 			f.WriteText(GAIA_FILELINEBREAK);
 		}
-		GINL GAIA::GVOID XML::write_indent(GAIA::XML::XMLNode& n, GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f)
+		GINL GAIA::GVOID Xml::write_indent(GAIA::XML::XmlNode& n, GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f)
 		{
 			if(st != GAIA::XML::XML_SAVE_BESTREAD)
 				return;
@@ -276,7 +276,7 @@ namespace GAIA
 				szTemp[x] = '\t';
 			this->write_string(st, f, szTemp, sDepth);
 		}
-		GINL GAIA::GVOID XML::write_string(GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f, const GAIA::CH* p, GAIA::NUM sLen)
+		GINL GAIA::GVOID Xml::write_string(GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f, const GAIA::CH* p, GAIA::NUM sLen)
 		{
 			GAST(!GAIA::ALGO::gstremp(p));
 			if(GAIA::ALGO::gstremp(p))
@@ -287,7 +287,7 @@ namespace GAIA
 				return;
 			f.Write(p, sLen);
 		}
-		GINL GAIA::GVOID XML::write_string(GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f, const GAIA::WCH* p, GAIA::NUM sLen)
+		GINL GAIA::GVOID Xml::write_string(GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f, const GAIA::WCH* p, GAIA::NUM sLen)
 		{
 			GAST(!GAIA::ALGO::gstremp(p));
 			if(GAIA::ALGO::gstremp(p))
@@ -306,7 +306,7 @@ namespace GAIA
 			f.Write(p, sLen);
 		#endif
 		}
-		GINL GAIA::GVOID XML::save_node(GAIA::XML::XMLNode& n, GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f)
+		GINL GAIA::GVOID Xml::save_node(GAIA::XML::XmlNode& n, GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f)
 		{
 			switch(n.GetType())
 			{
@@ -373,11 +373,11 @@ namespace GAIA
 				break;
 			}
 		}
-		GINL GAIA::GVOID XML::save_child_node(GAIA::XML::XMLNode& n, GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f)
+		GINL GAIA::GVOID Xml::save_child_node(GAIA::XML::XmlNode& n, GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f)
 		{
 			for(GAIA::NUM x = 0; x < n.GetChildCount(); ++x)
 			{
-				GAIA::XML::XMLNode* pChild = n.GetChild(x);
+				GAIA::XML::XmlNode* pChild = n.GetChild(x);
 				if(pChild == GNIL)
 					continue;
 				GAIA::XML::XML_NODE childtype = pChild->GetType();
@@ -388,11 +388,11 @@ namespace GAIA
 				this->save_node(*pChild, st, f);
 			}
 		}
-		GINL GAIA::GVOID XML::save_child_node_value(GAIA::XML::XMLNode& n, GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f)
+		GINL GAIA::GVOID Xml::save_child_node_value(GAIA::XML::XmlNode& n, GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f)
 		{
 			for(GAIA::NUM x = 0; x < n.GetChildCount(); ++x)
 			{
-				GAIA::XML::XMLNode* pChild = n.GetChild(x);
+				GAIA::XML::XmlNode* pChild = n.GetChild(x);
 				if(pChild == GNIL)
 					continue;
 				GAIA::XML::XML_NODE childtype = pChild->GetType();
@@ -404,7 +404,7 @@ namespace GAIA
 				this->save_node(*pChild, st, f);
 			}
 		}
-		GINL GAIA::NUM XML::load_node(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::XML::XML_NODE& nt, GAIA::U8*& pBegin, GAIA::U8*& pEnd, GAIA::BL& bBegin) const
+		GINL GAIA::NUM Xml::load_node(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::XML::XML_NODE& nt, GAIA::U8*& pBegin, GAIA::U8*& pEnd, GAIA::BL& bBegin) const
 		{
 			GAST(pBuf != GNIL);
 			if(pBuf == GNIL)
@@ -545,7 +545,7 @@ namespace GAIA
 			}
 			return GINVALID;
 		}
-		GINL GAIA::NUM XML::load_head(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::NUM sOffset, GAIA::NUM& sNext) const
+		GINL GAIA::NUM Xml::load_head(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::NUM sOffset, GAIA::NUM& sNext) const
 		{
 			for(GAIA::NUM x = sOffset; x < sSize; ++x)
 			{
@@ -563,7 +563,7 @@ namespace GAIA
 			}
 			return GINVALID;
 		}
-		GINL GAIA::NUM XML::load_comment(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::NUM sOffset, GAIA::NUM& sNext) const
+		GINL GAIA::NUM Xml::load_comment(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::NUM sOffset, GAIA::NUM& sNext) const
 		{
 			for(GAIA::NUM x = sOffset; x < sSize; ++x)
 			{
@@ -581,7 +581,7 @@ namespace GAIA
 			}
 			return GINVALID;
 		}
-		GINL GAIA::NUM XML::load_node_name(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::NUM sOffset, GAIA::NUM& sNext) const
+		GINL GAIA::NUM Xml::load_node_name(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::NUM sOffset, GAIA::NUM& sNext) const
 		{
 			for(GAIA::NUM x = sOffset; x < sSize; ++x)
 			{
@@ -593,7 +593,7 @@ namespace GAIA
 			}
 			return GINVALID;
 		}
-		GINL GAIA::NUM XML::load_name(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::NUM sOffset, GAIA::NUM& sNext) const
+		GINL GAIA::NUM Xml::load_name(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::NUM sOffset, GAIA::NUM& sNext) const
 		{
 			for(GAIA::NUM x = sOffset; x < sSize; ++x)
 			{
@@ -605,7 +605,7 @@ namespace GAIA
 			}
 			return GINVALID;
 		}
-		GINL GAIA::NUM XML::load_value(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::NUM sOffset, GAIA::NUM& sNext) const
+		GINL GAIA::NUM Xml::load_value(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::NUM sOffset, GAIA::NUM& sNext) const
 		{
 			for(GAIA::NUM x = sOffset; x < sSize; ++x)
 			{
@@ -617,7 +617,7 @@ namespace GAIA
 			}
 			return GINVALID;
 		}
-		GINL GAIA::GVOID XML::read_string(const GAIA::U8* pBegin, const GAIA::U8* pEnd, GAIA::CTN::WString& strResult) const
+		GINL GAIA::GVOID Xml::read_string(const GAIA::U8* pBegin, const GAIA::U8* pEnd, GAIA::CTN::WString& strResult) const
 		{
 			GAST(pEnd - pBegin > 0);
 			strResult.resize(GSCAST(GAIA::NUM)(pEnd - pBegin));

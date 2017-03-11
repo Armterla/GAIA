@@ -63,16 +63,16 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		class HTMLFactoryHolder : public GAIA::Base
+		class HtmlFactoryHolder : public GAIA::Base
 		{
-			friend class HTMLFactory;
+			friend class HtmlFactory;
 		public:
-			GINL HTMLFactoryHolder(){m_pFactory = GNIL;}
-			GINL HTMLFactory* GetFactory() const{return m_pFactory;}
+			GINL HtmlFactoryHolder(){m_pFactory = GNIL;}
+			GINL HtmlFactory* GetFactory() const{return m_pFactory;}
 		private:
-			GINL GAIA::GVOID SetFactory(HTMLFactory* pFactory){m_pFactory = pFactory;}
+			GINL GAIA::GVOID SetFactory(HtmlFactory* pFactory){m_pFactory = pFactory;}
 		private:
-			HTMLFactory* m_pFactory;
+			HtmlFactory* m_pFactory;
 		};
 	}
 }

@@ -10,13 +10,13 @@ namespace GAIA
 {
 	namespace XML
 	{
-		class XMLNode : public XMLFactoryHolder
+		class XmlNode : public XmlFactoryHolder
 		{
-			friend class XML;
+			friend class Xml;
 
 		public:
-			GINL XMLNode();
-			GINL ~XMLNode();
+			GINL XmlNode();
+			GINL ~XmlNode();
 
 			GINL GAIA::GVOID Reset();
 
@@ -27,13 +27,13 @@ namespace GAIA
 			GINL GAIA::GVOID SetName(const GAIA::TCH* pszName);
 			GINL const GAIA::TCH* GetName() const;
 
-			GINL GAIA::NUM InsertChild(XMLNode& node, GAIA::NUM sIndex = GINVALID);
+			GINL GAIA::NUM InsertChild(XmlNode& node, GAIA::NUM sIndex = GINVALID);
 			GINL GAIA::BL DeleteChild(const GAIA::NUM& sIndex);
 			GINL GAIA::GVOID DeleteChildAll();
 			GINL GAIA::NUM GetChildCount() const;
-			GINL XMLNode* GetChild(const GAIA::NUM& nIndex) const;
-			GINL GAIA::NUM SetParent(XMLNode* pParent);
-			GINL XMLNode* GetParent() const;
+			GINL XmlNode* GetChild(const GAIA::NUM& nIndex) const;
+			GINL GAIA::NUM SetParent(XmlNode* pParent);
+			GINL XmlNode* GetParent() const;
 
 			GINL GAIA::NUM GetDepth() const;
 			GINL GAIA::NUM GetParentIndex() const;
@@ -46,9 +46,9 @@ namespace GAIA
 			GAIA::XML::XML_NODE m_nt;
 			const GAIA::TCH* m_pszName;
 			GAIA::BL m_bRoot;
-			GAIA::XML::XMLNode* m_pParent;
+			GAIA::XML::XmlNode* m_pParent;
 			GAIA::NUM m_sParentIndex;
-			GAIA::CTN::Vector<GAIA::XML::XMLNode*> m_childs;
+			GAIA::CTN::Vector<GAIA::XML::XmlNode*> m_childs;
 			GAIA::CTN::Vector<GAIA::NUM> m_freestack;
 		};
 	}

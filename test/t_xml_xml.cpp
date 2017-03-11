@@ -3,14 +3,14 @@
 
 namespace TEST
 {
-	static GAIA::GVOID SaveLoadXML(GAIA::LOG::Log& logobj, GAIA::XML::XML& xml)
+	static GAIA::GVOID SaveLoadXML(GAIA::LOG::Log& logobj, GAIA::XML::Xml& xml)
 	{
 		GAIA::CTN::TChars strTemp, strTemp1, strTemp2;
 
 		static const GAIA::NUM NODE_COUNT = 3;
 		static const GAIA::NUM VALUE_COUNT = 3;
 
-		GAIA::XML::XML::Cursor cur;
+		GAIA::XML::Xml::Cursor cur;
 
 		xml.BeginWriteNode(cur, GAIA::XML::XML_NODE_MULTICONTAINER, _T("Root"));
 
@@ -117,23 +117,23 @@ namespace TEST
 	}
 	extern GAIA::GVOID t_xml_xml(GAIA::LOG::Log& logobj)
 	{
-		GAIA::XML::XMLFactory fac;
-		GAIA::XML::XMLFactoryDesc desc;
+		GAIA::XML::XmlFactory fac;
+		GAIA::XML::XmlFactoryDesc desc;
 		desc.reset();
 		fac.Create(desc);
 		{
-			GAIA::XML::XML& xml = fac.CreateXML();
+			GAIA::XML::Xml& xml = fac.CreateXml();
 			{
 				SaveLoadXML(logobj, xml);
 			}
-			fac.ReleaseXML(xml);
+			fac.ReleaseXml(xml);
 		}
 		fac.Destroy();
 
-		GAIA::XML::XML* pXML = gnew GAIA::XML::XML;
+		GAIA::XML::Xml* pXml = gnew GAIA::XML::Xml;
 		{
-			SaveLoadXML(logobj, *pXML);
+			SaveLoadXML(logobj, *pXml);
 		}
-		gdel pXML;
+		gdel pXml;
 	}
 }
