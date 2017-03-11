@@ -64,8 +64,8 @@ namespace GAIA
 			const _DataType* m_pCursor;
 			GAIA::NUM m_sSize; // Size in bytes.
 		};
-		class JsonReaderA : public BasicJsonReader<GAIA::CH, GAIA::NUM, GAIA::NUM, 64>{public:};
-		class JsonReaderW : public BasicJsonReader<GAIA::WCH, GAIA::NUM, GAIA::NUM, 64>{public:};
+		class JsonReaderA : public BasicJsonReader<GAIA::CH, GAIA::NUM, GAIA::NUM, 32>{public:};
+		class JsonReaderW : public BasicJsonReader<GAIA::WCH, GAIA::NUM, GAIA::NUM, 32>{public:};
 	}
 }
 

@@ -256,8 +256,8 @@ namespace GAIA
 			GAIA::JSON::JSON_NODE m_LastNNVT; // NNVT means node name value type.
 			GAIA::BL m_bFirstNode;
 		};
-		class JsonWriterA : public BasicJsonWriter<GAIA::CH, GAIA::NUM, GAIA::NUM, 64>{public:};
-		class JsonWriterW : public BasicJsonWriter<GAIA::WCH, GAIA::NUM, GAIA::NUM, 64>{public:};
+		class JsonWriterA : public BasicJsonWriter<GAIA::CH, GAIA::NUM, GAIA::NUM, 32>{public:};
+		class JsonWriterW : public BasicJsonWriter<GAIA::WCH, GAIA::NUM, GAIA::NUM, 32>{public:};
 	}
 }
 

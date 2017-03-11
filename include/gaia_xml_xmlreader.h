@@ -64,8 +64,8 @@ namespace GAIA
 			const _DataType* m_pCursor;
 			GAIA::NUM m_sSize; // Size in bytes.
 		};
-		class XmlReaderA : public BasicXmlReader<GAIA::CH, GAIA::NUM, GAIA::NUM, 64>{public:};
-		class XmlReaderW : public BasicXmlReader<GAIA::WCH, GAIA::NUM, GAIA::NUM, 64>{public:};
+		class XmlReaderA : public BasicXmlReader<GAIA::CH, GAIA::NUM, GAIA::NUM, 32>{public:};
+		class XmlReaderW : public BasicXmlReader<GAIA::WCH, GAIA::NUM, GAIA::NUM, 32>{public:};
 	}
 }
 

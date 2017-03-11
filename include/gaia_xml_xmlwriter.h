@@ -248,8 +248,8 @@ namespace GAIA
 			GAIA::XML::XML_NODE m_LastNNVT; // NNVT means node name value type.
 			NodeName m_NodeNameStack[_MaxDepth];
 		};
-		class XmlWriterA : public BasicXmlWriter<GAIA::CH, GAIA::NUM, GAIA::NUM, 64>{public:};
-		class XmlWriterW : public BasicXmlWriter<GAIA::WCH, GAIA::NUM, GAIA::NUM, 64>{public:};
+		class XmlWriterA : public BasicXmlWriter<GAIA::CH, GAIA::NUM, GAIA::NUM, 32>{public:};
+		class XmlWriterW : public BasicXmlWriter<GAIA::WCH, GAIA::NUM, GAIA::NUM, 32>{public:};
 	}
 }
 
