@@ -10,17 +10,18 @@ namespace GAIA
 {
 	namespace XML
 	{
-		template<typename _DataType, typename _DepthType, _DepthType _MaxDepth> class BasicXMLReader : public GAIA::Base
+		template<typename _DataType, typename _SizeType, typename _DepthType, _DepthType _MaxDepth> class BasicXMLReader : public GAIA::Base
 		{
 		public:
 			typedef _DataType _datatype;
+			typedef _SizeType _sizetype;
 			typedef _DepthType _depthtype;
 
 		public:
 			static const _DepthType _maxdepth = _MaxDepth;
 
 		public:
-			typedef BasicXMLReader<_DataType, _DepthType, _MaxDepth> __MyType;
+			typedef BasicXMLReader<_DataType, _SizeType, _DepthType, _MaxDepth> __MyType;
 
 		public:
 			GINL BasicXMLReader(){this->init();}
@@ -45,11 +46,10 @@ namespace GAIA
 					m_sSize = sSize;
 				}
 			}
-			GINL const GAIA::GVOID* GetBuffer(GAIA::NUM& sSize) const
-			{
-				sSize = m_sSize;
-				return m_pFront;
-			}
+			GINL const GAIA::GVOID* GetBuffer(GAIA::NUM& sSize) const{sSize = m_sSize; return m_pFront;}
+			GINL GAIA::NUM GetBufferSize() const{return m_sSize;}
+			GINL GAIA::NUM GetReadSize() const{return (m_pCursor - m_pFront) * sizeof(_DataType);}
+			GINL GAIA::NUM GetRemainSize() const{return this->GetBufferSize() - this->GetReadSize();}
 
 		private:
 			GINL GAIA::GVOID init()
@@ -64,8 +64,8 @@ namespace GAIA
 			const _DataType* m_pCursor;
 			GAIA::NUM m_sSize; // Size in bytes.
 		};
-		class XMLReaderA : public BasicXMLReader<GAIA::CH, GAIA::NUM, 64>{public:};
-		class XMLReaderW : public BasicXMLReader<GAIA::WCH, GAIA::NUM, 64>{public:};
+		class XMLReaderA : public BasicXMLReader<GAIA::CH, GAIA::NUM, GAIA::NUM, 64>{public:};
+		class XMLReaderW : public BasicXMLReader<GAIA::WCH, GAIA::NUM, GAIA::NUM, 64>{public:};
 	}
 }
 

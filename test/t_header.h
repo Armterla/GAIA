@@ -279,13 +279,13 @@ namespace TEST
 			TITEM("File: File test begin!"); t_fsys_file(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("File: MemFile test begin!"); t_fsys_memfile(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("File: Dir test begin!"); t_fsys_dir(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("File: XMLReader test begin!"); t_xml_xmlreader(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("File: XMLWriter test begin!"); t_xml_xmlwriter(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("File: XML test begin!"); t_xml_xml(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("File: HTML test begin!"); t_html_html(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("File: JsonReader test begin!"); t_json_jsonreader(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("File: JsonWriter test begin!"); t_json_jsonwriter(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("File: Json test begin!"); t_json_json(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("XML: XMLReader test begin!"); t_xml_xmlreader(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("XML: XMLWriter test begin!"); t_xml_xmlwriter(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("XML: XML test begin!"); t_xml_xml(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("HTML: HTML test begin!"); t_html_html(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Json: JsonReader test begin!"); t_json_jsonreader(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Json: JsonWriter test begin!"); t_json_jsonwriter(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Json: Json test begin!"); t_json_json(logobj); TITEM("End"); TTEXT("\t");
 			
 			TITEM("Log: Log test begin!"); t_log_log(logobj); TITEM("End"); TTEXT("\t");
 
