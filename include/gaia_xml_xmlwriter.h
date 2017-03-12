@@ -10,6 +10,10 @@ namespace GAIA
 {
 	namespace XML
 	{
+		/*!
+			@brief Basic xml writer.
+				It used for high performance xml generate.
+		*/
 		template<typename _DataType, typename _SizeType, typename _DepthType, _DepthType _MaxDepth> class BasicXmlWriter : public GAIA::Base
 		{
 		public:
@@ -24,9 +28,29 @@ namespace GAIA
 			typedef BasicXmlWriter<_DataType, _SizeType, _DepthType, _MaxDepth> __MyType;
 
 		public:
+
+			/*!
+				@brief Constructor.
+			*/
 			GINL BasicXmlWriter(){this->init();}
+
+			/*!
+				@brief Destructor.
+			*/
 			GINL ~BasicXmlWriter(){}
 
+			/*!
+				@brief Set or unset a buffer for XmlWriter write to.
+
+				@param p [in] Specify a new buffer.
+					If GNIL, means unset the old buffer.
+
+				@param size [in] Specify parameter p's size in bytes.
+					If parameter p is GNIL, parameter size must be 0, or must above zero.
+
+				@remarks
+					Call SetBuffer will cause old xml data lost in old buffer.
+			*/
 			GINL GAIA::GVOID SetBuffer(const GAIA::GVOID* p, _SizeType size)
 			{
 				if(p == GNIL)
@@ -46,14 +70,62 @@ namespace GAIA
 				m_CNTCursor = GINVALID;
 				m_LastNNVT = GAIA::XML::XML_NODE_INVALID;
 			}
+
+			/*!
+				@brief Get the buffer which used for XmlWriter write to.
+
+				@param size [out] Used for saving the size of buffer(return) in bytes.
+
+				@return Return the buffer which had be set.
+					If not call SetBuffer with a buffer pointer, will return GNIL, and parameter size be filled by 0.
+			*/
 			GINL const GAIA::GVOID* GetBuffer(_SizeType& size) const{size = m_size; return m_pFront;}
+
+			/*!
+				@brief Get the buffer's size in bytes which had be set to current XmlWriter.
+
+				@return Return the buffer's size in bytes.
+			*/
 			GINL _SizeType GetBufferSize() const{return m_size;}
+
+			/*!
+				@brief Get the buffer's writen size in bytes.
+
+				@return Return the buffer's size in bytes.
+			*/
 			GINL _SizeType GetWriteSize() const{return (m_pCursor - m_pFront) * sizeof(_DataType);}
+
+			/*!
+				@brief Get the buffer's remain size in bytes.
+
+				@return Return the buffer's remain size in bytes.
+			*/
 			GINL _SizeType GetRemainSize() const{return this->GetBufferSize() - this->GetWriteSize();}
 
+			/*!
+				@brief Begin write a container node or a multi container node.
+
+				@param nt [in] Specify xml node type, must be GAIA::XML::XML_NODE_CONTAINER or GAIA::XML::XML_NODE_MULTICONTAINER.
+
+				@param pszNodeName [in] Specify the node name.
+
+				@param nodenamelen [in] Specify the parameter pszNodeName's length in characters with out '\0'.
+					It could be GINVALID means all parameter pszNodeName's character are used until to '\0'.
+
+				@exception GAIA::ECT::EctInvalidParam
+					If parameter nt is not GAIA::XML::XML_NODE_CONTAINER and is not GAIA::XML::XML_NODE_MULTICONTAINER, throw it.
+
+				@exception GAIA::ECT::EctInvalidParam
+					If parameter pszNodeName is not GNIL and pszNodeName is not a valid xml node name, throw it.
+
+				@exception
+					GAIA::ECT::EctIllegal If the last value node is not writen.
+			*/
 			GAIA::GVOID Begin(GAIA::XML::XML_NODE nt, const GAIA::CH* pszNodeName = GNIL, _SizeType nodenamelen = GINVALID)
 			{
-				GAST(nt > GAIA::XML::XML_NODE_INVALID && nt < GAIA::XML::XML_NODE_MAXENUMCOUNT);
+				if(nt != GAIA::XML::XML_NODE_CONTAINER &&
+				   nt != GAIA::XML::XML_NODE_MULTICONTAINER)
+					GTHROW(InvalidParam);
 				if(pszNodeName != GNIL)
 				{
 					if(!GAIA::XML::XmlCheckNodeName(nt, pszNodeName))
@@ -121,10 +193,10 @@ namespace GAIA
 					}
 					break;
 				case GAIA::XML::XML_NODE_NAME:
-					GTHROW(Illegal);
+					GASTFALSE;
 					break;
 				case GAIA::XML::XML_NODE_VALUE:
-					GTHROW(Illegal);
+					GASTFALSE;
 					break;
 				default:
 					GASTFALSE;
@@ -132,6 +204,16 @@ namespace GAIA
 				}
 				m_LastNNVT = GAIA::XML::XML_NODE_INVALID;
 			}
+
+			/*!
+				@brief End write a container node or a multi container node.
+
+				@exception GAIA::ECT::EctIllegal
+					If the node not began, throw it.
+
+				@exception GAIA::ECT::EctIllegal
+					If the last value node is not writen, throw it.
+			*/
 			GINL GAIA::GVOID End()
 			{
 				if(m_CNTCursor == GINVALID)
@@ -154,10 +236,10 @@ namespace GAIA
 					}
 					break;
 				case GAIA::XML::XML_NODE_NAME:
-					GTHROW(Illegal);
+					GASTFALSE;
 					break;
 				case GAIA::XML::XML_NODE_VALUE:
-					GTHROW(Illegal);
+					GASTFALSE;
 					break;
 				default:
 					GASTFALSE;
@@ -166,10 +248,41 @@ namespace GAIA
 				m_CNTCursor--;
 				m_LastNNVT = GAIA::XML::XML_NODE_INVALID;
 			}
+
+			/*!
+				@brief Write a name node or a value node.
+
+				@param nt [in] Specify the node type, must be GAIA::XML::XML_NODE_NAME or GAIA::XML::XML_NODE_VALUE.
+
+				@param pszNodeName [in] Specify the node name.
+
+				@param nodenamelen [in] Specify the parameter pszNodeName's length in characters with out '\0'.
+					It could be GINVALID means all parameter pszNodeName's character are used until to '\0'.
+
+				@exception GAIA::ECT::EctInvalidParam
+					If parameter nt is not GAIA::XML::XML_NODE_NAME and is not GAIA::XML::XML_NODE_VALUE, throw it.
+
+				@exception GAIA::ECT::EctInvalidParam
+					If parameter pszNodeName is GNIL or "", throw it.
+
+				@exception GAIA::ECT::EctInvalidParam
+					If parameter pszNodeName is not a valid xml node name, throw it.
+
+				@exception GAIA::ECT::EctIllegal
+					If have not call XmlWriter::Begin member function to begin a container or a multi container, throw it.
+
+				@exception GAIA::ECT::EctIllegal
+					If want write a value node, but the last node is not a name node.
+
+				@exception GAIA::ECT::EctIllegal
+					If want write a name not, but the last node is a name node.
+			*/
 			template<typename _ParamDataType>  GAIA::GVOID Write(GAIA::XML::XML_NODE nt, const _ParamDataType* pszNodeName, _SizeType nodenamelen = GINVALID)
 			{
-				GAST(nt > GAIA::XML::XML_NODE_INVALID && nt < GAIA::XML::XML_NODE_MAXENUMCOUNT);
-				GAST(!GAIA::ALGO::gstremp(pszNodeName));
+				if(nt != GAIA::XML::XML_NODE_NAME && nt != GAIA::XML::XML_NODE_VALUE)
+					GTHROW(InvalidParam);
+				if(GAIA::ALGO::gstremp(pszNodeName))
+					GTHROW(InvalidParam);
 				if(!GAIA::XML::XmlCheckNodeName(nt, pszNodeName))
 					GTHROW(InvalidParam);
 				if(m_CNTCursor == GINVALID)
@@ -179,10 +292,10 @@ namespace GAIA
 				switch(nt)
 				{
 				case GAIA::XML::XML_NODE_CONTAINER:
-					GTHROW(Illegal);
+					GASTFALSE;
 					break;
 				case GAIA::XML::XML_NODE_MULTICONTAINER:
-					GTHROW(Illegal);
+					GASTFALSE;
 					break;
 				case GAIA::XML::XML_NODE_NAME:
 					{
@@ -209,49 +322,181 @@ namespace GAIA
 					break;
 				}
 			}
+
+			/*!
+				@brief XmlWriter::Write's overwrite member function for write GAIA::BL type.
+			*/
 			GAIA::GVOID Write(GAIA::XML::XML_NODE nt, const GAIA::BL& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+
+			/*!
+				@brief XmlWriter::Write's overwrite member function for write GAIA::X128 type.
+			*/
 			GAIA::GVOID Write(GAIA::XML::XML_NODE nt, const GAIA::X128& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+
+			/*!
+				@brief XmlWriter::Write's overwrite member function for write GAIA::U8 type.
+			*/
 			GAIA::GVOID Write(GAIA::XML::XML_NODE nt, const GAIA::U8& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+
+			/*!
+				@brief XmlWriter::Write's overwrite member function for write GAIA::N8 type.
+			*/
 			GAIA::GVOID Write(GAIA::XML::XML_NODE nt, const GAIA::N8& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+
+			/*!
+				@brief XmlWriter::Write's overwrite member function for write GAIA::U16 type.
+			*/
 			GAIA::GVOID Write(GAIA::XML::XML_NODE nt, const GAIA::U16& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+
+			/*!
+				@brief XmlWriter::Write's overwrite member function for write GAIA::N16 type.
+			*/
 			GAIA::GVOID Write(GAIA::XML::XML_NODE nt, const GAIA::N16& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+
+			/*!
+				@brief XmlWriter::Write's overwrite member function for write GAIA::U32 type.
+			*/
 			GAIA::GVOID Write(GAIA::XML::XML_NODE nt, const GAIA::U32& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+
+			/*!
+				@brief XmlWriter::Write's overwrite member function for write GAIA::N32 type.
+			*/
 			GAIA::GVOID Write(GAIA::XML::XML_NODE nt, const GAIA::N32& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+
+			/*!
+				@brief XmlWriter::Write's overwrite member function for write GAIA::U64 type.
+			*/
 			GAIA::GVOID Write(GAIA::XML::XML_NODE nt, const GAIA::U64& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+
+			/*!
+				@brief XmlWriter::Write's overwrite member function for write GAIA::N64 type.
+			*/
 			GAIA::GVOID Write(GAIA::XML::XML_NODE nt, const GAIA::N64& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+
+			/*!
+				@brief XmlWriter::Write's overwrite member function for write GAIA::F32 type.
+			*/
 			GAIA::GVOID Write(GAIA::XML::XML_NODE nt, const GAIA::F32& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+
+			/*!
+				@brief XmlWriter::Write's overwrite member function for write GAIA::F64 type.
+			*/
 			GAIA::GVOID Write(GAIA::XML::XML_NODE nt, const GAIA::F64& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
-			__MyType& operator << (const GAIA::CH* p)
+
+			/*!
+				@brief Another method to call XmlWriter::Write member function will simpler form.
+
+				@param psz [in] Specify a node's name or a node's value.
+
+				@return Return current XmlWriter's reference.
+
+				@remarks
+					The parameter psz's node type(GAIA::XML::XML_NODE) will be decided by
+					the times of write(XmlWriter's functions which have the write property) functions call,
+					so, if current XmlWriter need a name string, you will write a name string by current function call,
+					if current XmlWriter need a value string, you will write a value string by current function call.\n
+
+					Notice that, current function can't write a GAIA::XML::XML_NODE_CONTAINER node or
+					a GAIA::XML::XML_NODE_MULTICONTAINER, current function only write a GAIA::XML::XML_NODE_NAME or
+					a GAIA::XML::XML_NODE_VALUE.\n
+			*/
+			__MyType& operator << (const GAIA::CH* psz)
 			{
 				if(m_LastNNVT == GAIA::XML::XML_NODE_INVALID || m_LastNNVT == GAIA::XML::XML_NODE_VALUE)
-					this->Write(GAIA::XML::XML_NODE_NAME, p);
+					this->Write(GAIA::XML::XML_NODE_NAME, psz);
 				else if(m_LastNNVT == GAIA::XML::XML_NODE_NAME)
-					this->Write(GAIA::XML::XML_NODE_VALUE, p);
+					this->Write(GAIA::XML::XML_NODE_VALUE, psz);
 				else
 					GASTFALSE;
 				return *this;
 			}
-			__MyType& operator << (const GAIA::WCH* p)
+
+			/*!
+				@brief Another method to call XmlWriter::Write member function will simpler form.
+
+				@param psz [in] Specify a node's name or a node's value.
+
+				@return Return current XmlWriter's reference.
+
+				@remarks
+					The parameter psz's node type(GAIA::XML::XML_NODE) will be decided by
+					the times of write(XmlWriter's functions which have the write property) functions call,
+					so, if current XmlWriter need a name string, you will write a name string by current function call,
+					if current XmlWriter need a value string, you will write a value string by current function call.\n
+
+					Notice that, current function can't write a GAIA::XML::XML_NODE_CONTAINER node or
+					a GAIA::XML::XML_NODE_MULTICONTAINER, current function only write a GAIA::XML::XML_NODE_NAME or
+					a GAIA::XML::XML_NODE_VALUE.\n
+			*/
+			__MyType& operator << (const GAIA::WCH* psz)
 			{
 				if(m_LastNNVT == GAIA::XML::XML_NODE_INVALID || m_LastNNVT == GAIA::XML::XML_NODE_VALUE)
-					this->Write(GAIA::XML::XML_NODE_NAME, p);
+					this->Write(GAIA::XML::XML_NODE_NAME, psz);
 				else if(m_LastNNVT == GAIA::XML::XML_NODE_NAME)
-					this->Write(GAIA::XML::XML_NODE_VALUE, p);
+					this->Write(GAIA::XML::XML_NODE_VALUE, psz);
 				else
 					GASTFALSE;
 				return *this;
 			}
+
+			/*!
+				@brief Another method to call XmlWriter::Write member function for write GAIA::BL.
+			*/
 			__MyType& operator << (const GAIA::BL& v){this->Write(GAIA::XML::XML_NODE_VALUE, v); return *this;}
+
+			/*!
+				@brief Another method to call XmlWriter::Write member function for write GAIA::X128.
+			*/
 			__MyType& operator << (const GAIA::X128& v){this->Write(GAIA::XML::XML_NODE_VALUE, v); return *this;}
+
+			/*!
+				@brief Another method to call XmlWriter::Write member function for write GAIA::U8.
+			*/
 			__MyType& operator << (const GAIA::U8& v){this->Write(GAIA::XML::XML_NODE_VALUE, v); return *this;}
+
+			/*!
+				@brief Another method to call XmlWriter::Write member function for write GAIA::N8.
+			*/
 			__MyType& operator << (const GAIA::N8& v){this->Write(GAIA::XML::XML_NODE_VALUE, v); return *this;}
+
+			/*!
+				@brief Another method to call XmlWriter::Write member function for write GAIA::U16.
+			*/
 			__MyType& operator << (const GAIA::U16& v){this->Write(GAIA::XML::XML_NODE_VALUE, v); return *this;}
+
+			/*!
+				@brief Another method to call XmlWriter::Write member function for write GAIA::N16.
+			*/
 			__MyType& operator << (const GAIA::N16& v){this->Write(GAIA::XML::XML_NODE_VALUE, v); return *this;}
+
+			/*!
+				@brief Another method to call XmlWriter::Write member function for write GAIA::U32.
+			*/
 			__MyType& operator << (const GAIA::U32& v){this->Write(GAIA::XML::XML_NODE_VALUE, v); return *this;}
+
+			/*!
+				@brief Another method to call XmlWriter::Write member function for write GAIA::N32.
+			*/
 			__MyType& operator << (const GAIA::N32& v){this->Write(GAIA::XML::XML_NODE_VALUE, v); return *this;}
+
+			/*!
+				@brief Another method to call XmlWriter::Write member function for write GAIA::U64.
+			*/
 			__MyType& operator << (const GAIA::U64& v){this->Write(GAIA::XML::XML_NODE_VALUE, v); return *this;}
+
+			/*!
+				@brief Another method to call XmlWriter::Write member function for write GAIA::N64.
+			*/
 			__MyType& operator << (const GAIA::N64& v){this->Write(GAIA::XML::XML_NODE_VALUE, v); return *this;}
+
+			/*!
+				@brief Another method to call XmlWriter::Write member function for write GAIA::F32.
+			*/
 			__MyType& operator << (const GAIA::F32& v){this->Write(GAIA::XML::XML_NODE_VALUE, v); return *this;}
+
+			/*!
+				@brief Another method to call XmlWriter::Write member function for write GAIA::F64.
+			*/
 			__MyType& operator << (const GAIA::F64& v){this->Write(GAIA::XML::XML_NODE_VALUE, v); return *this;}
 
 		private:
