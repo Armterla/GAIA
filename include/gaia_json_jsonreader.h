@@ -24,9 +24,26 @@ namespace GAIA
 			typedef BasicJsonReader<_DataType, _SizeType, _DepthType, _MaxDepth> __MyType;
 
 		public:
+			/*!
+				@brief Constructor.
+			*/
 			GINL BasicJsonReader(){this->init();}
+
+			/*!
+				@brief Destructor.
+			*/
 			GINL ~BasicJsonReader(){}
 
+			/*!
+				@brief Reset current JsonReader to default state(LIKE A NEW OBJECT).
+			*/
+			GINL GAIA::GVOID Reset(){this->init();}
+
+			/*!
+				@brief
+
+				@param
+			*/
 			GINL GAIA::GVOID SetBuffer(const GAIA::GVOID* p, _SizeType size)
 			{
 				if(p == m_pFront && size == m_size)
@@ -46,10 +63,100 @@ namespace GAIA
 					m_size = size;
 				}
 			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+			*/
 			GINL const GAIA::GVOID* GetBuffer(_SizeType& size) const{size = m_size; return m_pFront;}
+
+			/*!
+				@brief
+
+				@return
+			*/
 			GINL _SizeType GetBufferSize() const{return m_size;}
+
+			/*!
+				@brief
+
+				@return
+			*/
 			GINL _SizeType GetReadSize() const{return (m_pCursor - m_pFront) * sizeof(_DataType);}
+
+			/*!
+				@brief
+
+				@return
+			*/
 			GINL _SizeType GetRemainSize() const{return this->GetBufferSize() - this->GetReadSize();}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@exception
+
+				@remarks
+			*/
+			GINL const _DataType* Peek(GAIA::JSON::JSON_NODE& nt, _SizeType& nodenamelen)
+			{
+
+			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@exception
+
+				@remarks
+			*/
+			GINL const _DataType* Begin(GAIA::JSON::JSON_NODE& nt, _SizeType& nodenamelen)
+			{
+
+			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@exception
+
+				@remarks
+			*/
+			GINL GAIA::GVOID End()
+			{
+
+			}
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@exception
+
+				@remarks
+			*/
+			GINL const _DataType* Read(GAIA::JSON::JSON_NODE& nt, _SizeType& nodenamelen)
+			{
+
+			}
 
 		private:
 			GINL GAIA::GVOID init()
