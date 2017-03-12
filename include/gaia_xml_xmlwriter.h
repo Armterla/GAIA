@@ -40,6 +40,11 @@ namespace GAIA
 			GINL ~BasicXmlWriter(){}
 
 			/*!
+				@brief Reset current XmlWriter to default state(LIKE A NEW OBJECT).
+			*/
+			GINL GAIA::GVOID Reset(){this->init();}
+
+			/*!
 				@brief Set or unset a buffer for XmlWriter write to.
 
 				@param p [in] Specify a new buffer.

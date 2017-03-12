@@ -39,6 +39,11 @@ namespace GAIA
 			GINL ~BasicJsonWriter(){}
 
 			/*!
+				@brief Reset current JsonWriter to default state(LIKE A NEW OBJECT).
+			*/
+			GINL GAIA::GVOID Reset(){this->init();}
+
+			/*!
 				@brief Set or unset a buffer for JsonWriter write to.
 
 				@param p [in] Specify a new buffer.
