@@ -46,8 +46,6 @@ namespace GAIA
 			*/
 			GINL GAIA::GVOID SetBuffer(const GAIA::GVOID* p, _SizeType size)
 			{
-				if(p == m_pFront && size == m_size)
-					return;
 				if(p == GNIL)
 				{
 					GAST(size == 0);
