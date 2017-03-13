@@ -109,7 +109,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GINL const _DataType* Peek(GAIA::JSON::JSON_NODE& nt, _SizeType& nodenamelen, _DataTypePtr* pNext = GNIL)
+			GINL const _DataType* Peek(GAIA::JSON::JSON_NODE& nt, _SizeType& nodenamelen, _DataTypePtr* pNext = GNIL, GAIA::BL* pValueIsString = GNIL)
 			{
 				m_pCursor = this->move_to_next(m_pCursor);
 				if(m_pCursor == GNIL)
@@ -172,7 +172,17 @@ namespace GAIA
 							nt = GAIA::JSON::JSON_NODE_NAME;
 							break;
 						default:
-							GTHROW_RET(DataError, GNIL);
+							{
+								if(*pLocalNext >= '0' && *pLocalNext <= '9' ||
+								   *pLocalNext == 't' ||
+								   *pLocalNext == 'f')
+								{
+									nt = GAIA::JSON::JSON_NODE_NAME;
+									break;
+								}
+								else
+									GTHROW_RET(DataError, GNIL);
+							}
 						}
 						nodenamelen = (_SizeType)(pLastQuote - m_pCursor - 1);
 						pLocalNext = pColon;
@@ -185,19 +195,78 @@ namespace GAIA
 						pLocalNext = p = this->move_to_next(p + 1);
 						if(pLocalNext == GNIL)
 							GTHROW_RET(DataError, GNIL);
-						if(*pLocalNext != '\"')
-							GTHROW_RET(DataError, GNIL);
-						while(pLocalNext <= m_pBack)
+						GAIA::BL bValueIsString = GAIA::True;
+						if(*pLocalNext == '\"')
 						{
-							if(*pLocalNext == '\"' && pLocalNext > p && pLocalNext[-1] != '\\')
-								break;
-							++pLocalNext;
+							while(pLocalNext <= m_pBack)
+							{
+								if(*pLocalNext == '\"' && pLocalNext > p && pLocalNext[-1] != '\\')
+									break;
+								++pLocalNext;
+							}
+							p++;
+							bValueIsString = GAIA::True;
 						}
+						else if(*pLocalNext >= '0' && *pLocalNext <= '9')
+						{
+							while(pLocalNext <= m_pBack)
+							{
+								if((*pLocalNext >= '0' && *pLocalNext <= '9') || *pLocalNext == '.')
+									++pLocalNext;
+								else
+									break;
+							}
+							GAIA::BL bExistValidNumber = GAIA::False;
+							_SizeType dotcnt = 0;
+							_SizeType zerocntbefore = 0;
+							for(const _DataType* pTemp = p; pTemp < pLocalNext; ++pTemp)
+							{
+								if(*pTemp >= '0' && *pTemp <= '9')
+								{
+									if(dotcnt == 0 && zerocntbefore != 0)
+										GTHROW_RET(DataError, GNIL);
+									bExistValidNumber = GAIA::True;
+								}
+								else if(*pTemp == '0' && !bExistValidNumber && dotcnt == 0)
+								{
+									if(++zerocntbefore > 1)
+										GTHROW_RET(DataError, GNIL);
+								}
+								else if(*pTemp == '.')
+								{
+									dotcnt++;
+									if(dotcnt > 1)
+										GTHROW_RET(DataError, GNIL);
+								}
+							}
+							bValueIsString = GAIA::False;
+						}
+						else if(*pLocalNext == 't')
+						{
+							if(pLocalNext + 3 <= m_pBack && pLocalNext[1] == 'r' && pLocalNext[2] == 'u' && pLocalNext[3] == 'e')
+								pLocalNext = pLocalNext + 4;
+							else
+								GTHROW_RET(DataError, GNIL);
+							bValueIsString = GAIA::False;
+						}
+						else if(*pLocalNext == 'f')
+						{
+							if(pLocalNext + 4 <= m_pBack && pLocalNext[1] == 'a' && pLocalNext[2] == 'l' && pLocalNext[3] == 's' && pLocalNext[4] == 'e')
+								pLocalNext = pLocalNext + 5;
+							else
+								GTHROW_RET(DataError, GNIL);
+							bValueIsString= GAIA::False;
+						}
+						else
+							GTHROW_RET(DataError, GNIL);
 						if(pLocalNext > m_pBack)
 							GTHROW_RET(DataError, GNIL);
-						nodenamelen = (_SizeType)(pLocalNext - p - 1);
-						pLocalNext = pLocalNext + 1;
-						pRet = p + 1;
+						nodenamelen = (_SizeType)(pLocalNext - p);
+						if(bValueIsString)
+							pLocalNext = pLocalNext + 1;
+						if(pValueIsString != GNIL)
+							*pValueIsString = bValueIsString;
+						pRet = p;
 					}
 					break;
 				case '}':

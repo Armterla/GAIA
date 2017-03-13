@@ -13,7 +13,7 @@ namespace TEST
 		{
 			// Depth1 test.
 			{
-				static const GAIA::CH SOURCE_COMPACT[] = "{\"a\":\"1\",\"b\":\"2\"}";
+				static const GAIA::CH SOURCE_COMPACT[] = "{\"a\":\"1\",\"b\":\"2\",\"c\":3}";
 				jr.SetBuffer(SOURCE_COMPACT, sizeof(SOURCE_COMPACT) - 1);
 				GTRY
 				{
@@ -50,6 +50,18 @@ namespace TEST
 						TAST(nt == GAIA::JSON::JSON_NODE_VALUE);
 						TAST(sNodeNameLen == 1);
 						TAST(*psz == '2');
+
+						psz = jr.Read(nt, sNodeNameLen);
+						TAST(psz != GNIL);
+						TAST(nt == GAIA::JSON::JSON_NODE_NAME);
+						TAST(sNodeNameLen == 1);
+						TAST(*psz == 'c');
+
+						psz = jr.Read(nt, sNodeNameLen);
+						TAST(psz != GNIL);
+						TAST(nt == GAIA::JSON::JSON_NODE_VALUE);
+						TAST(sNodeNameLen == 1);
+						TAST(*psz == '3');
 					}
 					psz = jr.End();
 					TAST(psz != GNIL);
@@ -60,7 +72,7 @@ namespace TEST
 					TERROR;
 				}
 
-				static const GAIA::CH SOURCE_USERWRITE[] = " { \n\t\"a\": \"1\",\n\"b\":\"2\" \n} \n";
+				static const GAIA::CH SOURCE_USERWRITE[] = " { \n\t\"a\": \"1\",\n\"b\":\"2\" \n\t\n\"c\":3} \n";
 				jr.SetBuffer(SOURCE_USERWRITE, sizeof(SOURCE_USERWRITE) - 1);
 				GTRY
 				{
@@ -97,6 +109,18 @@ namespace TEST
 						TAST(nt == GAIA::JSON::JSON_NODE_VALUE);
 						TAST(sNodeNameLen == 1);
 						TAST(*psz == '2');
+
+						psz = jr.Read(nt, sNodeNameLen);
+						TAST(psz != GNIL);
+						TAST(nt == GAIA::JSON::JSON_NODE_NAME);
+						TAST(sNodeNameLen == 1);
+						TAST(*psz == 'c');
+
+						psz = jr.Read(nt, sNodeNameLen);
+						TAST(psz != GNIL);
+						TAST(nt == GAIA::JSON::JSON_NODE_VALUE);
+						TAST(sNodeNameLen == 1);
+						TAST(*psz == '3');
 					}
 					psz = jr.End();
 					TAST(psz != GNIL);
