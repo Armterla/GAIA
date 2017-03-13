@@ -283,6 +283,9 @@ namespace GAIA
 				@param nodenamelen [in] Specify the parameter pszNodeName's length in characters with out '\0'.
 					It could be GINVALID means all parameter pszNodeName's character are used until to '\0'.
 
+				@param bQuotes [in] Specify append quotes or not when write value node.
+					This parameter will be ignored when write a name node.
+
 				@exception GAIA::ECT::EctInvalidParam
 					If parameter nt is not GAIA::JSON::JSON_NODE_NAME and is not GAIA::JSON::JSON_NODE_VALUE, throw it.
 
@@ -304,7 +307,7 @@ namespace GAIA
 				@exception GAIA::ECT::EctIllegal
 					If want write a name not, but the last node is a name node.
 			*/
-			template<typename _ParamDataType> GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const _ParamDataType* pszNodeName, _SizeType nodenamelen = GINVALID)
+			template<typename _ParamDataType> GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const _ParamDataType* pszNodeName, _SizeType nodenamelen = GINVALID, GAIA::BL bQuotes = GAIA::True)
 			{
 				if(nt != GAIA::JSON::JSON_NODE_NAME && nt != GAIA::JSON::JSON_NODE_VALUE)
 					GTHROW(InvalidParam);
@@ -345,9 +348,14 @@ namespace GAIA
 					{
 						if(m_LastNNVT != GAIA::JSON::JSON_NODE_NAME)
 							GTHROW(Illegal);
-						this->write("\"", sizeof("\"") - 1);
-						this->write(pszNodeName, nodenamelen);
-						this->write("\"", sizeof("\"") - 1);
+						if(bQuotes)
+						{
+							this->write("\"", sizeof("\"") - 1);
+							this->write(pszNodeName, nodenamelen);
+							this->write("\"", sizeof("\"") - 1);
+						}
+						else
+							this->write(pszNodeName, nodenamelen);
 						m_LastNNVT = GAIA::JSON::JSON_NODE_VALUE;
 					}
 					break;
@@ -360,7 +368,13 @@ namespace GAIA
 			/*!
 				@brief JsonWriter::Write's overwrite member function for write GAIA::BL type.
 			*/
-			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::BL& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::BL& v)
+			{
+				if(v)
+					this->Write(nt, "true", 4, GAIA::False);
+				else
+					this->Write(nt, "false", 5, GAIA::False);
+			}
 
 			/*!
 				@brief JsonWriter::Write's overwrite member function for write GAIA::X128 type.
@@ -370,52 +384,52 @@ namespace GAIA
 			/*!
 				@brief JsonWriter::Write's overwrite member function for write GAIA::U8 type.
 			*/
-			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::U8& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::U8& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp, GINVALID, GAIA::False);}
 
 			/*!
 				@brief JsonWriter::Write's overwrite member function for write GAIA::N8 type.
 			*/
-			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::N8& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::N8& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp, GINVALID, GAIA::False);}
 
 			/*!
 				@brief JsonWriter::Write's overwrite member function for write GAIA::U16 type.
 			*/
-			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::U16& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::U16& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp, GINVALID, GAIA::False);}
 
 			/*!
 				@brief JsonWriter::Write's overwrite member function for write GAIA::N16 type.
 			*/
-			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::N16& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::N16& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp, GINVALID, GAIA::False);}
 
 			/*!
 				@brief JsonWriter::Write's overwrite member function for write GAIA::U32 type.
 			*/
-			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::U32& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::U32& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp, GINVALID, GAIA::False);}
 
 			/*!
 				@brief JsonWriter::Write's overwrite member function for write GAIA::N32 type.
 			*/
-			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::N32& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::N32& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp, GINVALID, GAIA::False);}
 
 			/*!
 				@brief JsonWriter::Write's overwrite member function for write GAIA::U64 type.
 			*/
-			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::N64& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::N64& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp, GINVALID, GAIA::False);}
 
 			/*!
 				@brief JsonWriter::Write's overwrite member function for write GAIA::N64 type.
 			*/
-			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::U64& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::U64& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp, GINVALID, GAIA::False);}
 
 			/*!
 				@brief JsonWriter::Write's overwrite member function for write GAIA::F32 type.
 			*/
-			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::F32& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::F32& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp, GINVALID, GAIA::False);}
 
 			/*!
 				@brief JsonWriter::Write's overwrite member function for write GAIA::F64 type.
 			*/
-			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::F64& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::F64& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp, GINVALID, GAIA::False);}
 
 			/*!
 				@brief Another method to call JsonWriter::Write member function will simpler form.

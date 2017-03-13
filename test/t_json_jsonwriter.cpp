@@ -180,7 +180,7 @@ namespace TEST
 				strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
 				if(ENABLE_DEBUG_OUTPUT)
 					TLOG(strResult.fptr());
-				if(strResult != "[{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\",\"Node0\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"},\"Node1\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"},\"Node2\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"}},{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\",\"Node0\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"},\"Node1\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"},\"Node2\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"}},{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\",\"Node0\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"},\"Node1\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"},\"Node2\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"}}]")
+				if(strResult != "[{\"Prop0\":0,\"Prop1\":1,\"Prop2\":2,\"Node0\":{\"Prop0\":0,\"Prop1\":1,\"Prop2\":2},\"Node1\":{\"Prop0\":0,\"Prop1\":1,\"Prop2\":2},\"Node2\":{\"Prop0\":0,\"Prop1\":1,\"Prop2\":2}},{\"Prop0\":0,\"Prop1\":1,\"Prop2\":2,\"Node0\":{\"Prop0\":0,\"Prop1\":1,\"Prop2\":2},\"Node1\":{\"Prop0\":0,\"Prop1\":1,\"Prop2\":2},\"Node2\":{\"Prop0\":0,\"Prop1\":1,\"Prop2\":2}},{\"Prop0\":0,\"Prop1\":1,\"Prop2\":2,\"Node0\":{\"Prop0\":0,\"Prop1\":1,\"Prop2\":2},\"Node1\":{\"Prop0\":0,\"Prop1\":1,\"Prop2\":2},\"Node2\":{\"Prop0\":0,\"Prop1\":1,\"Prop2\":2}}]")
 					TERROR;
 			}
 		}
