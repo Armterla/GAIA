@@ -298,7 +298,7 @@ namespace GAIA
 					GTHROW(InvalidParam);
 				if(GAIA::ALGO::gstremp(pszNodeName))
 					GTHROW(InvalidParam);
-				if(!GAIA::XML::XmlCheckNodeName(nt, pszNodeName))
+				if(nt == GAIA::XML::XML_NODE_NAME && !GAIA::XML::XmlCheckNodeName(nt, pszNodeName))
 					GTHROW(InvalidParam);
 				if(m_CNTCursor == GINVALID)
 					GTHROW(Illegal);
@@ -539,8 +539,6 @@ namespace GAIA
 			}
 			template<typename _ParamDataType> GAIA::GVOID write(const _ParamDataType* p, _SizeType size) // parameter size is valid character count.
 			{
-				GAST(p != GNIL);
-				GAST(size > 0);
 				if(size * sizeof(_DataType) > this->GetRemainSize())
 					GTHROW(BufNotEnough);
 				for(_SizeType x = 0; x < size; ++x)

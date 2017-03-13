@@ -6,7 +6,7 @@ namespace TEST
 	extern GAIA::GVOID t_xml_xmlwriter(GAIA::LOG::Log& logobj)
 	{
 		static const GAIA::BL ENABLE_DEBUG_OUTPUT = GAIA::False;
-		static const GAIA::NUM TEST_TIMES = 1000;
+		static const GAIA::NUM TEST_TIMES = 10000;
 		static const GAIA::NUM SAMPLE_COUNT = 3;
 
 		GAIA::XML::XmlWriterA xw;
@@ -20,6 +20,7 @@ namespace TEST
 		if(xw.GetRemainSize() != 0)
 			TERROR;
 
+		GAIA::CTN::AString strResult;
 		GAIA::CTN::Buffer buf;
 		buf.resize(1024 * 1024 * 4);
 
@@ -49,7 +50,6 @@ namespace TEST
 
 				GAIA::NUM sWriteSize = xw.GetWriteSize();
 
-				GAIA::CTN::AString strResult;
 				strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
 				if(ENABLE_DEBUG_OUTPUT)
 					TLOG(strResult.fptr());
@@ -122,7 +122,6 @@ namespace TEST
 
 				GAIA::NUM sWriteSize = xw.GetWriteSize();
 
-				GAIA::CTN::AString strResult;
 				strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
 				if(ENABLE_DEBUG_OUTPUT)
 					TLOG(strResult.fptr());
@@ -190,7 +189,6 @@ namespace TEST
 
 				GAIA::NUM sWriteSize = xw.GetWriteSize();
 
-				GAIA::CTN::AString strResult;
 				strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
 				if(ENABLE_DEBUG_OUTPUT)
 					TLOG(strResult.fptr());

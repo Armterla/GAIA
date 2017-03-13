@@ -6,7 +6,7 @@ namespace TEST
 	extern GAIA::GVOID t_json_jsonwriter(GAIA::LOG::Log& logobj)
 	{
 		static const GAIA::BL ENABLE_DEBUG_OUTPUT = GAIA::False;
-		static const GAIA::NUM TEST_TIMES = 1000;
+		static const GAIA::NUM TEST_TIMES = 10000;
 		static const GAIA::NUM SAMPLE_COUNT = 3;
 
 		GAIA::JSON::JsonWriterA jw;
@@ -20,6 +20,7 @@ namespace TEST
 		if(jw.GetRemainSize() != 0)
 			TERROR;
 
+		GAIA::CTN::AString strResult;
 		GAIA::CTN::Buffer buf;
 		buf.resize(1024 * 1024 * 4);
 
@@ -49,7 +50,6 @@ namespace TEST
 
 				GAIA::NUM sWriteSize = jw.GetWriteSize();
 
-				GAIA::CTN::AString strResult;
 				strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
 				if(ENABLE_DEBUG_OUTPUT)
 					TLOG(strResult.fptr());
@@ -116,7 +116,6 @@ namespace TEST
 
 				GAIA::NUM sWriteSize = jw.GetWriteSize();
 
-				GAIA::CTN::AString strResult;
 				strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
 				if(ENABLE_DEBUG_OUTPUT)
 					TLOG(strResult.fptr());
@@ -178,7 +177,6 @@ namespace TEST
 
 				GAIA::NUM sWriteSize = jw.GetWriteSize();
 
-				GAIA::CTN::AString strResult;
 				strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
 				if(ENABLE_DEBUG_OUTPUT)
 					TLOG(strResult.fptr());
