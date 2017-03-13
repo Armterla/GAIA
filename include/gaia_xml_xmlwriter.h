@@ -121,32 +121,38 @@ namespace GAIA
 					If parameter nt is not GAIA::XML::XML_NODE_CONTAINER and is not GAIA::XML::XML_NODE_MULTICONTAINER, throw it.
 
 				@exception GAIA::ECT::EctInvalidParam
+					if parameter pszNodeName is GNIL or "", throw it.
+
+				@exception GAIA::ECT::EctInvalidParam
 					If parameter pszNodeName is not GNIL and pszNodeName is not a valid xml node name, throw it.
 
-				@exception
-					GAIA::ECT::EctIllegal If the last value node is not writen.
+				@exception GAIA::ECT::EctIllegal
+					If the last value node is not writen, throw it.
 			*/
 			GAIA::GVOID Begin(GAIA::XML::XML_NODE nt, const GAIA::CH* pszNodeName = GNIL, _SizeType nodenamelen = GINVALID)
 			{
 				if(nt != GAIA::XML::XML_NODE_CONTAINER &&
 				   nt != GAIA::XML::XML_NODE_MULTICONTAINER)
 					GTHROW(InvalidParam);
-				if(pszNodeName != GNIL)
-				{
-					if(!GAIA::XML::XmlCheckNodeName(nt, pszNodeName))
-						GTHROW(InvalidParam);
-				}
+				if(GAIA::ALGO::gstremp(pszNodeName))
+					GTHROW(InvalidParam);
+				if(!GAIA::XML::XmlCheckNodeName(nt, pszNodeName))
+					GTHROW(InvalidParam);
 				if(nodenamelen == GINVALID && pszNodeName != GNIL)
 					nodenamelen = GAIA::ALGO::gstrlen(pszNodeName);
 				if(m_LastNNVT == GAIA::XML::XML_NODE_NAME)
 					GTHROW(Illegal);
+				if(m_bMultiContainerProperting)
+				{
+					this->write(">", sizeof(">") - 1);
+					m_bMultiContainerProperting = GAIA::False;
+				}
 				switch(nt)
 				{
 				case GAIA::XML::XML_NODE_CONTAINER:
 					{
 						if(m_CNTCursor == GINVALID)
 						{
-							GAST(!GAIA::ALGO::gstremp(pszNodeName));
 							m_CNTCursor = 0;
 							m_LastCNT[m_CNTCursor] = nt;
 							this->write("<", sizeof("<") - 1);
@@ -158,7 +164,6 @@ namespace GAIA
 						}
 						else
 						{
-							GAST(!GAIA::ALGO::gstremp(pszNodeName));
 							GAST(m_CNTCursor + 1 < _MaxDepth);
 							m_LastCNT[++m_CNTCursor] = nt;
 							this->write("<", sizeof("<") - 1);
@@ -173,7 +178,6 @@ namespace GAIA
 					{
 						if(m_CNTCursor == GINVALID)
 						{
-							GAST(!GAIA::ALGO::gstremp(pszNodeName));
 							m_CNTCursor = 0;
 							m_LastCNT[m_CNTCursor] = nt;
 							this->write("<", sizeof("<") - 1);
@@ -181,11 +185,9 @@ namespace GAIA
 							nn.p = m_pCursor;
 							nn.len = nodenamelen;
 							this->write(pszNodeName, nodenamelen);
-							this->write(">", sizeof(">") - 1);
 						}
 						else
 						{
-							GAST(!GAIA::ALGO::gstremp(pszNodeName));
 							GAST(m_CNTCursor + 1 < _MaxDepth);
 							m_LastCNT[++m_CNTCursor] = nt;
 							this->write("<", sizeof("<") - 1);
@@ -193,8 +195,8 @@ namespace GAIA
 							nn.p = m_pCursor;
 							nn.len = nodenamelen;
 							this->write(pszNodeName, nodenamelen);
-							this->write(">", sizeof(">") - 1);
 						}
+						m_bMultiContainerProperting = GAIA::True;
 					}
 					break;
 				case GAIA::XML::XML_NODE_NAME:
@@ -234,6 +236,11 @@ namespace GAIA
 					break;
 				case GAIA::XML::XML_NODE_MULTICONTAINER:
 					{
+						if(m_bMultiContainerProperting)
+						{
+							this->write(">", sizeof(">") - 1);
+							m_bMultiContainerProperting = GAIA::False;
+						}
 						this->write("</", sizeof("</") - 1);
 						NodeName& nn = m_NodeNameStack[m_CNTCursor];
 						this->write(nn.p, nn.len);
@@ -281,6 +288,9 @@ namespace GAIA
 
 				@exception GAIA::ECT::EctIllegal
 					If want write a name not, but the last node is a name node.
+
+				@exception GAIA::ECT::EctIllegal
+					If parent container is a multi container, and sub node had began, throw it.
 			*/
 			template<typename _ParamDataType>  GAIA::GVOID Write(GAIA::XML::XML_NODE nt, const _ParamDataType* pszNodeName, _SizeType nodenamelen = GINVALID)
 			{
@@ -292,6 +302,11 @@ namespace GAIA
 					GTHROW(InvalidParam);
 				if(m_CNTCursor == GINVALID)
 					GTHROW(Illegal);
+				if(m_CNTCursor >= 0 && m_LastCNT[m_CNTCursor] == GAIA::XML::XML_NODE_MULTICONTAINER)
+				{
+					if(!m_bMultiContainerProperting)
+						GTHROW(Illegal);
+				}
 				if(nodenamelen == GINVALID && pszNodeName != GNIL)
 					nodenamelen = GAIA::ALGO::gstrlen(pszNodeName);
 				switch(nt)
@@ -520,6 +535,7 @@ namespace GAIA
 				m_size = 0;
 				m_CNTCursor = GINVALID;
 				m_LastNNVT = GAIA::XML::XML_NODE_INVALID;
+				m_bMultiContainerProperting = GAIA::False;
 			}
 			template<typename _ParamDataType> GAIA::GVOID write(const _ParamDataType* p, _SizeType size) // parameter size is valid character count.
 			{
@@ -540,6 +556,7 @@ namespace GAIA
 			_DepthType m_CNTCursor;
 			GAIA::XML::XML_NODE m_LastNNVT; // NNVT means node name value type.
 			NodeName m_NodeNameStack[_MaxDepth];
+			GAIA::BL m_bMultiContainerProperting;
 		};
 		class XmlWriterA : public BasicXmlWriter<GAIA::CH, GAIA::NUM, GAIA::NUM, 32>{public:};
 		class XmlWriterW : public BasicXmlWriter<GAIA::WCH, GAIA::NUM, GAIA::NUM, 32>{public:};

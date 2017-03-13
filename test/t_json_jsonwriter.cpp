@@ -5,7 +5,8 @@ namespace TEST
 {
 	extern GAIA::GVOID t_json_jsonwriter(GAIA::LOG::Log& logobj)
 	{
-		static const GAIA::BL ENABLE_DEBUG_OUTPUT = GAIA::True;
+		static const GAIA::BL ENABLE_DEBUG_OUTPUT = GAIA::False;
+		static const GAIA::NUM TEST_TIMES = 1000;
 		static const GAIA::NUM SAMPLE_COUNT = 3;
 
 		GAIA::JSON::JsonWriterA jw;
@@ -22,123 +23,168 @@ namespace TEST
 		GAIA::CTN::Buffer buf;
 		buf.resize(1024 * 1024 * 4);
 
-		// Depth1 test.
+		for(GAIA::NUM t = 0; t < TEST_TIMES; ++t)
 		{
-			jw.SetBuffer(buf.fptr(), buf.write_size());
-			jw.Begin(GAIA::JSON::JSON_NODE_CONTAINER);
+			// Depth1 test.
 			{
-				for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
+				jw.SetBuffer(buf.fptr(), buf.write_size());
+				jw.Begin(GAIA::JSON::JSON_NODE_CONTAINER);
 				{
-					GAIA::CH szTempIndexX[32];
-					GAIA::ALGO::castv(x, szTempIndexX, sizeof(szTempIndexX));
-
-					GAIA::CH szTempName[32] = "Prop";
-					GAIA::ALGO::gstrcat(szTempName, szTempIndexX);
-
-					GAIA::CH szTempValue[32] = "Value";
-					GAIA::ALGO::gstrcat(szTempValue, szTempIndexX);
-
-					jw.Write(GAIA::JSON::JSON_NODE_NAME, szTempName);
-					jw.Write(GAIA::JSON::JSON_NODE_VALUE, szTempValue);
-				}
-			}
-			jw.End();
-
-			GAIA::NUM sWriteSize = jw.GetWriteSize();
-
-			GAIA::CTN::AString strResult;
-			strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
-			if(ENABLE_DEBUG_OUTPUT)
-				TLOG(strResult.fptr());
-			if(strResult != "{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"}")
-				TERROR;
-		}
-
-		// Depth2 test.
-		{
-			jw.SetBuffer(buf.fptr(), buf.write_size());
-			jw.Begin(GAIA::JSON::JSON_NODE_MULTICONTAINER);
-			{
-				for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
-				{
-					GAIA::CH szTempIndexX[32];
-					GAIA::ALGO::castv(x, szTempIndexX, sizeof(szTempIndexX));
-
-					GAIA::CH szTempNode[32] = "Node";
-					GAIA::ALGO::gstrcat(szTempNode, szTempIndexX);
-
-
-					jw.Begin(GAIA::JSON::JSON_NODE_CONTAINER, szTempNode);
+					for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 					{
-						for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
-						{
-							GAIA::CH szTempIndexY[32];
-							GAIA::ALGO::castv(y, szTempIndexY, sizeof(szTempIndexY));
+						GAIA::CH szTempIndexX[32];
+						GAIA::ALGO::castv(x, szTempIndexX, sizeof(szTempIndexX));
 
-							GAIA::CH szTempName[32] = "Prop";
-							GAIA::ALGO::gstrcat(szTempName, szTempIndexY);
+						GAIA::CH szTempName[32] = "Prop";
+						GAIA::ALGO::gstrcat(szTempName, szTempIndexX);
 
-							GAIA::CH szTempValue[32] = "Value";
-							GAIA::ALGO::gstrcat(szTempValue, szTempIndexY);
+						GAIA::CH szTempValue[32] = "Value";
+						GAIA::ALGO::gstrcat(szTempValue, szTempIndexX);
 
-							jw.Write(GAIA::JSON::JSON_NODE_NAME, szTempName);
-							jw.Write(GAIA::JSON::JSON_NODE_VALUE, szTempValue);
-						}
+						jw.Write(GAIA::JSON::JSON_NODE_NAME, szTempName);
+						jw.Write(GAIA::JSON::JSON_NODE_VALUE, szTempValue);
 					}
-					jw.End();
 				}
+				jw.End();
+
+				GAIA::NUM sWriteSize = jw.GetWriteSize();
+
+				GAIA::CTN::AString strResult;
+				strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
+				if(ENABLE_DEBUG_OUTPUT)
+					TLOG(strResult.fptr());
+				if(strResult != "{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"}")
+					TERROR;
 			}
-			jw.End();
 
-			GAIA::NUM sWriteSize = jw.GetWriteSize();
-
-			GAIA::CTN::AString strResult;
-			strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
-			if(ENABLE_DEBUG_OUTPUT)
-				TLOG(strResult.fptr());
-			if(strResult != "[{\"Node0\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"}},{\"Node1\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"}},{\"Node2\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"}}]")
-				TERROR;
-		}
-
-		// Template test.
-		{
-			jw.SetBuffer(buf.fptr(), buf.write_size());
-			jw.Begin(GAIA::JSON::JSON_NODE_MULTICONTAINER);
+			// Depth3 test.
 			{
-				for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
+				jw.SetBuffer(buf.fptr(), buf.write_size());
+				jw.Begin(GAIA::JSON::JSON_NODE_MULTICONTAINER);
 				{
-					GAIA::CH szTempIndexX[32];
-					GAIA::ALGO::castv(x, szTempIndexX, sizeof(szTempIndexX));
-
-					GAIA::CH szTempNode[32] = "Node";
-					GAIA::ALGO::gstrcat(szTempNode, szTempIndexX);
-
-					jw.Begin(GAIA::JSON::JSON_NODE_CONTAINER, szTempNode);
+					for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 					{
-						for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
+						jw.Begin(GAIA::JSON::JSON_NODE_CONTAINER, GNIL);
 						{
-							GAIA::CH szTempIndexY[32];
-							GAIA::ALGO::castv(y, szTempIndexY, sizeof(szTempIndexY));
+							for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
+							{
+								GAIA::CH szTempIndexY[32];
+								GAIA::ALGO::castv(y, szTempIndexY, sizeof(szTempIndexY));
 
-							GAIA::WCH szTempName[32] = L"Prop";
-							GAIA::ALGO::gstrcat(szTempName, szTempIndexY);
+								GAIA::CH szTempName[32] = "Prop";
+								GAIA::ALGO::gstrcat(szTempName, szTempIndexY);
 
-							jw << szTempName << y;
+								GAIA::CH szTempValue[32] = "Value";
+								GAIA::ALGO::gstrcat(szTempValue, szTempIndexY);
+
+								jw.Write(GAIA::JSON::JSON_NODE_NAME, szTempName);
+								jw.Write(GAIA::JSON::JSON_NODE_VALUE, szTempValue);
+							}
+
+							for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
+							{
+								GAIA::CH szTempIndexY[32];
+								GAIA::ALGO::castv(y, szTempIndexY, sizeof(szTempIndexY));
+
+								GAIA::CH szTempName[32] = "Node";
+								GAIA::ALGO::gstrcat(szTempName, szTempIndexY);
+
+								jw.Begin(GAIA::JSON::JSON_NODE_CONTAINER, szTempName);
+								{
+									for(GAIA::NUM z = 0; z < SAMPLE_COUNT; ++z)
+									{
+										GAIA::CH szTempIndexZ[32];
+										GAIA::ALGO::castv(z, szTempIndexZ, sizeof(szTempIndexZ));
+
+										GAIA::CH szTempName[32] = "Prop";
+										GAIA::ALGO::gstrcat(szTempName, szTempIndexZ);
+
+										GAIA::CH szTempValue[32] = "Value";
+										GAIA::ALGO::gstrcat(szTempValue, szTempIndexZ);
+
+										jw.Write(GAIA::JSON::JSON_NODE_NAME, szTempName);
+										jw.Write(GAIA::JSON::JSON_NODE_VALUE, szTempValue);
+									}
+								}
+								jw.End();
+							}
 						}
+						jw.End();
 					}
-					jw.End();
 				}
+				jw.End();
+
+				GAIA::NUM sWriteSize = jw.GetWriteSize();
+
+				GAIA::CTN::AString strResult;
+				strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
+				if(ENABLE_DEBUG_OUTPUT)
+					TLOG(strResult.fptr());
+				if(strResult != "[{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\",\"Node0\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node1\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node2\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"}},{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\",\"Node0\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node1\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node2\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"}},{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\",\"Node0\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node1\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node2\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"}}]")
+					TERROR;
 			}
-			jw.End();
 
-			GAIA::NUM sWriteSize = jw.GetWriteSize();
+			// Template test.
+			{
+				jw.SetBuffer(buf.fptr(), buf.write_size());
+				jw.Begin(GAIA::JSON::JSON_NODE_MULTICONTAINER);
+				{
+					for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
+					{
+						jw.Begin(GAIA::JSON::JSON_NODE_CONTAINER, GNIL);
+						{
+							for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
+							{
+								GAIA::CH szTempIndexY[32];
+								GAIA::ALGO::castv(y, szTempIndexY, sizeof(szTempIndexY));
 
-			GAIA::CTN::AString strResult;
-			strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
-			if(ENABLE_DEBUG_OUTPUT)
-				TLOG(strResult.fptr());
-			if(strResult != "[{\"Node0\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"}},{\"Node1\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"}},{\"Node2\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"}}]")
-				TERROR;
+								GAIA::WCH szTempName[32] = L"Prop";
+								GAIA::ALGO::gstrcat(szTempName, szTempIndexY);
+
+								jw << szTempName << y;
+							}
+
+							for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
+							{
+								GAIA::CH szTempIndexY[32];
+								GAIA::ALGO::castv(y, szTempIndexY, sizeof(szTempIndexY));
+
+								GAIA::CH szTempName[32] = "Node";
+								GAIA::ALGO::gstrcat(szTempName, szTempIndexY);
+
+								jw.Begin(GAIA::JSON::JSON_NODE_CONTAINER, szTempName);
+								{
+									for(GAIA::NUM z = 0; z < SAMPLE_COUNT; ++z)
+									{
+										GAIA::CH szTempIndexZ[32];
+										GAIA::ALGO::castv(z, szTempIndexZ, sizeof(szTempIndexZ));
+
+										GAIA::CH szTempName[32] = "Prop";
+										GAIA::ALGO::gstrcat(szTempName, szTempIndexZ);
+
+										GAIA::CH szTempValue[32] = "Value";
+										GAIA::ALGO::gstrcat(szTempValue, szTempIndexZ);
+
+										jw << szTempName << z;
+									}
+								}
+								jw.End();
+							}
+						}
+						jw.End();
+					}
+				}
+				jw.End();
+
+				GAIA::NUM sWriteSize = jw.GetWriteSize();
+
+				GAIA::CTN::AString strResult;
+				strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
+				if(ENABLE_DEBUG_OUTPUT)
+					TLOG(strResult.fptr());
+				if(strResult != "[{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\",\"Node0\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"},\"Node1\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"},\"Node2\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"}},{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\",\"Node0\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"},\"Node1\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"},\"Node2\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"}},{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\",\"Node0\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"},\"Node1\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"},\"Node2\":{\"Prop0\":\"0\",\"Prop1\":\"1\",\"Prop2\":\"2\"}}]")
+					TERROR;
+			}
 		}
 	}
 }

@@ -121,10 +121,19 @@ namespace GAIA
 					If parameter nt is not GAIA::JSON::JSON_NODE_CONTAINER and is not GAIA::JSON::JSON_NODE_MULTICONTAINER, throw it.
 
 				@exception GAIA::ECT::EctInvalidParam
+					If begin a container or multi container as a root container, and parameter pszNodeName is not GNIL and "", throw it.
+
+				@exception GAIA::ECT::EctInvalidParam
 					If parameter pszNodeName is not GNIL and pszNodeName is not a valid json node name, throw it.
 
-				@exception
-					GAIA::ECT::EctIllegal If the last value node is not writen.
+				@exception GAIA::ECT::EctInvalidParam
+					If begin a container in multi container, and parameter pszNodeName is not GNIL and "", throw it.
+
+				@exception GAIA::ECT::EctIllegal
+					If the last value node is not writen, throw it.
+
+				@exception GAIA::ECT::EctIllegal
+					If begin a multi container in multi container, throw it.
 			*/
 			GAIA::GVOID Begin(GAIA::JSON::JSON_NODE nt, const GAIA::CH* pszNodeName = GNIL, _SizeType nodenamelen = GINVALID)
 			{
@@ -146,7 +155,8 @@ namespace GAIA
 					{
 						if(m_CNTCursor == GINVALID)
 						{
-							GAST(GAIA::ALGO::gstremp(pszNodeName));
+							if(!GAIA::ALGO::gstremp(pszNodeName))
+								GTHROW(InvalidParam);
 							m_CNTCursor = 0;
 							m_LastCNT[m_CNTCursor] = nt;
 							if(!m_bFirstNode)
@@ -156,18 +166,27 @@ namespace GAIA
 						}
 						else
 						{
-							GAST(!GAIA::ALGO::gstremp(pszNodeName));
 							GAST(m_CNTCursor + 1 < _MaxDepth);
 							GAIA::JSON::JSON_NODE parentnt = m_LastCNT[m_CNTCursor];
-							m_LastCNT[++m_CNTCursor] = nt;
-							if(!m_bFirstNode)
-								this->write(",", sizeof(",") - 1);
 							if(parentnt == GAIA::JSON::JSON_NODE_MULTICONTAINER)
-								this->write("{\"", sizeof("{\"") - 1);
+							{
+								if(!GAIA::ALGO::gstremp(pszNodeName))
+									GTHROW(InvalidParam);
+								m_LastCNT[++m_CNTCursor] = nt;
+								if(!m_bFirstNode)
+									this->write(",", sizeof(",") - 1);
+								this->write("{", sizeof("{") - 1);
+							}
 							else
+							{
+								m_LastCNT[++m_CNTCursor] = nt;
+								if(!m_bFirstNode)
+									this->write(",", sizeof(",") - 1);
 								this->write("\"", sizeof("\"") - 1);
-							this->write(pszNodeName, nodenamelen);
-							this->write("\":{", sizeof("\":{") - 1);
+								this->write(pszNodeName, nodenamelen);
+								this->write("\":{", sizeof("\":{") - 1);
+							}
+
 						}
 					}
 					break;
@@ -187,13 +206,12 @@ namespace GAIA
 							GAST(!GAIA::ALGO::gstremp(pszNodeName));
 							GAST(m_CNTCursor + 1 < _MaxDepth);
 							GAIA::JSON::JSON_NODE parentnt = m_LastCNT[m_CNTCursor];
+							if(parentnt == GAIA::JSON::JSON_NODE_MULTICONTAINER)
+								GTHROW(Illegal);
 							m_LastCNT[++m_CNTCursor] = nt;
 							if(!m_bFirstNode)
 								this->write(",", sizeof(",") - 1);
-							if(parentnt == GAIA::JSON::JSON_NODE_MULTICONTAINER)
-								this->write("{\"", sizeof("{\"") - 1);
-							else
-								this->write("\"", sizeof("\"") - 1);
+							this->write("\"", sizeof("\"") - 1);
 							this->write(pszNodeName, nodenamelen);
 							this->write("\":[", sizeof("\":[") - 1);
 						}
@@ -232,18 +250,12 @@ namespace GAIA
 				{
 				case GAIA::JSON::JSON_NODE_CONTAINER:
 					{
-						if(m_CNTCursor > 0 && m_LastCNT[m_CNTCursor - 1] == GAIA::JSON::JSON_NODE_MULTICONTAINER)
-							this->write("}}", sizeof("}}") - 1);
-						else
-							this->write("}", sizeof("}") - 1);
+						this->write("}", sizeof("}") - 1);
 					}
 					break;
 				case GAIA::JSON::JSON_NODE_MULTICONTAINER:
 					{
-						if(m_CNTCursor > 0 && m_LastCNT[m_CNTCursor - 1] == GAIA::JSON::JSON_NODE_MULTICONTAINER)
-							this->write("}]", sizeof("}]") - 1);
-						else
-							this->write("]", sizeof("]") - 1);
+						this->write("]", sizeof("]") - 1);
 					}
 					break;
 				case GAIA::JSON::JSON_NODE_NAME:
