@@ -101,7 +101,7 @@ namespace GAIA
 			GINL _SizeType GetWriteSize() const{return (m_pCursor - m_pFront) * sizeof(_DataType);}
 
 			/*!
-				@brief Get the buffer's remain size in bytes.
+				@brief Get the buffer's remain size(not be writen) in bytes.
 
 				@return Return the buffer's remain size in bytes.
 			*/

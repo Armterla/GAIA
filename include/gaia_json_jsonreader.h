@@ -41,9 +41,13 @@ namespace GAIA
 			GINL GAIA::GVOID Reset(){this->init();}
 
 			/*!
-				@brief
+				@brief Set or unset a buffer for JsonReader read from.
 
-				@param
+				@param p [in] Specify a loaded json buffer.
+					If GNIL, means unset the old buffer.
+
+				@param size [in] Specify parameter p's size in bytes.
+					If parameter p is GNIL, parameter size must be 0, or must above zero.
 			*/
 			GINL GAIA::GVOID SetBuffer(const GAIA::GVOID* p, _SizeType size)
 			{
@@ -64,32 +68,33 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Get the buffer which used for JsonReader read from.
 
-				@param
+				@param size [out] Used for saving the size of buffer(return) in bytes.
 
-				@return
+				@return Return the buffer which had be set.
+					If not call SetBuffer with a buffer pointer, will return GNIL, and parameter size be filled by 0.
 			*/
 			GINL const GAIA::GVOID* GetBuffer(_SizeType& size) const{size = m_size; return m_pFront;}
 
 			/*!
-				@brief
+				@brief Get the buffer's size in bytes which had be set to current JsonReader.
 
-				@return
+				@return Return the buffer's size in bytes.
 			*/
 			GINL _SizeType GetBufferSize() const{return m_size;}
 
 			/*!
-				@brief
+				@brief Get the buffer's readed size in bytes.
 
-				@return
+				@return Return the buffer's size in bytes.
 			*/
 			GINL _SizeType GetReadSize() const{return (m_pCursor - m_pFront) * sizeof(_DataType);}
 
 			/*!
-				@brief
+				@brief Get the buffer's remain(not be readed) size in bytes.
 
-				@return
+				@return Return the buffer's remain size in bytes.
 			*/
 			GINL _SizeType GetRemainSize() const{return this->GetBufferSize() - this->GetReadSize();}
 
@@ -345,7 +350,8 @@ namespace GAIA
 					if(*p != ' ' &&
 					   *p != '\t' &&
 					   *p != '\r' &&
-					   *p != '\n')
+					   *p != '\n' &&
+					   *p != ',')
 						return p;
 					++p;
 				}
