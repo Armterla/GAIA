@@ -347,6 +347,7 @@ namespace GAIA
 					   *p != '\r' &&
 					   *p != '\n')
 						return p;
+					++p;
 				}
 				return GNIL;
 			}
