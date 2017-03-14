@@ -81,7 +81,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID SetURL(const GAIA::CH* pszURL);
+			GAIA::GVOID SetURL(const GAIA::NETWORK::HttpURL& url);
 
 			/*!
 				@brief
@@ -92,7 +92,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			const GAIA::CH* GetURL() const;
+			const GAIA::NETWORK::HttpURL& GetURL() const;
 
 			/*!
 				@brief
@@ -103,7 +103,18 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID SetHead(const GAIA::NETWORK::HttpHead& pHead);
+			GAIA::NETWORK::HttpURL& GetURL();
+
+			/*!
+				@brief
+
+				@param
+
+				@return
+
+				@remarks
+			*/
+			GAIA::GVOID SetHead(const GAIA::NETWORK::HttpHead& head);
 
 			/*!
 				@brief
@@ -238,7 +249,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::N64 GetResultCode() const;
+			GAIA::NETWORK::HTTP_CODE GetResultCode() const;
 
 			/*!
 				@brief
@@ -477,9 +488,38 @@ namespace GAIA
 			virtual GAIA::BL OnRead(GAIA::N64 lOffset, GAIA::GVOID* pData, GAIA::NUM sMaxDataSize, GAIA::NUM& sPracticeDataSize){return GAIA::False;}
 
 		private:
+			GINL GAIA::GVOID init()
+			{
+				m_pHttp = GNIL;
+				m_method = GAIA::NETWORK::HTTP_METHOD_INVALID;
+				m_bComplete = GAIA::False;
+				m_ResultCode = GAIA::NETWORK::HTTP_CODE_INVALID;
+				m_bAsync = GAIA::False;
+				m_uTimeout = 16 * 1000 * 1000;
+				m_bEnableWriteCookicRAM = GAIA::False;
+				m_bEnableWriteCookicFile = GAIA::False;
+				m_uWriteCookicTime = 0;
+				m_bEnableReadCookicRAM = GAIA::False;
+				m_bEnableReadCookicFile = GAIA::False;
+				m_uReadCookicTime = 0;
+			}
+
+		private:
+			GAIA::NETWORK::Http* m_pHttp;
+			GAIA::NETWORK::HTTP_METHOD m_method;
 			GAIA::NETWORK::HttpURL m_url;
 			GAIA::NETWORK::HttpHead m_head;
-
+			GAIA::CTN::Buffer m_buf;
+			GAIA::BL m_bComplete;
+			GAIA::NETWORK::HTTP_CODE m_ResultCode;
+			GAIA::BL m_bAsync;
+			GAIA::U64 m_uTimeout;
+			GAIA::BL m_bEnableWriteCookicRAM;
+			GAIA::BL m_bEnableWriteCookicFile;
+			GAIA::U64 m_uWriteCookicTime;
+			GAIA::BL m_bEnableReadCookicRAM;
+			GAIA::BL m_bEnableReadCookicFile;
+			GAIA::U64 m_uReadCookicTime;
 		};
 
 		/*!
@@ -753,8 +793,26 @@ namespace GAIA
 			GAIA::BL CleanupCookic(GAIA::BL bMem = GAIA::True, GAIA::BL bFile = GAIA::True, const GAIA::U64& uBeyondTime = 0);
 
 		private:
+			GINL GAIA::GVOID init()
+			{
+				m_bCreated = GAIA::False;
+				m_desc.reset();
+				m_bBegin = GAIA::False;
+				m_bEnableWriteCookicRAM = GAIA::False;
+				m_bEnableWriteCookicFile = GAIA::False;
+				m_bEnableReadCookicRAM = GAIA::False;
+				m_bEnableReadCookicFile = GAIA::False;
+			}
+
+		private:
 			GAIA::BL m_bCreated;
 			GAIA::NETWORK::HttpDesc m_desc;
+			GAIA::BL m_bBegin;
+			GAIA::BL m_bEnableWriteCookicRAM;
+			GAIA::BL m_bEnableWriteCookicFile;
+			GAIA::BL m_bEnableReadCookicRAM;
+			GAIA::BL m_bEnableReadCookicFile;
+
 		};
 	}
 }
