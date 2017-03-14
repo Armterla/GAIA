@@ -6,6 +6,7 @@ namespace TEST
 	extern GAIA::GVOID t_json_jsonreader(GAIA::LOG::Log& logobj)
 	{
 		static const GAIA::NUM TEST_TIMES = 10000;
+		static const GAIA::NUM SAMPLE_COUNT = 3;
 
 		GAIA::JSON::JsonReaderA jr;
 
@@ -21,12 +22,11 @@ namespace TEST
 					GAIA::NUM sNodeNameLen;
 					const GAIA::CH* psz;
 					psz = jr.Begin(nt, sNodeNameLen);
+					TAST(psz != GNIL);
+					TAST(*psz == '{');
+					TAST(nt == GAIA::JSON::JSON_NODE_CONTAINER);
+					TAST(sNodeNameLen == 0);
 					{
-						TAST(psz != GNIL);
-						TAST(*psz == '{');
-						TAST(nt == GAIA::JSON::JSON_NODE_CONTAINER);
-						TAST(sNodeNameLen == 0);
-
 						psz = jr.Read(nt, sNodeNameLen);
 						TAST(psz != GNIL);
 						TAST(nt == GAIA::JSON::JSON_NODE_NAME);
@@ -80,12 +80,11 @@ namespace TEST
 					GAIA::NUM sNodeNameLen;
 					const GAIA::CH* psz;
 					psz = jr.Begin(nt, sNodeNameLen);
+					TAST(psz != GNIL);
+					TAST(*psz == '{');
+					TAST(nt == GAIA::JSON::JSON_NODE_CONTAINER);
+					TAST(sNodeNameLen == 0);
 					{
-						TAST(psz != GNIL);
-						TAST(*psz == '{');
-						TAST(nt == GAIA::JSON::JSON_NODE_CONTAINER);
-						TAST(sNodeNameLen == 0);
-
 						psz = jr.Read(nt, sNodeNameLen);
 						TAST(psz != GNIL);
 						TAST(nt == GAIA::JSON::JSON_NODE_NAME);
@@ -134,7 +133,104 @@ namespace TEST
 
 			// Depth2 test.
 			{
+				static const GAIA::CH SOURCE[] = "[{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\",\"Node0\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node1\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node2\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"}},{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\",\"Node0\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node1\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node2\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"}},{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\",\"Node0\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node1\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node2\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"}}]";
+				jr.SetBuffer(SOURCE, sizeof(SOURCE) - 1);
+				GTRY
+				{
+					GAIA::JSON::JSON_NODE nt;
+					GAIA::NUM sNodeNameLen;
+					const GAIA::CH* psz;
 
+					psz = jr.Begin(nt, sNodeNameLen);
+					TAST(psz != GNIL);
+					TAST(*psz == '[');
+					TAST(nt == GAIA::JSON::JSON_NODE_MULTICONTAINER);
+					TAST(sNodeNameLen == 0);
+					{
+						for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
+						{
+							psz = jr.Begin(nt, sNodeNameLen);
+							TAST(psz != GNIL);
+							TAST(*psz == '{');
+							TAST(nt == GAIA::JSON::JSON_NODE_CONTAINER);
+							TAST(sNodeNameLen == 0);
+							{
+								for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
+								{
+									GAIA::CH szTempIndexY[32];
+									GAIA::ALGO::castv(y, szTempIndexY, sizeof(szTempIndexY));
+
+									GAIA::CH szTempName[32] = "Prop";
+									GAIA::ALGO::gstrcat(szTempName, szTempIndexY);
+
+									GAIA::CH szTempValue[32] = "Value";
+									GAIA::ALGO::gstrcat(szTempValue, szTempIndexY);
+
+									psz = jr.Read(nt, sNodeNameLen);
+									TAST(psz != GNIL);
+									TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempName));
+									TAST(GAIA::ALGO::gstrcmp(szTempName, psz, sNodeNameLen) == 0);
+
+									psz = jr.Read(nt, sNodeNameLen);
+									TAST(psz != GNIL);
+									TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempValue));
+									TAST(GAIA::ALGO::gstrcmp(szTempValue, psz, sNodeNameLen) == 0);
+								}
+
+								for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
+								{
+									GAIA::CH szTempIndexY[32];
+									GAIA::ALGO::castv(y, szTempIndexY, sizeof(szTempIndexY));
+
+									GAIA::CH szTempName[32] = "Node";
+									GAIA::ALGO::gstrcat(szTempName, szTempIndexY);
+
+									psz = jr.Begin(nt, sNodeNameLen);
+									TAST(psz != GNIL);
+									TAST(nt == GAIA::JSON::JSON_NODE_CONTAINER);
+									TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempName));
+									TAST(GAIA::ALGO::gstrcmp(psz, szTempName, sNodeNameLen) == 0);
+									{
+										for(GAIA::NUM z = 0; z < SAMPLE_COUNT; ++z)
+										{
+											GAIA::CH szTempIndexZ[32];
+											GAIA::ALGO::castv(z, szTempIndexZ, sizeof(szTempIndexZ));
+
+											GAIA::CH szTempName[32] = "Prop";
+											GAIA::ALGO::gstrcat(szTempName, szTempIndexZ);
+
+											GAIA::CH szTempValue[32] = "Value";
+											GAIA::ALGO::gstrcat(szTempValue, szTempIndexZ);
+
+											psz = jr.Read(nt, sNodeNameLen);
+											TAST(psz != GNIL);
+											TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempName));
+											TAST(GAIA::ALGO::gstrcmp(szTempName, psz, sNodeNameLen) == 0);
+
+											psz = jr.Read(nt, sNodeNameLen);
+											TAST(psz != GNIL);
+											TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempValue));
+											TAST(GAIA::ALGO::gstrcmp(szTempValue, psz, sNodeNameLen) == 0);
+										}
+									}
+									psz = jr.End();
+									TAST(psz != GNIL);
+									TAST(*psz == '}');
+								}
+							}
+							psz = jr.End();
+							TAST(psz != GNIL);
+							TAST(*psz == '}');
+						}
+					}
+					psz = jr.End();
+					TAST(psz != GNIL);
+					TAST(*psz == ']');
+				}
+				GCATCHALL
+				{
+					TERROR;
+				}
 			}
 
 			// Template test.

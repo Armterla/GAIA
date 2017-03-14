@@ -163,13 +163,22 @@ namespace GAIA
 						switch(*pLocalNext)
 						{
 						case '{':
-							nt = GAIA::JSON::JSON_NODE_CONTAINER;
+							{
+								nt = GAIA::JSON::JSON_NODE_CONTAINER;
+								pLocalNext = pLocalNext + 1;
+							}
 							break;
 						case '[':
-							nt = GAIA::JSON::JSON_NODE_MULTICONTAINER;
+							{
+								nt = GAIA::JSON::JSON_NODE_MULTICONTAINER;
+								pLocalNext = pLocalNext + 1;
+							}
 							break;
 						case '\"':
-							nt = GAIA::JSON::JSON_NODE_NAME;
+							{
+								nt = GAIA::JSON::JSON_NODE_NAME;
+								pLocalNext = pColon;
+							}
 							break;
 						default:
 							{
@@ -178,14 +187,15 @@ namespace GAIA
 								   *pLocalNext == 'f')
 								{
 									nt = GAIA::JSON::JSON_NODE_NAME;
+									pLocalNext = pColon;
 									break;
 								}
 								else
 									GTHROW_RET(DataError, GNIL);
 							}
+							break;
 						}
 						nodenamelen = (_SizeType)(pLastQuote - m_pCursor - 1);
-						pLocalNext = pColon;
 						pRet = m_pCursor + 1;
 					}
 					break;
@@ -315,13 +325,11 @@ namespace GAIA
 				switch(nt)
 				{
 				case GAIA::JSON::JSON_NODE_CONTAINER:
-					{
-						if(*pRet != '{')
-							GTHROW_RET(Illegal, GNIL);
-					}
+					GAST(nodenamelen >= 0);
 					break;
 				case GAIA::JSON::JSON_NODE_MULTICONTAINER:
 					{
+						GAST(nodenamelen == 0);
 						if(*pRet != '[')
 							GTHROW_RET(Illegal, GNIL);
 					}
@@ -329,7 +337,6 @@ namespace GAIA
 				default:
 					GTHROW_RET(Illegal, GNIL);
 				}
-				GAST(nodenamelen == 0);
 				m_pCursor = pNext;
 				return pRet;
 			}
