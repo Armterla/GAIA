@@ -12,7 +12,7 @@ namespace GAIA
 	{
 		/*!
 			@brief Basic json writer.
-				It used for high performance json generate.
+				It used for high performance json streamed write.
 		*/
 		template<typename _DataType, typename _SizeType, typename _DepthType, _DepthType _MaxDepth> class BasicJsonWriter : public GAIA::Base
 		{

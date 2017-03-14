@@ -12,7 +12,7 @@ namespace GAIA
 	{
 		/*!
 			@brief Basic xml writer.
-				It used for high performance xml generate.
+				It used for high performance xml streamed write.
 		*/
 		template<typename _DataType, typename _SizeType, typename _DepthType, _DepthType _MaxDepth> class BasicXmlWriter : public GAIA::Base
 		{
