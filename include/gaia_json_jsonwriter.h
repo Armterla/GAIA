@@ -112,10 +112,11 @@ namespace GAIA
 
 				@param nt [in] Specify json node type, must be GAIA::JSON::JSON_NODE_CONTAINER or GAIA::JSON::JSON_NODE_MULTICONTAINER.
 
-				@param pszNodeName [in] Specify the node name. It could be GNIL for root json node.
+				@param pszNodeName [in] Specify the node name.\n
+					This parameter could be GNIL means have not a node name.\n
 
-				@param nodenamelen [in] Specify the parameter pszNodeName's length in characters with out '\0'.
-					It could be GINVALID means all parameter pszNodeName's character are used until to '\0'.
+				@param nodenamelen [in] Specify the parameter pszNodeName's length in characters with out '\0'.\n
+					It could be GINVALID means all parameter pszNodeName's character are used until to '\0'.\n
 
 				@exception GAIA::ECT::EctInvalidParam
 					If parameter nt is not GAIA::JSON::JSON_NODE_CONTAINER and is not GAIA::JSON::JSON_NODE_MULTICONTAINER, throw it.

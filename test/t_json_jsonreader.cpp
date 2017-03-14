@@ -235,7 +235,49 @@ namespace TEST
 
 			// Template test.
 			{
+				static const GAIA::CH SOURCE[] = "{\"aa\":1,\"bb\":true,\"cc\":\"12345678123456781234567812345678\"}";
+				jr.SetBuffer(SOURCE, sizeof(SOURCE) - 1);
+				GTRY
+				{
+					GAIA::JSON::JSON_NODE nt;
+					GAIA::NUM sNodeNameLen;
+					const GAIA::CH* psz;
+					psz = jr.Begin(nt, sNodeNameLen);
+					TAST(psz != GNIL);
+					TAST(*psz == '{');
+					TAST(nt == GAIA::JSON::JSON_NODE_CONTAINER);
+					TAST(sNodeNameLen == 0);
+					{
+						GAIA::CH szName[64];
 
+						jr.ReadName(szName);
+						TAST(GAIA::ALGO::gstrequal(szName, "aa"));
+						GAIA::N32 n;
+						n = jr.ReadValue(n);
+						TAST(n == 1);
+
+						jr.ReadName(szName, sizeof(szName));
+						TAST(GAIA::ALGO::gstrequal(szName, "bb"));
+						GAIA::BL b;
+						b = jr.ReadValue(b);
+						TAST(b == GAIA::True);
+
+						jr.ReadName(szName, sizeof(szName));
+						TAST(GAIA::ALGO::gstrequal(szName, "cc"));
+						GAIA::X128 x128;
+						x128 = jr.ReadValue(x128);
+						GAIA::X128 x128Source;
+						x128Source.fromstring("12345678123456781234567812345678");
+						TAST(x128 == x128Source);
+					}
+					psz = jr.End();
+					TAST(psz != GNIL);
+					TAST(*psz == '}');
+				}
+				GCATCHALL
+				{
+					TERROR;
+				}
 			}
 		}
 	}

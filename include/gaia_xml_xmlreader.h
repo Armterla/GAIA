@@ -20,7 +20,7 @@ namespace GAIA
 			typedef _DataType _datatype;
 			typedef _SizeType _sizetype;
 			typedef _DepthType _depthtype;
-			typedef const _DataType* DataTypePtr;
+			typedef const _DataType* _DataTypePtr;
 
 		public:
 			static const _DepthType _maxdepth = _MaxDepth;
@@ -123,7 +123,7 @@ namespace GAIA
 				@exception GAIA::ECT::EctDataError
 					If the source xml's format exist error, and can't peek, throw it.
 			*/
-			GINL const _DataType* Peek(GAIA::XML::XML_NODE& nt, _SizeType& nodenamelen)
+			GINL const _DataType* Peek(GAIA::XML::XML_NODE& nt, _SizeType& nodenamelen, _DataTypePtr* pNext = GNIL)
 			{
 
 			}

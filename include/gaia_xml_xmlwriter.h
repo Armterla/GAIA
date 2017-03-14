@@ -112,10 +112,10 @@ namespace GAIA
 
 				@param nt [in] Specify xml node type, must be GAIA::XML::XML_NODE_CONTAINER or GAIA::XML::XML_NODE_MULTICONTAINER.
 
-				@param pszNodeName [in] Specify the node name.
+				@param pszNodeName [in] Specify the node name.\n
 
-				@param nodenamelen [in] Specify the parameter pszNodeName's length in characters with out '\0'.
-					It could be GINVALID means all parameter pszNodeName's character are used until to '\0'.
+				@param nodenamelen [in] Specify the parameter pszNodeName's length in characters with out '\0'.\n
+					It could be GINVALID means all parameter pszNodeName's character are used until to '\0'.\n
 
 				@exception GAIA::ECT::EctInvalidParam
 					If parameter nt is not GAIA::XML::XML_NODE_CONTAINER and is not GAIA::XML::XML_NODE_MULTICONTAINER, throw it.
@@ -129,7 +129,7 @@ namespace GAIA
 				@exception GAIA::ECT::EctIllegal
 					If the last value node is not writen, throw it.
 			*/
-			GAIA::GVOID Begin(GAIA::XML::XML_NODE nt, const GAIA::CH* pszNodeName = GNIL, _SizeType nodenamelen = GINVALID)
+			GAIA::GVOID Begin(GAIA::XML::XML_NODE nt, const GAIA::CH* pszNodeName, _SizeType nodenamelen = GINVALID)
 			{
 				if(nt != GAIA::XML::XML_NODE_CONTAINER &&
 				   nt != GAIA::XML::XML_NODE_MULTICONTAINER)
@@ -268,8 +268,8 @@ namespace GAIA
 
 				@param pszNodeName [in] Specify the node name.
 
-				@param nodenamelen [in] Specify the parameter pszNodeName's length in characters with out '\0'.
-					It could be GINVALID means all parameter pszNodeName's character are used until to '\0'.
+				@param nodenamelen [in] Specify the parameter pszNodeName's length in characters with out '\0'.\n
+					It could be GINVALID means all parameter pszNodeName's character are used until to '\0'.\n
 
 				@exception GAIA::ECT::EctInvalidParam
 					If parameter nt is not GAIA::XML::XML_NODE_NAME and is not GAIA::XML::XML_NODE_VALUE, throw it.
