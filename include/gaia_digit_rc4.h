@@ -16,6 +16,7 @@ namespace GAIA
 		public:
 			GINL GAIA::BL set_key(const GAIA::GVOID* p, GAIA::U32 uKeySize)
 			{
+				GAST(uKeySize == sizeof(m_key));
 				if(uKeySize != sizeof(m_key))
 					return GAIA::False;
 				GAIA::ALGO::gmemcpy(m_key, p, sizeof(m_key));
@@ -23,6 +24,7 @@ namespace GAIA
 			}
 			GINL GAIA::BL get_key(GAIA::GVOID* p, GAIA::U32 uKeySize) const
 			{
+				GAST(uKeySize == sizeof(m_key));
 				if(uKeySize != sizeof(m_key))
 					return GAIA::False;
 				GAIA::ALGO::gmemcpy(p, m_key, sizeof(m_key));

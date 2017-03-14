@@ -24,7 +24,7 @@ namespace GAIA
 
 		static const GAIA::TCH HTML_DEFAULT_ROOT_NODE_NAME[] = _T("html");
 
-		GINL GAIA::BL HTMLCheckNodeName(GAIA::HTML::HTML_NODE nt, const GAIA::TCH* pszNodeName)
+		template<typename _DataType> GAIA::BL HtmlCheckNodeName(GAIA::HTML::HTML_NODE nt, const _DataType* pszNodeName)
 		{
 			switch(nt)
 			{
@@ -32,7 +32,7 @@ namespace GAIA
 			case GAIA::HTML::HTML_NODE_MULTICONTAINER:
 			case GAIA::HTML::HTML_NODE_NAME:
 				{
-					const GAIA::TCH* p = pszNodeName;
+					const _DataType* p = pszNodeName;
 					while(*p != '\0')
 					{
 						if((*p >= 'a' && *p <= 'z') ||
@@ -47,7 +47,7 @@ namespace GAIA
 				break;
 			case GAIA::HTML::HTML_NODE_VALUE:
 				{
-					const GAIA::TCH* p = pszNodeName;
+					const _DataType* p = pszNodeName;
 					while(*p != '\0')
 					{
 						if(*p == '<' || *p == '>' || *p == '\"')
@@ -63,16 +63,16 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		class HTMLFactoryHolder : public GAIA::Base
+		class HtmlFactoryHolder : public GAIA::Base
 		{
-			friend class HTMLFactory;
+			friend class HtmlFactory;
 		public:
-			GINL HTMLFactoryHolder(){m_pFactory = GNIL;}
-			GINL HTMLFactory* GetFactory() const{return m_pFactory;}
+			GINL HtmlFactoryHolder(){m_pFactory = GNIL;}
+			GINL HtmlFactory* GetFactory() const{return m_pFactory;}
 		private:
-			GINL GAIA::GVOID SetFactory(HTMLFactory* pFactory){m_pFactory = pFactory;}
+			GINL GAIA::GVOID SetFactory(HtmlFactory* pFactory){m_pFactory = pFactory;}
 		private:
-			HTMLFactory* m_pFactory;
+			HtmlFactory* m_pFactory;
 		};
 	}
 }

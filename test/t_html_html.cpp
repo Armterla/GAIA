@@ -3,14 +3,14 @@
 
 namespace TEST
 {
-	static GAIA::GVOID SaveLoadHTML(GAIA::LOG::Log& logobj, GAIA::HTML::HTML& html)
+	static GAIA::GVOID SaveLoadHTML(GAIA::LOG::Log& logobj, GAIA::HTML::Html& html)
 	{
 		GAIA::CTN::TChars strTemp, strTemp1, strTemp2;
 
 		static const GAIA::NUM NODE_COUNT = 3;
 		static const GAIA::NUM VALUE_COUNT = 3;
 
-		GAIA::HTML::HTML::Cursor cur;
+		GAIA::HTML::Html::Cursor cur;
 
 		html.BeginWriteNode(cur, GAIA::HTML::HTML_NODE_MULTICONTAINER, _T("Root"));
 
@@ -117,23 +117,23 @@ namespace TEST
 	}
 	extern GAIA::GVOID t_html_html(GAIA::LOG::Log& logobj)
 	{
-		GAIA::HTML::HTMLFactory fac;
-		GAIA::HTML::HTMLFactoryDesc desc;
+		GAIA::HTML::HtmlFactory fac;
+		GAIA::HTML::HtmlFactoryDesc desc;
 		desc.reset();
 		fac.Create(desc);
 		{
-			GAIA::HTML::HTML& html = fac.CreateHTML();
+			GAIA::HTML::Html& html = fac.CreateHtml();
 			{
 				SaveLoadHTML(logobj, html);
 			}
-			fac.ReleaseHTML(html);
+			fac.ReleaseHtml(html);
 		}
 		fac.Destroy();
 
-		GAIA::HTML::HTML* pHTML = gnew GAIA::HTML::HTML;
+		GAIA::HTML::Html* pHtml = gnew GAIA::HTML::Html;
 		{
-			SaveLoadHTML(logobj, *pHTML);
+			SaveLoadHTML(logobj, *pHtml);
 		}
-		gdel pHTML;
+		gdel pHtml;
 	}
 }

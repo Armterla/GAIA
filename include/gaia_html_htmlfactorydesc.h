@@ -8,7 +8,7 @@ namespace GAIA
 {
 	namespace HTML
 	{
-		class HTMLFactoryDesc : public GAIA::Base
+		class HtmlFactoryDesc : public GAIA::Base
 		{
 		public:
 			GINL GAIA::GVOID reset()

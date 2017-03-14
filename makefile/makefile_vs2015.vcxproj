@@ -1335,6 +1335,7 @@
     <ClCompile Include="..\test\t_dbg_perfcollector.cpp" />
     <ClCompile Include="..\test\t_db_local.cpp" />
     <ClCompile Include="..\test\t_db_remote.cpp" />
+    <ClCompile Include="..\test\t_digit_aes.cpp" />
     <ClCompile Include="..\test\t_digit_base64.cpp" />
     <ClCompile Include="..\test\t_digit_diff.cpp" />
     <ClCompile Include="..\test\t_digit_md5.cpp" />
@@ -1353,6 +1354,8 @@
     <ClCompile Include="..\test\t_img_png.cpp" />
     <ClCompile Include="..\test\t_iterator.cpp" />
     <ClCompile Include="..\test\t_json_json.cpp" />
+    <ClCompile Include="..\test\t_json_jsonreader.cpp" />
+    <ClCompile Include="..\test\t_json_jsonwriter.cpp" />
     <ClCompile Include="..\test\t_locale.cpp" />
     <ClCompile Include="..\test\t_log_log.cpp" />
     <ClCompile Include="..\test\t_math_aabb.cpp" />
@@ -1394,6 +1397,8 @@
     <ClCompile Include="..\test\t_time_timer.cpp" />
     <ClCompile Include="..\test\t_type.cpp" />
     <ClCompile Include="..\test\t_xml_xml.cpp" />
+    <ClCompile Include="..\test\t_xml_xmlreader.cpp" />
+    <ClCompile Include="..\test\t_xml_xmlwriter.cpp" />
     <ClCompile Include="main.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>

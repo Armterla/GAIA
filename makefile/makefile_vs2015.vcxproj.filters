@@ -928,6 +928,21 @@
     <ClCompile Include="..\test\tperf_msys_heapesg.cpp">
       <Filter>GAIA\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\t_xml_xmlreader.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_xml_xmlwriter.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_json_jsonreader.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_json_jsonwriter.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_digit_aes.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\test\preheader.h">

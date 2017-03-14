@@ -10,13 +10,13 @@ namespace GAIA
 {
 	namespace HTML
 	{
-		class HTMLNode : public HTMLFactoryHolder
+		class HtmlNode : public HtmlFactoryHolder
 		{
-			friend class HTML;
+			friend class Html;
 
 		public:
-			GINL HTMLNode();
-			GINL ~HTMLNode();
+			GINL HtmlNode();
+			GINL ~HtmlNode();
 
 			GINL GAIA::GVOID Reset();
 
@@ -27,13 +27,13 @@ namespace GAIA
 			GINL GAIA::GVOID SetName(const GAIA::TCH* pszName);
 			GINL const GAIA::TCH* GetName() const;
 
-			GINL GAIA::NUM InsertChild(HTMLNode& node, GAIA::NUM sIndex = GINVALID);
+			GINL GAIA::NUM InsertChild(HtmlNode& node, GAIA::NUM sIndex = GINVALID);
 			GINL GAIA::BL DeleteChild(const GAIA::NUM& sIndex);
 			GINL GAIA::GVOID DeleteChildAll();
 			GINL GAIA::NUM GetChildCount() const;
-			GINL HTMLNode* GetChild(const GAIA::NUM& nIndex) const;
-			GINL GAIA::NUM SetParent(HTMLNode* pParent);
-			GINL HTMLNode* GetParent() const;
+			GINL HtmlNode* GetChild(const GAIA::NUM& nIndex) const;
+			GINL GAIA::NUM SetParent(HtmlNode* pParent);
+			GINL HtmlNode* GetParent() const;
 
 			GINL GAIA::NUM GetDepth() const;
 			GINL GAIA::NUM GetParentIndex() const;
@@ -46,9 +46,9 @@ namespace GAIA
 			GAIA::HTML::HTML_NODE m_nt;
 			const GAIA::TCH* m_pszName;
 			GAIA::BL m_bRoot;
-			GAIA::HTML::HTMLNode* m_pParent;
+			GAIA::HTML::HtmlNode* m_pParent;
 			GAIA::NUM m_sParentIndex;
-			GAIA::CTN::Vector<GAIA::HTML::HTMLNode*> m_childs;
+			GAIA::CTN::Vector<GAIA::HTML::HtmlNode*> m_childs;
 			GAIA::CTN::Vector<GAIA::NUM> m_freestack;
 		};
 	}

@@ -25,6 +25,15 @@ namespace TEST
 		if(nResDecode != 26 || GAIA::ALGO::gmemcmp(src, newsrc, nResDecode) != 0)
 			TERROR;
 
+		GAIA::ALGO::gstrcpy(src, "a1b2c3d4!@#$%^&*(");
+		nResEncode = GAIA::DIGIT::base64encode(dst, (GAIA::N32)sizeof(dst), src, 17);
+		dst[nResEncode] = '\0';
+		if(GAIA::ALGO::gstrcmp(dst, "YTFiMmMzZDQhQCMkJV4mKig=") != 0)
+			TERROR;
+		nResDecode = GAIA::DIGIT::base64decode(newsrc, (GAIA::N32)sizeof(newsrc), dst, nResEncode);
+		if(nResDecode != 17 || GAIA::ALGO::gmemcmp(src, newsrc, nResDecode) != 0)
+			TERROR;
+
 		for(GAIA::N32 x = 0; x < 10000; ++x)
 		{
 			GAIA::NUM sSrcLen = GAIA::MATH::xrandom();

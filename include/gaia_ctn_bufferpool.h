@@ -118,9 +118,10 @@ namespace GAIA
 					n.data = GNIL;
 					n.datasize = 0;
 					m_freestack.push_back(finded.index);
-					gdel[] finded.data;
+					GAIA::U8* pData = finded.data;
 					if(!it.erase())
 						return GAIA::False;
+					gdel[] pData;
 				}
 				return GAIA::True;
 			}

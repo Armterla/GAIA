@@ -13,25 +13,25 @@ namespace GAIA
 {
 	namespace XML
 	{
-		class XMLFactory : public GAIA::Base
+		class XmlFactory : public GAIA::Base
 		{
-			friend class XML;
-			friend class XMLNode;
+			friend class Xml;
+			friend class XmlNode;
 
 		public:
-			GINL XMLFactory();
-			GINL ~XMLFactory();
+			GINL XmlFactory();
+			GINL ~XmlFactory();
 
-			GINL GAIA::BL Create(const XMLFactoryDesc& desc);
+			GINL GAIA::BL Create(const XmlFactoryDesc& desc);
 			GINL GAIA::BL Destroy();
 			GINL GAIA::BL IsCreated() const;
-			GINL const XMLFactoryDesc& GetDesc() const;
+			GINL const XmlFactoryDesc& GetDesc() const;
 
-			GINL XMLNode& CreateNode();
-			GINL XML& CreateXML();
+			GINL XmlNode& CreateNode();
+			GINL Xml& CreateXml();
 
-			GINL GAIA::BL ReleaseNode(XMLNode& node);
-			GINL GAIA::BL ReleaseXML(XML& xml);
+			GINL GAIA::BL ReleaseNode(XmlNode& node);
+			GINL GAIA::BL ReleaseXml(Xml& xml);
 
 		private:
 			GINL const GAIA::TCH* AllocString(const GAIA::TCH* psz);
@@ -40,20 +40,20 @@ namespace GAIA
 			GINL GAIA::BL ReleaseStaticString(const GAIA::TCH* psz);
 
 		private:
-			XMLFactoryDesc m_desc;
+			XmlFactoryDesc m_desc;
 			GAIA::BL m_bCreated;
 
 			GAIA::SYNC::LockRW m_rwStringPool;
 			GAIA::SYNC::LockRW m_rwStaticStringPool;
 
 			GAIA::SYNC::LockRW m_rwNodePool;
-			GAIA::SYNC::LockRW m_rwXMLPool;
+			GAIA::SYNC::LockRW m_rwXmlPool;
 
 			GAIA::CTN::StringPtrPool<GAIA::TCH> m_strpool;
 			GAIA::CTN::StaticStringPtrPool<GAIA::TCH> m_sstrpool;
 
-			GAIA::CTN::Pool<XMLNode> m_NodePool;
-			GAIA::CTN::Pool<XML> m_XMLPool;
+			GAIA::CTN::Pool<XmlNode> m_NodePool;
+			GAIA::CTN::Pool<Xml> m_XmlPool;
 		};
 	}
 }

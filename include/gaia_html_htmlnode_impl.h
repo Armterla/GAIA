@@ -8,7 +8,7 @@ namespace GAIA
 {
 	namespace HTML
 	{
-		GINL HTMLNode::HTMLNode()
+		GINL HtmlNode::HtmlNode()
 		{
 			m_nt = GAIA::HTML::HTML_NODE_MULTICONTAINER;
 			m_pszName = GNIL;
@@ -16,22 +16,22 @@ namespace GAIA
 			m_pParent = GNIL;
 			m_sParentIndex = GINVALID;
 		}
-		GINL HTMLNode::~HTMLNode()
+		GINL HtmlNode::~HtmlNode()
 		{
 			this->Reset();
 		}
-		GINL GAIA::GVOID HTMLNode::Reset()
+		GINL GAIA::GVOID HtmlNode::Reset()
 		{
 			this->SetType(GAIA::HTML::HTML_NODE_INVALID);
 			this->SetName(GNIL);
 			this->DeleteChildAll();
 			this->SetParent(GNIL);
 		}
-		GINL GAIA::BL HTMLNode::IsRoot() const
+		GINL GAIA::BL HtmlNode::IsRoot() const
 		{
 			return m_bRoot;
 		}
-		GINL GAIA::GVOID HTMLNode::SetType(GAIA::HTML::HTML_NODE nt)
+		GINL GAIA::GVOID HtmlNode::SetType(GAIA::HTML::HTML_NODE nt)
 		{
 			if(m_bRoot)
 			{
@@ -45,13 +45,13 @@ namespace GAIA
 			}
 			m_nt = nt;
 		}
-		GINL GAIA::HTML::HTML_NODE HTMLNode::GetType() const
+		GINL GAIA::HTML::HTML_NODE HtmlNode::GetType() const
 		{
 			return m_nt;
 		}
-		GINL GAIA::GVOID HTMLNode::SetName(const GAIA::TCH* pszName)
+		GINL GAIA::GVOID HtmlNode::SetName(const GAIA::TCH* pszName)
 		{
-			GAIA::HTML::HTMLFactory* pFactory = this->GetFactory();
+			GAIA::HTML::HtmlFactory* pFactory = this->GetFactory();
 			if(GAIA::ALGO::gstrcmpnil(m_pszName, pszName) == 0)
 				return;
 			if(pszName == GNIL)
@@ -69,11 +69,11 @@ namespace GAIA
 			else
 				m_pszName = pFactory->AllocStaticString(pszName);
 		}
-		GINL const GAIA::TCH* HTMLNode::GetName() const
+		GINL const GAIA::TCH* HtmlNode::GetName() const
 		{
 			return m_pszName;
 		}
-		GINL GAIA::NUM HTMLNode::InsertChild(HTMLNode& node, GAIA::NUM sIndex)
+		GINL GAIA::NUM HtmlNode::InsertChild(HtmlNode& node, GAIA::NUM sIndex)
 		{
 			if(m_nt == GAIA::HTML::HTML_NODE_VALUE)
 				return GINVALID;
@@ -118,11 +118,11 @@ namespace GAIA
 			}
 			return node.GetParentIndex();
 		}
-		GINL GAIA::BL HTMLNode::DeleteChild(const GAIA::NUM& sIndex)
+		GINL GAIA::BL HtmlNode::DeleteChild(const GAIA::NUM& sIndex)
 		{
 			if(sIndex >= m_childs.size())
 				return GAIA::False;
-			GAIA::HTML::HTMLNode* pChild = m_childs[sIndex];
+			GAIA::HTML::HtmlNode* pChild = m_childs[sIndex];
 			if(pChild == GNIL)
 				return GAIA::False;
 			if(pChild->GetFactory() != GNIL)
@@ -132,11 +132,11 @@ namespace GAIA
 			m_childs[sIndex] = GNIL;
 			return GAIA::True;
 		}
-		GINL GAIA::GVOID HTMLNode::DeleteChildAll()
+		GINL GAIA::GVOID HtmlNode::DeleteChildAll()
 		{
 			for(GAIA::NUM x = 0; x < m_childs.size(); ++x)
 			{
-				GAIA::HTML::HTMLNode* pChild = m_childs[x];
+				GAIA::HTML::HtmlNode* pChild = m_childs[x];
 				if(pChild == GNIL)
 					continue;
 				if(pChild->GetFactory() != GNIL)
@@ -147,15 +147,15 @@ namespace GAIA
 			m_childs.clear();
 			m_freestack.clear();
 		}
-		GINL GAIA::NUM HTMLNode::GetChildCount() const
+		GINL GAIA::NUM HtmlNode::GetChildCount() const
 		{
 			return m_childs.size();
 		}
-		GINL HTMLNode* HTMLNode::GetChild(const GAIA::NUM& nIndex) const
+		GINL HtmlNode* HtmlNode::GetChild(const GAIA::NUM& nIndex) const
 		{
 			return m_childs[nIndex];
 		}
-		GINL GAIA::NUM HTMLNode::SetParent(HTMLNode* pParent)
+		GINL GAIA::NUM HtmlNode::SetParent(HtmlNode* pParent)
 		{
 			if(m_pParent == pParent)
 				return this->GetParentIndex();
@@ -176,14 +176,14 @@ namespace GAIA
 			}
 			return GINVALID;
 		}
-		GINL HTMLNode* HTMLNode::GetParent() const
+		GINL HtmlNode* HtmlNode::GetParent() const
 		{
 			return m_pParent;
 		}
-		GINL GAIA::NUM HTMLNode::GetDepth() const
+		GINL GAIA::NUM HtmlNode::GetDepth() const
 		{
 			GAIA::NUM sDepth = 0;
-			const HTMLNode* pNode = this;
+			const HtmlNode* pNode = this;
 			while(pNode->m_pParent != GNIL)
 			{
 				sDepth++;
@@ -191,15 +191,15 @@ namespace GAIA
 			}
 			return sDepth;
 		}
-		GINL GAIA::NUM HTMLNode::GetParentIndex() const
+		GINL GAIA::NUM HtmlNode::GetParentIndex() const
 		{
 			return m_sParentIndex;
 		}
-		GINL GAIA::GVOID HTMLNode::SetRoot(GAIA::BL bRoot)
+		GINL GAIA::GVOID HtmlNode::SetRoot(GAIA::BL bRoot)
 		{
 			m_bRoot = bRoot;
 		}
-		GINL GAIA::GVOID HTMLNode::SetParentIndex(GAIA::NUM sIndex)
+		GINL GAIA::GVOID HtmlNode::SetParentIndex(GAIA::NUM sIndex)
 		{
 			m_sParentIndex = sIndex;
 		}

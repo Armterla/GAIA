@@ -14,17 +14,17 @@ namespace GAIA
 {
 	namespace XML
 	{
-		GINL XMLFactory::XMLFactory()
+		GINL XmlFactory::XmlFactory()
 		{
 			m_desc.reset();
 			m_bCreated = GAIA::False;
 		}
-		GINL XMLFactory::~XMLFactory()
+		GINL XmlFactory::~XmlFactory()
 		{
 			if(this->IsCreated())
 				this->Destroy();
 		}
-		GINL GAIA::BL XMLFactory::Create(const XMLFactoryDesc& desc)
+		GINL GAIA::BL XmlFactory::Create(const XmlFactoryDesc& desc)
 		{
 			GAST(!this->IsCreated());
 			if(this->IsCreated())
@@ -36,7 +36,7 @@ namespace GAIA
 			m_bCreated = GAIA::True;
 			return GAIA::True;
 		}
-		GINL GAIA::BL XMLFactory::Destroy()
+		GINL GAIA::BL XmlFactory::Destroy()
 		{
 			GAST(this->IsCreated());
 			if(!this->IsCreated())
@@ -45,23 +45,23 @@ namespace GAIA
 			m_strpool.destroy();
 			m_sstrpool.destroy();
 			m_NodePool.destroy();
-			m_XMLPool.destroy();
+			m_XmlPool.destroy();
 			m_bCreated = GAIA::False;
 			return GAIA::True;
 		}
-		GINL GAIA::BL XMLFactory::IsCreated() const
+		GINL GAIA::BL XmlFactory::IsCreated() const
 		{
 			return m_bCreated;
 		}
-		GINL const XMLFactoryDesc& XMLFactory::GetDesc() const
+		GINL const XmlFactoryDesc& XmlFactory::GetDesc() const
 		{
 			GAST(this->IsCreated());
 			return m_desc;
 		}
-		GINL XMLNode& XMLFactory::CreateNode()
+		GINL XmlNode& XmlFactory::CreateNode()
 		{
 			GAST(this->IsCreated());
-			XMLNode* pNode;
+			XmlNode* pNode;
 			if(m_desc.bObjectPoolEnable)
 			{
 				if(m_desc.bThreadSafe)
@@ -73,30 +73,30 @@ namespace GAIA
 					pNode = m_NodePool.alloc();
 			}
 			else
-				pNode = gnew XMLNode;
+				pNode = gnew XmlNode;
 			pNode->SetFactory(this);
 			return *pNode;
 		}
-		GINL XML& XMLFactory::CreateXML()
+		GINL Xml& XmlFactory::CreateXml()
 		{
 			GAST(this->IsCreated());
-			XML* pXML;
+			Xml* pXml;
 			if(m_desc.bObjectPoolEnable)
 			{
 				if(m_desc.bThreadSafe)
 				{
-					GAIA::SYNC::AutolockW al(m_rwXMLPool);
-					pXML = m_XMLPool.alloc();
+					GAIA::SYNC::AutolockW al(m_rwXmlPool);
+					pXml = m_XmlPool.alloc();
 				}
 				else
-					pXML = m_XMLPool.alloc();
+					pXml = m_XmlPool.alloc();
 			}
 			else
-				pXML = gnew XML;
-			pXML->SetFactory(this);
-			return *pXML;
+				pXml = gnew Xml;
+			pXml->SetFactory(this);
+			return *pXml;
 		}
-		GINL GAIA::BL XMLFactory::ReleaseNode(XMLNode& node)
+		GINL GAIA::BL XmlFactory::ReleaseNode(XmlNode& node)
 		{
 			GAST(node.GetFactory() == this);
 			if(node.GetFactory() != this)
@@ -119,7 +119,7 @@ namespace GAIA
 				gdel &node;
 			return GAIA::True;
 		}
-		GINL GAIA::BL XMLFactory::ReleaseXML(XML& xml)
+		GINL GAIA::BL XmlFactory::ReleaseXml(Xml& xml)
 		{
 			GAST(xml.GetFactory() == this);
 			if(xml.GetFactory() != this)
@@ -132,17 +132,17 @@ namespace GAIA
 			{
 				if(m_desc.bThreadSafe)
 				{
-					GAIA::SYNC::AutolockW al(m_rwXMLPool);
-					m_XMLPool.release(&xml);
+					GAIA::SYNC::AutolockW al(m_rwXmlPool);
+					m_XmlPool.release(&xml);
 				}
 				else
-					m_XMLPool.release(&xml);
+					m_XmlPool.release(&xml);
 			}
 			else
 				gdel &xml;
 			return GAIA::True;
 		}
-		GINL const GAIA::TCH* XMLFactory::AllocString(const GAIA::TCH* psz)
+		GINL const GAIA::TCH* XmlFactory::AllocString(const GAIA::TCH* psz)
 		{
 			GAST(psz != GNIL);
 			GAST(this->IsCreated());
@@ -159,7 +159,7 @@ namespace GAIA
 			else
 				return GAIA::ALGO::gstrnew(psz);
 		}
-		GINL GAIA::BL XMLFactory::ReleaseString(const GAIA::TCH* psz)
+		GINL GAIA::BL XmlFactory::ReleaseString(const GAIA::TCH* psz)
 		{
 			GAST(psz != GNIL);
 			GAST(this->IsCreated());
@@ -177,7 +177,7 @@ namespace GAIA
 				gdel[] psz;
 			return GAIA::True;
 		}
-		GINL const GAIA::TCH* XMLFactory::AllocStaticString(const GAIA::TCH* psz)
+		GINL const GAIA::TCH* XmlFactory::AllocStaticString(const GAIA::TCH* psz)
 		{
 			GAST(psz != GNIL);
 			GAST(this->IsCreated());
@@ -194,7 +194,7 @@ namespace GAIA
 			else
 				return GAIA::ALGO::gstrnew(psz);
 		}
-		GINL GAIA::BL XMLFactory::ReleaseStaticString(const GAIA::TCH* psz)
+		GINL GAIA::BL XmlFactory::ReleaseStaticString(const GAIA::TCH* psz)
 		{
 			GAST(psz != GNIL);
 			GAST(this->IsCreated());

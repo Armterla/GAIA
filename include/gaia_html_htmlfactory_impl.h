@@ -14,17 +14,17 @@ namespace GAIA
 {
 	namespace HTML
 	{
-		GINL HTMLFactory::HTMLFactory()
+		GINL HtmlFactory::HtmlFactory()
 		{
 			m_desc.reset();
 			m_bCreated = GAIA::False;
 		}
-		GINL HTMLFactory::~HTMLFactory()
+		GINL HtmlFactory::~HtmlFactory()
 		{
 			if(this->IsCreated())
 				this->Destroy();
 		}
-		GINL GAIA::BL HTMLFactory::Create(const HTMLFactoryDesc& desc)
+		GINL GAIA::BL HtmlFactory::Create(const HtmlFactoryDesc& desc)
 		{
 			GAST(!this->IsCreated());
 			if(this->IsCreated())
@@ -36,7 +36,7 @@ namespace GAIA
 			m_bCreated = GAIA::True;
 			return GAIA::True;
 		}
-		GINL GAIA::BL HTMLFactory::Destroy()
+		GINL GAIA::BL HtmlFactory::Destroy()
 		{
 			GAST(this->IsCreated());
 			if(!this->IsCreated())
@@ -45,23 +45,23 @@ namespace GAIA
 			m_strpool.destroy();
 			m_sstrpool.destroy();
 			m_NodePool.destroy();
-			m_HTMLPool.destroy();
+			m_HtmlPool.destroy();
 			m_bCreated = GAIA::False;
 			return GAIA::True;
 		}
-		GINL GAIA::BL HTMLFactory::IsCreated() const
+		GINL GAIA::BL HtmlFactory::IsCreated() const
 		{
 			return m_bCreated;
 		}
-		GINL const HTMLFactoryDesc& HTMLFactory::GetDesc() const
+		GINL const HtmlFactoryDesc& HtmlFactory::GetDesc() const
 		{
 			GAST(this->IsCreated());
 			return m_desc;
 		}
-		GINL HTMLNode& HTMLFactory::CreateNode()
+		GINL HtmlNode& HtmlFactory::CreateNode()
 		{
 			GAST(this->IsCreated());
-			HTMLNode* pNode;
+			HtmlNode* pNode;
 			if(m_desc.bObjectPoolEnable)
 			{
 				if(m_desc.bThreadSafe)
@@ -73,30 +73,30 @@ namespace GAIA
 					pNode = m_NodePool.alloc();
 			}
 			else
-				pNode = gnew HTMLNode;
+				pNode = gnew HtmlNode;
 			pNode->SetFactory(this);
 			return *pNode;
 		}
-		GINL HTML& HTMLFactory::CreateHTML()
+		GINL Html& HtmlFactory::CreateHtml()
 		{
 			GAST(this->IsCreated());
-			HTML* pHTML;
+			Html* pHtml;
 			if(m_desc.bObjectPoolEnable)
 			{
 				if(m_desc.bThreadSafe)
 				{
-					GAIA::SYNC::AutolockW al(m_rwHTMLPool);
-					pHTML = m_HTMLPool.alloc();
+					GAIA::SYNC::AutolockW al(m_rwHtmlPool);
+					pHtml = m_HtmlPool.alloc();
 				}
 				else
-					pHTML = m_HTMLPool.alloc();
+					pHtml = m_HtmlPool.alloc();
 			}
 			else
-				pHTML = gnew HTML;
-			pHTML->SetFactory(this);
-			return *pHTML;
+				pHtml = gnew Html;
+			pHtml->SetFactory(this);
+			return *pHtml;
 		}
-		GINL GAIA::BL HTMLFactory::ReleaseNode(HTMLNode& node)
+		GINL GAIA::BL HtmlFactory::ReleaseNode(HtmlNode& node)
 		{
 			GAST(node.GetFactory() == this);
 			if(node.GetFactory() != this)
@@ -119,7 +119,7 @@ namespace GAIA
 				gdel &node;
 			return GAIA::True;
 		}
-		GINL GAIA::BL HTMLFactory::ReleaseHTML(HTML& html)
+		GINL GAIA::BL HtmlFactory::ReleaseHtml(Html& html)
 		{
 			GAST(html.GetFactory() == this);
 			if(html.GetFactory() != this)
@@ -132,17 +132,17 @@ namespace GAIA
 			{
 				if(m_desc.bThreadSafe)
 				{
-					GAIA::SYNC::AutolockW al(m_rwHTMLPool);
-					m_HTMLPool.release(&html);
+					GAIA::SYNC::AutolockW al(m_rwHtmlPool);
+					m_HtmlPool.release(&html);
 				}
 				else
-					m_HTMLPool.release(&html);
+					m_HtmlPool.release(&html);
 			}
 			else
 				gdel &html;
 			return GAIA::True;
 		}
-		GINL const GAIA::TCH* HTMLFactory::AllocString(const GAIA::TCH* psz)
+		GINL const GAIA::TCH* HtmlFactory::AllocString(const GAIA::TCH* psz)
 		{
 			GAST(psz != GNIL);
 			GAST(this->IsCreated());
@@ -159,7 +159,7 @@ namespace GAIA
 			else
 				return GAIA::ALGO::gstrnew(psz);
 		}
-		GINL GAIA::BL HTMLFactory::ReleaseString(const GAIA::TCH* psz)
+		GINL GAIA::BL HtmlFactory::ReleaseString(const GAIA::TCH* psz)
 		{
 			GAST(psz != GNIL);
 			GAST(this->IsCreated());
@@ -177,7 +177,7 @@ namespace GAIA
 				gdel[] psz;
 			return GAIA::True;
 		}
-		GINL const GAIA::TCH* HTMLFactory::AllocStaticString(const GAIA::TCH* psz)
+		GINL const GAIA::TCH* HtmlFactory::AllocStaticString(const GAIA::TCH* psz)
 		{
 			GAST(psz != GNIL);
 			GAST(this->IsCreated());
@@ -194,7 +194,7 @@ namespace GAIA
 			else
 				return GAIA::ALGO::gstrnew(psz);
 		}
-		GINL GAIA::BL HTMLFactory::ReleaseStaticString(const GAIA::TCH* psz)
+		GINL GAIA::BL HtmlFactory::ReleaseStaticString(const GAIA::TCH* psz)
 		{
 			GAST(psz != GNIL);
 			GAST(this->IsCreated());

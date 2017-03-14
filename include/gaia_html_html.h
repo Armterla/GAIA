@@ -32,20 +32,20 @@ namespace GAIA
 {
 	namespace HTML
 	{
-		class HTML : public HTMLFactoryHolder
+		class Html : public HtmlFactoryHolder
 		{
 		public:
 			class Cursor : public GAIA::Base
 			{
-				friend class HTML;
+				friend class Html;
 			public:
 				GINL Cursor(){pCurrentNode = GNIL;}
 			private:
-				HTMLNode* pCurrentNode;
+				HtmlNode* pCurrentNode;
 			};
 		public:
-			GINL HTML();
-			GINL ~HTML();
+			GINL Html();
+			GINL ~Html();
 
 			GINL GAIA::GVOID Reset();
 
@@ -54,25 +54,25 @@ namespace GAIA
 			GINL GAIA::BL LoadFromMem(const GAIA::TCH* pszSrc, const GAIA::NUM& sSize);
 			GINL GAIA::BL SaveToMem(GAIA::TCH* pszDst, const GAIA::NUM& sSize, GAIA::HTML::HTML_SAVE st = GAIA::HTML::HTML_SAVE_BESTREAD);
 
-			GINL HTMLNode& GetRootNode();
-			GINL const HTMLNode& GetRootNode() const;
+			GINL HtmlNode& GetRootNode();
+			GINL const HtmlNode& GetRootNode() const;
 
-			GINL GAIA::BL BeginWriteNode(GAIA::HTML::HTML::Cursor& cur, GAIA::HTML::HTML_NODE nt, const GAIA::TCH* pszNodeName);
-			GINL GAIA::BL EndWriteNode(GAIA::HTML::HTML::Cursor& cur);
-			GINL GAIA::BL WriteNode(GAIA::HTML::HTML::Cursor& cur, GAIA::HTML::HTML_NODE nt, const GAIA::TCH* pszNodeName);
+			GINL GAIA::BL BeginWriteNode(GAIA::HTML::Html::Cursor& cur, GAIA::HTML::HTML_NODE nt, const GAIA::TCH* pszNodeName);
+			GINL GAIA::BL EndWriteNode(GAIA::HTML::Html::Cursor& cur);
+			GINL GAIA::BL WriteNode(GAIA::HTML::Html::Cursor& cur, GAIA::HTML::HTML_NODE nt, const GAIA::TCH* pszNodeName);
 
-			GINL const GAIA::TCH* BeginReadNode(GAIA::HTML::HTML::Cursor& cur) const;
-			GINL GAIA::BL EndReadNode(GAIA::HTML::HTML::Cursor& cur) const;
-			GINL const GAIA::TCH* ReadNode(GAIA::HTML::HTML::Cursor& cur) const;
+			GINL const GAIA::TCH* BeginReadNode(GAIA::HTML::Html::Cursor& cur) const;
+			GINL GAIA::BL EndReadNode(GAIA::HTML::Html::Cursor& cur) const;
+			GINL const GAIA::TCH* ReadNode(GAIA::HTML::Html::Cursor& cur) const;
 
 		private:
 			GINL GAIA::GVOID write_linebreak(GAIA::HTML::HTML_SAVE st, GAIA::FSYS::FileBase& f);
-			GINL GAIA::GVOID write_indent(GAIA::HTML::HTMLNode& n, GAIA::HTML::HTML_SAVE st, GAIA::FSYS::FileBase& f);
+			GINL GAIA::GVOID write_indent(GAIA::HTML::HtmlNode& n, GAIA::HTML::HTML_SAVE st, GAIA::FSYS::FileBase& f);
 			GINL GAIA::GVOID write_string(GAIA::HTML::HTML_SAVE st, GAIA::FSYS::FileBase& f, const GAIA::CH* p, GAIA::NUM sLen = GINVALID);
 			GINL GAIA::GVOID write_string(GAIA::HTML::HTML_SAVE st, GAIA::FSYS::FileBase& f, const GAIA::WCH* p, GAIA::NUM sLen = GINVALID);
-			GINL GAIA::GVOID save_node(GAIA::HTML::HTMLNode& n, GAIA::HTML::HTML_SAVE st, GAIA::FSYS::FileBase& f);
-			GINL GAIA::GVOID save_child_node(GAIA::HTML::HTMLNode& n, GAIA::HTML::HTML_SAVE st, GAIA::FSYS::FileBase& f);
-			GINL GAIA::GVOID save_child_node_value(GAIA::HTML::HTMLNode& n, GAIA::HTML::HTML_SAVE st, GAIA::FSYS::FileBase& f);
+			GINL GAIA::GVOID save_node(GAIA::HTML::HtmlNode& n, GAIA::HTML::HTML_SAVE st, GAIA::FSYS::FileBase& f);
+			GINL GAIA::GVOID save_child_node(GAIA::HTML::HtmlNode& n, GAIA::HTML::HTML_SAVE st, GAIA::FSYS::FileBase& f);
+			GINL GAIA::GVOID save_child_node_value(GAIA::HTML::HtmlNode& n, GAIA::HTML::HTML_SAVE st, GAIA::FSYS::FileBase& f);
 			GINL GAIA::NUM load_node(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::HTML::HTML_NODE& nt, GAIA::U8*& pBegin, GAIA::U8*& pEnd, GAIA::BL& bBegin) const;
 			GINL GAIA::NUM load_head(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::NUM sOffset, GAIA::NUM& sNext) const;
 			GINL GAIA::NUM load_comment(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::NUM sOffset, GAIA::NUM& sNext) const;
@@ -82,7 +82,7 @@ namespace GAIA
 			GINL GAIA::GVOID read_string(const GAIA::U8* pBegin, const GAIA::U8* pEnd, GAIA::CTN::WString& strResult) const;
 
 		private:
-			GAIA::HTML::HTMLNode m_root;
+			GAIA::HTML::HtmlNode m_root;
 			GAIA::CTN::AString m_strTempA;
 			GAIA::CTN::WString m_strTempW;
 		};

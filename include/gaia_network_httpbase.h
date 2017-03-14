@@ -538,6 +538,8 @@ namespace GAIA
 
 			@remarks This class support URL format like this :
 				"protocol://hostname[:port]/path[/path1][/][;parameters][?query][#fragment]".
+
+			@warning HttpURL is not a thread-safe class.
 		*/
 		class HttpURL : public GAIA::Base
 		{
@@ -1352,6 +1354,8 @@ namespace GAIA
 
 		/*!
 			@brief Http request heads management class.
+
+			@warning HttpHead is not a thread-safe class.
 		*/
 		class HttpHead : public GAIA::Base
 		{

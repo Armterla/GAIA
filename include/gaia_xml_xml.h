@@ -31,20 +31,20 @@ namespace GAIA
 {
 	namespace XML
 	{
-		class XML : public XMLFactoryHolder
+		class Xml : public XmlFactoryHolder
 		{
 		public:
 			class Cursor : public GAIA::Base
 			{
-				friend class XML;
+				friend class Xml;
 			public:
 				GINL Cursor(){pCurrentNode = GNIL;}
 			private:
-				XMLNode* pCurrentNode;
+				XmlNode* pCurrentNode;
 			};
 		public:
-			GINL XML();
-			GINL ~XML();
+			GINL Xml();
+			GINL ~Xml();
 
 			GINL GAIA::GVOID Reset();
 
@@ -53,25 +53,25 @@ namespace GAIA
 			GINL GAIA::BL LoadFromMem(const GAIA::TCH* pszSrc, const GAIA::NUM& sSize);
 			GINL GAIA::BL SaveToMem(GAIA::TCH* pszDst, const GAIA::NUM& sSize, GAIA::XML::XML_SAVE st = GAIA::XML::XML_SAVE_BESTREAD);
 
-			GINL XMLNode& GetRootNode();
-			GINL const XMLNode& GetRootNode() const;
+			GINL XmlNode& GetRootNode();
+			GINL const XmlNode& GetRootNode() const;
 
-			GINL GAIA::BL BeginWriteNode(GAIA::XML::XML::Cursor& cur, GAIA::XML::XML_NODE nt, const GAIA::TCH* pszNodeName);
-			GINL GAIA::BL EndWriteNode(GAIA::XML::XML::Cursor& cur);
-			GINL GAIA::BL WriteNode(GAIA::XML::XML::Cursor& cur, GAIA::XML::XML_NODE nt, const GAIA::TCH* pszNodeName);
+			GINL GAIA::BL BeginWriteNode(GAIA::XML::Xml::Cursor& cur, GAIA::XML::XML_NODE nt, const GAIA::TCH* pszNodeName);
+			GINL GAIA::BL EndWriteNode(GAIA::XML::Xml::Cursor& cur);
+			GINL GAIA::BL WriteNode(GAIA::XML::Xml::Cursor& cur, GAIA::XML::XML_NODE nt, const GAIA::TCH* pszNodeName);
 
-			GINL const GAIA::TCH* BeginReadNode(GAIA::XML::XML::Cursor& cur) const;
-			GINL GAIA::BL EndReadNode(GAIA::XML::XML::Cursor& cur) const;
-			GINL const GAIA::TCH* ReadNode(GAIA::XML::XML::Cursor& cur) const;
+			GINL const GAIA::TCH* BeginReadNode(GAIA::XML::Xml::Cursor& cur) const;
+			GINL GAIA::BL EndReadNode(GAIA::XML::Xml::Cursor& cur) const;
+			GINL const GAIA::TCH* ReadNode(GAIA::XML::Xml::Cursor& cur) const;
 
 		private:
 			GINL GAIA::GVOID write_linebreak(GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f);
-			GINL GAIA::GVOID write_indent(GAIA::XML::XMLNode& n, GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f);
+			GINL GAIA::GVOID write_indent(GAIA::XML::XmlNode& n, GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f);
 			GINL GAIA::GVOID write_string(GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f, const GAIA::CH* p, GAIA::NUM sLen = GINVALID);
 			GINL GAIA::GVOID write_string(GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f, const GAIA::WCH* p, GAIA::NUM sLen = GINVALID);
-			GINL GAIA::GVOID save_node(GAIA::XML::XMLNode& n, GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f);
-			GINL GAIA::GVOID save_child_node(GAIA::XML::XMLNode& n, GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f);
-			GINL GAIA::GVOID save_child_node_value(GAIA::XML::XMLNode& n, GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f);
+			GINL GAIA::GVOID save_node(GAIA::XML::XmlNode& n, GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f);
+			GINL GAIA::GVOID save_child_node(GAIA::XML::XmlNode& n, GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f);
+			GINL GAIA::GVOID save_child_node_value(GAIA::XML::XmlNode& n, GAIA::XML::XML_SAVE st, GAIA::FSYS::FileBase& f);
 			GINL GAIA::NUM load_node(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::XML::XML_NODE& nt, GAIA::U8*& pBegin, GAIA::U8*& pEnd, GAIA::BL& bBegin) const;
 			GINL GAIA::NUM load_head(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::NUM sOffset, GAIA::NUM& sNext) const;
 			GINL GAIA::NUM load_comment(GAIA::U8* pBuf, GAIA::NUM sSize, GAIA::NUM sOffset, GAIA::NUM& sNext) const;
@@ -81,7 +81,7 @@ namespace GAIA
 			GINL GAIA::GVOID read_string(const GAIA::U8* pBegin, const GAIA::U8* pEnd, GAIA::CTN::WString& strResult) const;
 
 		private:
-			GAIA::XML::XMLNode m_root;
+			GAIA::XML::XmlNode m_root;
 			GAIA::CTN::AString m_strTempA;
 			GAIA::CTN::WString m_strTempW;
 		};

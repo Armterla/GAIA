@@ -250,16 +250,16 @@ namespace GAIA
 			GAIA::BL m_bClosed;
 		};
 
-		class HttpAsyncDispatcher : public GAIA::NETWORK::AsyncDispatcher
+		class HttpServerAsyncDispatcher : public GAIA::NETWORK::AsyncDispatcher
 		{
 		public:
-			HttpAsyncDispatcher(GAIA::NETWORK::HttpServer& svr)
+			HttpServerAsyncDispatcher(GAIA::NETWORK::HttpServer& svr)
 			{
 				this->init();
 				m_pSvr = &svr;
 			}
 
-			~HttpAsyncDispatcher()
+			~HttpServerAsyncDispatcher()
 			{
 			}
 
@@ -878,11 +878,11 @@ namespace GAIA
 
 		HttpServer::HttpServer()
 		{
-			GAST(HTTP_METHOD_MAXENUMCOUNT == sizeofarray(GAIA::NETWORK::HTTP_METHOD_STRING));
-			GAST(HTTP_CODE_MAXENUMCOUNT == sizeofarray(GAIA::NETWORK::HTTP_CODE_STRING));
-			GAST(HTTP_CODE_MAXENUMCOUNT == sizeofarray(GAIA::NETWORK::HTTP_CODE_LIST));
-			GAST(HTTP_CODE_MAXENUMCOUNT == sizeofarray(GAIA::NETWORK::HTTP_CODE_VALUE));
-			GAST(HTTP_CODE_MAXENUMCOUNT == sizeofarray(GAIA::NETWORK::HTTP_CODE_DESCRIPTION));
+			GAST(GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT == sizeofarray(GAIA::NETWORK::HTTP_METHOD_STRING));
+			GAST(GAIA::NETWORK::HTTP_CODE_MAXENUMCOUNT == sizeofarray(GAIA::NETWORK::HTTP_CODE_STRING));
+			GAST(GAIA::NETWORK::HTTP_CODE_MAXENUMCOUNT == sizeofarray(GAIA::NETWORK::HTTP_CODE_LIST));
+			GAST(GAIA::NETWORK::HTTP_CODE_MAXENUMCOUNT == sizeofarray(GAIA::NETWORK::HTTP_CODE_VALUE));
+			GAST(GAIA::NETWORK::HTTP_CODE_MAXENUMCOUNT == sizeofarray(GAIA::NETWORK::HTTP_CODE_DESCRIPTION));
 			this->init();
 		}
 
@@ -967,7 +967,7 @@ namespace GAIA
 				return GAIA::False;
 
 			// Create async dispatcher.
-			m_disp = gnew HttpAsyncDispatcher(*this);
+			m_disp = gnew HttpServerAsyncDispatcher(*this);
 			GAIA::NETWORK::AsyncDispatcherDesc descDisp;
 			descDisp.reset();
 			descDisp.sThreadCount = desc.sNetworkThreadCount;

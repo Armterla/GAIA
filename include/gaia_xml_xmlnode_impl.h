@@ -9,7 +9,7 @@ namespace GAIA
 {
 	namespace XML
 	{
-		GINL XMLNode::XMLNode()
+		GINL XmlNode::XmlNode()
 		{
 			m_nt = GAIA::XML::XML_NODE_MULTICONTAINER;
 			m_pszName = GNIL;
@@ -17,22 +17,22 @@ namespace GAIA
 			m_pParent = GNIL;
 			m_sParentIndex = GINVALID;
 		}
-		GINL XMLNode::~XMLNode()
+		GINL XmlNode::~XmlNode()
 		{
 			this->Reset();
 		}
-		GINL GAIA::GVOID XMLNode::Reset()
+		GINL GAIA::GVOID XmlNode::Reset()
 		{
 			this->SetType(GAIA::XML::XML_NODE_INVALID);
 			this->SetName(GNIL);
 			this->DeleteChildAll();
 			this->SetParent(GNIL);
 		}
-		GINL GAIA::BL XMLNode::IsRoot() const
+		GINL GAIA::BL XmlNode::IsRoot() const
 		{
 			return m_bRoot;
 		}
-		GINL GAIA::GVOID XMLNode::SetType(GAIA::XML::XML_NODE nt)
+		GINL GAIA::GVOID XmlNode::SetType(GAIA::XML::XML_NODE nt)
 		{
 			if(m_bRoot)
 			{
@@ -46,13 +46,13 @@ namespace GAIA
 			}
 			m_nt = nt;
 		}
-		GINL GAIA::XML::XML_NODE XMLNode::GetType() const
+		GINL GAIA::XML::XML_NODE XmlNode::GetType() const
 		{
 			return m_nt;
 		}
-		GINL GAIA::GVOID XMLNode::SetName(const GAIA::TCH* pszName)
+		GINL GAIA::GVOID XmlNode::SetName(const GAIA::TCH* pszName)
 		{
-			GAIA::XML::XMLFactory* pFactory = this->GetFactory();
+			GAIA::XML::XmlFactory* pFactory = this->GetFactory();
 			if(GAIA::ALGO::gstrcmpnil(m_pszName, pszName) == 0)
 				return;
 			if(pszName == GNIL)
@@ -70,11 +70,11 @@ namespace GAIA
 			else
 				m_pszName = pFactory->AllocStaticString(pszName);
 		}
-		GINL const GAIA::TCH* XMLNode::GetName() const
+		GINL const GAIA::TCH* XmlNode::GetName() const
 		{
 			return m_pszName;
 		}
-		GINL GAIA::NUM XMLNode::InsertChild(XMLNode& node, GAIA::NUM sIndex)
+		GINL GAIA::NUM XmlNode::InsertChild(XmlNode& node, GAIA::NUM sIndex)
 		{
 			if(m_nt == GAIA::XML::XML_NODE_VALUE)
 				return GINVALID;
@@ -119,11 +119,11 @@ namespace GAIA
 			}
 			return node.GetParentIndex();
 		}
-		GINL GAIA::BL XMLNode::DeleteChild(const GAIA::NUM& sIndex)
+		GINL GAIA::BL XmlNode::DeleteChild(const GAIA::NUM& sIndex)
 		{
 			if(sIndex >= m_childs.size())
 				return GAIA::False;
-			GAIA::XML::XMLNode* pChild = m_childs[sIndex];
+			GAIA::XML::XmlNode* pChild = m_childs[sIndex];
 			if(pChild == GNIL)
 				return GAIA::False;
 			if(pChild->GetFactory() != GNIL)
@@ -133,11 +133,11 @@ namespace GAIA
 			m_childs[sIndex] = GNIL;
 			return GAIA::True;
 		}
-		GINL GAIA::GVOID XMLNode::DeleteChildAll()
+		GINL GAIA::GVOID XmlNode::DeleteChildAll()
 		{
 			for(GAIA::NUM x = 0; x < m_childs.size(); ++x)
 			{
-				GAIA::XML::XMLNode* pChild = m_childs[x];
+				GAIA::XML::XmlNode* pChild = m_childs[x];
 				if(pChild == GNIL)
 					continue;
 				if(pChild->GetFactory() != GNIL)
@@ -148,15 +148,15 @@ namespace GAIA
 			m_childs.clear();
 			m_freestack.clear();
 		}
-		GINL GAIA::NUM XMLNode::GetChildCount() const
+		GINL GAIA::NUM XmlNode::GetChildCount() const
 		{
 			return m_childs.size();
 		}
-		GINL XMLNode* XMLNode::GetChild(const GAIA::NUM& nIndex) const
+		GINL XmlNode* XmlNode::GetChild(const GAIA::NUM& nIndex) const
 		{
 			return m_childs[nIndex];
 		}
-		GINL GAIA::NUM XMLNode::SetParent(XMLNode* pParent)
+		GINL GAIA::NUM XmlNode::SetParent(XmlNode* pParent)
 		{
 			if(m_pParent == pParent)
 				return this->GetParentIndex();
@@ -177,14 +177,14 @@ namespace GAIA
 			}
 			return GINVALID;
 		}
-		GINL XMLNode* XMLNode::GetParent() const
+		GINL XmlNode* XmlNode::GetParent() const
 		{
 			return m_pParent;
 		}
-		GINL GAIA::NUM XMLNode::GetDepth() const
+		GINL GAIA::NUM XmlNode::GetDepth() const
 		{
 			GAIA::NUM sDepth = 0;
-			const XMLNode* pNode = this;
+			const XmlNode* pNode = this;
 			while(pNode->m_pParent != GNIL)
 			{
 				sDepth++;
@@ -192,15 +192,15 @@ namespace GAIA
 			}
 			return sDepth;
 		}
-		GINL GAIA::NUM XMLNode::GetParentIndex() const
+		GINL GAIA::NUM XmlNode::GetParentIndex() const
 		{
 			return m_sParentIndex;
 		}
-		GINL GAIA::GVOID XMLNode::SetRoot(GAIA::BL bRoot)
+		GINL GAIA::GVOID XmlNode::SetRoot(GAIA::BL bRoot)
 		{
 			m_bRoot = bRoot;
 		}
-		GINL GAIA::GVOID XMLNode::SetParentIndex(GAIA::NUM sIndex)
+		GINL GAIA::GVOID XmlNode::SetParentIndex(GAIA::NUM sIndex)
 		{
 			m_sParentIndex = sIndex;
 		}

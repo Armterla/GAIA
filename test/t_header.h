@@ -113,11 +113,27 @@ namespace TEST
 	extern GAIA::GVOID t_fsys_memfile(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_fsys_dir(GAIA::LOG::Log& logobj);
 
+	extern GAIA::GVOID t_xml_xmlreader(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_xml_xmlwriter(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_xml_xml(GAIA::LOG::Log& logobj);
+
 	extern GAIA::GVOID t_html_html(GAIA::LOG::Log& logobj);
+
+	extern GAIA::GVOID t_json_jsonreader(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_json_jsonwriter(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_json_json(GAIA::LOG::Log& logobj);
 
 	extern GAIA::GVOID t_log_log(GAIA::LOG::Log& logobj);
+
+	extern GAIA::GVOID t_digit_regexp(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_digit_base64(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_digit_rc4(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_digit_aes(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_digit_rsa(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_digit_md5(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_digit_sha1(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_digit_diff(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_digit_zip(GAIA::LOG::Log& logobj);
 
 	extern GAIA::GVOID t_db_local(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_db_remote(GAIA::LOG::Log& logobj);
@@ -129,15 +145,6 @@ namespace TEST
 	extern GAIA::GVOID t_network_httpbase(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_network_httpserver(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_network_http(GAIA::LOG::Log& logobj);
-
-	extern GAIA::GVOID t_digit_regexp(GAIA::LOG::Log& logobj);
-	extern GAIA::GVOID t_digit_base64(GAIA::LOG::Log& logobj);
-	extern GAIA::GVOID t_digit_rc4(GAIA::LOG::Log& logobj);
-	extern GAIA::GVOID t_digit_rsa(GAIA::LOG::Log& logobj);
-	extern GAIA::GVOID t_digit_md5(GAIA::LOG::Log& logobj);
-	extern GAIA::GVOID t_digit_sha1(GAIA::LOG::Log& logobj);
-	extern GAIA::GVOID t_digit_diff(GAIA::LOG::Log& logobj);
-	extern GAIA::GVOID t_digit_zip(GAIA::LOG::Log& logobj);
 
 	extern GAIA::GVOID t_locale(GAIA::LOG::Log& logobj);
 
@@ -272,11 +279,25 @@ namespace TEST
 			TITEM("File: File test begin!"); t_fsys_file(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("File: MemFile test begin!"); t_fsys_memfile(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("File: Dir test begin!"); t_fsys_dir(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("File: XML test begin!"); t_xml_xml(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("File: HTML test begin!"); t_html_html(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("File: Json test begin!"); t_json_json(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("XML: XMLReader test begin!"); t_xml_xmlreader(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("XML: XMLWriter test begin!"); t_xml_xmlwriter(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("XML: XML test begin!"); t_xml_xml(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("HTML: HTML test begin!"); t_html_html(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Json: JsonReader test begin!"); t_json_jsonreader(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Json: JsonWriter test begin!"); t_json_jsonwriter(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Json: Json test begin!"); t_json_json(logobj); TITEM("End"); TTEXT("\t");
 			
 			TITEM("Log: Log test begin!"); t_log_log(logobj); TITEM("End"); TTEXT("\t");
+
+			TITEM("Digit: RegExp test begin!"); t_digit_regexp(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Digit: Base64 test begin!"); t_digit_base64(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Digit: RC4 test begin!"); t_digit_rc4(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Digit: AES test begin!"); t_digit_aes(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Digit: RSA test begin!"); t_digit_rsa(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Digit: MD5 test begin!"); t_digit_md5(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Digit: SHA1 test begin!"); t_digit_sha1(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Digit: Diff test begin!"); t_digit_diff(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Digit: Zip test begin!"); t_digit_zip(logobj); TITEM("End"); TTEXT("\t");
 
 			TITEM("Network: DBLocal test begin!"); t_db_local(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Network: DBRemote test begin!"); t_db_remote(logobj); TITEM("End"); TTEXT("\t");
@@ -288,15 +309,6 @@ namespace TEST
 			TITEM("Network: Network http base test begin!"); t_network_httpbase(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Network: Network http server test begin!"); t_network_httpserver(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Network: Network http test begin!"); t_network_http(logobj); TITEM("End"); TTEXT("\t");
-
-			TITEM("Digit: RegExp test begin!"); t_digit_regexp(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("Digit: Base64 test begin!"); t_digit_base64(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("Digit: RC4 test begin!"); t_digit_rc4(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("Digit: RSA test begin!"); t_digit_rsa(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("Digit: MD5 test begin!"); t_digit_md5(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("Digit: SHA1 test begin!"); t_digit_sha1(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("Digit: Diff test begin!"); t_digit_diff(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("Digit: Zip test begin!"); t_digit_zip(logobj); TITEM("End"); TTEXT("\t");
 
 			TITEM("Locale test begin!"); t_locale(logobj); TITEM("End"); TTEXT("\t");
 
