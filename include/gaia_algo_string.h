@@ -399,6 +399,20 @@ namespace GAIA
 			GAST(!!p2);
 			return GAIA::ALGO::gstricmp(p1, p2) == 0;
 		}
+		template<typename _DataType1, typename _DataType2, typename _SizeType>
+		GAIA::BL gstrequal(_DataType1 p1, _DataType2 p2, _SizeType size)
+		{
+			GAST(!!p1);
+			GAST(!!p2);
+			return GAIA::ALGO::gstrcmp(p1, p2, size) == 0;
+		}
+		template<typename _DataType1, typename _DataType2, typename _SizeType>
+		GAIA::BL gstriequal(_DataType1 p1, _DataType2 p2, _SizeType size)
+		{
+			GAST(!!p1);
+			GAST(!!p2);
+			return GAIA::ALGO::gstricmp(p1, p2, size) == 0;
+		}
 		template<typename _DataType1, typename _DataType2>
 		_DataType1 gstrstr(_DataType1 p1, _DataType2 p2)
 		{
