@@ -163,7 +163,6 @@ namespace GAIA
 							if(!m_bFirstNode)
 								this->write(",", sizeof(",") - 1);
 							this->write("{", sizeof("{") - 1);
-
 						}
 						else
 						{
@@ -187,7 +186,6 @@ namespace GAIA
 								this->write(pszNodeName, nodenamelen);
 								this->write("\":{", sizeof("\":{") - 1);
 							}
-
 						}
 					}
 					break;
@@ -250,14 +248,10 @@ namespace GAIA
 				switch(m_LastCNT[m_CNTCursor])
 				{
 				case GAIA::JSON::JSON_NODE_CONTAINER:
-					{
-						this->write("}", sizeof("}") - 1);
-					}
+					this->write("}", sizeof("}") - 1);
 					break;
 				case GAIA::JSON::JSON_NODE_MULTICONTAINER:
-					{
-						this->write("]", sizeof("]") - 1);
-					}
+					this->write("]", sizeof("]") - 1);
 					break;
 				case GAIA::JSON::JSON_NODE_NAME:
 					GASTFALSE;
