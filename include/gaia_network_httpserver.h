@@ -32,9 +32,9 @@ namespace GAIA
 		/*!
 			@brief HttpServer's access mode.
 
-				If you set HttpServer use BLACK mode, all requests in BLACK list will be deny.
-				If you set HttpServer use WHITE mode, all requests not in WHITE list will be deny.
-				If you set HttpServer use NONE mode, all requests will be accepted.
+				If you set HttpServer use BLACK mode, all requests in BLACK list will be deny.\n
+				If you set HttpServer use WHITE mode, all requests not in WHITE list will be deny.\n
+				If you set HttpServer use NONE mode, all requests will be accepted.\n
 		*/
 		GAIA_ENUM_BEGIN(HTTP_SERVER_BLACKWHITE_MODE)
 			/*!
@@ -613,9 +613,9 @@ namespace GAIA
 				@param Specify the second operator for compare.
 
 				@return 
-					If current HttpServerLink below paramter src, return -1.
-					If current HttpServerLink equal paramter src, return 0.
-					If current HttpServerLink above param src, return +1.
+					If current HttpServerLink below paramter src, return -1.\n
+					If current HttpServerLink equal paramter src, return 0.\n
+					If current HttpServerLink above param src, return +1.\n
 			*/
 			GINL GAIA::N32 compare(const HttpServerLink& src) const
 			{
@@ -661,13 +661,13 @@ namespace GAIA
 			@remarks
 				The HttpServer's user have responsibility to derive a sub class from HttpServerCallBack,
 				and the sub class's OnRequest virtual function will be called by HttpServer, the user 
-				will get client request information in OnRequest virtual function.
+				will get client request information in OnRequest virtual function.\n
 
 				Current class derived from GAIA::RefObject, so the object will be managed by thread-safe 
-				reference count.
+				reference count.\n
 
 				If you not need use this class's object later, and the class is allocated in Heap,
-				You will call GAIA::RefObject::drop_ref() to decrease the reference count.
+				You will call GAIA::RefObject::drop_ref() to decrease the reference count.\n
 		*/
 		class HttpServerCallBack : public GAIA::RefObject
 		{
@@ -731,12 +731,11 @@ namespace GAIA
 					If the request is be dispatched by the HttpServerCallBack's sub class(HttpServer's user derived),
 					HttpServer's user will return GAIA::True, and then HttpServer will 
 					not callback next HttpServerCallBack's OnRequest which be registed to 
-					HttpServer(By HttpServer::RegistCallBack).
+					HttpServer(By HttpServer::RegistCallBack).\n
 
 					If the request can't be dispatched by current HttpServerCallBack's sub class(HttpServer's user derived),
 					HttpServer's user will return GAIA::False, and then HttpServer will
-					 callback next HttpServerCallBack's OnRequest member function.
-					
+					callback next HttpServerCallBack's OnRequest member function.\n
 
 				@remarks
 					This function will be callbacked on multi thread.
@@ -1189,11 +1188,11 @@ namespace GAIA
 
 				@remarks
 					Cache is managed by reference count, call this function will cause reference count increase 1,
-					when a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.
+					when a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.\n
 
 					If current function return GAIA::True, current function will lock cache system's read-lock,
 					the HttpServer's user have responsibility to call HttpServer::ReleaseCache to release it(decrease reference count).
-					If not do it like above, the HttpServer will deadlock or memory leak.
+					If not do it like above, the HttpServer will deadlock or memory leak.\n
 			*/
 			GAIA::BL RequestCache(const GAIA::CH* pszKey, GAIA::NUM sKeyLen, GAIA::NETWORK::HttpHead& resphead, GAIA::GVOID** p, GAIA::NUM& sSize);
 
@@ -1217,11 +1216,11 @@ namespace GAIA
 
 				@remarks
 					Cache is managed by reference count, call this function will cause reference count increase 1,
-					when a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.
+					when a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.\n
 
 					If current function return GAIA::True, current function will lock cache system's read-lock,
 					the HttpServer's user have responsibility to call HttpServer::ReleaseCache to release it(decrease reference count).
-					If not do it like above, the HttpServer will deadlock or memory leak.
+					If not do it like above, the HttpServer will deadlock or memory leak.\n
 			*/
 			GAIA::BL RequestCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& reqhead, GAIA::NETWORK::HttpHead& resphead, GAIA::GVOID** p, GAIA::NUM& sSize);
 
@@ -1238,10 +1237,10 @@ namespace GAIA
 
 				@remarks
 					Cache is managed by reference count, call this function will cause reference count decrease 1,
-					When a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.
+					When a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.\n
 
 					If current function return GAIA::True, current function had release the cache system's read-lock
-					which is locked by HttpServer::RequestCache.
+					which is locked by HttpServer::RequestCache.\n
 			*/
 			GAIA::BL ReleaseCache(const GAIA::CH* pszKey, GAIA::NUM sKeyLen);
 
@@ -1257,10 +1256,10 @@ namespace GAIA
 
 				@remarks
 					Cache is managed by reference count, call this function will cause reference count decrease 1,
-					When a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.
+					When a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.\n
 
 					If current function return GAIA::True, current function had release the cache system's read-lock
-					which is locked by HttpServer::RequestCache.
+					which is locked by HttpServer::RequestCache.\n
 			*/
 			GAIA::BL ReleaseCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& reqhead);
 
