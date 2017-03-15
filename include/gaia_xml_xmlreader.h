@@ -10,6 +10,332 @@ namespace GAIA
 {
 	namespace XML
 	{
+		static const GAIA::U8 ascii_xml_validchar[128] =
+		{
+			/* 1-8 */
+			0	, //	'\0'	NUL(null)
+			0	, //			SOH(start of headline)
+			0	, //			STX(start of text)
+			0	, //			ETX(end of text)
+			0	, //			EOT(end of transmission)
+			0	, //			ENQ(enquiry)
+			0	, //			ACK(acknowledge)
+			0	, //			BEL(bell)
+
+			/* 9-16 */
+			0	, //			BS(backspace)
+			0	, //			HT(horizontal tab)
+			0	, //	'\n'	LF(NL line feed, new line)
+			0	, //			VT(vertical tab)
+			0	, //			FF(NP form feed, new page)
+			0	, //	'\r'	CR(carriage return)
+			0	, //			SO(shift out)
+			0	, //			SI(shift in)
+
+			/* 17-24 */
+			0	, //			DLE(data link escape)
+			0	, //			DC1(device control 1)
+			0	, //			DC2(device control 2)
+			0	, //			DC3(device control 3)
+			0	, //			DC4(device control 4)
+			0	, //			NAK(negative acknowledge)
+			0	, //			SYN(synchronous idle)
+			0	, //			ETB(end of trans. block)
+
+			/* 25-32 */
+			0	, //			CAN(cancel)
+			0	, //			EM(end of medium)
+			0	, //			SUB(substitute)
+			0	, //			ESC(escape)
+			0	, //			FS(file separator)
+			0	, //			GS(group separator)
+			0	, //			RS(record separator)
+			0	, //			US(unit separator)
+
+			/* 33-40 */
+			0	, //	' '		(space)
+			1	, //	'!'		CH
+			1	, //	'\"'	CH
+			1	, //	'#'		CH
+			1	, //	'$'		CH
+			1	, //	'%'		CH
+			1	, //	'&'		CH
+			1	, //	'\''	CH
+
+			/* 41-48 */
+			1	, //	'('		CH
+			1	, //	')'		CH
+			1	, //	'*'		CH
+			1	, //	'+'		CH
+			1	, //	','		CH
+			1	, //	'-'		CH
+			1	, //	'.'		CH
+			1	, //	'/'		CH
+
+			/* 49-56 */
+			1	, //	'0'		CH
+			1	, //	'1'		CH
+			1	, //	'2'		CH
+			1	, //	'3'		CH
+			1	, //	'4'		CH
+			1	, //	'5'		CH
+			1	, //	'6'		CH
+			1	, //	'7'		CH
+
+			/* 57-64 */
+			1	, //	'8'		CH
+			1	, //	'9'		CH
+			1	, //	':'		CH
+			1	, //	';'		CH
+			1	, //	'<'		CH
+			1	, //	'='		CH
+			1	, //	'>'		CH
+			1	, //	'?'		CH
+
+			/* 65-72 */
+			1	, //	'@'		CH
+			1	, //	'A'		CH
+			1	, //	'B'		CH
+			1	, //	'C'		CH
+			1	, //	'D'		CH
+			1	, //	'E'		CH
+			1	, //	'F'		CH
+			1	, //	'G'		CH
+
+			/* 73-80 */
+			1	, //	'H'		CH
+			1	, //	'I'		CH
+			1	, //	'J'		CH
+			1	, //	'K'		CH
+			1	, //	'L'		CH
+			1	, //	'M'		CH
+			1	, //	'N'		CH
+			1	, //	'O'		CH
+
+			/* 81-88 */
+			1	, //	'P'		CH
+			1	, //	'Q'		CH
+			1	, //	'R'		CH
+			1	, //	'S'		CH
+			1	, //	'T'		CH
+			1	, //	'U'		CH
+			1	, //	'V'		CH
+			1	, //	'W'		CH
+
+			/* 89-96 */
+			1	, //	'X'		CH
+			1	, //	'Y'		CH
+			1	, //	'Z'		CH
+			1	, //	'['		CH
+			1	, //	'\\'	CH
+			1	, //	']'		CH
+			1	, //	'^'		CH
+			1	, //	'_'		CH
+
+			/* 97-104 */
+			1	, //	'`'		CH
+			1	, //	'a'		CH
+			1	, //	'b'		CH
+			1	, //	'c'		CH
+			1	, //	'd'		CH
+			1	, //	'e'		CH
+			1	, //	'f'		CH
+			1	, //	'g'		CH
+
+			/* 105-112 */
+			1	, //	'h'		CH
+			1	, //	'i'		CH
+			1	, //	'j'		CH
+			1	, //	'k'		CH
+			1	, //	'l'		CH
+			1	, //	'm'		CH
+			1	, //	'n'		CH
+			1	, //	'o'		CH
+
+			/* 113-120 */
+			1	, //	'p'		CH
+			1	, //	'q'		CH
+			1	, //	'r'		CH
+			1	, //	's'		CH
+			1	, //	't'		CH
+			1	, //	'u'		CH
+			1	, //	'v'		CH
+			1	, //	'w'		CH
+
+			/* 121-128 */
+			1	, //	'x'		CH
+			1	, //	'y'		CH
+			1	, //	'z'		CH
+			1	, //	'{'		CH
+			1	, //	'|'		CH
+			1	, //	'}'		CH
+			1	, //	'~'		CH
+			0	, //			DEL(delete)
+		};
+
+		static const GAIA::U8 ascii_xml_validnamechar[128] =
+		{
+			/* 1-8 */
+			0	, //	'\0'	NUL(null)
+			0	, //			SOH(start of headline)
+			0	, //			STX(start of text)
+			0	, //			ETX(end of text)
+			0	, //			EOT(end of transmission)
+			0	, //			ENQ(enquiry)
+			0	, //			ACK(acknowledge)
+			0	, //			BEL(bell)
+
+			/* 9-16 */
+			0	, //			BS(backspace)
+			0	, //			HT(horizontal tab)
+			0	, //	'\n'	LF(NL line feed, new line)
+			0	, //			VT(vertical tab)
+			0	, //			FF(NP form feed, new page)
+			0	, //	'\r'	CR(carriage return)
+			0	, //			SO(shift out)
+			0	, //			SI(shift in)
+
+			/* 17-24 */
+			0	, //			DLE(data link escape)
+			0	, //			DC1(device control 1)
+			0	, //			DC2(device control 2)
+			0	, //			DC3(device control 3)
+			0	, //			DC4(device control 4)
+			0	, //			NAK(negative acknowledge)
+			0	, //			SYN(synchronous idle)
+			0	, //			ETB(end of trans. block)
+
+			/* 25-32 */
+			0	, //			CAN(cancel)
+			0	, //			EM(end of medium)
+			0	, //			SUB(substitute)
+			0	, //			ESC(escape)
+			0	, //			FS(file separator)
+			0	, //			GS(group separator)
+			0	, //			RS(record separator)
+			0	, //			US(unit separator)
+
+			/* 33-40 */
+			0	, //	' '		(space)
+			0	, //	'!'		CH
+			0	, //	'\"'	CH
+			0	, //	'#'		CH
+			0	, //	'$'		CH
+			0	, //	'%'		CH
+			0	, //	'&'		CH
+			0	, //	'\''	CH
+
+			/* 41-48 */
+			0	, //	'('		CH
+			0	, //	')'		CH
+			0	, //	'*'		CH
+			0	, //	'+'		CH
+			0	, //	','		CH
+			1	, //	'-'		CH
+			0	, //	'.'		CH
+			0	, //	'/'		CH
+
+			/* 49-56 */
+			1	, //	'0'		CH
+			1	, //	'1'		CH
+			1	, //	'2'		CH
+			1	, //	'3'		CH
+			1	, //	'4'		CH
+			1	, //	'5'		CH
+			1	, //	'6'		CH
+			1	, //	'7'		CH
+
+			/* 57-64 */
+			1	, //	'8'		CH
+			1	, //	'9'		CH
+			0	, //	':'		CH
+			0	, //	';'		CH
+			0	, //	'<'		CH
+			0	, //	'='		CH
+			0	, //	'>'		CH
+			0	, //	'?'		CH
+
+			/* 65-72 */
+			0	, //	'@'		CH
+			1	, //	'A'		CH
+			1	, //	'B'		CH
+			1	, //	'C'		CH
+			1	, //	'D'		CH
+			1	, //	'E'		CH
+			1	, //	'F'		CH
+			1	, //	'G'		CH
+
+			/* 73-80 */
+			1	, //	'H'		CH
+			1	, //	'I'		CH
+			1	, //	'J'		CH
+			1	, //	'K'		CH
+			1	, //	'L'		CH
+			1	, //	'M'		CH
+			1	, //	'N'		CH
+			1	, //	'O'		CH
+
+			/* 81-88 */
+			1	, //	'P'		CH
+			1	, //	'Q'		CH
+			1	, //	'R'		CH
+			1	, //	'S'		CH
+			1	, //	'T'		CH
+			1	, //	'U'		CH
+			1	, //	'V'		CH
+			1	, //	'W'		CH
+
+			/* 89-96 */
+			1	, //	'X'		CH
+			1	, //	'Y'		CH
+			1	, //	'Z'		CH
+			0	, //	'['		CH
+			0	, //	'\\'	CH
+			0	, //	']'		CH
+			0	, //	'^'		CH
+			1	, //	'_'		CH
+
+			/* 97-104 */
+			0	, //	'`'		CH
+			1	, //	'a'		CH
+			1	, //	'b'		CH
+			1	, //	'c'		CH
+			1	, //	'd'		CH
+			1	, //	'e'		CH
+			1	, //	'f'		CH
+			1	, //	'g'		CH
+
+			/* 105-112 */
+			1	, //	'h'		CH
+			1	, //	'i'		CH
+			1	, //	'j'		CH
+			1	, //	'k'		CH
+			1	, //	'l'		CH
+			1	, //	'm'		CH
+			1	, //	'n'		CH
+			1	, //	'o'		CH
+
+			/* 113-120 */
+			1	, //	'p'		CH
+			1	, //	'q'		CH
+			1	, //	'r'		CH
+			1	, //	's'		CH
+			1	, //	't'		CH
+			1	, //	'u'		CH
+			1	, //	'v'		CH
+			1	, //	'w'		CH
+
+			/* 121-128 */
+			1	, //	'x'		CH
+			1	, //	'y'		CH
+			1	, //	'z'		CH
+			0	, //	'{'		CH
+			0	, //	'|'		CH
+			0	, //	'}'		CH
+			0	, //	'~'		CH
+			0	, //			DEL(delete)
+		};
+
 		/*!
 			@brief Basic xml reader.
 				It used for high performance xml streamed read.
@@ -129,6 +455,28 @@ namespace GAIA
 				const _DataType* pRet = GNIL;
 				switch(*p)
 				{
+				case '=': // Value.
+					{
+						pLocalNext = p = this->move_to_next(p + 1);
+						if(pLocalNext == GNIL)
+							GTHROW_RET(DataError, GNIL);
+						if(*pLocalNext != '\"')
+							GTHROW_RET(DataError, GNIL);
+						do
+						{
+							if(*pLocalNext == '\"' && pLocalNext > p && pLocalNext[-1] != '\\')
+								break;
+							++pLocalNext;
+						}
+						while(pLocalNext <= m_pBack);
+						if(pLocalNext > m_pBack)
+							GTHROW_RET(DataError, GNIL);
+						nt = GAIA::XML::XML_NODE_VALUE;
+						nodenamelen = (_SizeType)(pLocalNext - p - 1);
+						pLocalNext = pLocalNext + 1;
+						pRet = p + 1;
+					}
+					break;
 				case '<': // Container begin or multi container begin or multi container end.
 					{
 						if(p == m_pBack)
@@ -139,15 +487,13 @@ namespace GAIA
 							++p;
 							if(!GAIA::ALGO::isalpha(*p))
 								GTHROW_RET(DataError, GNIL);
-							while(p <= m_pBack)
+							do
 							{
-								if(!GAIA::ALGO::isalpha(*p) &&
-								   !GAIA::ALGO::isdigit(*p) &&
-								   *p != '_' &&
-								   *p != '_')
+								if(*p > sizeof(ascii_xml_validnamechar) || !ascii_xml_validnamechar[*p])
 									break;
 								++p;
 							}
+							while(p <= m_pBack);
 							if(p > m_pBack)
 								GTHROW_RET(DataError, GNIL);
 							nt = GAIA::XML::XML_NODE_MULTICONTAINER;
@@ -163,15 +509,13 @@ namespace GAIA
 						{
 							if(!GAIA::ALGO::isalpha(*p))
 								GTHROW_RET(DataError, GNIL);
-							while(p <= m_pBack)
+							do
 							{
-								if(!GAIA::ALGO::isalpha(*p) &&
-								   !GAIA::ALGO::isdigit(*p) &&
-								   *p != '_' &&
-								   *p != '_')
+								if(*p > sizeof(ascii_xml_validnamechar) || !ascii_xml_validnamechar[*p])
 									break;
 								++p;
 							}
+							while(p <= m_pBack);
 							if(p > m_pBack)
 								GTHROW_RET(DataError, GNIL);
 							nt = GAIA::XML::XML_NODE_CONTAINER;
@@ -184,7 +528,7 @@ namespace GAIA
 							{
 								GAIA::BL bInQuote = GAIA::False;
 								GAIA::BL bCheckMultiContainerComplete = GAIA::False;
-								while(p <= m_pBack)
+								do
 								{
 									switch(*p)
 									{
@@ -216,6 +560,7 @@ namespace GAIA
 										break;
 									++p;
 								}
+								while(p <= m_pBack);
 								if(p > m_pBack)
 									GTHROW_RET(DataError, GNIL);
 							}
@@ -241,40 +586,17 @@ namespace GAIA
 						pRet = p;
 					}
 					break;
-				case '=': // Value.
-					{
-						pLocalNext = p = this->move_to_next(p + 1);
-						if(pLocalNext == GNIL)
-							GTHROW_RET(DataError, GNIL);
-						if(*pLocalNext != '\"')
-							GTHROW_RET(DataError, GNIL);
-						while(pLocalNext <= m_pBack)
-						{
-							if(*pLocalNext == '\"' && pLocalNext > p && pLocalNext[-1] != '\\')
-								break;
-							++pLocalNext;
-						}
-						if(pLocalNext > m_pBack)
-							GTHROW_RET(DataError, GNIL);
-						nt = GAIA::XML::XML_NODE_VALUE;
-						nodenamelen = (_SizeType)(pLocalNext - p - 1);
-						pLocalNext = pLocalNext + 1;
-						pRet = p + 1;
-					}
-					break;
 				default: // Name.
 					{
 						if(!GAIA::ALGO::isalpha(*p))
 							GTHROW_RET(DataError, GNIL);
-						while(p <= m_pBack)
+						do
 						{
-							if(!GAIA::ALGO::isalpha(*p) &&
-							   !GAIA::ALGO::isdigit(*p) &&
-							   *p != '_' &&
-							   *p != '_')
+							if(*p > sizeof(ascii_xml_validnamechar) || !ascii_xml_validnamechar[*p])
 								break;
 							++p;
 						}
+						while(p <= m_pBack);
 						if(p > m_pBack)
 							GTHROW_RET(DataError, GNIL);
 						nt = GAIA::XML::XML_NODE_NAME;
@@ -757,10 +1079,7 @@ namespace GAIA
 			{
 				while(p <= m_pBack)
 				{
-					if(*p != ' ' &&
-					   *p != '\t' &&
-					   *p != '\r' &&
-					   *p != '\n')
+					if(*p >= sizeof(ascii_xml_validchar) || ascii_xml_validchar[*p])
 						return p;
 					++p;
 				}
