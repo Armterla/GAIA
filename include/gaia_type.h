@@ -618,7 +618,7 @@ namespace GAIA
 
 	static const GAIA::NUM THREAD_STACK_SIZE = 1024 * 1024;
 
-	static const GAIA::CH TABLE_ASCII[128] =
+	static const GAIA::CH ascii[128] =
 	{
 		/* 1-8 */
 		'\0', //	'\0'	NUL(null)
