@@ -131,7 +131,7 @@ namespace TEST
 				}
 			}
 
-			// Depth2 test.
+			// Depth3 test.
 			{
 				static const GAIA::CH SOURCE[] = "[{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\",\"Node0\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node1\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node2\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"}},{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\",\"Node0\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node1\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node2\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"}},{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\",\"Node0\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node1\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"},\"Node2\":{\"Prop0\":\"Value0\",\"Prop1\":\"Value1\",\"Prop2\":\"Value2\"}}]";
 				jr.SetBuffer(SOURCE, sizeof(SOURCE) - 1);

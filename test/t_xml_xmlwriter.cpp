@@ -43,7 +43,7 @@ namespace TEST
 						GAIA::ALGO::gstrcat(szTempValue, szTempIndexX);
 
 						xw.Write(GAIA::XML::XML_NODE_NAME, szTempName);
-						xw.Write(GAIA::XML::XML_NODE_VALUE, szTempName);
+						xw.Write(GAIA::XML::XML_NODE_VALUE, szTempValue);
 					}
 				}
 				xw.End();
@@ -53,7 +53,7 @@ namespace TEST
 				strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
 				if(ENABLE_DEBUG_OUTPUT)
 					TLOG(strResult.fptr());
-				if(strResult != "<RootNode Prop0=\"Prop0\" Prop1=\"Prop1\" Prop2=\"Prop2\"/>")
+				if(strResult != "<RootNode Prop0=\"Value0\" Prop1=\"Value1\" Prop2=\"Value2\"/>")
 					TERROR;
 			}
 
