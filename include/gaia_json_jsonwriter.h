@@ -161,8 +161,9 @@ namespace GAIA
 							m_CNTCursor = 0;
 							m_LastCNT[m_CNTCursor] = nt;
 							if(!m_bFirstNode)
-								this->write(",", sizeof(",") - 1);
-							this->write("{", sizeof("{") - 1);
+								this->write(",{", sizeof(",{") - 1);
+							else
+								this->write("{", sizeof("{") - 1);
 						}
 						else
 						{
@@ -174,15 +175,17 @@ namespace GAIA
 									GTHROW(InvalidParam);
 								m_LastCNT[++m_CNTCursor] = nt;
 								if(!m_bFirstNode)
-									this->write(",", sizeof(",") - 1);
-								this->write("{", sizeof("{") - 1);
+									this->write(",{", sizeof(",{") - 1);
+								else
+									this->write("{", sizeof("{") - 1);
 							}
 							else
 							{
 								m_LastCNT[++m_CNTCursor] = nt;
 								if(!m_bFirstNode)
-									this->write(",", sizeof(",") - 1);
-								this->write("\"", sizeof("\"") - 1);
+									this->write(",\"", sizeof(",\"") - 1);
+								else
+									this->write("\"", sizeof("\"") - 1);
 								this->write(pszNodeName, nodenamelen);
 								this->write("\":{", sizeof("\":{") - 1);
 							}
@@ -197,8 +200,9 @@ namespace GAIA
 							m_CNTCursor = 0;
 							m_LastCNT[m_CNTCursor] = nt;
 							if(!m_bFirstNode)
-								this->write(",", sizeof(",") - 1);
-							this->write("[", sizeof("[") - 1);
+								this->write(",[", sizeof(",[") - 1);
+							else
+								this->write("[", sizeof("[") - 1);
 						}
 						else
 						{
@@ -209,8 +213,9 @@ namespace GAIA
 								GTHROW(Illegal);
 							m_LastCNT[++m_CNTCursor] = nt;
 							if(!m_bFirstNode)
-								this->write(",", sizeof(",") - 1);
-							this->write("\"", sizeof("\"") - 1);
+								this->write(",\"", sizeof(",\"") - 1);
+							else
+								this->write("\"", sizeof("\"") - 1);
 							this->write(pszNodeName, nodenamelen);
 							this->write("\":[", sizeof("\":[") - 1);
 						}
@@ -330,10 +335,12 @@ namespace GAIA
 						   m_LastNNVT != GAIA::JSON::JSON_NODE_VALUE)
 							GTHROW(Illegal);
 						if(!m_bFirstNode)
-							this->write(",", sizeof(",") - 1);
+							this->write(",\"", sizeof(",\"") - 1);
 						else
+						{
 							m_bFirstNode = GAIA::False;
-						this->write("\"", sizeof("\"") - 1);
+							this->write("\"", sizeof("\"") - 1);
+						}
 						this->write(pszNodeName, nodenamelen);
 						this->write("\":", sizeof("\":") - 1);
 						m_LastNNVT = GAIA::JSON::JSON_NODE_NAME;
