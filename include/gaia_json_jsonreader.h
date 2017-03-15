@@ -171,6 +171,8 @@ namespace GAIA
 							}
 							++p;
 						}
+						if(p > m_pBack)
+							GTHROW_RET(DataError, GNIL);
 						if(pColon == GNIL)
 							GTHROW_RET(DataError, GNIL);
 						pLocalNext = this->move_to_next(pColon + 1);
@@ -230,6 +232,8 @@ namespace GAIA
 									break;
 								++pLocalNext;
 							}
+							if(pLocalNext > m_pBack)
+								GTHROW_RET(DataError, GNIL);
 							p++;
 							bValueIsString = GAIA::True;
 						}
@@ -242,6 +246,8 @@ namespace GAIA
 								else
 									break;
 							}
+							if(pLocalNext > m_pBack)
+								GTHROW_RET(DataError, GNIL);
 							GAIA::BL bExistValidNumber = GAIA::False;
 							_SizeType dotcnt = 0;
 							_SizeType zerocntbefore = 0;
@@ -377,7 +383,6 @@ namespace GAIA
 
 				@exception GAIA::ECT::EctDataError
 					If the source json's format exist error, and can't read, throw it.
-
 			*/
 			GINL const _DataType* End()
 			{
@@ -585,7 +590,10 @@ namespace GAIA
 						else if(GAIA::ALGO::gstrcmp(pRet, "false", nodenamelen) == 0)
 							v = GAIA::False;
 						else
-							GTHROW(Convert);
+						{
+							v = GAIA::False;
+							GTHROW_RET(Convert, v);
+						}
 					}
 					break;
 				default:
@@ -816,7 +824,7 @@ namespace GAIA
 						return p;
 					++p;
 				}
-				return GNIL;
+				GTHROW_RET(DataError, GNIL);
 			}
 
 		private:
