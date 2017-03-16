@@ -49,7 +49,8 @@ namespace TEST
 							TAST(GAIA::ALGO::gstrequal(szTempValue, psz, sNodeNameLen));
 						}
 					}
-					psz = xr.End();
+					psz = xr.End(&nt);
+					TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 					TAST(psz != GNIL);
 					TAST(*psz == '/');
 				}
@@ -93,7 +94,8 @@ namespace TEST
 							TAST(GAIA::ALGO::gstrequal(szTempValue, psz, sNodeNameLen));
 						}
 					}
-					psz = xr.End();
+					psz = xr.End(&nt);
+					TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 					TAST(psz != GNIL);
 					TAST(*psz == '/');
 				}
@@ -190,17 +192,20 @@ namespace TEST
 											TAST(GAIA::ALGO::gstrequal(szTempValue, psz, sNodeNameLen));
 										}
 									}
-									psz = xr.End();
+									psz = xr.End(&nt);
+									TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 									TAST(psz != GNIL);
 									TAST(*psz == '/');
 								}
 							}
-							psz = xr.End();
+							psz = xr.End(&nt);
+							TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 							TAST(psz != GNIL);
 							TAST(*psz != '/');
 						}
 					}
-					psz = xr.End();
+					psz = xr.End(&nt);
+					TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 					TAST(psz != GNIL);
 					TAST(*psz != '/');
 				}
@@ -289,17 +294,20 @@ namespace TEST
 											TAST(nValue == z);
 										}
 									}
-									psz = xr.End();
+									psz = xr.End(&nt);
+									TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 									TAST(psz != GNIL);
 									TAST(*psz == '/');
 								}
 							}
-							psz = xr.End();
+							psz = xr.End(&nt);
+							TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 							TAST(psz != GNIL);
 							TAST(*psz != '/');
 						}
 					}
-					psz = xr.End();
+					psz = xr.End(&nt);
+					TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 					TAST(psz != GNIL);
 					TAST(*psz != '/');
 				}

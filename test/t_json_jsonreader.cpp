@@ -63,7 +63,8 @@ namespace TEST
 						TAST(sNodeNameLen == 1);
 						TAST(*psz == '3');
 					}
-					psz = jr.End();
+					psz = jr.End(&nt);
+					TAST(nt == GAIA::JSON::JSON_NODE_CONTAINER);
 					TAST(psz != GNIL);
 					TAST(*psz == '}');
 				}
@@ -121,7 +122,8 @@ namespace TEST
 						TAST(sNodeNameLen == 1);
 						TAST(*psz == '3');
 					}
-					psz = jr.End();
+					psz = jr.End(&nt);
+					TAST(nt == GAIA::JSON::JSON_NODE_CONTAINER);
 					TAST(psz != GNIL);
 					TAST(*psz == '}');
 				}
@@ -213,17 +215,20 @@ namespace TEST
 											TAST(GAIA::ALGO::gstrcmp(szTempValue, psz, sNodeNameLen) == 0);
 										}
 									}
-									psz = jr.End();
+									psz = jr.End(&nt);
+									TAST(nt == GAIA::JSON::JSON_NODE_CONTAINER);
 									TAST(psz != GNIL);
 									TAST(*psz == '}');
 								}
 							}
-							psz = jr.End();
+							psz = jr.End(&nt);
+							TAST(nt == GAIA::JSON::JSON_NODE_CONTAINER);
 							TAST(psz != GNIL);
 							TAST(*psz == '}');
 						}
 					}
-					psz = jr.End();
+					psz = jr.End(&nt);
+					TAST(nt == GAIA::JSON::JSON_NODE_MULTICONTAINER);
 					TAST(psz != GNIL);
 					TAST(*psz == ']');
 				}
@@ -270,7 +275,8 @@ namespace TEST
 						x128Source.fromstring("12345678123456781234567812345678");
 						TAST(x128 == x128Source);
 					}
-					psz = jr.End();
+					psz = jr.End(&nt);
+					TAST(nt == GAIA::JSON::JSON_NODE_CONTAINER);
 					TAST(psz != GNIL);
 					TAST(*psz == '}');
 				}

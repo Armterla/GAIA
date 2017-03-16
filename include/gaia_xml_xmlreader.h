@@ -324,6 +324,11 @@ namespace GAIA
 			/*!
 				@brief Try to end read a container node or a multi container node.
 
+				@param nt [out] Used for saving the json node type.\n
+					Default value is GNIL means this parameter is ignored.\n
+					If current function success, it would be XML_NODE_CONTAINER or XML_NODE_MULTICONTAINER.\n
+					If current function failed, it would be XML_NODE_CONTAINER or XML_NODE_MULTICONTAINER or XML_NODE_NAME or XML_NODE_VALUE.\n
+
 				@return Return the container's name without '\0'.\n
 					If current container is a single container, it will return "}" without '\0'.\n
 					If current container is a multi container, it will return "]" without '\0'.\n
@@ -336,15 +341,17 @@ namespace GAIA
 				@exception GAIA::ECT::EctDataError
 					If the source xml's format exist error, and can't read, throw it.
 			*/
-			GINL const _DataType* End()
+			GINL const _DataType* End(GAIA::XML::XML_NODE* nt = GNIL)
 			{
-				GAIA::XML::XML_NODE nt;
+				GAIA::XML::XML_NODE nodetype;
 				_SizeType nodenamelen;
 				const _DataType* pNext;
-				const _DataType* pRet = this->Peek(nt, nodenamelen, &pNext);
+				const _DataType* pRet = this->Peek(nodetype, nodenamelen, &pNext);
 				if(pRet == GNIL)
 					GTHROW_RET(Illegal, GNIL);
-				switch(nt)
+				if(nt != GNIL)
+					*nt = nodetype;
+				switch(nodetype)
 				{
 				case GAIA::XML::XML_NODE_CONTAINER:
 					GAST(nodenamelen == 0);
