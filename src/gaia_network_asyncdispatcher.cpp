@@ -552,7 +552,7 @@ namespace GAIA
 
 					{
 						GAIA::SYNC::AutolockR al(m_rwAsyncCtxEnding);
-						if(pCtx->pDataSocket->IsCreated())
+						if(pCtx->pDataSocket->IsCreated() && pCtx->pListenSocket->IsCreated())
 						{
 							this->attach_socket_iocp(*pCtx->pDataSocket);
 							pCtx->pDataSocket->SetBinded(GAIA::True);
