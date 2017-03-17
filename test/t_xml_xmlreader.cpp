@@ -21,12 +21,17 @@ namespace TEST
 					GAIA::XML::XML_NODE nt;
 					GAIA::NUM sNodeNameLen;
 					const GAIA::CH* psz;
+
+					psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 					psz = xr.Begin(nt, sNodeNameLen);
 					TAST(psz != GNIL);
 					TAST(sNodeNameLen == GAIA::ALGO::gstrlen("RootNode"));
 					TAST(GAIA::ALGO::gstrequal(psz, "RootNode", sNodeNameLen));
 					TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 					{
+						psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 						for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 						{
 							GAIA::CH szTempIndexY[32];
@@ -38,15 +43,21 @@ namespace TEST
 							GAIA::CH szTempValue[32] = "Value";
 							GAIA::ALGO::gstrcat(szTempValue, szTempIndexY);
 
+							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 							psz = xr.Read(nt, sNodeNameLen);
 							TAST(psz != GNIL);
 							TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempName));
 							TAST(GAIA::ALGO::gstrequal(szTempName, psz, sNodeNameLen));
 
+							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 							psz = xr.Read(nt, sNodeNameLen);
 							TAST(psz != GNIL);
 							TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempValue));
 							TAST(GAIA::ALGO::gstrequal(szTempValue, psz, sNodeNameLen));
+
+							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
 						}
 					}
 					psz = xr.End(&nt);
@@ -66,12 +77,17 @@ namespace TEST
 					GAIA::XML::XML_NODE nt;
 					GAIA::NUM sNodeNameLen;
 					const GAIA::CH* psz;
+
+					psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 					psz = xr.Begin(nt, sNodeNameLen);
 					TAST(psz != GNIL);
 					TAST(sNodeNameLen == GAIA::ALGO::gstrlen("RootNode"));
 					TAST(GAIA::ALGO::gstrequal(psz, "RootNode", sNodeNameLen));
 					TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 					{
+						psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 						for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 						{
 							GAIA::CH szTempIndexX[32];
@@ -83,15 +99,21 @@ namespace TEST
 							GAIA::CH szTempValue[32] = "Value";
 							GAIA::ALGO::gstrcat(szTempValue, szTempIndexX);
 
+							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 							psz = xr.Read(nt, sNodeNameLen);
 							TAST(psz != GNIL);
 							TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempName));
 							TAST(GAIA::ALGO::gstrequal(szTempName, psz, sNodeNameLen));
 
+							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 							psz = xr.Read(nt, sNodeNameLen);
 							TAST(psz != GNIL);
 							TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempValue));
 							TAST(GAIA::ALGO::gstrequal(szTempValue, psz, sNodeNameLen));
+
+							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
 						}
 					}
 					psz = xr.End(&nt);
@@ -114,12 +136,17 @@ namespace TEST
 					GAIA::XML::XML_NODE nt;
 					GAIA::NUM sNodeNameLen;
 					const GAIA::CH* psz;
+
+					psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 					psz = xr.Begin(nt, sNodeNameLen);
 					TAST(psz != GNIL);
 					TAST(sNodeNameLen == GAIA::ALGO::gstrlen("RootNode"));
 					TAST(GAIA::ALGO::gstrequal(psz, "RootNode", sNodeNameLen));
 					TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 					{
+						psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 						for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 						{
 							GAIA::CH szTempIndexX[32];
@@ -128,12 +155,16 @@ namespace TEST
 							GAIA::CH szTempNode[32] = "MNode";
 							GAIA::ALGO::gstrcat(szTempNode, szTempIndexX);
 
+							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 							psz = xr.Begin(nt, sNodeNameLen);
 							TAST(psz != GNIL);
 							TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempNode));
 							TAST(GAIA::ALGO::gstrequal(psz, szTempNode, sNodeNameLen));
 							TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 							{
+								psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 								for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
 								{
 									GAIA::CH szTempIndexY[32];
@@ -145,10 +176,14 @@ namespace TEST
 									GAIA::CH szTempValue[32] = "Value";
 									GAIA::ALGO::gstrcat(szTempValue, szTempIndexY);
 
+									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 									psz = xr.Read(nt, sNodeNameLen);
 									TAST(psz != GNIL);
 									TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempName));
 									TAST(GAIA::ALGO::gstrequal(szTempName, psz, sNodeNameLen));
+
+									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
 
 									psz = xr.Read(nt, sNodeNameLen);
 									TAST(psz != GNIL);
@@ -164,12 +199,16 @@ namespace TEST
 									GAIA::CH szTempName[32] = "Node";
 									GAIA::ALGO::gstrcat(szTempName, szTempIndexY);
 
+									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 									psz = xr.Begin(nt, sNodeNameLen);
 									TAST(psz != GNIL);
 									TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempName));
 									TAST(GAIA::ALGO::gstrequal(psz, szTempName, sNodeNameLen));
 									TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 									{
+										psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 										for(GAIA::NUM z = 0; z < SAMPLE_COUNT; ++z)
 										{
 											GAIA::CH szTempIndexZ[32];
@@ -181,27 +220,37 @@ namespace TEST
 											GAIA::CH szTempValue[32] = "Value";
 											GAIA::ALGO::gstrcat(szTempValue, szTempIndexZ);
 
+											psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 											psz = xr.Read(nt, sNodeNameLen);
 											TAST(psz != GNIL);
 											TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempName));
 											TAST(GAIA::ALGO::gstrequal(szTempName, psz, sNodeNameLen));
 
+											psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 											psz = xr.Read(nt, sNodeNameLen);
 											TAST(psz != GNIL);
 											TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempValue));
 											TAST(GAIA::ALGO::gstrequal(szTempValue, psz, sNodeNameLen));
+
+											psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
 										}
 									}
 									psz = xr.End(&nt);
 									TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 									TAST(psz != GNIL);
 									TAST(*psz == '/');
+
+									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
 								}
 							}
 							psz = xr.End(&nt);
 							TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 							TAST(psz != GNIL);
 							TAST(*psz != '/');
+
+							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
 						}
 					}
 					psz = xr.End(&nt);
@@ -224,12 +273,17 @@ namespace TEST
 					GAIA::XML::XML_NODE nt;
 					GAIA::NUM sNodeNameLen;
 					const GAIA::CH* psz;
+
+					psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 					psz = xr.Begin(nt, sNodeNameLen);
 					TAST(psz != GNIL);
 					TAST(sNodeNameLen == GAIA::ALGO::gstrlen("RootNode"));
 					TAST(GAIA::ALGO::gstrequal(psz, "RootNode", sNodeNameLen));
 					TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 					{
+						psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 						for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 						{
 							GAIA::CH szTempIndexX[32];
@@ -238,12 +292,16 @@ namespace TEST
 							GAIA::CH szTempNode[32] = "MNode";
 							GAIA::ALGO::gstrcat(szTempNode, szTempIndexX);
 
+							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 							psz = xr.Begin(nt, sNodeNameLen);
 							TAST(psz != GNIL);
 							TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempNode));
 							TAST(GAIA::ALGO::gstrequal(psz, szTempNode, sNodeNameLen));
 							TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 							{
+								psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 								for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
 								{
 									GAIA::CH szTempIndexY[32];
@@ -252,14 +310,20 @@ namespace TEST
 									GAIA::CH szTempName[32] = "Prop";
 									GAIA::ALGO::gstrcat(szTempName, szTempIndexY);
 
+									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 									psz = xr.Read(nt, sNodeNameLen);
 									TAST(psz != GNIL);
 									TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempName));
 									TAST(GAIA::ALGO::gstrequal(szTempName, psz, sNodeNameLen));
 
+									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 									GAIA::N32 nValue = -1;
 									TAST(xr.ReadValue(nValue) == y);
 									TAST(nValue == y);
+
+									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
 								}
 
 								for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
@@ -270,12 +334,16 @@ namespace TEST
 									GAIA::CH szTempName[32] = "Node";
 									GAIA::ALGO::gstrcat(szTempName, szTempIndexY);
 
+									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 									psz = xr.Begin(nt, sNodeNameLen);
 									TAST(psz != GNIL);
 									TAST(sNodeNameLen == GAIA::ALGO::gstrlen(szTempName));
 									TAST(GAIA::ALGO::gstrequal(psz, szTempName, sNodeNameLen));
 									TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 									{
+										psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+
 										for(GAIA::NUM z = 0; z < SAMPLE_COUNT; ++z)
 										{
 											GAIA::CH szTempIndexZ[32];
@@ -283,6 +351,8 @@ namespace TEST
 
 											GAIA::CH szTempName[32] = "Prop";
 											GAIA::ALGO::gstrcat(szTempName, szTempIndexZ);
+
+											psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
 
 											psz = xr.Read(nt, sNodeNameLen);
 											TAST(psz != GNIL);
@@ -292,18 +362,24 @@ namespace TEST
 											GAIA::N32 nValue = -1;
 											TAST(xr.ReadValue(nValue) == z);
 											TAST(nValue == z);
+
+											psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
 										}
 									}
 									psz = xr.End(&nt);
 									TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 									TAST(psz != GNIL);
 									TAST(*psz == '/');
+
+									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
 								}
 							}
 							psz = xr.End(&nt);
 							TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 							TAST(psz != GNIL);
 							TAST(*psz != '/');
+
+							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
 						}
 					}
 					psz = xr.End(&nt);

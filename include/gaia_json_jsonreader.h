@@ -69,6 +69,13 @@ namespace GAIA
 					m_pCursor = m_pFront;
 					m_size = size;
 				}
+
+				m_pLastPeekCursor = GNIL;
+				m_pLastPeekReturn = GNIL;
+				m_LastPeekNodeType = GAIA::JSON::JSON_NODE_INVALID;
+				m_LastPeekNodeNameLength = 0;
+				m_pLastPeekNext = GNIL;
+				m_bLastPeekValueIsString = GAIA::False;
 			}
 
 			/*!
@@ -127,6 +134,17 @@ namespace GAIA
 			*/
 			GINL const _DataType* Peek(GAIA::JSON::JSON_NODE& nt, _SizeType& nodenamelen, _DataTypePtr* pNext = GNIL, GAIA::BL* pValueIsString = GNIL)
 			{
+				if(m_pLastPeekCursor == m_pCursor)
+				{
+					nt = m_LastPeekNodeType;
+					nodenamelen = m_LastPeekNodeNameLength;
+					if(pNext != GNIL)
+						*pNext = m_pLastPeekNext;
+					if(pValueIsString != GNIL)
+						*pValueIsString = m_bLastPeekValueIsString;
+					return m_pLastPeekReturn;
+				}
+
 				m_pCursor = this->move_to_next(m_pCursor);
 				if(m_pCursor == GNIL)
 					GTHROW_RET(Illegal, GNIL);
@@ -285,6 +303,7 @@ namespace GAIA
 							pLocalNext = pLocalNext + 1;
 						if(pValueIsString != GNIL)
 							*pValueIsString = bValueIsString;
+						m_bLastPeekValueIsString = bValueIsString;
 						pRet = p;
 					}
 					break;
@@ -327,6 +346,11 @@ namespace GAIA
 				}
 				if(pNext != GNIL)
 					*pNext = pLocalNext;
+				m_pLastPeekCursor = m_pCursor;
+				m_pLastPeekReturn = pRet;
+				m_LastPeekNodeType = nt;
+				m_LastPeekNodeNameLength = nodenamelen;
+				m_pLastPeekNext = pLocalNext;
 				return pRet;
 			}
 
@@ -821,6 +845,13 @@ namespace GAIA
 			{
 				m_pFront = m_pBack = m_pCursor = GNIL;
 				m_size = 0;
+
+				m_pLastPeekCursor = GNIL;
+				m_pLastPeekReturn = GNIL;
+				m_LastPeekNodeType = GAIA::JSON::JSON_NODE_INVALID;
+				m_LastPeekNodeNameLength = 0;
+				m_pLastPeekNext = GNIL;
+				m_bLastPeekValueIsString = GAIA::False;
 			}
 			GINL const _DataType* move_to_next(const _DataType* p)
 			{
@@ -838,6 +869,13 @@ namespace GAIA
 			const _DataType* m_pBack; // Last valid character.
 			const _DataType* m_pCursor;
 			_SizeType m_size; // Size in bytes.
+
+			const _DataType* m_pLastPeekCursor;
+			const _DataType* m_pLastPeekReturn;
+			GAIA::JSON::JSON_NODE m_LastPeekNodeType;
+			_SizeType m_LastPeekNodeNameLength;
+			const _DataType* m_pLastPeekNext;
+			GAIA::BL m_bLastPeekValueIsString;
 		};
 		class JsonReaderA : public BasicJsonReader<GAIA::CH, GAIA::NUM, GAIA::NUM, 32>{public:};
 		class JsonReaderW : public BasicJsonReader<GAIA::WCH, GAIA::NUM, GAIA::NUM, 32>{public:};
