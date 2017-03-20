@@ -67,14 +67,14 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID SetMethod(GAIA::NETWORK::HTTP_METHOD method);
+			GAIA::GVOID SetMethod(GAIA::NETWORK::HTTP_METHOD method){m_method = method;}
 
 			/*!
 				@brief Get http request method.
 
 				@return Return http request method.
 			*/
-			GAIA::NETWORK::HTTP_METHOD GetMethod() const;
+			GAIA::NETWORK::HTTP_METHOD GetMethod() const{return m_method;}
 
 			/*!
 				@brief Set http request url.
@@ -83,7 +83,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID SetURL(const GAIA::NETWORK::HttpURL& url);
+			GAIA::GVOID SetURL(const GAIA::NETWORK::HttpURL& url){m_url = url;}
 
 			/*!
 				@brief Get http request url.
@@ -92,7 +92,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			const GAIA::NETWORK::HttpURL& GetURL() const;
+			const GAIA::NETWORK::HttpURL& GetURL() const{return m_url;}
 
 			/*!
 				@brief Get http request url.
@@ -101,7 +101,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::NETWORK::HttpURL& GetURL();
+			GAIA::NETWORK::HttpURL& GetURL(){return m_url;}
 
 			/*!
 				@brief Set http request head.
@@ -110,7 +110,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID SetHead(const GAIA::NETWORK::HttpHead& head);
+			GAIA::GVOID SetHead(const GAIA::NETWORK::HttpHead& head){m_head = head;}
 
 			/*!
 				@brief Get http request head.
@@ -119,7 +119,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			const GAIA::NETWORK::HttpHead& GetHead() const;
+			const GAIA::NETWORK::HttpHead& GetHead() const{return m_head;}
 
 			/*!
 				@brief Get http request head.
@@ -128,7 +128,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::NETWORK::HttpHead& GetHead();
+			GAIA::NETWORK::HttpHead& GetHead(){return m_head;}
 
 			// Buffer control.
 			/*!
@@ -154,7 +154,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			const GAIA::GVOID* GetBuffer() const;
+			const GAIA::GVOID* GetBuffer() const{return m_buf.fptr();}
 
 			/*!
 				@brief Get the buffer size in bytes for request.
@@ -162,14 +162,14 @@ namespace GAIA
 				@return Return the buffer size in bytes.\n
 					If there is no buffer bound, return GNIL.
 			*/
-			GAIA::NUM GetBufferSize() const;
+			GAIA::NUM GetBufferSize() const{return m_buf.write_size();}
 
 			/*!
 				@brief Check HttpRequest is the buffer's owner or not.
 
 				@return If HttpRequest is the buffer's owner, return GAIA::True, or will return GAIA::False.
 			*/
-			GAIA::BL IsBufferOwner() const;
+			GAIA::BL IsBufferOwner() const{return m_bBufOwner;}
 
 			// Work flow control.
 			/*!
@@ -227,7 +227,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL IsRequestComplete() const;
+			GAIA::BL IsRequestComplete() const{return m_bRequestComplete;}
 
 			/*!
 				@brief Check the response complete or not.
@@ -236,7 +236,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL IsResponseComplete() const;
+			GAIA::BL IsResponseComplete() const{return m_bResponseComplete;}
 
 			/*!
 				@brief Get http result code.
@@ -245,7 +245,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::NETWORK::HTTP_CODE GetResponseCode() const;
+			GAIA::NETWORK::HTTP_CODE GetResponseCode() const{return m_ResponseCode;}
 
 			/*!
 				@brief Get http response size in bytes.
@@ -254,7 +254,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::NUM GetResponseSize() const;
+			GAIA::NUM GetResponseSize() const{return m_sResponseSize;}
 
 			// Mode control.
 			/*!
@@ -264,7 +264,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID SetAsync(GAIA::BL bAsync);
+			GAIA::GVOID SetAsync(GAIA::BL bAsync){m_bAsync = bAsync;}
 
 			/*!
 				@brief Get async mode.
@@ -273,7 +273,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL GetAsync() const;
+			GAIA::BL GetAsync() const{return m_bAsync;}
 
 			/*!
 				@brief Set http request timeout time in milliseconds.
@@ -284,7 +284,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID SetTimeout(const GAIA::U64& uMilliSeconds);
+			GAIA::GVOID SetTimeout(const GAIA::U64& uMilliSeconds){m_uTimeout = uMilliSeconds;}
 
 			/*!
 				@brief Get http request timeout time in milliseconds.
@@ -295,7 +295,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			const GAIA::U64& GetTimeout() const;
+			const GAIA::U64& GetTimeout() const{return m_uTimeout;}
 
 			// Cookic control.
 			/*!
@@ -305,7 +305,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID EnableWriteCookicRAM(GAIA::BL bEnable);
+			GAIA::GVOID EnableWriteCookicRAM(GAIA::BL bEnable){m_bEnableWriteCookicRAM = bEnable;}
 
 			/*!
 				@brief Check enable write cookic to RAM.
@@ -314,7 +314,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL IsEnableWriteCookicRAM() const;
+			GAIA::BL IsEnableWriteCookicRAM() const{return m_bEnableWriteCookicRAM;}
 
 			/*!
 				@brief Enable or disablewrite cookic to file.
@@ -323,7 +323,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID EnableWriteCookicFile(GAIA::BL bEnable);
+			GAIA::GVOID EnableWriteCookicFile(GAIA::BL bEnable){m_bEnableWriteCookicFile = bEnable;}
 
 			/*!
 				@brief Check enable write cookic to file.
@@ -332,7 +332,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL IsEnableWriteCookicFile() const;
+			GAIA::BL IsEnableWriteCookicFile() const{return m_bEnableWriteCookicFile;}
 
 			/*!
 				@brief Set effect time in milliseconds for cookic which will be writen.
@@ -343,7 +343,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID SetWriteCookicTime(const GAIA::U64& uMilliSeconds);
+			GAIA::GVOID SetWriteCookicTime(const GAIA::U64& uMilliSeconds){m_uWriteCookicTime = uMilliSeconds;}
 
 			/*!
 				@brief Get effect time in milliseconds for cookic which will be writen.
@@ -354,7 +354,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			const GAIA::U64& GetWriteCookicTime() const;
+			const GAIA::U64& GetWriteCookicTime() const{return m_uWriteCookicTime;}
 
 			/*!
 				@brief Enable or disable read cookic from RAM.
@@ -365,7 +365,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID EnableReadCookicRAM(GAIA::BL bEnable);
+			GAIA::GVOID EnableReadCookicRAM(GAIA::BL bEnable){m_bEnableReadCookicRAM = bEnable;}
 
 			/*!
 				@brief Check enable read cookic from RAM.
@@ -376,7 +376,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL IsEnableReadCookicRAM() const;
+			GAIA::BL IsEnableReadCookicRAM() const{return m_bEnableReadCookicRAM;}
 
 			/*!
 				@brief Enable or disable read cookic from file.
@@ -387,7 +387,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID EnableReadCookicFile(GAIA::BL bEnable);
+			GAIA::GVOID EnableReadCookicFile(GAIA::BL bEnable){m_bEnableReadCookicFile = bEnable;}
 
 			/*!
 				@brief Check enable read cookic from file.
@@ -398,7 +398,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL IsEnableReadCookicFile() const;
+			GAIA::BL IsEnableReadCookicFile() const{return m_bEnableReadCookicFile;}
 
 			/*!
 				@brief Set effect time in milliseconds for cookic which will be read.
@@ -409,7 +409,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID SetReadCookicTime(const GAIA::U64& uMilliSeconds);
+			GAIA::GVOID SetReadCookicTime(const GAIA::U64& uMilliSeconds){m_uReadCookicTime = uMilliSeconds;}
 
 			/*!
 				@brief Get effect time in milliseconds for cookic which will be read.
@@ -420,7 +420,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			const GAIA::U64& GetReadCookicTime() const;
+			const GAIA::U64& GetReadCookicTime() const{return m_uReadCookicTime;}
 
 		protected:
 
@@ -737,7 +737,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID EnableWriteCookicRAM(GAIA::BL bEnable);
+			GAIA::GVOID EnableWriteCookicRAM(GAIA::BL bEnable){m_bEnableWriteCookicRAM = bEnable;}
 
 			/*!
 				@brief
@@ -748,7 +748,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL IsEnableWriteCookicRAM() const;
+			GAIA::BL IsEnableWriteCookicRAM() const{return m_bEnableWriteCookicRAM;}
 
 			/*!
 				@brief
@@ -759,7 +759,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID EnableWriteCookicFile(GAIA::BL bEnable);
+			GAIA::GVOID EnableWriteCookicFile(GAIA::BL bEnable){m_bEnableWriteCookicFile = bEnable;}
 
 			/*!
 				@brief
@@ -770,7 +770,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL IsEnableWriteCookicFile() const;
+			GAIA::BL IsEnableWriteCookicFile() const{return m_bEnableWriteCookicFile;}
 
 			/*!
 				@brief
@@ -781,7 +781,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID EnableReadCookicRAM(GAIA::BL bEnable);
+			GAIA::GVOID EnableReadCookicRAM(GAIA::BL bEnable){m_bEnableReadCookicRAM = bEnable;}
 
 			/*!
 				@brief
@@ -792,7 +792,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL IsEnableReadCookicRAM() const;
+			GAIA::BL IsEnableReadCookicRAM() const{return m_bEnableReadCookicRAM;}
 
 			/*!
 				@brief
@@ -803,7 +803,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID EnableReadCookicFile(GAIA::BL bEnable);
+			GAIA::GVOID EnableReadCookicFile(GAIA::BL bEnable){m_bEnableReadCookicFile = bEnable;}
 
 			/*!
 				@brief
@@ -814,7 +814,7 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::BL IsEnableReadCookicFile() const;
+			GAIA::BL IsEnableReadCookicFile() const{return m_bEnableReadCookicFile;}
 
 			/*!
 				@brief
