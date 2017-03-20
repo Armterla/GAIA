@@ -672,13 +672,53 @@ namespace TEST
 		TAST(str.type() & GAIA::STRING_TYPE_INTEGER);
 
 		str = "Hello World!";
+		str1.clear();
 		if(str.extract(3, 4, str1) != 2)
 			TERROR;
+		if(str1 != "lo")
+			TERROR;
+		str1 = str.extract(3, 4);
 		if(str1 != "lo")
 			TERROR;
 		if(str.extract(3, 4, szTemp, sizeofarray(szTemp)) != 2)
 			TERROR;
 		if(GAIA::ALGO::gstrcmp(szTemp, "lo") != 0)
+			TERROR;
+		str1.clear();
+		if(str.extract_left(5, str1) != 5)
+			TERROR;
+		if(str1 != "Hello")
+			TERROR;
+		str1.clear();
+		if(str.extract_right(5, str1) != 6)
+			TERROR;
+		if(str1 != "World!")
+			TERROR;
+		str1.clear();
+		if(str.extract_mid(4, 6, str1) != 3)
+			TERROR;
+		if(str1 != "o W")
+			TERROR;
+		str1 = str.extract_left(5);
+		if(str1 != "Hello")
+			TERROR;
+		str1 = str.extract_right(5);
+		if(str1 != "World!")
+			TERROR;
+		str1 = str.extract_mid(4, 6);
+		if(str1 != "o W")
+			TERROR;
+		if(str.extract_left(5, szTemp, sizeofarray(szTemp)) != 5)
+			TERROR;
+		if(GAIA::ALGO::gstrcmp(szTemp, "Hello") != 0)
+			TERROR;
+		if(str.extract_right(5, szTemp, sizeofarray(szTemp)) != 6)
+			TERROR;
+		if(GAIA::ALGO::gstrcmp(szTemp, "World!") != 0)
+			TERROR;
+		if(str.extract_mid(4, 6, szTemp, sizeofarray(szTemp)) != 3)
+			TERROR;
+		if(GAIA::ALGO::gstrcmp(szTemp, "o W") != 0)
 			TERROR;
 
 		x128.fromstring("12345678123456781234567812345678");

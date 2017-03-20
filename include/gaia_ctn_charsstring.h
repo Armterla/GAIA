@@ -763,6 +763,18 @@ namespace GAIA
 				else
 					return m_chars.extract(index_start, index_end, pResult, nResultSize);
 			}
+			template<typename _ParamDataType> _SizeType extract_left(_SizeType index, _ParamDataType* pResult, const _SizeType& nResultSize) const
+			{
+				return this->extract(0, index - 1, pResult, nResultSize);
+			}
+			template<typename _ParamDataType> _SizeType extract_right(_SizeType index, _ParamDataType* pResult, const _SizeType& nResultSize) const
+			{
+				return this->extract(index + 1, GINVALID, pResult, nResultSize);
+			}
+			template<typename _ParamDataType> _SizeType extract_mid(_SizeType index_start, _SizeType index_end, _ParamDataType* pResult, const _SizeType& nResultSize) const
+			{
+				return this->extract(index_start, index_end, pResult, nResultSize);
+			}
 			GINL _SizeType extract(_SizeType index_start, _SizeType index_end, __MyType& strResult) const
 			{
 				if(index_start < GINVALID || index_start >= this->size())
@@ -788,6 +800,36 @@ namespace GAIA
 				else
 					ret = m_chars.extract(index_start, index_end, strResult.fptr() + old_length, require);
 				return ret;
+			}
+			GINL _SizeType extract_left(_SizeType index, __MyType& strResult) const
+			{
+				return this->extract(0, index - 1, strResult);
+			}
+			GINL _SizeType extract_right(_SizeType index, __MyType& strResult) const
+			{
+				return this->extract(index + 1, GINVALID, strResult);
+			}
+			GINL _SizeType extract_mid(_SizeType index_start, _SizeType index_end, __MyType& strResult) const
+			{
+				return this->extract(index_start, index_end, strResult);
+			}
+			GINL __MyType extract(_SizeType index_start, _SizeType index_end) const
+			{
+				__MyType ret;
+				this->extract(index_start, index_end, ret);
+				return ret;
+			}
+			GINL __MyType extract_left(_SizeType index) const
+			{
+				return this->extract(0, index - 1);
+			}
+			GINL __MyType extract_right(_SizeType index) const
+			{
+				return this->extract(index + 1, GINVALID);
+			}
+			GINL __MyType extract_mid(_SizeType index_start, _SizeType index_end) const
+			{
+				return this->extract(index_start, index_end);
 			}
 			template<typename _ParamSizeType> GAIA::BL trim_left_index(const _ParamSizeType& index)
 			{
