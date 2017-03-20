@@ -16,13 +16,13 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
-		class HttpAsyncSocket : public GAIA::NETWORK::AsyncSocket
+		class HttpServerAsyncSocket : public GAIA::NETWORK::AsyncSocket
 		{
 			friend class HttpServerLink;
 			friend class HttpServer;
 
 		public:
-			HttpAsyncSocket(GAIA::NETWORK::HttpServer& svr, GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::ASYNC_SOCKET_TYPE socktype = GAIA::NETWORK::ASYNC_SOCKET_TYPE_CONNECTED)
+			HttpServerAsyncSocket(GAIA::NETWORK::HttpServer& svr, GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::ASYNC_SOCKET_TYPE socktype = GAIA::NETWORK::ASYNC_SOCKET_TYPE_CONNECTED)
 				: GAIA::NETWORK::AsyncSocket(disp, socktype)
 			{
 				this->init();
@@ -30,7 +30,7 @@ namespace GAIA
 				m_method = GAIA::NETWORK::HTTP_METHOD_INVALID;
 			}
 
-			virtual ~HttpAsyncSocket()
+			virtual ~HttpServerAsyncSocket()
 			{
 				if(m_pRecvBuf != GNIL)
 					m_pSvr->ReleaseBuffer(m_pRecvBuf);
@@ -266,14 +266,14 @@ namespace GAIA
 		protected:
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
-				HttpAsyncSocket* pListenSocket =
-						gnew HttpAsyncSocket(*m_pSvr, *this, ASYNC_SOCKET_TYPE_LISTEN);
+				HttpServerAsyncSocket* pListenSocket =
+						gnew HttpServerAsyncSocket(*m_pSvr, *this, ASYNC_SOCKET_TYPE_LISTEN);
 				return pListenSocket;
 			}
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptingSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
-				HttpAsyncSocket* pAcceptingSocket =
-						gnew HttpAsyncSocket(*m_pSvr, *this, ASYNC_SOCKET_TYPE_ACCEPTING);
+				HttpServerAsyncSocket* pAcceptingSocket =
+						gnew HttpServerAsyncSocket(*m_pSvr, *this, ASYNC_SOCKET_TYPE_ACCEPTING);
 				return pAcceptingSocket;
 			}
 			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen)
@@ -314,11 +314,11 @@ namespace GAIA
 
 				//
 				GAIA::NETWORK::HttpServerLink* pLink = gnew GAIA::NETWORK::HttpServerLink(*m_pSvr);
-				pLink->m_pSock = (GAIA::NETWORK::HttpAsyncSocket*)&sock;
+				pLink->m_pSock = (GAIA::NETWORK::HttpServerAsyncSocket*)&sock;
 				pLink->SetPeerAddr(addrPeer);
 				pLink->SetListenAddr(addrListen);
 				pLink->SetAcceptTime(GAIA::TIME::gmt_time());
-				((HttpAsyncSocket*)&sock)->SetLink(pLink);
+				((HttpServerAsyncSocket*)&sock)->SetLink(pLink);
 				GAIA::SYNC::AutolockW al(m_pSvr->m_rwLinks);
 				m_pSvr->m_links_bypeeraddr.insert(GAIA::CTN::Ref<GAIA::NETWORK::HttpServerLink>(pLink));
 				return GAIA::True;
@@ -1140,7 +1140,7 @@ namespace GAIA
 
 			// Execute the link.
 			{
-				HttpAsyncSocket* pSock = pLink->m_pSock;
+				HttpServerAsyncSocket* pSock = pLink->m_pSock;
 				if(!pSock->m_bClosed)
 				{
 					// Swap.

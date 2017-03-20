@@ -513,7 +513,7 @@ namespace GAIA
 			GAIA::U64 uEffectTime; // Relative time in microseconds.
 		};
 
-		class HttpAsyncSocket;
+		class HttpServerAsyncSocket;
 		class HttpServerAsyncDispatcher;
 
 		/*!
@@ -523,7 +523,7 @@ namespace GAIA
 		class HttpServerLink : public GAIA::RefObject
 		{
 			friend class HttpServer;
-			friend class HttpAsyncSocket;
+			friend class HttpServerAsyncSocket;
 			friend class HttpServerAsyncDispatcher;
 
 		public:
@@ -647,7 +647,7 @@ namespace GAIA
 
 		private:
 			GAIA::NETWORK::HttpServer* m_pSvr;
-			HttpAsyncSocket* m_pSock;
+			HttpServerAsyncSocket* m_pSock;
 			GAIA::NETWORK::Addr m_addrPeer;
 			GAIA::NETWORK::Addr m_addrListen;
 			GAIA::U64 m_uAcceptTime;
@@ -673,7 +673,7 @@ namespace GAIA
 		{
 			friend class HttpServerLink;
 			friend class HttpServer;
-			friend class HttpAsyncSocket;
+			friend class HttpServerAsyncSocket;
 			friend class HttpServerAsyncDispatcher;
 
 		public:
@@ -827,7 +827,7 @@ namespace GAIA
 		{
 			friend class HttpServerLink;
 			friend class HttpServerWorkThread;
-			friend class HttpAsyncSocket;
+			friend class HttpServerAsyncSocket;
 			friend class HttpServerAsyncDispatcher;
 
 		public:
