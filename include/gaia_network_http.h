@@ -21,8 +21,17 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		class HttpAsyncSocket;
+		class HttpAsyncDispatcher;
+
+		/*!
+			@brief Http request information class.
+				It is a reference object.
+		*/
 		class HttpRequest : public GAIA::RefObject
 		{
+			friend class HttpAsyncSocket;
+			friend class HttpAsyncDispatcher;
 			friend class Http;
 
 		public:
@@ -39,100 +48,83 @@ namespace GAIA
 			virtual ~HttpRequest();
 
 			/*!
-				@brief
+				@brief Get Http object reference.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return the Http object reference.
 			*/
 			Http& GetHttp();
 
+			/*!
+				@brief Reset the request, the request will like a new allocated object.
+			*/
+			GAIA::GVOID Reset();
+
 			// Base http operation.
 			/*!
-				@brief
+				@brief Set http request method.
 
-				@param
-
-				@return
+				@param method [in] Specify the method.
 
 				@remarks
 			*/
 			GAIA::GVOID SetMethod(GAIA::NETWORK::HTTP_METHOD method);
 
 			/*!
-				@brief
+				@brief Get http request method.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return http request method.
 			*/
 			GAIA::NETWORK::HTTP_METHOD GetMethod() const;
 
 			/*!
-				@brief
+				@brief Set http request url.
 
-				@param
-
-				@return
+				@param url [in] Specify the url.
 
 				@remarks
 			*/
 			GAIA::GVOID SetURL(const GAIA::NETWORK::HttpURL& url);
 
 			/*!
-				@brief
+				@brief Get http request url.
 
-				@param
-
-				@return
+				@return Return http request url.
 
 				@remarks
 			*/
 			const GAIA::NETWORK::HttpURL& GetURL() const;
 
 			/*!
-				@brief
+				@brief Get http request url.
 
-				@param
-
-				@return
+				@return Return http request url.
 
 				@remarks
 			*/
 			GAIA::NETWORK::HttpURL& GetURL();
 
 			/*!
-				@brief
+				@brief Set http request head.
 
-				@param
-
-				@return
+				@param head [in] Specify http head.
 
 				@remarks
 			*/
 			GAIA::GVOID SetHead(const GAIA::NETWORK::HttpHead& head);
 
 			/*!
-				@brief
+				@brief Get http request head.
 
-				@param
-
-				@return
+				@return Return http request head.
 
 				@remarks
 			*/
 			const GAIA::NETWORK::HttpHead& GetHead() const;
 
 			/*!
-				@brief
+				@brief Get http request head.
 
-				@param
-
-				@return
+				@return Return http request head.
 
 				@remarks
 			*/
@@ -140,153 +132,151 @@ namespace GAIA
 
 			// Buffer control.
 			/*!
-				@brief
+				@brief Bind a buffer to request.
 
-				@param
+				@param p [in] Specify the buffer.
 
-				@return
+				@param sSize [in] Specify the buffer's size in bytes.
 
-				@remarks
+				@return If bind buffer successfully, return GAIA::True, or return GAIA::False.
+
+				@remarks The bound buffer will be send to server after send the head, so it could be a http body.
+					If parameter p is not GNIL and sSize above 0, current function will reference the buffer and the caller must keep the buffer available until http request complete.\n
+					If parameter p is GNIL and sSize above 0, current function will allocate buffer internal.\n
+					If parameter p is GNIL and sSize equal zero, current function will unreference the buffer or destory the internal buffer.\n
 			*/
-			GAIA::BL BindBuffer(const GAIA::GVOID* p, GAIA::NUM sSize); // If p == GNIL, will allocate buffer.
+			GAIA::BL BindBuffer(const GAIA::GVOID* p, GAIA::NUM sSize);
 
 			/*!
-				@brief
+				@brief Get the buffer for request.
 
-				@param
-
-				@return
+				@return If the buffer exist, return a valid pointer, or will return GNIL.
 
 				@remarks
 			*/
 			const GAIA::GVOID* GetBuffer() const;
 
 			/*!
-				@brief
+				@brief Get the buffer size in bytes for request.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return the buffer size in bytes.\n
+					If there is no buffer bound, return GNIL.
 			*/
 			GAIA::NUM GetBufferSize() const;
 
+			/*!
+				@brief Check HttpRequest is the buffer's owner or not.
+
+				@return If HttpRequest is the buffer's owner, return GAIA::True, or will return GAIA::False.
+			*/
+			GAIA::BL IsBufferOwner() const;
+
 			// Work flow control.
 			/*!
-				@brief
+				@brief Execute request.
 
-				@param
+				@return If deliver http request successfully, return GAIA::True, or return GAIA::False.
 
-				@return
-
-				@remarks
+				@remarks This method is thread safe.
 			*/
 			GAIA::BL Request();
 
 			/*!
-				@brief
+				@brief Cancel the request.
 
-				@param
+				@return If cancel the request successfully, return GAIA::True, or return GAIA::False.
 
-				@return
-
-				@remarks
+				@remarks This method is thread safe.
 			*/
 			GAIA::BL Cancel();
 
 			/*!
-				@brief
+				@brief Pause the request.
 
-				@param
+				@return If pause the request successfully, return GAIA::True, or return GAIA::False.
 
-				@return
-
-				@remarks
+				@remarks This method is thread safe.
 			*/
 			GAIA::BL Pause();
 
 			/*!
-				@brief
+				@brief Resume the request.
 
-				@param
+				@return If resume the request successfully, return GAIA::True, or return GAIA::False.
 
-				@return
-
-				@remarks
+				@remarks This method is thread safe.
 			*/
 			GAIA::BL Resume();
 
 			/*!
-				@brief
+				@brief Wait the request complete.
 
-				@param
+				@param uMilliSeconds [in] Specify the timeout time in milli-seconds.
 
-				@return
+				@return If wait request complete successfully, return GAIA::True, or will return GAIA::False.
 
-				@remarks
+				@remarks This method is thread safe.
 			*/
 			GAIA::BL Wait(GAIA::U32 uMilliSeconds);
 
 			// Query result.
 			/*!
-				@brief
+				@brief Check the request complete or not.
 
-				@param
-
-				@return
+				@return If request completed, return GAIA::True, or will return GAIA::False.
 
 				@remarks
 			*/
-			GAIA::BL IsComplete() const;
+			GAIA::BL IsRequestComplete() const;
 
 			/*!
-				@brief
+				@brief Check the response complete or not.
 
-				@param
-
-				@return
+				@return If response completed, return GAIA::True, or will return GAIA::False.
 
 				@remarks
 			*/
-			GAIA::NETWORK::HTTP_CODE GetResultCode() const;
+			GAIA::BL IsResponseComplete() const;
 
 			/*!
-				@brief
+				@brief Get http result code.
 
-				@param
-
-				@return
+				@return Return http result code.
 
 				@remarks
 			*/
-			GAIA::NUM GetResultSize() const;
+			GAIA::NETWORK::HTTP_CODE GetResponseCode() const;
+
+			/*!
+				@brief Get http response size in bytes.
+
+				@return Return http response size in bytes.
+
+				@remarks
+			*/
+			GAIA::NUM GetResponseSize() const;
 
 			// Mode control.
 			/*!
-				@brief
+				@brief Set async mode.
 
-				@param
-
-				@return
+				@param bAsync [in] Specify the async mode.
 
 				@remarks
 			*/
 			GAIA::GVOID SetAsync(GAIA::BL bAsync);
 
 			/*!
-				@brief
+				@brief Get async mode.
 
-				@param
-
-				@return
+				@return If in async, return GAIA::True, or will return GAIA::False.
 
 				@remarks
 			*/
 			GAIA::BL GetAsync() const;
 
 			/*!
-				@brief
+				@brief Set http request timeout time in milliseconds.
 
 				@param
 
@@ -294,10 +284,10 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID SetTimeout(const GAIA::U64& uTimeout);
+			GAIA::GVOID SetTimeout(const GAIA::U64& uMilliSeconds);
 
 			/*!
-				@brief
+				@brief Get http request timeout time in milliseconds.
 
 				@param
 
@@ -309,62 +299,54 @@ namespace GAIA
 
 			// Cookic control.
 			/*!
-				@brief
+				@brief Enable or disable write cookic to RAM.
 
-				@param
-
-				@return
+				@param bEnable [in] Specify enable or disable write cookic to RAM.
 
 				@remarks
 			*/
 			GAIA::GVOID EnableWriteCookicRAM(GAIA::BL bEnable);
 
 			/*!
-				@brief
+				@brief Check enable write cookic to RAM.
 
-				@param
-
-				@return
+				@return If enable write cookic to RAM, return GAIA::True, or will return GAIA::False.
 
 				@remarks
 			*/
 			GAIA::BL IsEnableWriteCookicRAM() const;
 
 			/*!
-				@brief
+				@brief Enable or disablewrite cookic to file.
 
-				@param
-
-				@return
+				@param bEnable [in] Specify enable or disable write cookic to file.
 
 				@remarks
 			*/
 			GAIA::GVOID EnableWriteCookicFile(GAIA::BL bEnable);
 
 			/*!
-				@brief
+				@brief Check enable write cookic to file.
 
-				@param
-
-				@return
+				@return If enable write cookic to file, return GAIA::True, or will return GAIA::False.
 
 				@remarks
 			*/
 			GAIA::BL IsEnableWriteCookicFile() const;
 
 			/*!
-				@brief
+				@brief Set effect time in milliseconds for cookic which will be writen.
 
-				@param
+				@param uMilliSeconds [in] Specify the effect time in milliseconds.
 
 				@return
 
 				@remarks
 			*/
-			GAIA::GVOID SetWriteCookicTime(const GAIA::U64& uTime);
+			GAIA::GVOID SetWriteCookicTime(const GAIA::U64& uMilliSeconds);
 
 			/*!
-				@brief
+				@brief Get effect time in milliseconds for cookic which will be writen.
 
 				@param
 
@@ -375,7 +357,7 @@ namespace GAIA
 			const GAIA::U64& GetWriteCookicTime() const;
 
 			/*!
-				@brief
+				@brief Enable or disable read cookic from RAM.
 
 				@param
 
@@ -386,7 +368,7 @@ namespace GAIA
 			GAIA::GVOID EnableReadCookicRAM(GAIA::BL bEnable);
 
 			/*!
-				@brief
+				@brief Check enable read cookic from RAM.
 
 				@param
 
@@ -397,7 +379,7 @@ namespace GAIA
 			GAIA::BL IsEnableReadCookicRAM() const;
 
 			/*!
-				@brief
+				@brief Enable or disable read cookic from file.
 
 				@param
 
@@ -408,7 +390,7 @@ namespace GAIA
 			GAIA::GVOID EnableReadCookicFile(GAIA::BL bEnable);
 
 			/*!
-				@brief
+				@brief Check enable read cookic from file.
 
 				@param
 
@@ -419,7 +401,7 @@ namespace GAIA
 			GAIA::BL IsEnableReadCookicFile() const;
 
 			/*!
-				@brief
+				@brief Set effect time in milliseconds for cookic which will be read.
 
 				@param
 
@@ -427,10 +409,10 @@ namespace GAIA
 
 				@remarks
 			*/
-			GAIA::GVOID SetReadCookicTime(const GAIA::U64& uTime);
+			GAIA::GVOID SetReadCookicTime(const GAIA::U64& uMilliSeconds);
 
 			/*!
-				@brief
+				@brief Get effect time in milliseconds for cookic which will be read.
 
 				@param
 
@@ -444,56 +426,90 @@ namespace GAIA
 
 			// Stream like read write callback.
 			/*!
-				@brief
-
-				@param
-
-				@return
+				@brief When a HttpRequest begin to dispatch, this function will be callbacked.
 
 				@remarks
 			*/
 			virtual GAIA::GVOID OnBegin(){}
 
 			/*!
-				@brief
+				@brief When a HttpRequest end to dispatch,
 
-				@param
-
-				@return
+				@param bCanceled [in] If current request is ended by member function HttpRequest::Cancel, it will be filled by GAIA::True, or will be filled by GAIA::False.
 
 				@remarks
 			*/
 			virtual GAIA::GVOID OnEnd(GAIA::BL bCanceled){}
 
 			/*!
-				@brief
+				@brief When the request data send complete, this function will be callbacked.
 
-				@param
+				@remarks
+			*/
+			virtual GAIA::GVOID OnRequestComplete(){}
+
+			/*!
+				@brief When all response data recv complete, this function will be callbacked.
+
+				@remarks
+			*/
+			virtual GAIA::GVOID OnResponseComplete(){}
+
+			/*!
+				@brief When the request is paused, this function will be callbacked.
+
+				@remarks
+			*/
+			virtual GAIA::GVOID OnPause(){}
+
+			/*!
+				@brief When the request is resumed, this function will be callbacked.
+
+				@remarks
+			*/
+			virtual GAIA::GVOID OnResume(){}
+
+			/*!
+				@brief When requested and receive a response, this function will be callbacked.
+
+				@param lOffset [in]
+
+				@param pData [in]
+
+				@param sDataSize [in]
 
 				@return
 
-				@remarks
+				@remarks One request could cause multiply callbacks.
 			*/
 			virtual GAIA::BL OnWrite(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){return GAIA::False;}
 
 			/*!
-				@brief
+				@brief When a request try to read request data, this function will be callbacked.
 
-				@param
+				@param lOffset [in]
+
+				@param pData [in]
+
+				@param sMaxDataSize [in]
+
+				@param sPracticeDataSize [in]
 
 				@return
 
-				@remarks
+				@remarks One request could cause multiply callbacks.
 			*/
 			virtual GAIA::BL OnRead(GAIA::N64 lOffset, GAIA::GVOID* pData, GAIA::NUM sMaxDataSize, GAIA::NUM& sPracticeDataSize){return GAIA::False;}
 
 		private:
 			GINL GAIA::GVOID init()
 			{
-				m_pHttp = GNIL;
 				m_method = GAIA::NETWORK::HTTP_METHOD_INVALID;
-				m_bComplete = GAIA::False;
-				m_ResultCode = GAIA::NETWORK::HTTP_CODE_INVALID;
+				m_bBufOwner = GAIA::True;
+				m_bRequestComplete = GAIA::False;
+				m_bResponseComplete = GAIA::False;
+				m_ResponseCode = GAIA::NETWORK::HTTP_CODE_INVALID;
+				m_sResponseSize = 0;
 				m_bAsync = GAIA::False;
 				m_uTimeout = 16 * 1000 * 1000;
 				m_bEnableWriteCookicRAM = GAIA::False;
@@ -502,6 +518,7 @@ namespace GAIA
 				m_bEnableReadCookicRAM = GAIA::False;
 				m_bEnableReadCookicFile = GAIA::False;
 				m_uReadCookicTime = 0;
+				m_bRequesting = GAIA::False;
 			}
 
 		private:
@@ -510,8 +527,11 @@ namespace GAIA
 			GAIA::NETWORK::HttpURL m_url;
 			GAIA::NETWORK::HttpHead m_head;
 			GAIA::CTN::Buffer m_buf;
-			GAIA::BL m_bComplete;
-			GAIA::NETWORK::HTTP_CODE m_ResultCode;
+			GAIA::BL m_bBufOwner;
+			GAIA::BL m_bRequestComplete;
+			GAIA::BL m_bResponseComplete;
+			GAIA::NETWORK::HTTP_CODE m_ResponseCode;
+			GAIA::NUM m_sResponseSize;
 			GAIA::BL m_bAsync;
 			GAIA::U64 m_uTimeout;
 			GAIA::BL m_bEnableWriteCookicRAM;
@@ -520,6 +540,7 @@ namespace GAIA
 			GAIA::BL m_bEnableReadCookicRAM;
 			GAIA::BL m_bEnableReadCookicFile;
 			GAIA::U64 m_uReadCookicTime;
+			GAIA::BL m_bRequesting;
 		};
 
 		/*!
@@ -528,7 +549,8 @@ namespace GAIA
 		class HttpDesc : public GAIA::Base
 		{
 		public:
-			static const GAIA::NUM DEFAULT_THREAD_COUNT = 4;
+			static const GAIA::NUM DEFAULT_NETWORK_THREAD_COUNT = 4;
+			static const GAIA::NUM DEFAULT_WORK_THREAD_COUNT = 4;
 			static const GAIA::NUM DEFAULT_MAX_PARALLEL_COUNT = 1000;
 			static const GAIA::NUM DEFAULT_MAX_COOKIC_COUNT = 10000;
 			static const GAIA::NUM DEFAULT_MAX_COOKIC_SIZE = 10000;
@@ -546,7 +568,8 @@ namespace GAIA
 			*/
 			GAIA::GVOID reset()
 			{
-				sThreadCount = DEFAULT_THREAD_COUNT;
+				sNetworkThreadCount = DEFAULT_NETWORK_THREAD_COUNT;
+				sWorkThreadCount = DEFAULT_WORK_THREAD_COUNT;
 				sMaxParallelCount = DEFAULT_MAX_PARALLEL_COUNT;
 				sMaxCookicCount = DEFAULT_MAX_COOKIC_COUNT;
 				sMaxCookicSize = DEFAULT_MAX_COOKIC_SIZE;
@@ -563,7 +586,9 @@ namespace GAIA
 			*/
 			GAIA::BL check() const
 			{
-				if(sThreadCount <= 0)
+				if(sNetworkThreadCount <= 0)
+					return GAIA::False;
+				if(sWorkThreadCount <= 0)
 					return GAIA::False;
 				if(sMaxParallelCount <= 0)
 					return GAIA::False;
@@ -577,9 +602,14 @@ namespace GAIA
 		public:
 
 			/*!
+				@brief Network thread count.
+			*/
+			GAIA::NUM sNetworkThreadCount;
+
+			/*!
 				@brief
 			*/
-			GAIA::NUM sThreadCount;
+			GAIA::NUM sWorkThreadCount;
 
 			/*!
 				@brief
@@ -597,11 +627,16 @@ namespace GAIA
 			GAIA::NUM sMaxCookicSize;
 		};
 
+		class HttpWorkThread;
+
 		/*!
 			@brief
 		*/
 		class Http : public GAIA::Base
 		{
+			friend class HttpWorkThread;
+			friend class HttpAsyncSocket;
+			friend class HttpAsyncDispatcher;
 			friend class HttpRequest;
 
 		public:
@@ -802,6 +837,7 @@ namespace GAIA
 				m_bEnableWriteCookicFile = GAIA::False;
 				m_bEnableReadCookicRAM = GAIA::False;
 				m_bEnableReadCookicFile = GAIA::False;
+				m_disp = GNIL;
 			}
 
 		private:
@@ -812,7 +848,8 @@ namespace GAIA
 			GAIA::BL m_bEnableWriteCookicFile;
 			GAIA::BL m_bEnableReadCookicRAM;
 			GAIA::BL m_bEnableReadCookicFile;
-
+			GAIA::CTN::Vector<GAIA::NETWORK::HttpWorkThread*> m_listWorkThreads;
+			HttpAsyncDispatcher* m_disp;
 		};
 	}
 }

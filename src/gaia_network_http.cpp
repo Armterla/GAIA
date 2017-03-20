@@ -10,17 +10,30 @@ namespace GAIA
 	{
 		HttpRequest::HttpRequest(GAIA::NETWORK::Http& http)
 		{
-			this->init();
 			m_pHttp = &http;
+			this->init();
 		}
 
 		HttpRequest::~HttpRequest()
 		{
+			if(m_bBufOwner)
+				m_buf.destroy();
+			else
+				m_buf.proxy(GNIL, GNIL);
 		}
 
 		Http& HttpRequest::GetHttp()
 		{
 			return *m_pHttp;
+		}
+
+		GAIA::GVOID HttpRequest::Reset()
+		{
+			if(m_bBufOwner)
+				m_buf.destroy();
+			else
+				m_buf.proxy(GNIL, GNIL);
+			this->init();
 		}
 
 		GAIA::GVOID HttpRequest::SetMethod(GAIA::NETWORK::HTTP_METHOD method)
@@ -65,6 +78,43 @@ namespace GAIA
 
 		GAIA::BL HttpRequest::BindBuffer(const GAIA::GVOID* p, GAIA::NUM sSize)
 		{
+			if(p == GNIL)
+			{
+				if(sSize > 0)
+				{
+					m_bBufOwner = GAIA::True;
+					m_buf.resize(sSize);
+				}
+				else if(sSize == 0)
+				{
+					if(m_bBufOwner)
+						m_buf.destroy();
+					else
+						m_buf.proxy(GNIL, GNIL);
+				}
+				else
+				{
+					GASTFALSE;
+					return GAIA::False;
+				}
+			}
+			else
+			{
+				if(sSize > 0)
+				{
+					if(m_bBufOwner)
+						m_buf.destroy();
+					else
+						m_buf.proxy(GNIL, GNIL);
+					m_bBufOwner = GAIA::False;
+					m_buf.proxy((GAIA::U8*)p, (GAIA::U8*)p + sSize - 1);
+				}
+				else
+				{
+					GASTFALSE;
+					return GAIA::False;
+				}
+			}
 			return GAIA::True;
 		}
 
@@ -78,8 +128,21 @@ namespace GAIA
 			return m_buf.write_size();
 		}
 
+		GAIA::BL HttpRequest::IsBufferOwner() const
+		{
+			return m_bBufOwner;
+		}
+
 		GAIA::BL HttpRequest::Request()
 		{
+			if(this->GetAsync())
+			{
+
+			}
+			else
+			{
+
+			}
 			return GAIA::True;
 		}
 
@@ -103,19 +166,24 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		GAIA::BL HttpRequest::IsComplete() const
+		GAIA::BL HttpRequest::IsRequestComplete() const
 		{
-			return m_bComplete;
+			return m_bRequestComplete;
 		}
 
-		GAIA::NETWORK::HTTP_CODE HttpRequest::GetResultCode() const
+		GAIA::BL HttpRequest::IsResponseComplete() const
 		{
-			return m_ResultCode;
+			return m_bResponseComplete;
 		}
 
-		GAIA::NUM HttpRequest::GetResultSize() const
+		GAIA::NETWORK::HTTP_CODE HttpRequest::GetResponseCode() const
 		{
-			return 0;
+			return m_ResponseCode;
+		}
+
+		GAIA::NUM HttpRequest::GetResponseSize() const
+		{
+			return m_sResponseSize;
 		}
 
 		GAIA::GVOID HttpRequest::SetAsync(GAIA::BL bAsync)
@@ -128,9 +196,9 @@ namespace GAIA
 			return m_bAsync;
 		}
 
-		GAIA::GVOID HttpRequest::SetTimeout(const GAIA::U64& uTimeout)
+		GAIA::GVOID HttpRequest::SetTimeout(const GAIA::U64& uMilliSeconds)
 		{
-			m_uTimeout = uTimeout;
+			m_uTimeout = uMilliSeconds;
 		}
 
 		const GAIA::U64& HttpRequest::GetTimeout() const
@@ -158,9 +226,9 @@ namespace GAIA
 			return m_bEnableWriteCookicFile;
 		}
 
-		GAIA::GVOID HttpRequest::SetWriteCookicTime(const GAIA::U64& uTime)
+		GAIA::GVOID HttpRequest::SetWriteCookicTime(const GAIA::U64& uMilliSeconds)
 		{
-			m_uWriteCookicTime = uTime;
+			m_uWriteCookicTime = uMilliSeconds;
 		}
 
 		const GAIA::U64& HttpRequest::GetWriteCookicTime() const
@@ -188,9 +256,9 @@ namespace GAIA
 			return m_bEnableReadCookicFile;
 		}
 
-		GAIA::GVOID HttpRequest::SetReadCookicTime(const GAIA::U64& uTime)
+		GAIA::GVOID HttpRequest::SetReadCookicTime(const GAIA::U64& uMilliSeconds)
 		{
-			m_uReadCookicTime = uTime;
+			m_uReadCookicTime = uMilliSeconds;
 		}
 
 		const GAIA::U64& HttpRequest::GetReadCookicTime() const
@@ -256,6 +324,8 @@ namespace GAIA
 
 			if(this->IsBegin())
 				return GAIA::False;
+
+
 
 			m_bBegin = GAIA::True;
 			return GAIA::True;
