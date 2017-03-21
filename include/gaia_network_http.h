@@ -138,7 +138,7 @@ namespace GAIA
 
 				@return If bind buffer successfully, return GAIA::True, or return GAIA::False.
 
-				@remarks The bound buffer will be send to server after send the head, so it could be a http body.
+				@remarks The bound buffer will be send to server after send the head, so it could be a http body.\n
 					If parameter p is not GNIL and sSize above 0, current function will reference the buffer and the caller must keep the buffer available until http request complete.\n
 					If parameter p is GNIL and sSize above 0, current function will allocate buffer internal.\n
 					If parameter p is GNIL and sSize equal zero, current function will unreference the buffer or destory the internal buffer.\n
@@ -172,7 +172,7 @@ namespace GAIA
 			/*!
 				@brief Execute request.
 
-				@return If deliver http request successfully, return GAIA::True, or return GAIA::False.\n
+				@return If deliver http request successfully, return GAIA::True, or return GAIA::False.
 
 				@remarks This method is thread safe.\n
 					There are some reasons cause deliver http request failed:\n
@@ -453,32 +453,34 @@ namespace GAIA
 			virtual GAIA::GVOID OnResume(){}
 
 			/*!
-				@brief When requested and receive a response, this function will be callbacked.
+				@brief When send a request buffer piece, this function will be callbacked.
 
-				@param lOffset [in]
+				@param lOffset [in] Specify the offset position of total sent buffer.
 
-				@param pData [in]
+				@param pData [in] Specify the data buffer of current sent buffer piece.
 
-				@param sDataSize [in]
+				@param sDataSize [in] Specify the data buffer's size of current sent buffer piece.
 
 				@remarks This function would be callbacked in multi thread.\n
-					One request could cause multiply callbacks of this method.
+					One request could cause multiply callbacks of this method.\n
+					This method will be callbacked after send a piece of data by network.\n
 			*/
 			virtual GAIA::GVOID OnWrite(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){}
 
 			/*!
-				@brief When a request try to read request data, this function will be callbacked.
+				@brief When receive a response buffer piece, this function will be callbacked.
 
-				@param lOffset [in]
+				@param lOffset [in] Specify the offset position of total received buffer.
 
-				@param pData [in]
+				@param pData [in] Specify the data buffer of current received buffer piece.
 
-				@param sMaxDataSize [in]
+				@param sMaxDataSize [in] Specify the data buffer's max size of current received buffer piece.
 
-				@param sPracticeDataSize [in]
+				@param sPracticeDataSize [in] Specify the data buffer's size of current received buffer piece.
 
 				@remarks This function would be callbacked in multi thread.\n
-					One request could cause multiply callbacks of this method.
+					One request could cause multiply callbacks of this method.\n
+					This method will be callbacked after receive a piece of data by network.\n
 			*/
 			virtual GAIA::GVOID OnRead(GAIA::N64 lOffset, GAIA::GVOID* pData, GAIA::NUM sMaxDataSize, GAIA::NUM& sPracticeDataSize){}
 
@@ -712,7 +714,7 @@ namespace GAIA
 
 				@return If Http create successfully, return GAIA::True, or will return GAIA::False.
 
-				@remarks
+				@remarks After call this method, the user should call Http::Begin method to start work thread and network thread.
 
 				@see GAIA::NETWORK::HttpDesc.
 			*/
@@ -721,9 +723,9 @@ namespace GAIA
 			/*!
 				@brief Destroy http.
 
-				@return
+				@return If destroy http successfully, return GAIA::True, or return GAIA::False.
 
-				@remarks
+				@remarks Call this function will recycle all cookic in RAM.\n
 			*/
 			GAIA::BL Destroy();
 
@@ -746,18 +748,19 @@ namespace GAIA
 			/*!
 				@brief Begin http work.
 
-				@return
+				@return If begin http successfully, return GAIA::True, or return GAIA::False.
 
-				@remarks
+				@remarks Call this thread will startup the work thread and network thread.\n
 			*/
 			GAIA::BL Begin();
 
 			/*!
 				@brief End http work.
 
-				@return
+				@return If end http successfully, return GAIA::True, or return GAIA::False.
 
-				@remarks
+				@remarks Call this thread will shutdown the work thread and network thread,
+					but the RAM cookic wouldn't be recycle in this function call.
 			*/
 			GAIA::BL End();
 
@@ -771,20 +774,18 @@ namespace GAIA
 			/*!
 				@brief Execute http.
 
-				@return
+				@return If there exist a task to execute, pop and executed, return GAIA::True, or return GAIA::False.
 
-				@remarks
+				@remarks Call this method only pop a unit task in task queue and execute it, so if user need execute all waiting task,
+					call this method many times until GAIA::False be returnned.\n
+					This method is thread safe.\n
 			*/
 			GAIA::BL Execute();
 
 			/*!
 				@brief Enable or disable write cookic to RAM.
 
-				@param bEnable [in]
-
-				@return
-
-				@remarks
+				@param bEnable [in] Specify enable or disable write cookic to RAM.
 			*/
 			GAIA::GVOID EnableWriteCookicRAM(GAIA::BL bEnable){m_bEnableWriteCookicRAM = bEnable;}
 
@@ -800,11 +801,7 @@ namespace GAIA
 			/*!
 				@brief Enable or disable write cookic to file.
 
-				@param
-
-				@return
-
-				@remarks
+				@param bEnable [in] Specify enable or disable write cookic to file.
 			*/
 			GAIA::GVOID EnableWriteCookicFile(GAIA::BL bEnable){m_bEnableWriteCookicFile = bEnable;}
 
@@ -820,11 +817,7 @@ namespace GAIA
 			/*!
 				@brief Enable or disable read cookic from RAM.
 
-				@param
-
-				@return
-
-				@remarks
+				@param bEnable [in] Specify enable read cookic from RAM.
 			*/
 			GAIA::GVOID EnableReadCookicRAM(GAIA::BL bEnable){m_bEnableReadCookicRAM = bEnable;}
 
@@ -840,11 +833,7 @@ namespace GAIA
 			/*!
 				@brief Enable or disable read cookic from file.
 
-				@param
-
-				@return
-
-				@remarks
+				@param bEnable [in] Specify enable read cookic from file.
 			*/
 			GAIA::GVOID EnableReadCookicFile(GAIA::BL bEnable){m_bEnableReadCookicFile = bEnable;}
 
@@ -860,15 +849,17 @@ namespace GAIA
 			/*!
 				@brief Cleanup cookic.
 
-				@param bRAM [in]
+				@param bRAM [in] Specify clean cookic from RAM or not. Default is GAIA::True.
 
-				@param bFile [in]
+				@param bFile [in] Specify clean cookic from file or not. Default is GAIA::True.
 
-				@param uBeyondTime [in]
+				@param uBeyondTime [in] Specify the cookic recycle limit time.\n
+					If the cookic life time above equal this parameter, the cookic will be recycled.\n
+					Default is zero means all of the cookic would be cleanuped.\n
 
-				@return
+				@return If exist cookic be cleanuped, return GAIA::True, or return GAIA::False.
 
-				@remarks
+				@remarks This method is a sync method, and it is thread safe.
 			*/
 			GAIA::BL CleanupCookic(GAIA::BL bRAM = GAIA::True, GAIA::BL bFile = GAIA::True, const GAIA::U64& uBeyondTime = 0);
 
