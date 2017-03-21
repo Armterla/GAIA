@@ -65,9 +65,11 @@ namespace GAIA
 
 				@param method [in] Specify the method.
 
-				@remarks
+				@return If set method successfully, return GAIA::True, or return GAIA::False.
+
+				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::GVOID SetMethod(GAIA::NETWORK::HTTP_METHOD method){m_method = method;}
+			GAIA::BL SetMethod(GAIA::NETWORK::HTTP_METHOD method){if(m_bRequesting) return GAIA::False; m_method = method; return GAIA::True;}
 
 			/*!
 				@brief Get http request method.
@@ -81,16 +83,16 @@ namespace GAIA
 
 				@param url [in] Specify the url.
 
-				@remarks
+				@return If set url successfully, return GAIA::True, or will return GAIA::False.
+
+				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::GVOID SetURL(const GAIA::NETWORK::HttpURL& url){m_url = url;}
+			GAIA::BL SetURL(const GAIA::NETWORK::HttpURL& url){if(m_bRequesting) return GAIA::False; m_url = url; return GAIA::True;}
 
 			/*!
 				@brief Get http request url.
 
 				@return Return http request url.
-
-				@remarks
 			*/
 			const GAIA::NETWORK::HttpURL& GetURL() const{return m_url;}
 
@@ -98,8 +100,6 @@ namespace GAIA
 				@brief Get http request url.
 
 				@return Return http request url.
-
-				@remarks
 			*/
 			GAIA::NETWORK::HttpURL& GetURL(){return m_url;}
 
@@ -108,16 +108,16 @@ namespace GAIA
 
 				@param head [in] Specify http head.
 
-				@remarks
+				@return If set head successfully, return GAIA::True, or will return GAIA::False.
+
+				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::GVOID SetHead(const GAIA::NETWORK::HttpHead& head){m_head = head;}
+			GAIA::BL SetHead(const GAIA::NETWORK::HttpHead& head){if(m_bRequesting) return GAIA::False; m_head = head; return GAIA::True;}
 
 			/*!
 				@brief Get http request head.
 
 				@return Return http request head.
-
-				@remarks
 			*/
 			const GAIA::NETWORK::HttpHead& GetHead() const{return m_head;}
 
@@ -125,8 +125,6 @@ namespace GAIA
 				@brief Get http request head.
 
 				@return Return http request head.
-
-				@remarks
 			*/
 			GAIA::NETWORK::HttpHead& GetHead(){return m_head;}
 
@@ -144,6 +142,7 @@ namespace GAIA
 					If parameter p is not GNIL and sSize above 0, current function will reference the buffer and the caller must keep the buffer available until http request complete.\n
 					If parameter p is GNIL and sSize above 0, current function will allocate buffer internal.\n
 					If parameter p is GNIL and sSize equal zero, current function will unreference the buffer or destory the internal buffer.\n
+					When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.\n
 			*/
 			GAIA::BL BindBuffer(const GAIA::GVOID* p, GAIA::NUM sSize);
 
@@ -151,8 +150,6 @@ namespace GAIA
 				@brief Get the buffer for request.
 
 				@return If the buffer exist, return a valid pointer, or will return GNIL.
-
-				@remarks
 			*/
 			const GAIA::GVOID* GetBuffer() const{return m_buf.fptr();}
 
@@ -175,9 +172,13 @@ namespace GAIA
 			/*!
 				@brief Execute request.
 
-				@return If deliver http request successfully, return GAIA::True, or return GAIA::False.
+				@return If deliver http request successfully, return GAIA::True, or return GAIA::False.\n
 
-				@remarks This method is thread safe.
+				@remarks This method is thread safe.\n
+					There are some reasons cause deliver http request failed:\n
+					-# Http request's method is not be set.
+					-# Http request's url is not be set.
+					-# Deliver http request by HttpRequest::Request method twice.
 			*/
 			GAIA::BL Request();
 
@@ -186,7 +187,10 @@ namespace GAIA
 
 				@return If cancel the request successfully, return GAIA::True, or return GAIA::False.
 
-				@remarks This method is thread safe.
+				@remarks This method is thread safe.\n
+					There are some reasons cause cancel http request failed:\n
+					-# Http request had not be delivered by HttpRequest::Request method.
+					-# Http request is dispatched complete, HttpRequest::OnEnd had be called.
 			*/
 			GAIA::BL Cancel();
 
@@ -195,7 +199,11 @@ namespace GAIA
 
 				@return If pause the request successfully, return GAIA::True, or return GAIA::False.
 
-				@remarks This method is thread safe.
+				@remarks This method is thread safe.\n
+					There are some reasons cause pause http request failed:\n
+					-# Http request had not be deliverd by HttpRequest::Request method.
+					-# Http request had paused.
+					-# Http request is dispatched complete, HttpRequest::OnEnd had be called.
 			*/
 			GAIA::BL Pause();
 
@@ -204,18 +212,27 @@ namespace GAIA
 
 				@return If resume the request successfully, return GAIA::True, or return GAIA::False.
 
-				@remarks This method is thread safe.
+				@remarks This method is thread safe.\n
+					There are some reasons cause resume http request failed:\n
+					-# Http request had not be delivered by HttpRequest::Request method.
+					-# Http request had not be paused.
+					-# Http request is dispatched complete, HttpRequest::OnEnd had be called.
 			*/
 			GAIA::BL Resume();
 
 			/*!
 				@brief Wait the request complete.
 
-				@param uMilliSeconds [in] Specify the timeout time in milli-seconds.
+				@param uMilliSeconds [in] Specify the timeout time in milli-seconds.\n
+					Caller could pass GINVALID to wait for infinite.
 
 				@return If wait request complete successfully, return GAIA::True, or will return GAIA::False.
 
-				@remarks This method is thread safe.
+				@remarks This method is thread safe.\n
+					There are some reasons cause wait http request failed:\n
+					-# Http request had not be deliverd by HttpRequest::Request method.
+					-# Http request is dispatched complete, HttpRequest::OnEnd had be called.
+					-# Wait http request by HttpRequest::Wait twice.
 			*/
 			GAIA::BL Wait(GAIA::U32 uMilliSeconds);
 
@@ -224,8 +241,6 @@ namespace GAIA
 				@brief Check the request complete or not.
 
 				@return If request completed, return GAIA::True, or will return GAIA::False.
-
-				@remarks
 			*/
 			GAIA::BL IsRequestComplete() const{return m_bRequestComplete;}
 
@@ -233,8 +248,6 @@ namespace GAIA
 				@brief Check the response complete or not.
 
 				@return If response completed, return GAIA::True, or will return GAIA::False.
-
-				@remarks
 			*/
 			GAIA::BL IsResponseComplete() const{return m_bResponseComplete;}
 
@@ -242,8 +255,6 @@ namespace GAIA
 				@brief Get http result code.
 
 				@return Return http result code.
-
-				@remarks
 			*/
 			GAIA::NETWORK::HTTP_CODE GetResponseCode() const{return m_ResponseCode;}
 
@@ -251,49 +262,25 @@ namespace GAIA
 				@brief Get http response size in bytes.
 
 				@return Return http response size in bytes.
-
-				@remarks
 			*/
 			GAIA::NUM GetResponseSize() const{return m_sResponseSize;}
 
 			// Mode control.
 			/*!
-				@brief Set async mode.
-
-				@param bAsync [in] Specify the async mode.
-
-				@remarks
-			*/
-			GAIA::GVOID SetAsync(GAIA::BL bAsync){m_bAsync = bAsync;}
-
-			/*!
-				@brief Get async mode.
-
-				@return If in async, return GAIA::True, or will return GAIA::False.
-
-				@remarks
-			*/
-			GAIA::BL GetAsync() const{return m_bAsync;}
-
-			/*!
 				@brief Set http request timeout time in milliseconds.
 
-				@param
+				@param uMilliSeconds [in] Specify the timeout time in milliseconds.
 
-				@return
+				@return If set timeout time successfully, return GAIA::True, or will return GAIA::False.
 
-				@remarks
+				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::GVOID SetTimeout(const GAIA::U64& uMilliSeconds){m_uTimeout = uMilliSeconds;}
+			GAIA::BL SetTimeout(const GAIA::U64& uMilliSeconds){if(m_bRequesting) return GAIA::False; m_uTimeout = uMilliSeconds; return GAIA::True;}
 
 			/*!
 				@brief Get http request timeout time in milliseconds.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return the timeout time in milliseconds.
 			*/
 			const GAIA::U64& GetTimeout() const{return m_uTimeout;}
 
@@ -303,16 +290,18 @@ namespace GAIA
 
 				@param bEnable [in] Specify enable or disable write cookic to RAM.
 
-				@remarks
+				@return If enable or disable write cookic to ram successfully, return GAIA::True, or will return GAIA::False.
+
+				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::GVOID EnableWriteCookicRAM(GAIA::BL bEnable){m_bEnableWriteCookicRAM = bEnable;}
+			GAIA::BL EnableWriteCookicRAM(GAIA::BL bEnable){if(m_bRequesting) return GAIA::False; m_bEnableWriteCookicRAM = bEnable; return GAIA::True;}
 
 			/*!
 				@brief Check enable write cookic to RAM.
 
 				@return If enable write cookic to RAM, return GAIA::True, or will return GAIA::False.
 
-				@remarks
+				@remarks Default value after a HttpRequest construct is GAIA::False.
 			*/
 			GAIA::BL IsEnableWriteCookicRAM() const{return m_bEnableWriteCookicRAM;}
 
@@ -321,16 +310,18 @@ namespace GAIA
 
 				@param bEnable [in] Specify enable or disable write cookic to file.
 
-				@remarks
+				@return If enable or disable write cookic to file successfully, return GAIA::True, or will return GAIA::False.
+
+				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::GVOID EnableWriteCookicFile(GAIA::BL bEnable){m_bEnableWriteCookicFile = bEnable;}
+			GAIA::BL EnableWriteCookicFile(GAIA::BL bEnable){if(m_bRequesting) return GAIA::False; m_bEnableWriteCookicFile = bEnable; return GAIA::True;}
 
 			/*!
 				@brief Check enable write cookic to file.
 
 				@return If enable write cookic to file, return GAIA::True, or will return GAIA::False.
 
-				@remarks
+				@remarks Default value after a HttpRequest construct is GAIA::False.
 			*/
 			GAIA::BL IsEnableWriteCookicFile() const{return m_bEnableWriteCookicFile;}
 
@@ -339,86 +330,78 @@ namespace GAIA
 
 				@param uMilliSeconds [in] Specify the effect time in milliseconds.
 
-				@return
+				@return If set effect time for cookic which will be writen successfully, return GAIA::True, or will return GAIA::False.
 
-				@remarks
+				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::GVOID SetWriteCookicTime(const GAIA::U64& uMilliSeconds){m_uWriteCookicTime = uMilliSeconds;}
+			GAIA::BL SetWriteCookicTime(const GAIA::U64& uMilliSeconds){if(m_bRequesting) return GAIA::False; m_uWriteCookicTime = uMilliSeconds; return GAIA::True;}
 
 			/*!
 				@brief Get effect time in milliseconds for cookic which will be writen.
 
-				@param
+				@return Return the effect time in milliseconds for cookic which will be writen.
 
-				@return
-
-				@remarks
+				@remarks Default value after a HttpRequest construct is 0.
 			*/
 			const GAIA::U64& GetWriteCookicTime() const{return m_uWriteCookicTime;}
 
 			/*!
 				@brief Enable or disable read cookic from RAM.
 
-				@param
+				@param bEnable [in] Specify enable or disable read cookic from RAM.
 
-				@return
+				@return If enable or disable read cookic from RAM successfully, return GAIA::True, or will return GAIA::False.
 
-				@remarks
+				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::GVOID EnableReadCookicRAM(GAIA::BL bEnable){m_bEnableReadCookicRAM = bEnable;}
+			GAIA::BL EnableReadCookicRAM(GAIA::BL bEnable){if(m_bRequesting) return GAIA::False; m_bEnableReadCookicRAM = bEnable; return GAIA::True;}
 
 			/*!
 				@brief Check enable read cookic from RAM.
 
-				@param
+				@return If enable read cookic from RAM, return GAIA::True, or will return GAIA::False.
 
-				@return
-
-				@remarks
+				@remarks Default value after a HttpRequest construct is GAIA::False.
 			*/
 			GAIA::BL IsEnableReadCookicRAM() const{return m_bEnableReadCookicRAM;}
 
 			/*!
 				@brief Enable or disable read cookic from file.
 
-				@param
+				@param bEnable [in] Specify enable or disable read cookic from file.
 
-				@return
+				@return If enable or disable read cookic from file successfully, return GAIA::True, or will return GAIA::False.
 
-				@remarks
+				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::GVOID EnableReadCookicFile(GAIA::BL bEnable){m_bEnableReadCookicFile = bEnable;}
+			GAIA::BL EnableReadCookicFile(GAIA::BL bEnable){if(m_bRequesting) return GAIA::False; m_bEnableReadCookicFile = bEnable; return GAIA::True;}
 
 			/*!
 				@brief Check enable read cookic from file.
 
-				@param
+				@return If enable read cookic from file, return GAIA::True, or will return GAIA::False.
 
-				@return
-
-				@remarks
+				@remarks Default value after a HttpRequest construct is GAIA::False.
 			*/
 			GAIA::BL IsEnableReadCookicFile() const{return m_bEnableReadCookicFile;}
 
 			/*!
 				@brief Set effect time in milliseconds for cookic which will be read.
 
-				@param
+				@param uMilliSeconds [in] Specify the effect time for cookic which will be read.
 
-				@return
+				@return If set effect time for cookic which will be read successfully, return GAIA::True, or will return GAIA::False.
 
-				@remarks
+				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::GVOID SetReadCookicTime(const GAIA::U64& uMilliSeconds){m_uReadCookicTime = uMilliSeconds;}
+			GAIA::BL SetReadCookicTime(const GAIA::U64& uMilliSeconds){if(m_bRequesting) return GAIA::False; m_uReadCookicTime = uMilliSeconds; return GAIA::True;}
 
 			/*!
 				@brief Get effect time in milliseconds for cookic which will be read.
 
-				@param
+				@return Return effect time in milliseconds for cookic which will be read.
 
-				@return
-
-				@remarks
+				@remarks Default value after a HttpRequest construct is 0.
 			*/
 			const GAIA::U64& GetReadCookicTime() const{return m_uReadCookicTime;}
 
@@ -428,7 +411,7 @@ namespace GAIA
 			/*!
 				@brief When a HttpRequest begin to dispatch, this function will be callbacked.
 
-				@remarks
+				@remarks This function would be callbacked in multi thread.\n
 			*/
 			virtual GAIA::GVOID OnBegin(){}
 
@@ -437,35 +420,35 @@ namespace GAIA
 
 				@param bCanceled [in] If current request is ended by member function HttpRequest::Cancel, it will be filled by GAIA::True, or will be filled by GAIA::False.
 
-				@remarks
+				@remarks This function would be callbacked in multi thread.\n
 			*/
 			virtual GAIA::GVOID OnEnd(GAIA::BL bCanceled){}
 
 			/*!
 				@brief When the request data send complete, this function will be callbacked.
 
-				@remarks
+				@remarks This function would be callbacked in multi thread.\n
 			*/
 			virtual GAIA::GVOID OnRequestComplete(){}
 
 			/*!
 				@brief When all response data recv complete, this function will be callbacked.
 
-				@remarks
+				@remarks This function would be callbacked in multi thread.\n
 			*/
 			virtual GAIA::GVOID OnResponseComplete(){}
 
 			/*!
 				@brief When the request is paused, this function will be callbacked.
 
-				@remarks
+				@remarks This function would be callbacked in multi thread.\n
 			*/
 			virtual GAIA::GVOID OnPause(){}
 
 			/*!
 				@brief When the request is resumed, this function will be callbacked.
 
-				@remarks
+				@remarks This function would be callbacked in multi thread.\n
 			*/
 			virtual GAIA::GVOID OnResume(){}
 
@@ -478,11 +461,10 @@ namespace GAIA
 
 				@param sDataSize [in]
 
-				@return
-
-				@remarks One request could cause multiply callbacks.
+				@remarks This function would be callbacked in multi thread.\n
+					One request could cause multiply callbacks of this method.
 			*/
-			virtual GAIA::BL OnWrite(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){return GAIA::False;}
+			virtual GAIA::GVOID OnWrite(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){}
 
 			/*!
 				@brief When a request try to read request data, this function will be callbacked.
@@ -495,11 +477,10 @@ namespace GAIA
 
 				@param sPracticeDataSize [in]
 
-				@return
-
-				@remarks One request could cause multiply callbacks.
+				@remarks This function would be callbacked in multi thread.\n
+					One request could cause multiply callbacks of this method.
 			*/
-			virtual GAIA::BL OnRead(GAIA::N64 lOffset, GAIA::GVOID* pData, GAIA::NUM sMaxDataSize, GAIA::NUM& sPracticeDataSize){return GAIA::False;}
+			virtual GAIA::GVOID OnRead(GAIA::N64 lOffset, GAIA::GVOID* pData, GAIA::NUM sMaxDataSize, GAIA::NUM& sPracticeDataSize){}
 
 		private:
 			GINL GAIA::GVOID init()
@@ -510,7 +491,6 @@ namespace GAIA
 				m_bResponseComplete = GAIA::False;
 				m_ResponseCode = GAIA::NETWORK::HTTP_CODE_INVALID;
 				m_sResponseSize = 0;
-				m_bAsync = GAIA::False;
 				m_uTimeout = 16 * 1000 * 1000;
 				m_bEnableWriteCookicRAM = GAIA::False;
 				m_bEnableWriteCookicFile = GAIA::False;
@@ -519,6 +499,8 @@ namespace GAIA
 				m_bEnableReadCookicFile = GAIA::False;
 				m_uReadCookicTime = 0;
 				m_bRequesting = GAIA::False;
+				m_pSock = GNIL;
+				m_sIndex = GINVALID;
 			}
 
 		private:
@@ -532,7 +514,6 @@ namespace GAIA
 			GAIA::BL m_bResponseComplete;
 			GAIA::NETWORK::HTTP_CODE m_ResponseCode;
 			GAIA::NUM m_sResponseSize;
-			GAIA::BL m_bAsync;
 			GAIA::U64 m_uTimeout;
 			GAIA::BL m_bEnableWriteCookicRAM;
 			GAIA::BL m_bEnableWriteCookicFile;
@@ -541,48 +522,50 @@ namespace GAIA
 			GAIA::BL m_bEnableReadCookicFile;
 			GAIA::U64 m_uReadCookicTime;
 			GAIA::BL m_bRequesting;
+			GAIA::NETWORK::AsyncSocket* m_pSock;
+			GAIA::NUM m_sIndex; // Is the index in GAIA::NETWORK::Http's variable member m_requests.
 		};
 
 		/*!
-			@brief
+			@brief Http description for work.
 		*/
 		class HttpDesc : public GAIA::Base
 		{
 		public:
 			static const GAIA::NUM DEFAULT_NETWORK_THREAD_COUNT = 4;
 			static const GAIA::NUM DEFAULT_WORK_THREAD_COUNT = 4;
-			static const GAIA::NUM DEFAULT_MAX_PARALLEL_COUNT = 1000;
+			static const GAIA::NUM DEFAULT_MAX_CONN_COUNT = 10000;
+			static const GAIA::U64 DEFAULT_MAX_CONN_TIME = (GAIA::U64)1000 * 1000 * 3600 * 24;
 			static const GAIA::NUM DEFAULT_MAX_COOKIC_COUNT = 10000;
 			static const GAIA::NUM DEFAULT_MAX_COOKIC_SIZE = 10000;
 
 		public:
 
 			/*!
-				@brief
-
-				@param
-
-				@return
-
-				@remarks
+				@brief Reset all of the HttpDesc's member variables to default value.
 			*/
 			GAIA::GVOID reset()
 			{
 				sNetworkThreadCount = DEFAULT_NETWORK_THREAD_COUNT;
 				sWorkThreadCount = DEFAULT_WORK_THREAD_COUNT;
-				sMaxParallelCount = DEFAULT_MAX_PARALLEL_COUNT;
+				pszRootPath = GNILSTR;
+				sMaxConnCount = DEFAULT_MAX_CONN_COUNT;
+				uMaxConnTime = DEFAULT_MAX_CONN_TIME;
+				GAIA::ALGO::gstrcpy(szHttpVer, GAIA::NETWORK::HTTP_VERSION_STRING);
+				sHttpVerLen = GAIA::ALGO::gstrlen(szHttpVer);
+				bEnableSocketTCPNoDelay = GAIA::True;
+				bEnableSocketNoBlock = GAIA::False;
+				bEnableSocketReuseAddr = GAIA::True;
+				nSocketSendBufferSize = GINVALID;
+				nSocketRecvBufferSize = GINVALID;
 				sMaxCookicCount = DEFAULT_MAX_COOKIC_COUNT;
 				sMaxCookicSize = DEFAULT_MAX_COOKIC_SIZE;
 			}
 
 			/*!
-				@brief
+				@brief Check HttpDesc's member variables is valid or not.
 
-				@param
-
-				@return
-
-				@remarks
+				@return If all of the member variables is valid, return GAIA::True, or will return GAIA::False.
 			*/
 			GAIA::BL check() const
 			{
@@ -590,7 +573,21 @@ namespace GAIA
 					return GAIA::False;
 				if(sWorkThreadCount <= 0)
 					return GAIA::False;
-				if(sMaxParallelCount <= 0)
+				if(pszRootPath == GNIL)
+					return GAIA::False;
+				if(sMaxConnCount == 0)
+					return GAIA::False;
+				if(uMaxConnTime == 0)
+					return GAIA::False;
+				if(szHttpVer[0] == '\0')
+					return GAIA::False;
+				if(sHttpVerLen <= 0)
+					return GAIA::False;
+				if(GAIA::ALGO::gstrlen(szHttpVer) != sHttpVerLen)
+					return GAIA::False;
+				if(nSocketSendBufferSize != GINVALID && nSocketSendBufferSize <= 0)
+					return GAIA::False;
+				if(nSocketRecvBufferSize != GINVALID && nSocketRecvBufferSize <= 0)
 					return GAIA::False;
 				if(sMaxCookicCount < 0)
 					return GAIA::False;
@@ -602,27 +599,84 @@ namespace GAIA
 		public:
 
 			/*!
-				@brief Network thread count.
+				@brief Specify network thread count, default value is DEFAULT_NETWORK_THREAD_COUNT.
+
+				@see DEFAULT_NETWORK_THREAD_COUNT.
 			*/
 			GAIA::NUM sNetworkThreadCount;
 
 			/*!
-				@brief
+				@brief Specify work thread count, default value is DEFAULT_WORK_THREAD_COUNT.
+
+				@see DEFAULT_WORK_THREAD_COUNT.
 			*/
 			GAIA::NUM sWorkThreadCount;
 
 			/*!
-				@brief
+				@brief Specify HttpServer's root path, default value is "".
 			*/
-			GAIA::NUM sMaxParallelCount;
+			const GAIA::CH* pszRootPath;
 
 			/*!
-				@brief
+				@brief Specify HttpServer's max connection count at same time, default value is DEFAULT_MAX_CONN_COUNT.
+
+				@see DEFAULT_MAX_CONN_COUNT.
+			*/
+			GAIA::NUM sMaxConnCount;
+
+			/*!
+				@brief Specify the connection's max transfer time, default value is DEFAULT_MAX_CONN_TIME.
+
+				@see DEFAULT_MAX_CONN_TIME.
+			*/
+			GAIA::U64 uMaxConnTime;
+
+			/*!
+				@brief Specify the http version, default value is "HTTP/1.1".
+			*/
+			GAIA::CH szHttpVer[16];
+
+			/*!
+				@brief Specify the http version string's length, default value is strlen("HTTP/1.1").
+			*/
+			GAIA::NUM sHttpVerLen;
+
+			/*!
+				@brief Specify the socket use TCP NO-DELAY mode, default is GAIA::False.
+			*/
+			GAIA::BL bEnableSocketTCPNoDelay;
+
+			/*!
+				@brief Specify the socket use NO-BLOCK mode, default is GAIA::False.
+			*/
+			GAIA::BL bEnableSocketNoBlock;
+
+			/*!
+				@brief Specify the socket RE-USE-ADDRESS mode, default is GAIA::False.
+			*/
+			GAIA::BL bEnableSocketReuseAddr;
+
+			/*!
+				@brief Specify the socket's send buffer size in bytes, default is GINVALID means use system default setting.
+			*/
+			GAIA::N32 nSocketSendBufferSize;
+
+			/*!
+				@brief Specify the socket's receive buffer size in bytes, default is GINVALID means use system default setting.
+			*/
+			GAIA::N32 nSocketRecvBufferSize;
+
+			/*!
+				@brief Specify the max cookic count, default value is DEFAULT_MAX_COOKIC_COUNT.
+
+				@see DEFAULT_MAX_COOKIC_COUNT.
 			*/
 			GAIA::NUM sMaxCookicCount;
 
 			/*!
-				@brief
+				@brief Specify the max cookic size in bytes, default value is DEFAULT_MAX_COOKIC_SIZE.
+
+				@see DEFAULT_MAX_COOKIC_SIZE.
 			*/
 			GAIA::NUM sMaxCookicSize;
 		};
@@ -630,7 +684,7 @@ namespace GAIA
 		class HttpWorkThread;
 
 		/*!
-			@brief
+			@brief Http request manager class.
 		*/
 		class Http : public GAIA::Base
 		{
@@ -652,20 +706,20 @@ namespace GAIA
 			~Http();
 
 			/*!
-				@brief
+				@brief Create http.
 
-				@param
+				@param desc [in] Specify http work description.
 
-				@return
+				@return If Http create successfully, return GAIA::True, or will return GAIA::False.
 
 				@remarks
+
+				@see GAIA::NETWORK::HttpDesc.
 			*/
 			GAIA::BL Create(const GAIA::NETWORK::HttpDesc& desc);
 
 			/*!
-				@brief
-
-				@param
+				@brief Destroy http.
 
 				@return
 
@@ -674,31 +728,23 @@ namespace GAIA
 			GAIA::BL Destroy();
 
 			/*!
-				@brief
+				@brief Check http is created or not.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Is http is created, return GAIA::True, or return GAIA::False.
 			*/
-			GAIA::BL IsCreated() const;
+			GAIA::BL IsCreated() const{return m_bCreated;}
 
 			/*!
-				@brief
+				@brief Get http work description which is specified when call Http::Create.
 
-				@param
+				@return Return the http work description.
 
-				@return
-
-				@remarks
+				@see GAIA::NETWORK::HttpDesc.
 			*/
-			const GAIA::NETWORK::HttpDesc& GetDesc() const;
+			const GAIA::NETWORK::HttpDesc& GetDesc() const{return m_desc;}
 
 			/*!
-				@brief
-
-				@param
+				@brief Begin http work.
 
 				@return
 
@@ -707,9 +753,7 @@ namespace GAIA
 			GAIA::BL Begin();
 
 			/*!
-				@brief
-
-				@param
+				@brief End http work.
 
 				@return
 
@@ -718,20 +762,25 @@ namespace GAIA
 			GAIA::BL End();
 
 			/*!
-				@brief
+				@brief Check http is working or not.
 
-				@param
+				@return If http is working, return GAIA::True, or will return GAIA::False.
+			*/
+			GAIA::BL IsBegin() const{return m_bBegin;}
+
+			/*!
+				@brief Execute http.
 
 				@return
 
 				@remarks
 			*/
-			GAIA::BL IsBegin() const;
+			GAIA::BL Execute();
 
 			/*!
-				@brief
+				@brief Enable or disable write cookic to RAM.
 
-				@param
+				@param bEnable [in]
 
 				@return
 
@@ -740,18 +789,16 @@ namespace GAIA
 			GAIA::GVOID EnableWriteCookicRAM(GAIA::BL bEnable){m_bEnableWriteCookicRAM = bEnable;}
 
 			/*!
-				@brief
+				@brief Check enable write cookic to RAM.
 
-				@param
+				@return If enable write cookic to RAM, return GAIA::True, or will return GAIA::False.
 
-				@return
-
-				@remarks
+				@remarks Default value after a Http construct is GAIA::False.
 			*/
 			GAIA::BL IsEnableWriteCookicRAM() const{return m_bEnableWriteCookicRAM;}
 
 			/*!
-				@brief
+				@brief Enable or disable write cookic to file.
 
 				@param
 
@@ -762,18 +809,16 @@ namespace GAIA
 			GAIA::GVOID EnableWriteCookicFile(GAIA::BL bEnable){m_bEnableWriteCookicFile = bEnable;}
 
 			/*!
-				@brief
+				@brief Check enable write cookic to file.
 
-				@param
+				@return If enable write cookic to file, return GAIA::True, or will return GAIA::False.
 
-				@return
-
-				@remarks
+				@remarks Default value after a Http construct is GAIA::False.
 			*/
 			GAIA::BL IsEnableWriteCookicFile() const{return m_bEnableWriteCookicFile;}
 
 			/*!
-				@brief
+				@brief Enable or disable read cookic from RAM.
 
 				@param
 
@@ -784,18 +829,16 @@ namespace GAIA
 			GAIA::GVOID EnableReadCookicRAM(GAIA::BL bEnable){m_bEnableReadCookicRAM = bEnable;}
 
 			/*!
-				@brief
+				@brief Check enable read cookic from RAM.
 
-				@param
+				@return If enable read cookic from RAM, return GAIA::True, or will return GAIA::False.
 
-				@return
-
-				@remarks
+				@remarks Default value after a Http construct is GAIA::False.
 			*/
 			GAIA::BL IsEnableReadCookicRAM() const{return m_bEnableReadCookicRAM;}
 
 			/*!
-				@brief
+				@brief Enable or disable read cookic from file.
 
 				@param
 
@@ -806,26 +849,32 @@ namespace GAIA
 			GAIA::GVOID EnableReadCookicFile(GAIA::BL bEnable){m_bEnableReadCookicFile = bEnable;}
 
 			/*!
-				@brief
+				@brief Check enable read cookic from file.
 
-				@param
+				@return If enable read cookic from file, return GAIA::True, or will return GAIA::False.
 
-				@return
-
-				@remarks
+				@remarks Default value after a Http construct is GAIA::False.
 			*/
 			GAIA::BL IsEnableReadCookicFile() const{return m_bEnableReadCookicFile;}
 
 			/*!
-				@brief
+				@brief Cleanup cookic.
 
-				@param
+				@param bRAM [in]
+
+				@param bFile [in]
+
+				@param uBeyondTime [in]
 
 				@return
 
 				@remarks
 			*/
-			GAIA::BL CleanupCookic(GAIA::BL bMem = GAIA::True, GAIA::BL bFile = GAIA::True, const GAIA::U64& uBeyondTime = 0);
+			GAIA::BL CleanupCookic(GAIA::BL bRAM = GAIA::True, GAIA::BL bFile = GAIA::True, const GAIA::U64& uBeyondTime = 0);
+
+		private:
+			typedef GAIA::CTN::Vector<GAIA::NETWORK::HttpRequest*> __RequestVectorType;
+			typedef GAIA::CTN::Vector<GAIA::NETWORK::HttpAsyncSocket*> __SockVectorType;
 
 		private:
 			GINL GAIA::GVOID init()
@@ -849,7 +898,11 @@ namespace GAIA
 			GAIA::BL m_bEnableReadCookicRAM;
 			GAIA::BL m_bEnableReadCookicFile;
 			GAIA::CTN::Vector<GAIA::NETWORK::HttpWorkThread*> m_listWorkThreads;
-			HttpAsyncDispatcher* m_disp;
+			GAIA::NETWORK::HttpAsyncDispatcher* m_disp;
+			GAIA::SYNC::Lock m_lrRequests;
+			__RequestVectorType m_requests;
+			GAIA::SYNC::Lock m_lrSocks;
+			__SockVectorType m_socks;
 		};
 	}
 }

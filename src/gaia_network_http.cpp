@@ -1,5 +1,6 @@
 #include <gaia_type.h>
 #include <gaia_assert.h>
+#include <gaia_sync_base.h>
 #include <gaia_network_http.h>
 #include <gaia_assert_impl.h>
 #include <gaia_thread_base_impl.h>
@@ -8,6 +9,40 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		class HttpWorkThread : public GAIA::THREAD::Thread
+		{
+		public:
+			HttpWorkThread(GAIA::NETWORK::Http& http)
+			{
+				this->init();
+				m_pHttp = &http;
+			}
+			~HttpWorkThread(){}
+			GAIA::GVOID SetStopCmd(GAIA::BL bStopCmd){m_bStopCmd = bStopCmd;}
+			virtual GAIA::GVOID Run()
+			{
+				for(;;)
+				{
+					if(m_bStopCmd)
+						break;
+					GAIA::BL bExistExecutedTask = m_pHttp->Execute();
+					if(!bExistExecutedTask)
+						GAIA::SYNC::gsleep(1);
+				}
+			}
+
+		private:
+			GINL GAIA::GVOID init()
+			{
+				m_pHttp = GNIL;
+				m_bStopCmd = GAIA::False;
+			}
+
+		private:
+			GAIA::NETWORK::Http* m_pHttp;
+			GAIA::BL m_bStopCmd;
+		};
+
 		class HttpAsyncSocket : public GAIA::NETWORK::AsyncSocket
 		{
 		public:
@@ -20,16 +55,46 @@ namespace GAIA
 
 			~HttpAsyncSocket(){}
 
+			virtual GAIA::GVOID Create()
+			{
+				GAIA::NETWORK::AsyncSocket::Create();
+
+				const GAIA::NETWORK::HttpDesc& descHttp = m_pHttp->GetDesc();
+				if(descHttp.bEnableSocketTCPNoDelay)
+					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY, GAIA::True);
+				if(descHttp.bEnableSocketNoBlock)
+					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
+				if(descHttp.bEnableSocketReuseAddr)
+					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEADDR, GAIA::True);
+
+				if(descHttp.nSocketSendBufferSize != GINVALID)
+					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, descHttp.nSocketSendBufferSize);
+				if(descHttp.nSocketRecvBufferSize != GINVALID)
+					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, descHttp.nSocketRecvBufferSize);
+			}
+
 		protected:
 			virtual GAIA::GVOID OnCreated(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnClosed(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnBound(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
-			virtual GAIA::GVOID OnConnected(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
-			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult){}
+			virtual GAIA::GVOID OnConnected(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr)
+			{
+
+			}
+			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult)
+			{
+
+			}
 			virtual GAIA::GVOID OnListened(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnAccepted(GAIA::BL bResult, const GAIA::NETWORK::Addr& addrListen){}
-			virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nPracticeSize, GAIA::N32 nSize){}
-			virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize){}
+			virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nPracticeSize, GAIA::N32 nSize)
+			{
+
+			}
+			virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize)
+			{
+
+			}
 			virtual GAIA::GVOID OnShutdowned(GAIA::BL bResult, GAIA::N32 nShutdownFlag){}
 
 		private:
@@ -37,11 +102,13 @@ namespace GAIA
 			{
 				m_pHttp = GNIL;
 				m_pRequest = GNIL;
+				m_sIndex = GINVALID;
 			}
 
 		private:
 			GAIA::NETWORK::Http* m_pHttp;
 			GAIA::NETWORK::HttpRequest* m_pRequest;
+			GAIA::NUM m_sIndex; // Is the index in GAIA::NETWORK::Http's variable member m_socks.
 		};
 
 		class HttpAsyncDispatcher : public GAIA::NETWORK::AsyncDispatcher
@@ -107,6 +174,9 @@ namespace GAIA
 
 		GAIA::BL HttpRequest::BindBuffer(const GAIA::GVOID* p, GAIA::NUM sSize)
 		{
+			if(m_bRequesting)
+				return GAIA::False;
+
 			if(p == GNIL)
 			{
 				if(sSize > 0)
@@ -149,14 +219,6 @@ namespace GAIA
 
 		GAIA::BL HttpRequest::Request()
 		{
-			if(this->GetAsync())
-			{
-
-			}
-			else
-			{
-
-			}
 			return GAIA::True;
 		}
 
@@ -205,6 +267,20 @@ namespace GAIA
 				return GAIA::False;
 
 			// Create async network.
+			m_disp = gnew GAIA::NETWORK::HttpAsyncDispatcher(*this);
+			GAIA::NETWORK::AsyncDispatcherDesc descDisp;
+			descDisp.reset();
+			descDisp.sThreadCount = desc.sNetworkThreadCount;
+			descDisp.sMaxConnectionCount = desc.sMaxConnCount;
+			if(!m_disp->Create(descDisp))
+				return GAIA::False;
+
+			// Create work thread.
+			for(GAIA::NUM x = 0; x < m_desc.sWorkThreadCount; ++x)
+			{
+				HttpWorkThread* pThread = gnew HttpWorkThread(*this);
+				m_listWorkThreads.push_back(pThread);
+			}
 
 			m_desc = desc;
 			m_bCreated = GAIA::True;
@@ -219,20 +295,24 @@ namespace GAIA
 			if(this->IsBegin())
 				this->End();
 
-			// Destroy async network;
+			// Destroy async network.
+			m_disp->Destroy();
+			gdel m_disp;
+			m_disp = GNIL;
+
+			// Destroy work thread.
+			for(GAIA::NUM x = 0; x < m_desc.sWorkThreadCount; ++x)
+			{
+				HttpWorkThread* pThread = m_listWorkThreads[x];
+				GAST(pThread != GNIL);
+				gdel pThread;
+			}
+			m_listWorkThreads.clear();
+
+			// Cleanup cookic in RAM.
 
 			m_bCreated = GAIA::False;
 			return GAIA::True;
-		}
-
-		GAIA::BL Http::IsCreated() const
-		{
-			return m_bCreated;
-		}
-
-		const GAIA::NETWORK::HttpDesc& Http::GetDesc() const
-		{
-			return m_desc;
 		}
 
 		GAIA::BL Http::Begin()
@@ -243,9 +323,28 @@ namespace GAIA
 			if(this->IsBegin())
 				return GAIA::False;
 
-			// Create work thread.
-
 			// Begin async network.
+			if(!m_disp->Begin())
+			{
+				for(GAIA::NUM x = 0; x < m_listWorkThreads.size(); ++x)
+				{
+					HttpWorkThread* pThread = m_listWorkThreads[x];
+					pThread->SetStopCmd(GAIA::True);
+				}
+				for(GAIA::NUM x = 0; x < m_listWorkThreads.size(); ++x)
+				{
+					HttpWorkThread* pThread = m_listWorkThreads[x];
+					pThread->Wait();
+				}
+				return GAIA::False;
+			}
+
+			// Start work thread.
+			for(GAIA::NUM x = 0; x < m_listWorkThreads.size(); ++x)
+			{
+				HttpWorkThread* pThread = m_listWorkThreads[x];
+				pThread->Start();
+			}
 
 			m_bBegin = GAIA::True;
 			return GAIA::True;
@@ -256,20 +355,57 @@ namespace GAIA
 			if(!this->IsBegin())
 				return GAIA::False;
 
-			// End async network.
-
 			// Close work thread.
+			for(GAIA::NUM x = 0; x < m_listWorkThreads.size(); ++x)
+			{
+				HttpWorkThread* pThread = m_listWorkThreads[x];
+				GAST(pThread != GNIL);
+				pThread->SetStopCmd(GAIA::True);
+			}
+			for(GAIA::NUM x = 0; x < m_listWorkThreads.size(); ++x)
+			{
+				HttpWorkThread* pThread = m_listWorkThreads[x];
+				GAST(pThread != GNIL);
+				pThread->Wait();
+			}
+
+			// Release all requests.
+			{
+				GAIA::SYNC::Autolock al(m_lrRequests);
+				for(__RequestVectorType::it it = m_requests.frontit(); !it.empty(); ++it)
+				{
+					GAIA::NETWORK::HttpRequest* pRequest = *it;
+					GAST(pRequest != GNIL);
+					pRequest->drop_ref();
+				}
+				m_requests.clear();
+			}
+
+			// Release all sockets.
+			{
+				GAIA::SYNC::Autolock al(m_lrSocks);
+				for(__SockVectorType::it it = m_socks.frontit(); !it.empty(); ++it)
+				{
+					GAIA::NETWORK::HttpAsyncSocket* pSocket = *it;
+					GAST(pSocket != GNIL);
+					pSocket->drop_ref();
+				}
+				m_socks.clear();
+			}
+
+			// End async network.
+			m_disp->End();
 
 			m_bBegin = GAIA::False;
 			return GAIA::True;
 		}
 
-		GAIA::BL Http::IsBegin() const
+		GAIA::BL Http::Execute()
 		{
-			return m_bBegin;
+			return GAIA::True;
 		}
 
-		GAIA::BL Http::CleanupCookic(GAIA::BL bMem, GAIA::BL bFile, const GAIA::U64& uBeyondTime)
+		GAIA::BL Http::CleanupCookic(GAIA::BL bRAM, GAIA::BL bFile, const GAIA::U64& uBeyondTime)
 		{
 			return GAIA::True;
 		}
