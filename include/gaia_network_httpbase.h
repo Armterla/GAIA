@@ -24,6 +24,11 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		/*!
+			@brief Current supported HTTP protocal version.
+		*/
+		static const GAIA::CH* HTTP_VERSION_STRING = "HTTP/1.1";
+
 		// Http method.
 		GAIA_ENUM_BEGIN(HTTP_METHOD)
 			HTTP_METHOD_PUT,

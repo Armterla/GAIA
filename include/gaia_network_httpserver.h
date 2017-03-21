@@ -25,11 +25,6 @@ namespace GAIA
 	namespace NETWORK
 	{
 		/*!
-			@brief Current supported HTTP protocal version.
-		*/
-		static const GAIA::CH* HTTP_VERSION_STRING = "HTTP/1.1";
-
-		/*!
 			@brief HttpServer's access mode.
 
 				If you set HttpServer use BLACK mode, all requests in BLACK list will be deny.\n
@@ -160,10 +155,7 @@ namespace GAIA
 		public:
 
 			/*!
-				@brief Specify network thread count.
-
-					Default value is DEFAULT_NETWORK_THREAD_COUNT.
-					You can call HttpServerDesc::reset function to reset to default value.
+				@brief Specify network thread count, default value is DEFAULT_NETWORK_THREAD_COUNT.
 
 				@see DEFAULT_NETWORK_THREAD_COUNT.
 			*/
@@ -204,7 +196,7 @@ namespace GAIA
 			GAIA::U64 uMaxHarfConnTime;
 
 			/*!
-				@brief Specify the max dynamic cache size in bytes, default value is DEFAUL_MAX_DYNAMIC_CACHE_SIZE.
+				@brief Specify the max dynamic cache size in bytes, default value is DEFAULT_MAX_DYNAMIC_CACHE_SIZE.
 
 				@see DEFAULT_MAX_DYNAMIC_CACHE_SIZE.
 			*/
