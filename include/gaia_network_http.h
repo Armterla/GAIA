@@ -218,7 +218,7 @@ namespace GAIA
 				@return If deliver http request successfully, return GAIA::True, or return GAIA::False.
 
 				@remarks This method is thread safe.\n
-					There are some reasons cause deliver http request failed:\n
+					There are some reasons cause deliver http request failed:
 					-# Http request's method is not be set or invalid.
 					-# Http request's url is not be set is not be set or invalid.
 					-# Deliver http request by HttpRequest::Request method twice.
@@ -231,7 +231,7 @@ namespace GAIA
 				@return If cancel the request successfully, return GAIA::True, or return GAIA::False.
 
 				@remarks This method is thread safe.\n
-					There are some reasons cause cancel http request failed:\n
+					There are some reasons cause cancel http request failed:
 					-# Http request had not be delivered by HttpRequest::Request method.
 					-# Http request is dispatched complete, HttpRequest::OnEnd had be called.
 			*/
@@ -243,7 +243,7 @@ namespace GAIA
 				@return If pause the request successfully, return GAIA::True, or return GAIA::False.
 
 				@remarks This method is thread safe.\n
-					There are some reasons cause pause http request failed:\n
+					There are some reasons cause pause http request failed:
 					-# Http request had not be deliverd by HttpRequest::Request method.
 					-# Http request had paused.
 					-# Http request is dispatched complete, HttpRequest::OnEnd had be called.
@@ -256,7 +256,7 @@ namespace GAIA
 				@return If resume the request successfully, return GAIA::True, or return GAIA::False.
 
 				@remarks This method is thread safe.\n
-					There are some reasons cause resume http request failed:\n
+					There are some reasons cause resume http request failed:
 					-# Http request had not be delivered by HttpRequest::Request method.
 					-# Http request had not be paused.
 					-# Http request is dispatched complete, HttpRequest::OnEnd had be called.
@@ -272,7 +272,7 @@ namespace GAIA
 				@return If wait request complete successfully, return GAIA::True, or will return GAIA::False.
 
 				@remarks This method is thread safe.\n
-					There are some reasons cause wait http request failed:\n
+					There are some reasons cause wait http request failed:
 					-# Http request had not be deliverd by HttpRequest::Request method.
 					-# Http request is dispatched complete, HttpRequest::OnEnd had be called.
 					-# Wait http request by HttpRequest::Wait twice.

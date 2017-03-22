@@ -1153,9 +1153,9 @@ namespace GAIA
 			GAIA::BL CollectWhiteList(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerBlackWhiteNode>& listResult) const;
 
 			/*!
-				@brief Get server status.
+				@brief Get http server status.
 
-				@return Return server status.
+				@return Return http server status.
 			*/
 			GINL GAIA::NETWORK::HttpServerStatus& GetStatus(){return m_status;}
 
