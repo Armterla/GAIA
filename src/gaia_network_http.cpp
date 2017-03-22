@@ -219,6 +219,8 @@ namespace GAIA
 
 		GAIA::BL HttpRequest::Request()
 		{
+			if(m_method == GAIA::NETWORK::HTTP_METHOD_INVALID)
+				return GAIA::False;
 			return GAIA::True;
 		}
 
@@ -402,6 +404,88 @@ namespace GAIA
 
 		GAIA::BL Http::Execute()
 		{
+			GAIA::BL bRet = GAIA::False;
+
+			// Request.
+			{
+				GAIA::BL bConnectionIsFull = GAIA::False;
+				{
+					GAIA::SYNC::Autolock al(m_lrSocks);
+					if(m_socks.size() >= m_desc.sMaxConnCount)
+						bConnectionIsFull = GAIA::False;
+				}
+
+				if(!bConnectionIsFull)
+				{
+					GAIA::NETWORK::HttpRequest* pRequest = GNIL;
+					{
+						GAIA::SYNC::Autolock al(m_lrRequests);
+						if(!m_requests.empty())
+						{
+							pRequest = m_requests.back();
+							m_requests.pop_back();
+						}
+					}
+
+					if(pRequest != GNIL)
+					{
+						pRequest->OnBegin();
+
+						const GAIA::NETWORK::HttpURL& url = pRequest->GetURL();
+						GAIA::CH szHostName[64];
+						GAIA::NUM sHostNameLen;
+						const GAIA::CH* pszHostName = url.GetHostName(szHostName, sizeof(szHostName), &sHostNameLen);
+						if(GAIA::ALGO::gstremp(pszHostName))
+							pszHostName = GAIA::NETWORK::GAIA_LOCAL_HOST_IP;
+
+						GAIA::BL bHostAddressIsValid = GAIA::True;
+						GAIA::NETWORK::Addr addrHost;
+						if(!addrHost.fromstring(pszHostName))
+						{
+							if(!GAIA::NETWORK::GetHostIP(pszHostName, addrHost.ip))
+								bHostAddressIsValid = GAIA::False;
+							else
+							{
+								if(!addrHost.fromstring(pszHostName))
+									bHostAddressIsValid = GAIA::False;
+							}
+						}
+
+						addrHost.uPort = url.GetPort();
+						if(addrHost.uPort == 0)
+							addrHost.uPort = GAIA::NETWORK::HTTP_DEFAULT_PORT;
+
+						if(bHostAddressIsValid)
+						{
+							HttpAsyncSocket* pSocket = gnew HttpAsyncSocket(*this, *m_disp);
+							pSocket->Create();
+							pSocket->Connect(addrHost);
+							bRet = GAIA::True;
+						}
+						else
+						{
+							pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_DOMAIN_ANALYSIS_FAILED;
+							pRequest->OnEnd(GAIA::False);
+						}
+					}
+				}
+			}
+
+			// Response.
+			{
+
+			}
+
+			// Request timeout dispatch.
+			{
+
+			}
+
+			// Recycle cache.
+			{
+
+			}
+
 			return GAIA::True;
 		}
 

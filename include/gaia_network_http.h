@@ -176,8 +176,8 @@ namespace GAIA
 
 				@remarks This method is thread safe.\n
 					There are some reasons cause deliver http request failed:\n
-					-# Http request's method is not be set.
-					-# Http request's url is not be set.
+					-# Http request's method is not be set or invalid.
+					-# Http request's url is not be set is not be set or invalid.
 					-# Deliver http request by HttpRequest::Request method twice.
 			*/
 			GAIA::BL Request();
@@ -255,6 +255,9 @@ namespace GAIA
 				@brief Get http result code.
 
 				@return Return http result code.
+
+				@remarks If return value is GAIA::NETWORK::HTTP_CODE_INVALID, may be some network error occurred,
+					call HttpRequest::GetNetworkError to check it.
 			*/
 			GAIA::NETWORK::HTTP_CODE GetResponseCode() const{return m_ResponseCode;}
 
@@ -264,6 +267,16 @@ namespace GAIA
 				@return Return http response size in bytes.
 			*/
 			GAIA::NUM GetResponseSize() const{return m_sResponseSize;}
+
+			/*!
+				@brief Get http request's network error.
+
+				@return Return the http reuqest's network error.
+
+				@remarks If return value is not GAIA::NETWORK::NETWORK_ERROR_OK, means network error occurred,
+					at this time, response code obtained by HttpRequest::GetResponseCode will be GAIA::NETWORK::HTTP_CODE_INVALID.
+			*/
+			GAIA::NETWORK::NETWORK_ERROR GetNetworkError() const{return m_NetworkError;}
 
 			// Mode control.
 			/*!
@@ -493,6 +506,7 @@ namespace GAIA
 				m_bResponseComplete = GAIA::False;
 				m_ResponseCode = GAIA::NETWORK::HTTP_CODE_INVALID;
 				m_sResponseSize = 0;
+				m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_INVALID;
 				m_uTimeout = 16 * 1000 * 1000;
 				m_bEnableWriteCookicRAM = GAIA::False;
 				m_bEnableWriteCookicFile = GAIA::False;
@@ -516,6 +530,7 @@ namespace GAIA
 			GAIA::BL m_bResponseComplete;
 			GAIA::NETWORK::HTTP_CODE m_ResponseCode;
 			GAIA::NUM m_sResponseSize;
+			GAIA::NETWORK::NETWORK_ERROR m_NetworkError;
 			GAIA::U64 m_uTimeout;
 			GAIA::BL m_bEnableWriteCookicRAM;
 			GAIA::BL m_bEnableWriteCookicFile;
@@ -615,12 +630,12 @@ namespace GAIA
 			GAIA::NUM sWorkThreadCount;
 
 			/*!
-				@brief Specify HttpServer's root path, default value is "".
+				@brief Specify Http's root path, default value is "".
 			*/
 			const GAIA::CH* pszRootPath;
 
 			/*!
-				@brief Specify HttpServer's max connection count at same time, default value is DEFAULT_MAX_CONN_COUNT.
+				@brief Specify Http's max connection count at same time, default value is DEFAULT_MAX_CONN_COUNT.
 
 				@see DEFAULT_MAX_CONN_COUNT.
 			*/
@@ -684,6 +699,224 @@ namespace GAIA
 		};
 
 		class HttpWorkThread;
+
+		/*!
+			@brief Http server's status description class.
+		*/
+		class HttpStatus : public GAIA::Base
+		{
+		public:
+
+			/*!
+				@brief Reset the HttpStatus to default value.
+
+				@remarks All member variables are be filled by zero.
+			*/
+			GINL GAIA::GVOID reset()
+			{
+				uStartupTime = 0;
+
+				uRequestLifeTime = 0;
+				uRequestLifeCount = 0;
+
+				uRequestCount = 0;
+				uResponseCount = 0;
+
+				uRequestPieceCount = 0;
+				uResponsePieceCount = 0;
+
+				uRequestSize = 0;
+				uResponseSize = 0;
+
+				GAST(sizeofarray(uRequestCountByMethod) == sizeofarray(uResponseCountByMethod));
+				GAST(sizeofarray(uRequestCountByMethod) == sizeofarray(uRequestPieceCountByMethod));
+				GAST(sizeofarray(uRequestCountByMethod) == sizeofarray(uResponsePieceCountByMethod));
+				GAST(sizeofarray(uRequestCountByMethod) == sizeofarray(uRequestSizeByMethod));
+				GAST(sizeofarray(uRequestCountByMethod) == sizeofarray(uResponseSizeByMethod));
+				for(GAIA::NUM x = 0; x < sizeofarray(uRequestCountByMethod); ++x)
+				{
+					uRequestCountByMethod[x] = 0;
+					uResponseCountByMethod[x] = 0;
+					uRequestPieceCountByMethod[x] = 0;
+					uResponsePieceCountByMethod[x] = 0;
+					uRequestSizeByMethod[x] = 0;
+					uResponseSizeByMethod[x] = 0;
+				}
+
+				for(GAIA::NUM x = 0; x < sizeofarray(uResponseCountByCode); ++x)
+					uResponseCountByCode[x] = 0;
+
+				uHitCookicCount = 0;
+				uHitCookicSize = 0;
+				uNotHitCookicCount = 0;
+				uNotResponseCount = 0;
+
+				uRequestTimeoutCount = 0;
+				uCallBackBeginCount = 0;
+				uCallBackEndCount = 0;
+				uCallBackEndWithCancelCount = 0;
+				uCallBackRequestCompleteCount = 0;
+				uCallBackResponseCompleteCount = 0;
+				uCallBackPauseCount = 0;
+				uCallBackResumeCount = 0;
+				uCallBackWriteCount = 0;
+				uCallBackReadCount = 0;
+			}
+
+		public:
+
+			/*!
+				@brief Specify the server startup GMT time in microseconds.
+
+					When you call Http::Begin, this time will be filled.
+			*/
+			GAIA::U64 uStartupTime;
+
+			/*!
+				@brief Specify the request's life time.
+			*/
+			GAIA::U64 uRequestLifeTime;
+
+			/*!
+				@brief Specify the request's life dispatch count.
+			*/
+			GAIA::U64 uRequestLifeCount;
+
+			/*!
+				@brief Specify Http's total request count.
+			*/
+			GAIA::U64 uRequestCount;
+
+			/*!
+				@brief Specify Http's total response count.
+			*/
+			GAIA::U64 uResponseCount;
+
+			/*!
+				@brief Specify Http's total request piese count.
+			*/
+			GAIA::U64 uRequestPieceCount;
+
+			/*!
+				@brief Specify Http's total response piece count.
+			*/
+			GAIA::U64 uResponsePieceCount;
+
+			/*!
+				@brief Specify Http's total request size in bytes.
+			*/
+			GAIA::U64 uRequestSize;
+
+			/*!
+				@brief Specify Http's total response size in bytes.
+			*/
+			GAIA::U64 uResponseSize;
+
+			/*!
+				@brief Specify Http's total request count by HTTP_METHOD catagory.
+			*/
+			GAIA::U64 uRequestCountByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
+
+			/*!
+				@brief Specify Http's total response count by HTTP_METHOD catagory.
+			*/
+			GAIA::U64 uResponseCountByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
+
+			/*!
+				@brief Specify Http's total request piese count by HTTP_METHOD catagory.
+			*/
+			GAIA::U64 uRequestPieceCountByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
+
+			/*!
+				@brief Specify Http's total response piece count by HTTP_METHOD catagory.
+			*/
+			GAIA::U64 uResponsePieceCountByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
+
+			/*!
+				@brief Specify Http's total request size in bytes by HTTP_METHOD catagory.
+			*/
+			GAIA::U64 uRequestSizeByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
+
+			/*!
+				@brief Specify Http's total response size in bytes by HTTP_METHOD catagory.
+			*/
+			GAIA::U64 uResponseSizeByMethod[GAIA::NETWORK::HTTP_METHOD_MAXENUMCOUNT];
+
+			/*!
+				@brief Specify Http's total response count by HTTP_CODE catagory.
+			*/
+			GAIA::U64 uResponseCountByCode[GAIA::NETWORK::HTTP_CODE_MAXENUMCOUNT];
+
+			/*!
+				@brief Specify hit cookic count.
+			*/
+			GAIA::U64 uHitCookicCount;
+
+			/*!
+				@brief Specify hit cookic size.
+			*/
+			GAIA::U64 uHitCookicSize;
+
+			/*!
+				@brief Specify not hit cookic count.
+			*/
+			GAIA::U64 uNotHitCookicCount;
+
+			/*!
+				@brief Specify not response count.
+			*/
+			GAIA::U64 uNotResponseCount;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uRequestTimeoutCount;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uCallBackBeginCount;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uCallBackEndCount;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uCallBackEndWithCancelCount;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uCallBackRequestCompleteCount;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uCallBackResponseCompleteCount;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uCallBackPauseCount;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uCallBackResumeCount;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uCallBackWriteCount;
+
+			/*!
+				@brief
+			*/
+			GAIA::U64 uCallBackReadCount;
+		};
 
 		/*!
 			@brief Http request manager class.
@@ -863,6 +1096,13 @@ namespace GAIA
 			*/
 			GAIA::BL CleanupCookic(GAIA::BL bRAM = GAIA::True, GAIA::BL bFile = GAIA::True, const GAIA::U64& uBeyondTime = 0);
 
+			/*!
+				@brief Get http status.
+
+				@return Return http status.
+			*/
+			GINL GAIA::NETWORK::HttpStatus& GetStatus(){return m_status;}
+
 		private:
 			typedef GAIA::CTN::Vector<GAIA::NETWORK::HttpRequest*> __RequestVectorType;
 			typedef GAIA::CTN::Vector<GAIA::NETWORK::HttpAsyncSocket*> __SockVectorType;
@@ -878,6 +1118,7 @@ namespace GAIA
 				m_bEnableReadCookicRAM = GAIA::False;
 				m_bEnableReadCookicFile = GAIA::False;
 				m_disp = GNIL;
+				m_status.reset();
 			}
 
 		private:
@@ -894,6 +1135,7 @@ namespace GAIA
 			__RequestVectorType m_requests;
 			GAIA::SYNC::Lock m_lrSocks;
 			__SockVectorType m_socks;
+			GAIA::NETWORK::HttpStatus m_status;
 		};
 	}
 }
