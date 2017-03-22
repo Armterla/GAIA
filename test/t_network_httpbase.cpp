@@ -89,6 +89,8 @@ namespace TEST
 				TERROR;
 			if(sPracSize != sizeof("4567") - 1)
 				TERROR;
+			if(hu.GetPort() != 4567)
+				TERROR;
 
 			if(hu.GetPath(szPath, sizeof(szPath), &sPracSize) != szPath)
 				TERROR;

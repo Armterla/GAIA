@@ -985,6 +985,20 @@ namespace GAIA
 			}
 
 			/*!
+				@brief Get integer port in HttpURL.
+
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return 0.
+			*/
+			GINL GAIA::U16 GetPort() const
+			{
+				GAIA::CH szPort[32];
+				GAIA::CH* pszPort = this->GetPort(szPort, sizeof(szPort));
+				if(pszPort == GNIL)
+					return 0;
+				return GAIA::ALGO::acasts(pszPort);
+			}
+
+			/*!
 				@brief Get the path string in HttpURL.
 
 				@param psz [out] Used for saving the paths string.
