@@ -5,7 +5,7 @@ namespace TEST
 {
 	extern GAIA::GVOID t_json_jsonreader(GAIA::LOG::Log& logobj)
 	{
-		static const GAIA::NUM TEST_TIMES = 10000;
+		static const GAIA::NUM TEST_TIMES = 1000;
 		static const GAIA::NUM SAMPLE_COUNT = 3;
 
 		GAIA::JSON::JsonReaderA jr;

@@ -6,7 +6,7 @@ namespace TEST
 	extern GAIA::GVOID t_xml_xmlwriter(GAIA::LOG::Log& logobj)
 	{
 		static const GAIA::BL ENABLE_DEBUG_OUTPUT = GAIA::False;
-		static const GAIA::NUM TEST_TIMES = 10000;
+		static const GAIA::NUM TEST_TIMES = 1000;
 		static const GAIA::NUM SAMPLE_COUNT = 3;
 
 		GAIA::XML::XmlWriterA xw;

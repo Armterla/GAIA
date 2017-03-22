@@ -5,7 +5,7 @@ namespace TEST
 {
 	extern GAIA::GVOID t_ctn_orderless(GAIA::LOG::Log& logobj)
 	{
-		static const GAIA::NUM SAMPLE_COUNT = 100;
+		static const GAIA::NUM SAMPLE_COUNT = 17;
 
 		typedef GAIA::CTN::TString __StrType;
 		typedef GAIA::CTN::Orderless<__StrType> __OrderlessType;

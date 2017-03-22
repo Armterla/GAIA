@@ -122,7 +122,7 @@ namespace TEST
 		for(GAIA::NUM x = 0; x < sizeofarray(thds); ++x)
 			thds[x].Start();
 		e.Fire();
-		GAIA::SYNC::gsleep(100);
+		GAIA::SYNC::gsleep(50);
 		GAIA::NUM sCompleteThreadCount = 0;
 		for(GAIA::NUM x = 0; x < sizeofarray(thds); ++x)
 		{
