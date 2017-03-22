@@ -19,9 +19,14 @@ namespace GAIA
 		GINL GAIA::BL GetHostName(GAIA::CH* pszResult, const GAIA::N32& size);
 
 		/*!
-			@brief Get current host ip list.
+			@brief Get host ip list.
 		*/
-		GINL GAIA::GVOID GetHostIPList(const GAIA::CH* pszHostName, GAIA::CTN::Vector<GAIA::NETWORK::IP>& listResult);
+		GINL GAIA::BL GetHostIPList(const GAIA::CH* pszHostName, GAIA::CTN::Vector<GAIA::NETWORK::IP>& listResult);
+
+		/*!
+			@brief Get host ip.
+		*/
+		GINL GAIA::BL GetHostIP(const GAIA::CH* pszHostName, GAIA::NETWORK::IP& ip);
 
 		/*!
 			@brief Convert GAIA IP to socket sockaddr_in.
