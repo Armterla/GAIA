@@ -20,6 +20,7 @@ namespace GAIA
 			NETWORK_ERROR_UNKNOWN,
 			NETWORK_ERROR_CONNECT_FAILED,
 			NETWORK_ERROR_DOMAIN_ANALYSIS_FAILED,
+			NETWORK_ERROR_LOSTCONNECTION,
 		GAIA_ENUM_END(NETWORK_ERROR)
 
 		static const GAIA::CH* NETWORK_ERROR_STRING[] =
@@ -29,6 +30,7 @@ namespace GAIA
 			"NetworkErrorUnknown",
 			"NetworkErrorConnectFailed",
 			"NetworkErrorDomainAnalysisFailed",
+			"NetworkErrorLostConnection",
 		};
 
 		/*!

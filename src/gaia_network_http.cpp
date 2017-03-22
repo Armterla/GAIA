@@ -45,6 +45,9 @@ namespace GAIA
 
 		class HttpAsyncSocket : public GAIA::NETWORK::AsyncSocket
 		{
+			friend class HttpRequest;
+			friend class Http;
+
 		public:
 			HttpAsyncSocket(GAIA::NETWORK::Http& http, GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::ASYNC_SOCKET_TYPE socktype = GAIA::NETWORK::ASYNC_SOCKET_TYPE_CONNECTED)
 				: GAIA::NETWORK::AsyncSocket(disp, socktype)
@@ -76,24 +79,66 @@ namespace GAIA
 		protected:
 			virtual GAIA::GVOID OnCreated(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnClosed(GAIA::BL bResult){}
-			virtual GAIA::GVOID OnBound(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
+			virtual GAIA::GVOID OnBound(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){GASTFALSE;}
 			virtual GAIA::GVOID OnConnected(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr)
 			{
+				if(!bResult)
+				{
+					m_pHttp->InternalCloseAsyncSocket(*this, GAIA::NETWORK::NETWORK_ERROR_CONNECT_FAILED);
+					return;
+				}
+				GAST(m_pRequest != GNIL);
 
+				// Remove from connecting list.
+				{
+					GAIA::SYNC::Autolock al(m_pHttp->m_lrConnectingList);
+					GAIA::BL bEraseResult = m_pHttp->m_connectinglist.erase(m_pRequest);
+					GAST(bEraseResult);
+				}
+
+				// Insert to requesting list.
+				{
+					GAIA::SYNC::Autolock al(m_pHttp->m_lrRequestingList);
+					m_pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_REQUESTING;
+					GAIA::BL bInsertResult = m_pHttp->m_requestinglist.insert(m_pRequest);
+					GAST(bInsertResult);
+				}
 			}
 			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult)
 			{
-
+				if(!bResult)
+				{
+					m_pHttp->InternalCloseAsyncSocket(*this, GAIA::NETWORK::NETWORK_ERROR_LOSTCONNECTION);
+					return;
+				}
+				GAST(m_pRequest != GNIL);
+				m_pHttp->InternalCloseAsyncSocket(*this, GAIA::NETWORK::NETWORK_ERROR_OK);
 			}
-			virtual GAIA::GVOID OnListened(GAIA::BL bResult){}
-			virtual GAIA::GVOID OnAccepted(GAIA::BL bResult, const GAIA::NETWORK::Addr& addrListen){}
+			virtual GAIA::GVOID OnListened(GAIA::BL bResult){GASTFALSE;}
+			virtual GAIA::GVOID OnAccepted(GAIA::BL bResult, const GAIA::NETWORK::Addr& addrListen){GASTFALSE;}
 			virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nPracticeSize, GAIA::N32 nSize)
 			{
-
+				if(!bResult)
+				{
+					m_pHttp->InternalCloseAsyncSocket(*this, GAIA::NETWORK::NETWORK_ERROR_LOSTCONNECTION);
+					return;
+				}
+				if(nPracticeSize == 0)
+					return;
+				GAST(m_pRequest != GNIL);
+				m_pRequest->OnWrite(m_pRequest->m_lRequestedSize, pData, nPracticeSize);
+				m_pRequest->m_lRequestedSize += nPracticeSize;
 			}
 			virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize)
 			{
-
+				if(!bResult)
+				{
+					m_pHttp->InternalCloseAsyncSocket(*this, GAIA::NETWORK::NETWORK_ERROR_OK);
+					return;
+				}
+				GAST(m_pRequest != GNIL);
+				m_pRequest->OnRead(m_pRequest->m_lResponsedSize, pData, nSize);
+				m_pRequest->m_lResponsedSize += nSize;
 			}
 			virtual GAIA::GVOID OnShutdowned(GAIA::BL bResult, GAIA::N32 nShutdownFlag){}
 
@@ -102,17 +147,18 @@ namespace GAIA
 			{
 				m_pHttp = GNIL;
 				m_pRequest = GNIL;
-				m_sIndex = GINVALID;
 			}
 
 		private:
 			GAIA::NETWORK::Http* m_pHttp;
 			GAIA::NETWORK::HttpRequest* m_pRequest;
-			GAIA::NUM m_sIndex; // Is the index in GAIA::NETWORK::Http's variable member m_socks.
 		};
 
 		class HttpAsyncDispatcher : public GAIA::NETWORK::AsyncDispatcher
 		{
+			friend class HttpRequest;
+			friend class Http;
+
 		public:
 			HttpAsyncDispatcher(GAIA::NETWORK::Http& http)
 			{
@@ -174,7 +220,7 @@ namespace GAIA
 
 		GAIA::BL HttpRequest::BindBuffer(const GAIA::GVOID* p, GAIA::NUM sSize)
 		{
-			if(m_bRequesting)
+			if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY)
 				return GAIA::False;
 
 			if(p == GNIL)
@@ -221,6 +267,17 @@ namespace GAIA
 		{
 			if(m_method == GAIA::NETWORK::HTTP_METHOD_INVALID)
 				return GAIA::False;
+
+			this->rise_ref();
+
+			// Push to pending list.
+			{
+				GAIA::SYNC::Autolock al(m_pHttp->m_lrPendingList);
+				m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING;
+				GAIA::BL bInsertResult = m_pHttp->m_pendinglist.insert(this);
+				GAST(bInsertResult);
+			}
+
 			return GAIA::True;
 		}
 
@@ -371,22 +428,75 @@ namespace GAIA
 				pThread->Wait();
 			}
 
-			// Release all requests.
+			// Release all pending requests.
 			{
-				GAIA::SYNC::Autolock al(m_lrRequests);
-				for(__RequestVectorType::it it = m_requests.frontit(); !it.empty(); ++it)
+				GAIA::SYNC::Autolock al(m_lrPendingList);
+				for(__RequestSetType::it it = m_pendinglist.frontit(); !it.empty(); ++it)
 				{
 					GAIA::NETWORK::HttpRequest* pRequest = *it;
 					GAST(pRequest != GNIL);
+					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
 					pRequest->drop_ref();
 				}
-				m_requests.clear();
+				m_pendinglist.clear();
+			}
+
+			// Release all connecting requests.
+			{
+				GAIA::SYNC::Autolock al(m_lrConnectingList);
+				for(__RequestSetType::it it = m_connectinglist.frontit(); !it.empty(); ++it)
+				{
+					GAIA::NETWORK::HttpRequest* pRequest = *it;
+					GAST(pRequest != GNIL);
+					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
+					pRequest->drop_ref();
+				}
+				m_connectinglist.clear();
+			}
+
+			// Release all requesting requests.
+			{
+				GAIA::SYNC::Autolock al(m_lrRequestingList);
+				for(__RequestSetType::it it = m_requestinglist.frontit(); !it.empty(); ++it)
+				{
+					GAIA::NETWORK::HttpRequest* pRequest = *it;
+					GAST(pRequest != GNIL);
+					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
+					pRequest->drop_ref();
+				}
+				m_requestinglist.clear();
+			}
+
+			// Release all waiting requests.
+			{
+				GAIA::SYNC::Autolock al(m_lrWaitingList);
+				for(__RequestSetType::it it = m_waitinglist.frontit(); !it.empty(); ++it)
+				{
+					GAIA::NETWORK::HttpRequest* pRequest = *it;
+					GAST(pRequest != GNIL);
+					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
+					pRequest->drop_ref();
+				}
+				m_waitinglist.clear();
+			}
+
+			// Release all responsing requests.
+			{
+				GAIA::SYNC::Autolock al(m_lrResponsingList);
+				for(__RequestSetType::it it = m_responsinglist.frontit(); !it.empty(); ++it)
+				{
+					GAIA::NETWORK::HttpRequest* pRequest = *it;
+					GAST(pRequest != GNIL);
+					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
+					pRequest->drop_ref();
+				}
+				m_responsinglist.clear();
 			}
 
 			// Release all sockets.
 			{
 				GAIA::SYNC::Autolock al(m_lrSocks);
-				for(__SockVectorType::it it = m_socks.frontit(); !it.empty(); ++it)
+				for(__SockSetType::it it = m_socks.frontit(); !it.empty(); ++it)
 				{
 					GAIA::NETWORK::HttpAsyncSocket* pSocket = *it;
 					GAST(pSocket != GNIL);
@@ -406,7 +516,7 @@ namespace GAIA
 		{
 			GAIA::BL bRet = GAIA::False;
 
-			// Request.
+			// Connect.
 			{
 				GAIA::BL bConnectionIsFull = GAIA::False;
 				{
@@ -419,18 +529,22 @@ namespace GAIA
 				{
 					GAIA::NETWORK::HttpRequest* pRequest = GNIL;
 					{
-						GAIA::SYNC::Autolock al(m_lrRequests);
-						if(!m_requests.empty())
+						GAIA::SYNC::Autolock al(m_lrPendingList);
+						if(!m_pendinglist.empty())
 						{
-							pRequest = m_requests.back();
-							m_requests.pop_back();
+							__RequestSetType::it itfront = m_pendinglist.frontit();
+							GAST(!itfront.empty());
+							pRequest = *itfront;
+							itfront.erase();
 						}
 					}
 
 					if(pRequest != GNIL)
 					{
+						//
 						pRequest->OnBegin();
 
+						//
 						const GAIA::NETWORK::HttpURL& url = pRequest->GetURL();
 						GAIA::CH szHostName[64];
 						GAIA::NUM sHostNameLen;
@@ -438,6 +552,7 @@ namespace GAIA
 						if(GAIA::ALGO::gstremp(pszHostName))
 							pszHostName = GAIA::NETWORK::GAIA_LOCAL_HOST_IP;
 
+						//
 						GAIA::BL bHostAddressIsValid = GAIA::True;
 						GAIA::NETWORK::Addr addrHost;
 						if(!addrHost.fromstring(pszHostName))
@@ -451,32 +566,66 @@ namespace GAIA
 							}
 						}
 
+						//
 						addrHost.uPort = url.GetPort();
 						if(addrHost.uPort == 0)
 							addrHost.uPort = GAIA::NETWORK::HTTP_DEFAULT_PORT;
 
+						//
 						if(bHostAddressIsValid)
 						{
+							// Insert to connecting list.
+							{
+								GAIA::SYNC::Autolock al(m_lrConnectingList);
+								pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING;
+								GAIA::BL bInsertResult = m_connectinglist.insert(pRequest);
+								GAST(bInsertResult);
+							}
+
+							// Allocate socket.
 							HttpAsyncSocket* pSocket = gnew HttpAsyncSocket(*this, *m_disp);
+							pSocket->m_pRequest = pRequest;
+
+							// Insert to socket list.
+							{
+								GAIA::SYNC::Autolock al(m_lrSocks);
+								GAIA::BL bInsertResult = m_socks.insert(pSocket);
+								GAST(bInsertResult);
+							}
+
+							// Create socket.
 							pSocket->Create();
+
+							// Connect to server.
 							pSocket->Connect(addrHost);
+
+							//
 							bRet = GAIA::True;
 						}
 						else
-						{
-							pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_DOMAIN_ANALYSIS_FAILED;
-							pRequest->OnEnd(GAIA::False);
-						}
+							this->InternalCloseRequest(*pRequest, GAIA::NETWORK::NETWORK_ERROR_DOMAIN_ANALYSIS_FAILED);
 					}
 				}
 			}
 
-			// Response.
+			// Request.
 			{
+				// Swap.
+				{
+					GAIA::SYNC::Autolock al(m_lrRequestingList);
+					for(__RequestSetType::it it = m_requestinglist.frontit(); !it.empty(); ++it)
+					{
 
+					}
+				}
+
+				// Request.
+				{
+
+				}
 			}
 
-			// Request timeout dispatch.
+			// Timeout dispatch.
 			{
 
 			}
@@ -492,6 +641,71 @@ namespace GAIA
 		GAIA::BL Http::CleanupCookic(GAIA::BL bRAM, GAIA::BL bFile, const GAIA::U64& uBeyondTime)
 		{
 			return GAIA::True;
+		}
+
+		GAIA::BL Http::CheckResponseComplete(GAIA::NETWORK::HttpAsyncSocket& sock)
+		{
+			return GAIA::True;
+		}
+
+		GAIA::GVOID Http::InternalCloseAsyncSocket(GAIA::NETWORK::HttpAsyncSocket& sock, GAIA::NETWORK::NETWORK_ERROR neterr)
+		{
+			this->InternalCloseRequest(*sock.m_pRequest, neterr);
+		}
+
+		GAIA::GVOID Http::InternalCloseRequest(GAIA::NETWORK::HttpRequest& req, GAIA::NETWORK::NETWORK_ERROR neterr)
+		{
+			//
+
+			// Set network error.
+			req.m_NetworkError = neterr;
+
+			// Socket.
+			{
+				GAIA::NETWORK::HttpAsyncSocket* pSocket = req.m_pSock;
+				if(pSocket != GNIL)
+				{
+					// Unreference.
+					req.m_pSock = GNIL;
+
+					// Remove from list.
+					{
+						GAIA::SYNC::Autolock al(m_lrSocks);
+						GAIA::BL bEraseResult = m_socks.erase(pSocket);
+						GAST(bEraseResult);
+					}
+
+					// Close socket.
+					pSocket->Close();
+
+					// Release.
+					pSocket->drop_ref();
+				}
+			}
+
+			// Request.
+			{
+				// If request complete callback complete.
+				{
+
+				}
+
+				// If response complete, callback complete.
+				{
+
+				}
+
+				// Remove from list.
+				{
+
+				}
+
+				// Callback End.
+				req.OnEnd(GAIA::False);
+
+				// Release.
+				req.drop_ref();
+			}
 		}
 	}
 }

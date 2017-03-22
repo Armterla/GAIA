@@ -25,6 +25,48 @@ namespace GAIA
 		class HttpAsyncDispatcher;
 
 		/*!
+			@brief HttpRequest state.
+
+			@remarks This enum's element have a fixed order, anybody can't change the order.
+		*/
+		GAIA_ENUM_BEGIN(HTTP_REQUEST_STATE)
+			/*!
+				@brief First state when a HttpRequest allocate and not call HttpRequest::Request method.
+			*/
+			HTTP_REQUEST_STATE_READY,
+
+			/*!
+				@brief Second state when after call HttpRequest::Request method and push it to task list.
+			*/
+			HTTP_REQUEST_STATE_PENDING,
+
+			/*!
+				@brief Third state when after pop HttpRequest from task list but not connected.
+			*/
+			HTTP_REQUEST_STATE_CONNECTING,
+
+			/*!
+				@brief Fourth state when and after connected and begin to send request data but not complete.
+			*/
+			HTTP_REQUEST_STATE_REQUESTING,
+
+			/*!
+				@brief Fifth state when all request data sended and no response back.
+			*/
+			HTTP_REQUEST_STATE_WAITING,
+
+			/*!
+				@brief Sixth state when the response data begin receive but not complete.
+			*/
+			HTTP_REQUEST_STATE_RESPONSING,
+
+			/*!
+				@brief Seventh state when HttpRequest is complete.
+			*/
+			HTTP_REQUEST_STATE_COMPLETE,
+		GAIA_ENUM_END(HTTP_REQUEST_STATE)
+
+		/*!
 			@brief Http request information class.
 				It is a reference object.
 		*/
@@ -36,7 +78,6 @@ namespace GAIA
 
 		public:
 
-			// Constructor and destructor.
 			/*!
 				@brief Constructor.
 			*/
@@ -59,7 +100,11 @@ namespace GAIA
 			*/
 			GAIA::GVOID Reset();
 
-			// Base http operation.
+			/*!
+				@brief Get http request state.
+			*/
+			GAIA::NETWORK::HTTP_REQUEST_STATE GetState() const{return m_state;}
+
 			/*!
 				@brief Set http request method.
 
@@ -69,7 +114,7 @@ namespace GAIA
 
 				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::BL SetMethod(GAIA::NETWORK::HTTP_METHOD method){if(m_bRequesting) return GAIA::False; m_method = method; return GAIA::True;}
+			GAIA::BL SetMethod(GAIA::NETWORK::HTTP_METHOD method){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_method = method; return GAIA::True;}
 
 			/*!
 				@brief Get http request method.
@@ -87,7 +132,7 @@ namespace GAIA
 
 				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::BL SetURL(const GAIA::NETWORK::HttpURL& url){if(m_bRequesting) return GAIA::False; m_url = url; return GAIA::True;}
+			GAIA::BL SetURL(const GAIA::NETWORK::HttpURL& url){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_url = url; return GAIA::True;}
 
 			/*!
 				@brief Get http request url.
@@ -112,7 +157,7 @@ namespace GAIA
 
 				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::BL SetHead(const GAIA::NETWORK::HttpHead& head){if(m_bRequesting) return GAIA::False; m_head = head; return GAIA::True;}
+			GAIA::BL SetHead(const GAIA::NETWORK::HttpHead& head){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_head = head; return GAIA::True;}
 
 			/*!
 				@brief Get http request head.
@@ -128,7 +173,6 @@ namespace GAIA
 			*/
 			GAIA::NETWORK::HttpHead& GetHead(){return m_head;}
 
-			// Buffer control.
 			/*!
 				@brief Bind a buffer to request.
 
@@ -168,7 +212,6 @@ namespace GAIA
 			*/
 			GAIA::BL IsBufferOwner() const{return m_bBufOwner;}
 
-			// Work flow control.
 			/*!
 				@brief Execute request.
 
@@ -236,20 +279,40 @@ namespace GAIA
 			*/
 			GAIA::BL Wait(GAIA::U32 uMilliSeconds);
 
-			// Query result.
 			/*!
-				@brief Check the request complete or not.
+				@brief Check the HttpRequest pending state complete or not.
+
+				@return If pending completed, return GAIA::True, or will return GAIA::False.
+			*/
+			GAIA::BL IsPendingComplete() const{return this->GetState() > GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING;}
+
+			/*!
+				@brief Check the HttpRequest connecting state complete or not.
+
+				@return If connect completed, return GAIA::True, or will return GAIA::False.
+			*/
+			GAIA::BL IsConnectComplete() const{return this->GetState() > GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING;}
+
+			/*!
+				@brief Check the HttpRequest requesting state complete or not.
 
 				@return If request completed, return GAIA::True, or will return GAIA::False.
 			*/
-			GAIA::BL IsRequestComplete() const{return m_bRequestComplete;}
+			GAIA::BL IsRequestComplete() const{return this->GetState() > GAIA::NETWORK::HTTP_REQUEST_STATE_REQUESTING;}
 
 			/*!
-				@brief Check the response complete or not.
+				@brief Check the HttpRequest waiting state complete or not.
+
+				@return If wait complete, return GAIA::True, or will return GAIA::False.
+			*/
+			GAIA::BL IsWaitComplete() const{return this->GetState() > GAIA::NETWORK::HTTP_REQUEST_STATE_WAITING;}
+
+			/*!
+				@brief Check the HttpRequest responsing state complete or not.
 
 				@return If response completed, return GAIA::True, or will return GAIA::False.
 			*/
-			GAIA::BL IsResponseComplete() const{return m_bResponseComplete;}
+			GAIA::BL IsResponseComplete() const{return this->GetState() > GAIA::NETWORK::HTTP_REQUEST_STATE_RESPONSING;}
 
 			/*!
 				@brief Get http result code.
@@ -262,11 +325,18 @@ namespace GAIA
 			GAIA::NETWORK::HTTP_CODE GetResponseCode() const{return m_ResponseCode;}
 
 			/*!
-				@brief Get http response size in bytes.
+				@brief Get http requested size in bytes.
 
-				@return Return http response size in bytes.
+				@return Return http requested size in bytes.
 			*/
-			GAIA::NUM GetResponseSize() const{return m_sResponseSize;}
+			GAIA::N64 GetRequestedSize() const{return m_lRequestedSize;}
+
+			/*!
+				@brief Get http responsed size in bytes.
+
+				@return Return http responsed size in bytes.
+			*/
+			GAIA::N64 GetResponsedSize() const{return m_lResponsedSize;}
 
 			/*!
 				@brief Get http request's network error.
@@ -278,26 +348,42 @@ namespace GAIA
 			*/
 			GAIA::NETWORK::NETWORK_ERROR GetNetworkError() const{return m_NetworkError;}
 
-			// Mode control.
 			/*!
-				@brief Set http request timeout time in milliseconds.
+				@brief Set http request logic timeout time in milliseconds.
 
 				@param uMilliSeconds [in] Specify the timeout time in milliseconds.
 
-				@return If set timeout time successfully, return GAIA::True, or will return GAIA::False.
+				@return If set logic timeout time successfully, return GAIA::True, or will return GAIA::False.
 
 				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::BL SetTimeout(const GAIA::U64& uMilliSeconds){if(m_bRequesting) return GAIA::False; m_uTimeout = uMilliSeconds; return GAIA::True;}
+			GAIA::BL SetLogicTimeout(const GAIA::U64& uMilliSeconds){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_uLogicTimeout = uMilliSeconds; return GAIA::True;}
 
 			/*!
-				@brief Get http request timeout time in milliseconds.
+				@brief Get http request logic timeout time in milliseconds.
 
-				@return Return the timeout time in milliseconds.
+				@return Return the logic timeout time in milliseconds.
 			*/
-			const GAIA::U64& GetTimeout() const{return m_uTimeout;}
+			const GAIA::U64& GetLogicTimeout() const{return m_uLogicTimeout;}
 
-			// Cookic control.
+			/*!
+				@brief Set http request network response timeout time in milliseconds.
+
+				@param uMilliSeconds [in] Specify the timeout time in milliseconds.
+
+				@return If set network response timeout time successfully, return GAIA::True, or will return GAIA::False.
+
+				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
+			*/
+			GAIA::BL SetNetworkResponseTimeout(const GAIA::U64& uMilliSeconds){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_uNetworkresponseTimeout = uMilliSeconds; return GAIA::True;}
+
+			/*!
+				@brief Get http request network response timeout time in milliseconds.
+
+				@return Return the network response timeout time in milliseconds.
+			*/
+			const GAIA::U64& GetNetworkResponseTimeout() const{return m_uNetworkresponseTimeout;}
+
 			/*!
 				@brief Enable or disable write cookic to RAM.
 
@@ -307,7 +393,7 @@ namespace GAIA
 
 				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::BL EnableWriteCookicRAM(GAIA::BL bEnable){if(m_bRequesting) return GAIA::False; m_bEnableWriteCookicRAM = bEnable; return GAIA::True;}
+			GAIA::BL EnableWriteCookicRAM(GAIA::BL bEnable){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_bEnableWriteCookicRAM = bEnable; return GAIA::True;}
 
 			/*!
 				@brief Check enable write cookic to RAM.
@@ -327,7 +413,7 @@ namespace GAIA
 
 				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::BL EnableWriteCookicFile(GAIA::BL bEnable){if(m_bRequesting) return GAIA::False; m_bEnableWriteCookicFile = bEnable; return GAIA::True;}
+			GAIA::BL EnableWriteCookicFile(GAIA::BL bEnable){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_bEnableWriteCookicFile = bEnable; return GAIA::True;}
 
 			/*!
 				@brief Check enable write cookic to file.
@@ -347,7 +433,7 @@ namespace GAIA
 
 				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::BL SetWriteCookicTime(const GAIA::U64& uMilliSeconds){if(m_bRequesting) return GAIA::False; m_uWriteCookicTime = uMilliSeconds; return GAIA::True;}
+			GAIA::BL SetWriteCookicTime(const GAIA::U64& uMilliSeconds){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_uWriteCookicTime = uMilliSeconds; return GAIA::True;}
 
 			/*!
 				@brief Get effect time in milliseconds for cookic which will be writen.
@@ -367,7 +453,7 @@ namespace GAIA
 
 				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::BL EnableReadCookicRAM(GAIA::BL bEnable){if(m_bRequesting) return GAIA::False; m_bEnableReadCookicRAM = bEnable; return GAIA::True;}
+			GAIA::BL EnableReadCookicRAM(GAIA::BL bEnable){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_bEnableReadCookicRAM = bEnable; return GAIA::True;}
 
 			/*!
 				@brief Check enable read cookic from RAM.
@@ -387,7 +473,7 @@ namespace GAIA
 
 				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::BL EnableReadCookicFile(GAIA::BL bEnable){if(m_bRequesting) return GAIA::False; m_bEnableReadCookicFile = bEnable; return GAIA::True;}
+			GAIA::BL EnableReadCookicFile(GAIA::BL bEnable){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_bEnableReadCookicFile = bEnable; return GAIA::True;}
 
 			/*!
 				@brief Check enable read cookic from file.
@@ -407,7 +493,7 @@ namespace GAIA
 
 				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::BL SetReadCookicTime(const GAIA::U64& uMilliSeconds){if(m_bRequesting) return GAIA::False; m_uReadCookicTime = uMilliSeconds; return GAIA::True;}
+			GAIA::BL SetReadCookicTime(const GAIA::U64& uMilliSeconds){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_uReadCookicTime = uMilliSeconds; return GAIA::True;}
 
 			/*!
 				@brief Get effect time in milliseconds for cookic which will be read.
@@ -420,7 +506,6 @@ namespace GAIA
 
 		protected:
 
-			// Stream like read write callback.
 			/*!
 				@brief When a HttpRequest begin to dispatch, this function will be callbacked.
 
@@ -487,7 +572,7 @@ namespace GAIA
 
 				@param pData [in] Specify the data buffer of current received buffer piece.
 
-				@param sMaxDataSize [in] Specify the data buffer's max size of current received buffer piece.
+				@param sDataSize [in] Specify the data buffer's size of current received buffer piece.
 
 				@param sPracticeDataSize [in] Specify the data buffer's size of current received buffer piece.
 
@@ -495,52 +580,54 @@ namespace GAIA
 					One request could cause multiply callbacks of this method.\n
 					This method will be callbacked after receive a piece of data by network.\n
 			*/
-			virtual GAIA::GVOID OnRead(GAIA::N64 lOffset, GAIA::GVOID* pData, GAIA::NUM sMaxDataSize, GAIA::NUM& sPracticeDataSize){}
+			virtual GAIA::GVOID OnRead(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){}
 
 		private:
 			GINL GAIA::GVOID init()
 			{
+				m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_READY;
 				m_method = GAIA::NETWORK::HTTP_METHOD_INVALID;
 				m_bBufOwner = GAIA::True;
-				m_bRequestComplete = GAIA::False;
-				m_bResponseComplete = GAIA::False;
 				m_ResponseCode = GAIA::NETWORK::HTTP_CODE_INVALID;
-				m_sResponseSize = 0;
+				m_lRequestedSize = 0;
+				m_lResponsedSize = 0;
 				m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_INVALID;
-				m_uTimeout = 16 * 1000 * 1000;
+				m_uLogicTimeout = 16 * 1000 * 1000;
+				m_uNetworkresponseTimeout = 4 * 1000 * 1000;
+
+				m_uRequestTime = 0;
 				m_bEnableWriteCookicRAM = GAIA::False;
 				m_bEnableWriteCookicFile = GAIA::False;
 				m_uWriteCookicTime = 0;
 				m_bEnableReadCookicRAM = GAIA::False;
 				m_bEnableReadCookicFile = GAIA::False;
 				m_uReadCookicTime = 0;
-				m_bRequesting = GAIA::False;
 				m_pSock = GNIL;
-				m_sIndex = GINVALID;
+
 			}
 
 		private:
 			GAIA::NETWORK::Http* m_pHttp;
+			GAIA::NETWORK::HTTP_REQUEST_STATE m_state;
 			GAIA::NETWORK::HTTP_METHOD m_method;
 			GAIA::NETWORK::HttpURL m_url;
 			GAIA::NETWORK::HttpHead m_head;
 			GAIA::CTN::Buffer m_buf;
 			GAIA::BL m_bBufOwner;
-			GAIA::BL m_bRequestComplete;
-			GAIA::BL m_bResponseComplete;
 			GAIA::NETWORK::HTTP_CODE m_ResponseCode;
-			GAIA::NUM m_sResponseSize;
+			GAIA::N64 m_lRequestedSize;
+			GAIA::N64 m_lResponsedSize;
 			GAIA::NETWORK::NETWORK_ERROR m_NetworkError;
-			GAIA::U64 m_uTimeout;
+			GAIA::U64 m_uLogicTimeout;
+			GAIA::U64 m_uNetworkresponseTimeout;
+			GAIA::U64 m_uRequestTime;
 			GAIA::BL m_bEnableWriteCookicRAM;
 			GAIA::BL m_bEnableWriteCookicFile;
 			GAIA::U64 m_uWriteCookicTime;
 			GAIA::BL m_bEnableReadCookicRAM;
 			GAIA::BL m_bEnableReadCookicFile;
 			GAIA::U64 m_uReadCookicTime;
-			GAIA::BL m_bRequesting;
-			GAIA::NETWORK::AsyncSocket* m_pSock;
-			GAIA::NUM m_sIndex; // Is the index in GAIA::NETWORK::Http's variable member m_requests.
+			HttpAsyncSocket* m_pSock;
 		};
 
 		/*!
@@ -1104,8 +1191,8 @@ namespace GAIA
 			GINL GAIA::NETWORK::HttpStatus& GetStatus(){return m_status;}
 
 		private:
-			typedef GAIA::CTN::Vector<GAIA::NETWORK::HttpRequest*> __RequestVectorType;
-			typedef GAIA::CTN::Vector<GAIA::NETWORK::HttpAsyncSocket*> __SockVectorType;
+			typedef GAIA::CTN::Set<GAIA::NETWORK::HttpRequest*> __RequestSetType;
+			typedef GAIA::CTN::Set<GAIA::NETWORK::HttpAsyncSocket*> __SockSetType;
 
 		private:
 			GINL GAIA::GVOID init()
@@ -1120,6 +1207,9 @@ namespace GAIA
 				m_disp = GNIL;
 				m_status.reset();
 			}
+			GAIA::BL CheckResponseComplete(GAIA::NETWORK::HttpAsyncSocket& sock);
+			GAIA::GVOID InternalCloseAsyncSocket(GAIA::NETWORK::HttpAsyncSocket& sock, GAIA::NETWORK::NETWORK_ERROR neterr);
+			GAIA::GVOID InternalCloseRequest(GAIA::NETWORK::HttpRequest& req, GAIA::NETWORK::NETWORK_ERROR neterr);
 
 		private:
 			GAIA::BL m_bCreated;
@@ -1131,10 +1221,18 @@ namespace GAIA
 			GAIA::BL m_bEnableReadCookicFile;
 			GAIA::CTN::Vector<GAIA::NETWORK::HttpWorkThread*> m_listWorkThreads;
 			GAIA::NETWORK::HttpAsyncDispatcher* m_disp;
-			GAIA::SYNC::Lock m_lrRequests;
-			__RequestVectorType m_requests;
+			GAIA::SYNC::Lock m_lrPendingList;
+			GAIA::SYNC::Lock m_lrConnectingList;
+			GAIA::SYNC::Lock m_lrRequestingList;
+			GAIA::SYNC::Lock m_lrWaitingList;
+			GAIA::SYNC::Lock m_lrResponsingList;
+			__RequestSetType m_pendinglist;
+			__RequestSetType m_connectinglist;
+			__RequestSetType m_requestinglist;
+			__RequestSetType m_waitinglist;
+			__RequestSetType m_responsinglist;
 			GAIA::SYNC::Lock m_lrSocks;
-			__SockVectorType m_socks;
+			__SockSetType m_socks;
 			GAIA::NETWORK::HttpStatus m_status;
 		};
 	}
