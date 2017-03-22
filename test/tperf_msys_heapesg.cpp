@@ -9,7 +9,7 @@ namespace TEST
 		{
 			logobj << "\t\tBegin compare HeapESG and CRT memory management..." << logobj.End();
 
-			static const GAIA::NUM RECURSIVE_TIMES = 10000;
+			static const GAIA::NUM RECURSIVE_TIMES = 1000;
 			static const GAIA::NUM SAMPLE_COUNT = 100;
 
 			GAIA::CTN::Vector<GAIA::GVOID*> listAllocated;

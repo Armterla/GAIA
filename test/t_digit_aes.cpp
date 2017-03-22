@@ -5,7 +5,7 @@ namespace TEST
 {
 	extern GAIA::GVOID t_digit_aes(GAIA::LOG::Log& logobj)
 	{
-		static const GAIA::NUM BUFFER_SIZE = 1024 * 1024 * 100;
+		static const GAIA::NUM BUFFER_SIZE = 1024 * 4;
 		GAST(BUFFER_SIZE % 16 == 0);
 		GAIA::U8* pSrc = gnew GAIA::U8[BUFFER_SIZE];
 		for(GAIA::NUM x = 0; x < BUFFER_SIZE; ++x)
