@@ -12,6 +12,24 @@ namespace GAIA
 	namespace NETWORK
 	{
 		static const GAIA::NUM GAIA_NETWORK_MTU = 1200;
+		static const GAIA::CH GAIA_LOCAL_HOST[] = "localhost";
+		static const GAIA::CH GAIA_LOCAL_HOST_IP[] = "127.0.0.1";
+
+		GAIA_ENUM_BEGIN(NETWORK_ERROR)
+			NETWORK_ERROR_OK,
+			NETWORK_ERROR_UNKNOWN,
+			NETWORK_ERROR_CONNECT_FAILED,
+			NETWORK_ERROR_DOMAIN_ANALYSIS_FAILED,
+		GAIA_ENUM_END(NETWORK_ERROR)
+
+		static const GAIA::CH* NETWORK_ERROR_STRING[] =
+		{
+			"NetworkErrorInvalid",
+			"NetworkErrorOK",
+			"NetworkErrorUnknown",
+			"NetworkErrorConnectFailed",
+			"NetworkErrorDomainAnalysisFailed",
+		};
 
 		/*!
 			@brief Get host name.

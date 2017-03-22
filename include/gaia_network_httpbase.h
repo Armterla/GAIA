@@ -28,6 +28,7 @@ namespace GAIA
 			@brief Current supported HTTP protocal version.
 		*/
 		static const GAIA::CH* HTTP_VERSION_STRING = "HTTP/1.1";
+		static const GAIA::U16 HTTP_DEFAULT_PORT = 80;
 
 		// Http method.
 		GAIA_ENUM_BEGIN(HTTP_METHOD)
