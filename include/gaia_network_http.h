@@ -8,6 +8,7 @@
 #include "gaia_sync_lockrw.h"
 #include "gaia_sync_autolockr.h"
 #include "gaia_sync_autolockw.h"
+#include "gaia_sync_autolockrw.h"
 #include "gaia_ctn_vector.h"
 #include "gaia_ctn_buffer.h"
 #include "gaia_ctn_set.h"
@@ -514,7 +515,7 @@ namespace GAIA
 			virtual GAIA::GVOID OnBegin(){}
 
 			/*!
-				@brief When a HttpRequest end to dispatch,
+				@brief When a HttpRequest end to dispatch, this function will be callbacked.
 
 				@param bCanceled [in] If current request is ended by member function HttpRequest::Cancel, it will be filled by GAIA::True, or will be filled by GAIA::False.
 
@@ -523,18 +524,14 @@ namespace GAIA
 			virtual GAIA::GVOID OnEnd(GAIA::BL bCanceled){}
 
 			/*!
-				@brief When the request data send complete, this function will be callbacked.
+				@brief When a HttpRequest state change, this function will be callbacked.
 
-				@remarks This function would be callbacked in multi thread.\n
+				@param newstate [in] Specify the new state.
+
+				@remark This function would be callbacked in multi thread.\n
+					The HttpRequest state is not changed when this function be callbacked, so you could call HttpRequest::GetState to get the old state.\n
 			*/
-			virtual GAIA::GVOID OnRequestComplete(){}
-
-			/*!
-				@brief When all response data recv complete, this function will be callbacked.
-
-				@remarks This function would be callbacked in multi thread.\n
-			*/
-			virtual GAIA::GVOID OnResponseComplete(){}
+			virtual GAIA::GVOID OnState(GAIA::NETWORK::HTTP_REQUEST_STATE newstate){}
 
 			/*!
 				@brief When the request is paused, this function will be callbacked.
@@ -603,7 +600,9 @@ namespace GAIA
 				m_bEnableReadCookicFile = GAIA::False;
 				m_uReadCookicTime = 0;
 				m_pSock = GNIL;
-
+				m_uThreadMagicIndex = GINVALID;
+				m_uLastRequestedTime = 0;
+				m_uLastResponsedTime = 0;
 			}
 
 		private:
@@ -628,6 +627,9 @@ namespace GAIA
 			GAIA::BL m_bEnableReadCookicFile;
 			GAIA::U64 m_uReadCookicTime;
 			HttpAsyncSocket* m_pSock;
+			GAIA::U32 m_uThreadMagicIndex;
+			GAIA::U64 m_uLastRequestedTime;
+			GAIA::U64 m_uLastResponsedTime;
 		};
 
 		/*!
@@ -842,7 +844,10 @@ namespace GAIA
 				uCallBackBeginCount = 0;
 				uCallBackEndCount = 0;
 				uCallBackEndWithCancelCount = 0;
+				uCallBackPendCompleteCount = 0;
+				uCallBackConnectCompleteCount = 0;
 				uCallBackRequestCompleteCount = 0;
+				uCallBackWaitCompleteCount = 0;
 				uCallBackResponseCompleteCount = 0;
 				uCallBackPauseCount = 0;
 				uCallBackResumeCount = 0;
@@ -955,52 +960,67 @@ namespace GAIA
 			GAIA::U64 uNotResponseCount;
 
 			/*!
-				@brief
+				@brief Specify request timeout count.
 			*/
 			GAIA::U64 uRequestTimeoutCount;
 
 			/*!
-				@brief
+				@brief Specify callback begin count.
 			*/
 			GAIA::U64 uCallBackBeginCount;
 
 			/*!
-				@brief
+				@brief Specify callback end count.
 			*/
 			GAIA::U64 uCallBackEndCount;
 
 			/*!
-				@brief
+				@brief Specify callback end with cancel count.
 			*/
 			GAIA::U64 uCallBackEndWithCancelCount;
 
 			/*!
-				@brief
+				@brief Specify callback pend complete count.
+			*/
+			GAIA::U64 uCallBackPendCompleteCount;
+
+			/*!
+				@brief Specify callback connect complete count.
+			*/
+			GAIA::U64 uCallBackConnectCompleteCount;
+
+			/*!
+				@brief Specify callback request complete count.
 			*/
 			GAIA::U64 uCallBackRequestCompleteCount;
 
 			/*!
-				@brief
+				@brief Specify callback waited complete count.
+			*/
+			GAIA::U64 uCallBackWaitCompleteCount;
+
+			/*!
+				@brief Specify callback response complete count.
 			*/
 			GAIA::U64 uCallBackResponseCompleteCount;
 
 			/*!
-				@brief
+				@brief Specify callback pause count.
 			*/
 			GAIA::U64 uCallBackPauseCount;
 
 			/*!
-				@brief
+				@brief Specify callback resume count.
 			*/
 			GAIA::U64 uCallBackResumeCount;
 
 			/*!
-				@brief
+				@brief Specify callback write count.
 			*/
 			GAIA::U64 uCallBackWriteCount;
 
 			/*!
-				@brief
+				@brief Specify callback read count.
 			*/
 			GAIA::U64 uCallBackReadCount;
 		};
@@ -1094,13 +1114,25 @@ namespace GAIA
 			/*!
 				@brief Execute http.
 
+				@param pWorkThread [in] Specify http work thread.\n
+					It used for internal, current class's user must set this parameter to GNIL.\n
+					Default value is GNIL.
+
+				@param bConnect [in] Specify execute connect operation or not. Default value is GAIA::True.
+
+				@param bRequest [in] Specify execute request operation or not. Default value is GAIA::True.
+
+				@param bLogicTimeout [in] Specify execute logic timeout operation or not. Default value is GAIA::True.
+
+				@param bRecycleCache [in] Specify execute reccyle cache operation or not. Default value is GAIA::True.
+
 				@return If there exist a task to execute, pop and executed, return GAIA::True, or return GAIA::False.
 
 				@remarks Call this method only pop a unit task in task queue and execute it, so if user need execute all waiting task,
 					call this method many times until GAIA::False be returnned.\n
 					This method is thread safe.\n
 			*/
-			GAIA::BL Execute();
+			GAIA::BL Execute(GAIA::NETWORK::HttpWorkThread* pWorkThread = GNIL, GAIA::BL bConnect = GAIA::True, GAIA::BL bRequest = GAIA::True, GAIA::BL bTimeout = GAIA::True, GAIA::BL bRecycleCache = GAIA::True);
 
 			/*!
 				@brief Enable or disable write cookic to RAM.
@@ -1193,6 +1225,8 @@ namespace GAIA
 		private:
 			typedef GAIA::CTN::Set<GAIA::NETWORK::HttpRequest*> __RequestSetType;
 			typedef GAIA::CTN::Set<GAIA::NETWORK::HttpAsyncSocket*> __SockSetType;
+			typedef GAIA::CTN::Vector<GAIA::NETWORK::HttpRequest*> __RequestVectorType;
+			typedef GAIA::CTN::Vector<GAIA::NETWORK::HttpAsyncSocket*> __SockVectorType;
 
 		private:
 			GINL GAIA::GVOID init()
@@ -1206,9 +1240,10 @@ namespace GAIA
 				m_bEnableReadCookicFile = GAIA::False;
 				m_disp = GNIL;
 				m_status.reset();
+				m_uCurrentThreadMagicIndex = 0;
 			}
-			GAIA::BL CheckResponseComplete(GAIA::NETWORK::HttpAsyncSocket& sock);
-			GAIA::GVOID InternalCloseAsyncSocket(GAIA::NETWORK::HttpAsyncSocket& sock, GAIA::NETWORK::NETWORK_ERROR neterr);
+			GAIA::U32 InternalRequestThreadMagicIndex();
+			GAIA::BL InternalCheckResponseComplete(GAIA::NETWORK::HttpAsyncSocket& sock);
 			GAIA::GVOID InternalCloseRequest(GAIA::NETWORK::HttpRequest& req, GAIA::NETWORK::NETWORK_ERROR neterr);
 
 		private:
@@ -1234,6 +1269,11 @@ namespace GAIA
 			GAIA::SYNC::Lock m_lrSocks;
 			__SockSetType m_socks;
 			GAIA::NETWORK::HttpStatus m_status;
+			GAIA::SYNC::Lock m_lrCurrentThreadMagicIndex;
+			GAIA::U32 m_uCurrentThreadMagicIndex;
+			GAIA::SYNC::LockRW m_rwExecuteRequest;
+			GAIA::SYNC::Lock m_lrExecuteTimeout;
+			GAIA::SYNC::Lock m_lrExecuteRecycleCache;
 		};
 	}
 }
