@@ -35,6 +35,7 @@
 #include	"gaia_sync_lockrw.h"
 #include	"gaia_sync_autolockr.h"
 #include	"gaia_sync_autolockw.h"
+#include	"gaia_sync_autolockrw.h"
 #include	"gaia_sync_event.h"
 #include	"gaia_sync_mutex.h"
 

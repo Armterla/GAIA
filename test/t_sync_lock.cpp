@@ -69,7 +69,7 @@ namespace TEST
 					GAIA::SYNC::AutolockW al(*m_pLockRW);
 					for(GAIA::NUM z = 0; z < 10; ++z)
 					{
-						GAIA::SYNC::AutolockW al(*m_pLockRW);
+						GAIA::SYNC::AutolockRW al(*m_pLockRW, GAIA::False);
 						*m_p += 1;
 					}
 				}
@@ -96,7 +96,7 @@ namespace TEST
 				{
 					GAIA::SYNC::AutolockR al(*m_pLockRW);
 					for(GAIA::NUM z = 0; z < 10; ++z)
-						GAIA::SYNC::AutolockR al(*m_pLockRW);
+						GAIA::SYNC::AutolockRW al(*m_pLockRW, GAIA::True);
 				}
 			}
 		}
