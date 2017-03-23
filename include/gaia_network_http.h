@@ -269,7 +269,8 @@ namespace GAIA
 				@brief Wait the request complete.
 
 				@param uMilliSeconds [in] Specify the timeout time in milli-seconds.\n
-					Caller could pass GINVALID to wait for infinite.
+					Caller could pass GINVALID to wait for infinite.\n
+					Default is GINVALID.\n
 
 				@return If wait request complete successfully, return GAIA::True, or will return GAIA::False.
 
@@ -279,7 +280,7 @@ namespace GAIA
 					-# Http request is dispatched complete, HttpRequest::OnEnd had be called.
 					-# Wait http request by HttpRequest::Wait twice.
 			*/
-			GAIA::BL Wait(GAIA::U32 uMilliSeconds);
+			GAIA::BL Wait(GAIA::U32 uMilliSeconds = GINVALID);
 
 			/*!
 				@brief Check the HttpRequest pending state complete or not.

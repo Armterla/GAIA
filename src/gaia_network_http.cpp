@@ -502,9 +502,13 @@ namespace GAIA
 			if(m_method == GAIA::NETWORK::HTTP_METHOD_INVALID)
 				return GAIA::False;
 
+			GAIA::NUM sRelativePartLength = m_url.GetRelativePartLength();
+			if(sRelativePartLength == 0)
+				sRelativePartLength = 1; // Default root path is "/".
+
 			m_sTotalHeadSize =
 					GAIA::NETWORK::HTTP_METHOD_STRING_LEN[m_method] + 1 +
-					m_url.Size() + 1 +
+					sRelativePartLength + 1 +
 					m_pHttp->GetDesc().sHttpVerLen + 2 +
 					m_head.GetStringSize() + 1;
 
@@ -636,19 +640,7 @@ namespace GAIA
 
 			// Begin async network.
 			if(!m_disp->Begin())
-			{
-				for(GAIA::NUM x = 0; x < m_listWorkThreads.size(); ++x)
-				{
-					HttpWorkThread* pThread = m_listWorkThreads[x];
-					pThread->SetStopCmd(GAIA::True);
-				}
-				for(GAIA::NUM x = 0; x < m_listWorkThreads.size(); ++x)
-				{
-					HttpWorkThread* pThread = m_listWorkThreads[x];
-					pThread->Wait();
-				}
 				return GAIA::False;
-			}
 
 			// Start work thread.
 			for(GAIA::NUM x = 0; x < m_listWorkThreads.size(); ++x)
@@ -678,6 +670,7 @@ namespace GAIA
 				HttpWorkThread* pThread = m_listWorkThreads[x];
 				GAST(pThread != GNIL);
 				pThread->Wait();
+				pThread->SetStopCmd(GAIA::False);
 			}
 
 			// Release all pending requests.
@@ -831,15 +824,10 @@ namespace GAIA
 						//
 						GAIA::BL bHostAddressIsValid = GAIA::True;
 						GAIA::NETWORK::Addr addrHost;
-						if(!addrHost.fromstring(pszHostName))
+						if(!addrHost.ip.fromstring(pszHostName))
 						{
 							if(!GAIA::NETWORK::GetHostIP(pszHostName, addrHost.ip))
 								bHostAddressIsValid = GAIA::False;
-							else
-							{
-								if(!addrHost.fromstring(pszHostName))
-									bHostAddressIsValid = GAIA::False;
-							}
 						}
 
 						//
@@ -900,7 +888,7 @@ namespace GAIA
 				__RequestVectorType listTemp;
 				__RequestVectorType* pTempList = &listTemp;
 
-				// Collect request list..
+				// Collect request list.
 				{
 					if(pWorkThread != GNIL)
 					{
@@ -950,7 +938,14 @@ namespace GAIA
 								// URL.
 								GAIA::NETWORK::HttpURL& url = pRequest->GetURL();
 								GAIA::NUM sUrlLen;
-								const GAIA::CH* pszUrl = url.ToString(&sUrlLen);
+								const GAIA::CH* pszUrl = url.GetRelativePart();
+								sUrlLen = url.GetRelativePartLength();
+								static const GAIA::CH ROOT_PATH[] = "/";
+								if(pszUrl == GNIL)
+								{
+									pszUrl = ROOT_PATH;
+									sUrlLen = 1;
+								}
 								pReqBuf->write(pszUrl, sUrlLen);
 								pReqBuf->write(" ", 1);
 
@@ -961,16 +956,27 @@ namespace GAIA
 								// Head.
 								GAIA::NETWORK::HttpHead& head = pRequest->GetHead();
 								GAIA::NUM sHeadSize = head.GetStringSize();
+								GAST(sHeadSize >= 0);
+								if(sHeadSize > 0)
+								{
+									GAIA::U8* pHeadBuf = pReqBuf->alloc(sHeadSize);
+									GAIA::NUM sPracHeadSize;
+									GAIA::BL bHeadToStringResult;
+									head.ToString((GAIA::CH*)pHeadBuf, sHeadSize, &sPracHeadSize, &bHeadToStringResult);
+									GAST(bHeadToStringResult);
+									GAST(sPracHeadSize == sHeadSize);
+								}
 
 								// Blank line.
 								pReqBuf->write("\n", 1);
 
 								// Send.
-								GAST(pReqBuf->write_size() == pRequest->m_sTotalHeadSize);
-								pRequest->m_lSendingSize += pReqBuf->write_size();
-								GAIA::N32 nSendSize = pRequest->m_pSock->Send(pReqBuf->fptr(), pReqBuf->write_size());
-								GAST(nSendSize == pReqBuf->write_size());
-								if(nSendSize != pReqBuf->write_size())
+								GAIA::NUM sWriteSize = pReqBuf->write_size();
+								GAST(sWriteSize == pRequest->m_sTotalHeadSize);
+								pRequest->m_lSendingSize += sWriteSize;
+								GAIA::N32 nSendSize = pRequest->m_pSock->Send(pReqBuf->fptr(), sWriteSize);
+								GAST(nSendSize == sWriteSize);
+								if(nSendSize != sWriteSize)
 								{
 									pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_UNKNOWN;
 									pNeedCloseRequests->push_back(pRequest);
