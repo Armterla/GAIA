@@ -130,7 +130,7 @@ namespace TEST
 
 	extern GAIA::GVOID t_network_http(GAIA::LOG::Log& logobj)
 	{
-		static const GAIA::CH* TEST_URL = "120.26.219.54:8080";
+		static const GAIA::CH* TEST_URL = "http://120.26.219.54:48010/httpstat?";
 		static const GAIA::NUM SAMPLE_COUNT = 10;
 
 		GAIA::CTN::Vector<MyHttpRequest*> listRequest;
@@ -149,8 +149,11 @@ namespace TEST
 			// Empty request test.
 			TAST(http.Begin());
 			{
-				MyHttpRequest* pRequest = gnew MyHttpRequest(http);
-				pRequest->drop_ref();
+				for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
+				{
+					MyHttpRequest* pRequest = gnew MyHttpRequest(http);
+					pRequest->drop_ref();
+				}
 			}
 			TAST(http.End());
 

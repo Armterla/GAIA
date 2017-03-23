@@ -50,6 +50,8 @@ namespace TEST
 				TERROR;
 
 			hu.FromString(TEST_URL3);
+			if(hu.GetRelativePartLength() != 11)
+				TERROR;
 			if(!hu.Analyze())
 				TERROR;
 			if(hu.GetHostName(szHostName) == GNIL || !GAIA::ALGO::gstrequal(szHostName, "127.0.0.1"))
