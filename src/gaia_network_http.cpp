@@ -896,10 +896,16 @@ namespace GAIA
 							}
 
 							// Connect to server.
-							pSocket->Connect(addrHost);
-
-							//
-							bRet = GAIA::True;
+							GTRY
+							{
+								pSocket->Connect(addrHost);
+								bRet = GAIA::True;
+							}
+							GCATCHALL
+							{
+								pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_CONNECT_FAILED;
+								pNeedCloseRequests->push_back(pRequest);
+							}
 						}
 						else
 						{
@@ -1017,6 +1023,8 @@ namespace GAIA
 								// Update info.
 								pRequest->m_uLastSendingTime = uCurrentTime;
 								pRequest->m_bHeadSendingComplete = GAIA::True;
+
+								bRet = GAIA::True;
 							}
 
 							// Send body.
@@ -1069,11 +1077,16 @@ namespace GAIA
 
 									// Update info.
 									pRequest->m_uLastSendingTime = uCurrentTime;
+
+									bRet = GAIA::True;
 								}
 
 								// If body complete, record it.
 								if(bBodySendingComplete)
+								{
 									pRequest->m_bBodySendingComplete = GAIA::True;
+									bRet = GAIA::True;
+								}
 							}
 						}
 						while(GAIA::ALWAYSFALSE);
@@ -1098,6 +1111,7 @@ namespace GAIA
 				{
 					GAIA::NETWORK::HttpRequest& req = *(*pNeedCloseRequests)[x];
 					this->InternalCloseRequest(req);
+					bRet = GAIA::True;
 				}
 				pNeedCloseRequests->clear();
 			}
@@ -1138,6 +1152,7 @@ namespace GAIA
 					{
 						GAIA::NETWORK::HttpRequest& req = *(*pNeedCloseRequests)[x];
 						this->InternalCloseRequest(req);
+						bRet = GAIA::True;
 					}
 					pNeedCloseRequests->clear();
 				}
