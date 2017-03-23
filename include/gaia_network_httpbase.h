@@ -1353,6 +1353,8 @@ namespace GAIA
 			}
 			GINL GAIA::CH* get_analyzed_node(const Node& n, GAIA::CH* psz, GAIA::NUM sMaxSize, GAIA::NUM* pResultSize) const
 			{
+				if(n.psz == GNIL)
+					return GNIL;
 				if(psz == GNIL)
 				{
 					GAST(sMaxSize == GINVALID);

@@ -31,6 +31,8 @@ namespace TEST
 				TERROR;
 			if(hu.GetHostName(szHostName) == GNIL || !GAIA::ALGO::gstrequal(szHostName, "127.0.0.1"))
 				TERROR;
+			if(hu.GetPath(szPath, sizeof(szPath)) != GNIL)
+				TERROR;
 
 			hu.FromString(TEST_URL2);
 			if(!hu.Analyze())
@@ -43,11 +45,19 @@ namespace TEST
 				TERROR;
 			if(hu.GetHostName(szHostName) == GNIL || !GAIA::ALGO::gstrequal(szHostName, "127.0.0.1"))
 				TERROR;
+			if(hu.GetPath(szPath, sizeof(szPath)) == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szPath, "/index.html"))
+				TERROR;
 
 			hu.FromString(TEST_URL4);
 			if(!hu.Analyze())
 				TERROR;
 			if(hu.GetHostName(szHostName) == GNIL || !GAIA::ALGO::gstrequal(szHostName, "127.0.0.1"))
+				TERROR;
+			if(hu.GetPath(szPath, sizeof(szPath)) == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szPath, "/path1/path2/path3"))
 				TERROR;
 
 			hu.FromString(TEST_URL5);
@@ -60,6 +70,10 @@ namespace TEST
 			if(!hu.Analyze())
 				TERROR;
 			if(hu.GetHostName(szHostName) == GNIL || !GAIA::ALGO::gstrequal(szHostName, "127.0.0.1"))
+				TERROR;
+			if(hu.GetPath(szPath, sizeof(szPath)) == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szPath, "/"))
 				TERROR;
 
 			hu.Reset();
