@@ -10,6 +10,33 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		GINL GAIA::GVOID PrintBinary(const GAIA::CH* pszInfo, const GAIA::GVOID* pData, GAIA::NUM sDataSize)
+		{
+			GAST(pszInfo != GNIL);
+			GAST(pData != GNIL);
+			GAST(sDataSize > 0);
+			GAIA::CTN::AString strTemp;
+			strTemp.reserve(sDataSize * 2);
+			const GAIA::U8* p = (const GAIA::U8*)pData;
+			for(GAIA::NUM x = 0; x < sDataSize; ++x)
+			{
+				if(p[x] == '\0')
+					strTemp += "\\0";
+				else if(p[x] == '\r')
+					strTemp += "\\r";
+				else if(p[x] == '\n')
+					strTemp += "\\n";
+				else
+				{
+					GAIA::CH szTemp[2];
+					szTemp[0] = p[x];
+					szTemp[1] = '\0';
+					strTemp += szTemp;
+				}
+			}
+			GLOG << pszInfo << ": " << strTemp.fptr() << GEND;
+		}
+
 		class HttpWorkThread : public GAIA::THREAD::Thread
 		{
 			friend class HttpRequest;
@@ -152,6 +179,8 @@ namespace GAIA
 					return;
 				GAST(m_pRequest != GNIL);
 
+				PrintBinary("Sent", pData, nPracticeSize);
+
 				// Callback.
 				m_pRequest->OnSent(m_pRequest->m_lSentSize, pData, nPracticeSize);
 				m_pRequest->m_lSentSize += nPracticeSize;
@@ -159,9 +188,7 @@ namespace GAIA
 
 				if(m_pRequest->m_lSentSize >= m_pRequest->m_sTotalHeadSize &&
 				   m_pRequest->m_lSentSize - nPracticeSize < m_pRequest->m_sTotalHeadSize)
-				{
 					m_pRequest->OnSentHead(m_pHttp->GetDesc().szHttpVer, m_pRequest->GetMethod(), m_pRequest->GetURL(), m_pRequest->GetHead());
-				}
 
 				if(m_pRequest->m_lSentSize > m_pRequest->m_sTotalHeadSize)
 				{
@@ -218,6 +245,8 @@ namespace GAIA
 				}
 				GAST(m_pRequest != GNIL);
 
+				PrintBinary("Recv", pData, nSize);
+
 				// Change state.
 				if(m_pRequest->m_lRecvedSize == 0)
 				{
@@ -269,7 +298,9 @@ namespace GAIA
 					GAIA::U8* pWriter = m_pRequest->m_respbuf.write_ptr();
 					while(pReader < pWriter)
 					{
-						if(pReader[0] == '\r' && pReader + 1 < pWriter && pReader[1] == '\n' && pReader + 2 < pWriter && (pReader[2] == '\r' || pReader[2] == '\n'))
+						if(pReader[0] == '\r' &&
+						   pReader + 1 < pWriter && pReader[1] == '\n' &&
+						   pReader + 2 < pWriter && (pReader[2] == '\r' || pReader[2] == '\n'))
 						{
 							GAIA::NUM sHeadEndOffset = (GAIA::NUM)(pReader - m_pRequest->m_respbuf.fptr() + 3);
 							m_pRequest->m_respbuf.seek_read(sHeadEndOffset);
@@ -292,16 +323,15 @@ namespace GAIA
 						{
 							if(pszHead[x] == ' ')
 							{
-								pszHead[x] = '\0'; // End string.
-
 								if(pszHttpCode == GNIL)
-									pszHttpCode = &pszHead[x + 1];
-								else if(pszHttpCodeDesc == GNIL)
-									pszHttpCodeDesc = &pszHead[x + 1];
-								else // If analyze failed.
 								{
-									pszHttpVersion = GNIL;
-									break;
+									pszHttpCode = &pszHead[x + 1];
+									pszHead[x] = '\0'; // End string.
+								}
+								else if(pszHttpCodeDesc == GNIL)
+								{
+									pszHttpCodeDesc = &pszHead[x + 1];
+									pszHead[x] = '\0'; // End string.
 								}
 							}
 							else if(pszHead[x] == '\r')
@@ -770,7 +800,7 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		GAIA::BL Http::Execute(GAIA::NETWORK::HttpWorkThread* pWorkThread, GAIA::BL bConnect, GAIA::BL bRequest, GAIA::BL bTimeout, GAIA::BL bRecycleCache)
+		GAIA::BL Http::Execute(GAIA::NETWORK::HttpWorkThread* pWorkThread, GAIA::BL bConnect, GAIA::BL bRequest, GAIA::BL bClose, GAIA::BL bRecycleCache)
 		{
 			GAIA::BL bRet = GAIA::False;
 			GAIA::U64 uCurrentTime = GAIA::TIME::tick_time();
@@ -838,17 +868,6 @@ namespace GAIA
 						//
 						if(bHostAddressIsValid)
 						{
-							// Insert to connecting list.
-							{
-								GAST(pRequest->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING);
-								pRequest->OnState(GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING);
-
-								GAIA::SYNC::Autolock al(m_lrConnectingList);
-								pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING;
-								GAIA::BL bInsertResult = m_connectinglist.insert(pRequest);
-								GAST(bInsertResult);
-							}
-
 							// Allocate socket.
 							HttpAsyncSocket* pSocket = gnew HttpAsyncSocket(*this, *m_disp);
 							pRequest->m_pSock = pSocket;
@@ -864,6 +883,17 @@ namespace GAIA
 
 							// Create socket.
 							pSocket->Create();
+
+							// Insert to connecting list.
+							{
+								GAST(pRequest->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING);
+								pRequest->OnState(GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING);
+
+								GAIA::SYNC::Autolock al(m_lrConnectingList);
+								pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING;
+								GAIA::BL bInsertResult = m_connectinglist.insert(pRequest);
+								GAST(bInsertResult);
+							}
 
 							// Connect to server.
 							pSocket->Connect(addrHost);
@@ -883,7 +913,7 @@ namespace GAIA
 			// Request.
 			if(bRequest)
 			{
-				GAIA::SYNC::AutolockR al(m_rwExecuteRequest, pWorkThread != GNIL);
+				GAIA::SYNC::AutolockRW al(m_rwExecuteRequest, pWorkThread != GNIL);
 
 				__RequestVectorType listTemp;
 				__RequestVectorType* pTempList = &listTemp;
@@ -1062,120 +1092,61 @@ namespace GAIA
 				}
 			}
 
-			// Timeout dispatch.
-			if(bTimeout)
+			// Close the request.
 			{
-				GAIA::SYNC::Autolock al(m_lrExecuteTimeout);
+				for(GAIA::NUM x = 0; x < pNeedCloseRequests->size(); ++x)
+				{
+					GAIA::NETWORK::HttpRequest& req = *(*pNeedCloseRequests)[x];
+					this->InternalCloseRequest(req);
+				}
+				pNeedCloseRequests->clear();
+			}
 
+			// Close dispatch.
+			if(bClose)
+			{
+				GAIA::SYNC::Autolock al(m_lrExecuteClose);
+
+				// Collect completed request..
+				{
+					GAIA::SYNC::Autolock al(m_lrCompleteList);
+					for(__RequestSetType::it it = m_completelist.frontit(); !it.empty(); ++it)
+					{
+						GAIA::NETWORK::HttpRequest* pRequest = *it;
+						GAST(pRequest != GNIL);
+						pNeedCloseRequests->push_back(pRequest);
+					}
+				}
+
+				// Collect timeout request.
+				{
+
+				}
+
+				// Collect lost connection request.
+				{
+
+				}
+
+				// Make element in request list is unique.
+				pNeedCloseRequests->sort();
+				pNeedCloseRequests->unique();
+
+				// Close the request.
+				{
+					for(GAIA::NUM x = 0; x < pNeedCloseRequests->size(); ++x)
+					{
+						GAIA::NETWORK::HttpRequest& req = *(*pNeedCloseRequests)[x];
+						this->InternalCloseRequest(req);
+					}
+					pNeedCloseRequests->clear();
+				}
 			}
 
 			// Recycle cache.
 			if(bRecycleCache)
 			{
 				GAIA::SYNC::Autolock al(m_lrExecuteRecycleCache);
-
-			}
-
-			// Close the request.
-			{
-				for(GAIA::NUM x = 0; x < pNeedCloseRequests->size(); ++x)
-				{
-					GAIA::NETWORK::HttpRequest& req = *(*pNeedCloseRequests)[x];
-
-					// Socket object.
-					{
-						GAIA::NETWORK::HttpAsyncSocket* pSocket = req.m_pSock;
-						if(pSocket != GNIL)
-						{
-							// Remove from list.
-							{
-								GAIA::SYNC::Autolock al(m_lrSocks);
-								GAIA::BL bEraseResult = m_socks.erase(pSocket);
-								GAST(bEraseResult);
-							}
-
-							// Close socket.
-							pSocket->Shutdown();
-							pSocket->Close();
-
-							// Release.
-							pSocket->drop_ref();
-						}
-					}
-
-					// Request object.
-					{
-						// Call back state changement.
-						if(req.m_NetworkError == GAIA::NETWORK::NETWORK_ERROR_INVALID)
-							req.m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_OK;
-						if(req.m_NetworkError == GAIA::NETWORK::NETWORK_ERROR_OK)
-						{
-
-						}
-
-						// Callback End.
-						req.OnEnd(GAIA::False);
-						req.m_eventforcomplete.Fire();
-
-						// Remove from list.
-						{
-							switch(req.GetState())
-							{
-							case GAIA::NETWORK::HTTP_REQUEST_STATE_READY:
-								break;
-							case GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING:
-								{
-									GAIA::SYNC::Autolock al(m_lrPendingList);
-									GAIA::BL bEraseResult = m_pendinglist.erase(&req);
-									GAST(bEraseResult);
-								}
-								break;
-							case GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING:
-								{
-									GAIA::SYNC::Autolock al(m_lrConnectingList);
-									GAIA::BL bEraseResult = m_connectinglist.erase(&req);
-									GAST(bEraseResult);
-								}
-								break;
-							case GAIA::NETWORK::HTTP_REQUEST_STATE_REQUESTING:
-								{
-									GAIA::SYNC::Autolock al(m_lrRequestingList);
-									GAIA::BL bEraseResult = m_requestinglist.erase(&req);
-									GAST(bEraseResult);
-								}
-								break;
-							case GAIA::NETWORK::HTTP_REQUEST_STATE_WAITING:
-								{
-									GAIA::SYNC::Autolock al(m_lrWaitingList);
-									GAIA::BL bEraseResult = m_waitinglist.erase(&req);
-									GAST(bEraseResult);
-								}
-								break;
-							case GAIA::NETWORK::HTTP_REQUEST_STATE_RESPONSING:
-								{
-									GAIA::SYNC::Autolock al(m_lrResponsingList);
-									GAIA::BL bEraseResult = m_responsinglist.erase(&req);
-									GAST(bEraseResult);
-								}
-								break;
-							default:
-								GASTFALSE;
-								break;
-							}
-						}
-
-						// Unreference socket.
-						if(req.m_pSock != GNIL)
-						{
-							req.m_pSock->Shutdown();
-							req.m_pSock->Close();
-							req.m_pSock->drop_ref();
-						}
-
-						// Release.
-						req.drop_ref();
-					}
-				}
 			}
 
 			return GAIA::True;
@@ -1184,6 +1155,118 @@ namespace GAIA
 		GAIA::BL Http::CleanupCookic(GAIA::BL bRAM, GAIA::BL bFile, const GAIA::U64& uBeyondTime)
 		{
 			return GAIA::True;
+		}
+
+		GVOID Http::InternalCloseRequest(HttpRequest& req)
+		{
+			// Socket object.
+			{
+				GAIA::NETWORK::HttpAsyncSocket* pSocket = req.m_pSock;
+				if(pSocket != GNIL)
+				{
+					// Remove from list.
+					{
+						GAIA::SYNC::Autolock al(m_lrSocks);
+						GAIA::BL bEraseResult = m_socks.erase(pSocket);
+						GAST(bEraseResult);
+					}
+
+					// Close socket.
+					GTRY
+					{
+						pSocket->Shutdown();
+						pSocket->Close();
+					}
+					GCATCHALL{}
+
+					// Release.
+					pSocket->drop_ref();
+				}
+			}
+
+			// Request object.
+			{
+				// Call back state changement.
+				if(req.m_NetworkError == GAIA::NETWORK::NETWORK_ERROR_INVALID)
+					req.m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_OK;
+				if(req.m_NetworkError == GAIA::NETWORK::NETWORK_ERROR_OK)
+				{
+
+				}
+
+				// Callback End.
+				req.OnEnd(GAIA::False);
+				req.m_eventforcomplete.Fire();
+
+				// Remove from list.
+				{
+					switch(req.GetState())
+					{
+					case GAIA::NETWORK::HTTP_REQUEST_STATE_READY:
+						break;
+					case GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING:
+						{
+							GAIA::SYNC::Autolock al(m_lrPendingList);
+							GAIA::BL bEraseResult = m_pendinglist.erase(&req);
+							GAST(bEraseResult);
+						}
+						break;
+					case GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING:
+						{
+							GAIA::SYNC::Autolock al(m_lrConnectingList);
+							GAIA::BL bEraseResult = m_connectinglist.erase(&req);
+							GAST(bEraseResult);
+						}
+						break;
+					case GAIA::NETWORK::HTTP_REQUEST_STATE_REQUESTING:
+						{
+							GAIA::SYNC::Autolock al(m_lrRequestingList);
+							GAIA::BL bEraseResult = m_requestinglist.erase(&req);
+							GAST(bEraseResult);
+						}
+						break;
+					case GAIA::NETWORK::HTTP_REQUEST_STATE_WAITING:
+						{
+							GAIA::SYNC::Autolock al(m_lrWaitingList);
+							GAIA::BL bEraseResult = m_waitinglist.erase(&req);
+							GAST(bEraseResult);
+						}
+						break;
+					case GAIA::NETWORK::HTTP_REQUEST_STATE_RESPONSING:
+						{
+							GAIA::SYNC::Autolock al(m_lrResponsingList);
+							GAIA::BL bEraseResult = m_responsinglist.erase(&req);
+							GAST(bEraseResult);
+						}
+						break;
+					case GAIA::NETWORK::HTTP_REQUEST_STATE_COMPLETE:
+						{
+							GAIA::SYNC::Autolock al(m_lrCompleteList);
+							GAIA::BL bEraseResult = m_completelist.erase(&req);
+							GAST(bEraseResult);
+						}
+						break;
+					default:
+						GASTFALSE;
+						break;
+					}
+				}
+
+				// Unreference socket.
+				if(req.m_pSock != GNIL)
+				{
+					GTRY
+					{
+						req.m_pSock->Shutdown();
+						req.m_pSock->Close();
+					}
+					GCATCHALL{}
+					req.m_pSock->drop_ref();
+				}
+
+				// Release.
+				req.drop_ref();
+			}
 		}
 	}
 }

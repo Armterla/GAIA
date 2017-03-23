@@ -1237,7 +1237,7 @@ namespace GAIA
 
 				@param bRequest [in] Specify execute request operation or not. Default value is GAIA::True.
 
-				@param bLogicTimeout [in] Specify execute logic timeout operation or not. Default value is GAIA::True.
+				@param bClose [in] Specify execute close operation or not. Default value is GAIA::True.
 
 				@param bRecycleCache [in] Specify execute reccyle cache operation or not. Default value is GAIA::True.
 
@@ -1247,7 +1247,7 @@ namespace GAIA
 					call this method many times until GAIA::False be returnned.\n
 					This method is thread safe.\n
 			*/
-			GAIA::BL Execute(GAIA::NETWORK::HttpWorkThread* pWorkThread = GNIL, GAIA::BL bConnect = GAIA::True, GAIA::BL bRequest = GAIA::True, GAIA::BL bTimeout = GAIA::True, GAIA::BL bRecycleCache = GAIA::True);
+			GAIA::BL Execute(GAIA::NETWORK::HttpWorkThread* pWorkThread = GNIL, GAIA::BL bConnect = GAIA::True, GAIA::BL bRequest = GAIA::True, GAIA::BL bClose = GAIA::True, GAIA::BL bRecycleCache = GAIA::True);
 
 			/*!
 				@brief Enable or disable write cookic to RAM.
@@ -1357,6 +1357,7 @@ namespace GAIA
 				m_status.reset();
 				m_uCurrentThreadMagicIndex = 0;
 			}
+			GAIA::GVOID InternalCloseRequest(GAIA::NETWORK::HttpRequest& req);
 
 		private:
 			GAIA::BL m_bCreated;
@@ -1386,7 +1387,7 @@ namespace GAIA
 			GAIA::SYNC::Lock m_lrCurrentThreadMagicIndex;
 			GAIA::U32 m_uCurrentThreadMagicIndex;
 			GAIA::SYNC::LockRW m_rwExecuteRequest;
-			GAIA::SYNC::Lock m_lrExecuteTimeout;
+			GAIA::SYNC::Lock m_lrExecuteClose;
 			GAIA::SYNC::Lock m_lrExecuteRecycleCache;
 		};
 	}
