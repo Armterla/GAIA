@@ -1809,6 +1809,41 @@ namespace GAIA
 			}
 
 			/*!
+				@brief Get the Name-Value pair's value by a name.
+
+				@param pszName [in] Specify the Name-Value pair's name.
+
+				@return If Name-Value pair is exist which specified by parameter pszName,
+					current function call will success, and return the value string,
+					or will return GNIL.
+
+				@remarks If the Name-Value pair list is not sorted, this function will loop check every node match the parameter pszName,
+					If the Name-Value pair list is sorted, this function will binary search the matched node by parameter pszName.
+			*/
+			GINL const GAIA::CH* GetValueByName(const GAIA::CH* pszName) const
+			{
+				GAST(!GAIA::ALGO::gstremp(pszName));
+				Node nfinder;
+				nfinder.pszName = pszName;
+				if(m_bSorted)
+				{
+					GAIA::NUM sFinded = m_nodes.binary_search(nfinder);
+					if(sFinded >= 0)
+						return m_nodes[sFinded].pszValue;
+				}
+				else
+				{
+					for(GAIA::NUM x = 0; x < m_nodes.size(); ++x)
+					{
+						const Node& n = m_nodes[x];
+						if(n == nfinder)
+							return n.pszValue;
+					}
+				}
+				return GNIL;
+			}
+
+			/*!
 				@brief Sort Name-Value pair list.
 
 				@remarks

@@ -271,7 +271,23 @@ namespace TEST
 			if(h.Size() != 3)
 				TERROR;
 
-			const GAIA::CH* pszValue = h.Get(GAIA::NETWORK::HTTP_HEADNAME_CONTENTLENGTH);
+			const GAIA::CH* pszValue = h.GetValueByName(GAIA::NETWORK::HTTP_HEADNAME_CONTENTLENGTH);
+			if(pszValue == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(pszValue, "123"))
+				TERROR;
+			pszValue = h.GetValueByName(GAIA::NETWORK::HTTP_HEADNAME_CONTENTTYPE);
+			if(pszValue == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(pszValue, "html"))
+				TERROR;
+			pszValue = h.GetValueByName(GAIA::NETWORK::HTTP_HEADNAME_HOST);
+			if(pszValue == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(pszValue, "www.abc.com"))
+				TERROR;
+
+			pszValue = h.Get(GAIA::NETWORK::HTTP_HEADNAME_CONTENTLENGTH);
 			if(pszValue == GNIL)
 				TERROR;
 			if(!GAIA::ALGO::gstrequal(pszValue, "123"))
@@ -331,6 +347,22 @@ namespace TEST
 			if(!h.Exist(GAIA::NETWORK::HTTP_HEADNAME_CONTENTTYPE))
 				TERROR;
 			if(!h.Exist(GAIA::NETWORK::HTTP_HEADNAME_HOST))
+				TERROR;
+
+			pszValue = h.GetValueByName(GAIA::NETWORK::HTTP_HEADNAME_CONTENTLENGTH);
+			if(pszValue == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(pszValue, "123"))
+				TERROR;
+			pszValue = h.GetValueByName(GAIA::NETWORK::HTTP_HEADNAME_CONTENTTYPE);
+			if(pszValue == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(pszValue, "html"))
+				TERROR;
+			pszValue = h.GetValueByName(GAIA::NETWORK::HTTP_HEADNAME_HOST);
+			if(pszValue == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(pszValue, "www.abc.com"))
 				TERROR;
 
 			GAIA::NETWORK::HttpHead h1 = h;
