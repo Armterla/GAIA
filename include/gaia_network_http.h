@@ -190,14 +190,14 @@ namespace GAIA
 					If parameter p is GNIL and sSize equal zero, current function will unreference the buffer or destory the internal buffer.\n
 					When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.\n
 			*/
-			GAIA::BL BindBuffer(const GAIA::GVOID* p, GAIA::NUM sSize);
+			GAIA::BL BindRequestBuffer(const GAIA::GVOID* p, GAIA::NUM sSize);
 
 			/*!
 				@brief Get the buffer for request.
 
 				@return If the buffer exist, return a valid pointer, or will return GNIL.
 			*/
-			const GAIA::GVOID* GetBuffer() const{return m_buf.fptr();}
+			const GAIA::GVOID* GetRequestBuffer() const{return m_reqbuf.fptr();}
 
 			/*!
 				@brief Get the buffer size in bytes for request.
@@ -205,14 +205,14 @@ namespace GAIA
 				@return Return the buffer size in bytes.\n
 					If there is no buffer bound, return GNIL.
 			*/
-			GAIA::NUM GetBufferSize() const{return m_buf.write_size();}
+			GAIA::NUM GetRequestBufferSize() const{return m_reqbuf.write_size();}
 
 			/*!
 				@brief Check HttpRequest is the buffer's owner or not.
 
 				@return If HttpRequest is the buffer's owner, return GAIA::True, or will return GAIA::False.
 			*/
-			GAIA::BL IsBufferOwner() const{return m_bBufOwner;}
+			GAIA::BL IsRequestBufferOwner() const{return m_bReqBufOwner;}
 
 			/*!
 				@brief Execute request.
@@ -594,6 +594,7 @@ namespace GAIA
 				@remarks This function would be callbacked in multi thread.\n
 					This method will be callbacked after send a piece of data by network.\n
 					This method will be callbacked after HttpRequest::OnSent.\n
+					This method will be callbacked before HttpRequest::OnSendBody.\n
 			*/
 			virtual GAIA::GVOID OnSentHead(const GAIA::CH* pszHttpVersion, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& head){}
 
@@ -610,6 +611,7 @@ namespace GAIA
 					One request could cause multiply callbacks of this method.\n
 					This method will be callbacked after send a piece of data by network.\n
 					This method will be callbacked after HttpRequest::OnSent.\n
+					This method will be callbacked after HttpRequest::OnSentHead.\n
 			*/
 			virtual GAIA::GVOID OnSentBody(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){}
 
@@ -627,6 +629,7 @@ namespace GAIA
 				@remarks This function would be callbacked in multi thread.\n
 					This method will be callbacked after receive a piece of data by network.\n
 					This method will be callbacked after HttpRequest::OnRecved.\n
+					This method will be callbacked before HttpRequest::OnRecvedBody.\n
 			*/
 			virtual GAIA::GVOID OnRecvedHead(const GAIA::CH* pszHttpVersion, const GAIA::CH* pszHttpCode, const GAIA::CH* pszHttpCodeDesc, const GAIA::NETWORK::HttpHead& head){}
 
@@ -643,6 +646,7 @@ namespace GAIA
 					One request could cause multiply callbacks of this method.\n
 					This method will be callbacked after receive a piece of data by network.\n
 					This method will be callbacked after HttpRequest::OnRecved.\n
+					This method will be callbacked after HttpRequest::OnRecvedHead.\n
 			*/
 			virtual GAIA::GVOID OnRecvedBody(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){}
 
@@ -672,7 +676,7 @@ namespace GAIA
 				m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_READY;
 				m_method = GAIA::NETWORK::HTTP_METHOD_INVALID;
 				m_sTotalHeadSize = 0;
-				m_bBufOwner = GAIA::True;
+				m_bReqBufOwner = GAIA::True;
 				m_ResponseCode = GAIA::NETWORK::HTTP_CODE_INVALID;
 				m_lSentSize = 0;
 				m_lRecvedSize = 0;
@@ -694,6 +698,9 @@ namespace GAIA
 				m_bHeadSendingComplete = GAIA::False;
 				m_bBodySendingComplete = GAIA::False;
 				m_lSendingSize = 0;
+				m_bHeadRecvingComplete = GAIA::False;
+				m_sTotalRespHeadSize = 0;
+				m_lExpectRespBodySize = GINVALID;
 			}
 
 		private:
@@ -703,8 +710,8 @@ namespace GAIA
 			GAIA::NETWORK::HttpURL m_url;
 			GAIA::NETWORK::HttpHead m_head;
 			GAIA::NUM m_sTotalHeadSize;
-			GAIA::CTN::Buffer m_buf;
-			GAIA::BL m_bBufOwner;
+			GAIA::CTN::Buffer m_reqbuf;
+			GAIA::BL m_bReqBufOwner;
 			GAIA::NETWORK::HTTP_CODE m_ResponseCode;
 			GAIA::N64 m_lSentSize;
 			GAIA::N64 m_lRecvedSize;
@@ -727,6 +734,10 @@ namespace GAIA
 			GAIA::BL m_bHeadSendingComplete;
 			GAIA::BL m_bBodySendingComplete;
 			GAIA::N64 m_lSendingSize;
+			GAIA::BL m_bHeadRecvingComplete;
+			GAIA::NUM m_sTotalRespHeadSize;
+			GAIA::CTN::Buffer m_respbuf;
+			GAIA::N64 m_lExpectRespBodySize;
 		};
 
 		/*!
@@ -1361,11 +1372,13 @@ namespace GAIA
 			GAIA::SYNC::Lock m_lrRequestingList;
 			GAIA::SYNC::Lock m_lrWaitingList;
 			GAIA::SYNC::Lock m_lrResponsingList;
+			GAIA::SYNC::Lock m_lrCompleteList;
 			__RequestSetType m_pendinglist;
 			__RequestSetType m_connectinglist;
 			__RequestSetType m_requestinglist;
 			__RequestSetType m_waitinglist;
 			__RequestSetType m_responsinglist;
+			__RequestSetType m_completelist;
 			GAIA::SYNC::Lock m_lrSocks;
 			__SockSetType m_socks;
 			GAIA::NETWORK::HttpStatus m_status;

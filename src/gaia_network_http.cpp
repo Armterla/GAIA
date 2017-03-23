@@ -157,6 +157,27 @@ namespace GAIA
 				m_pRequest->m_lSentSize += nPracticeSize;
 				m_pRequest->m_uLastSentTime = GAIA::TIME::tick_time();
 
+				if(m_pRequest->m_lSentSize >= m_pRequest->m_sTotalHeadSize &&
+				   m_pRequest->m_lSentSize - nPracticeSize < m_pRequest->m_sTotalHeadSize)
+				{
+					m_pRequest->OnSentHead(m_pHttp->GetDesc().szHttpVer, m_pRequest->GetMethod(), m_pRequest->GetURL(), m_pRequest->GetHead());
+				}
+
+				if(m_pRequest->m_lSentSize > m_pRequest->m_sTotalHeadSize)
+				{
+					GAIA::N64 lOffset = m_pRequest->m_lSentSize - nPracticeSize - m_pRequest->m_sTotalHeadSize;
+					GAIA::N32 nSize = nPracticeSize;
+					const GAIA::U8* pDataU8 = (const GAIA::U8*)pData;
+					if(lOffset < 0)
+					{
+						pDataU8 -= lOffset;
+						nSize += lOffset;
+						lOffset = 0;
+					}
+					GAST(nSize > 0);
+					m_pRequest->OnSentBody(lOffset, pDataU8, nSize);
+				}
+
 				// Change state.
 				GAST(m_pRequest->m_lSentSize <= m_pRequest->m_lSendingSize);
 				if(m_pRequest->m_bHeadSendingComplete && m_pRequest->m_bBodySendingComplete &&
@@ -234,9 +255,123 @@ namespace GAIA
 				m_pRequest->m_lRecvedSize += nSize;
 				m_pRequest->m_uLastRecvedTime = GAIA::TIME::tick_time();
 
+				if(m_pRequest->m_bHeadRecvingComplete)
+				{
+					GAIA::N64 lOffset = m_pRequest->m_lRecvedSize - nSize;
+					GAST(lOffset >= m_pRequest->m_sTotalHeadSize);
+					lOffset -= m_pRequest->m_sTotalHeadSize;
+					m_pRequest->OnRecvedBody(lOffset, pData, nSize);
+				}
+				else
+				{
+					m_pRequest->m_respbuf.write(pData, nSize);
+					GAIA::U8* pReader = m_pRequest->m_respbuf.read_ptr();
+					GAIA::U8* pWriter = m_pRequest->m_respbuf.write_ptr();
+					while(pReader < pWriter)
+					{
+						if(pReader[0] == '\r' && pReader + 1 < pWriter && pReader[1] == '\n' && pReader + 2 < pWriter && (pReader[2] == '\r' || pReader[2] == '\n'))
+						{
+							GAIA::NUM sHeadEndOffset = (GAIA::NUM)(pReader - m_pRequest->m_respbuf.fptr() + 3);
+							m_pRequest->m_respbuf.seek_read(sHeadEndOffset);
+							m_pRequest->m_bHeadRecvingComplete = GAIA::True;
+						}
+						++pReader;
+					}
+					if(m_pRequest->m_bHeadRecvingComplete)
+					{
+						//
+						m_pRequest->m_sTotalRespHeadSize = m_pRequest->m_respbuf.read_size();
+
+						// Analyze.
+						GAIA::CH* pszHead = (GAIA::CH*)m_pRequest->m_respbuf.fptr();
+						GAIA::CH* pszHttpVersion = pszHead;
+						GAIA::CH* pszHttpCode = GNIL;
+						GAIA::CH* pszHttpCodeDesc = GNIL;
+						GAIA::NETWORK::HttpHead resphead;
+						for(GAIA::NUM x = 0; x < m_pRequest->m_sTotalRespHeadSize; ++x)
+						{
+							if(pszHead[x] == ' ')
+							{
+								pszHead[x] = '\0'; // End string.
+
+								if(pszHttpCode == GNIL)
+									pszHttpCode = &pszHead[x + 1];
+								else if(pszHttpCodeDesc == GNIL)
+									pszHttpCodeDesc = &pszHead[x + 1];
+								else // If analyze failed.
+								{
+									pszHttpVersion = GNIL;
+									break;
+								}
+							}
+							else if(pszHead[x] == '\r')
+							{
+								pszHead[x] = '\0'; // End string.
+
+								// If analyze failed.
+								if(x + 1 >= m_pRequest->m_sTotalRespHeadSize)
+								{
+									pszHttpVersion = GNIL;
+									break;
+								}
+								if(pszHead[x + 1] != '\n')
+								{
+									pszHttpVersion = GNIL;
+									break;
+								}
+								GAIA::NUM sHeadSize = m_pRequest->m_sTotalRespHeadSize - x - 3;
+								if(sHeadSize > 0)
+								{
+									if(!resphead.FromString(&pszHead[x + 2], &sHeadSize))
+									{
+										pszHttpVersion = GNIL;
+										break;
+									}
+								}
+								break;
+							}
+						}
+						const GAIA::CH* pszContentLength = resphead.GetValueByName(GAIA::NETWORK::HTTP_HEADNAME_CONTENTLENGTH);
+						if(pszContentLength != GNIL)
+							m_pRequest->m_lExpectRespBodySize = GAIA::ALGO::acasts(pszContentLength);
+
+						// Callback head.
+						if(pszHttpVersion != GNIL && pszHttpCode != GNIL && pszHttpCodeDesc != GNIL)
+							m_pRequest->OnRecvedHead(pszHttpVersion, pszHttpCode, pszHttpCodeDesc, resphead);
+
+						// Callback body.
+						m_pRequest->m_respbuf.keep_remain();
+						if(m_pRequest->m_respbuf.remain() > 0)
+						{
+							m_pRequest->OnRecvedBody(0, m_pRequest->m_respbuf.fptr(), m_pRequest->m_respbuf.write_size());
+							m_pRequest->m_respbuf.destroy();
+						}
+					}
+				}
+
 				// Check complete, if complete, change state.
 				{
+					if(m_pRequest->m_lExpectRespBodySize != GINVALID &&
+					   m_pRequest->m_lRecvedSize - m_pRequest->m_sTotalRespHeadSize >= m_pRequest->m_lExpectRespBodySize)
+					{
+						// Remove from responsing list.
+						{
+							GAIA::SYNC::Autolock al(m_pHttp->m_lrResponsingList);
+							GAIA::BL bEraseResult = m_pHttp->m_responsinglist.erase(m_pRequest);
+							GAST(bEraseResult);
+						}
 
+						// Insert to complete list.
+						{
+							GAST(m_pRequest->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_COMPLETE);
+							m_pRequest->OnState(GAIA::NETWORK::HTTP_REQUEST_STATE_COMPLETE);
+
+							GAIA::SYNC::Autolock al(m_pHttp->m_lrCompleteList);
+							m_pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_COMPLETE;
+							GAIA::BL bInsertResult = m_pHttp->m_completelist.insert(m_pRequest);
+							GAST(bInsertResult);
+						}
+					}
 				}
 			}
 			virtual GAIA::GVOID OnShutdowned(GAIA::BL bResult, GAIA::N32 nShutdownFlag){}
@@ -297,10 +432,10 @@ namespace GAIA
 
 		HttpRequest::~HttpRequest()
 		{
-			if(m_bBufOwner)
-				m_buf.destroy();
+			if(m_bReqBufOwner)
+				m_reqbuf.destroy();
 			else
-				m_buf.proxy(GNIL, GNIL);
+				m_reqbuf.proxy(GNIL, GNIL);
 		}
 
 		Http& HttpRequest::GetHttp()
@@ -310,14 +445,14 @@ namespace GAIA
 
 		GAIA::GVOID HttpRequest::Reset()
 		{
-			if(m_bBufOwner)
-				m_buf.destroy();
+			if(m_bReqBufOwner)
+				m_reqbuf.destroy();
 			else
-				m_buf.proxy(GNIL, GNIL);
+				m_reqbuf.proxy(GNIL, GNIL);
 			this->init();
 		}
 
-		GAIA::BL HttpRequest::BindBuffer(const GAIA::GVOID* p, GAIA::NUM sSize)
+		GAIA::BL HttpRequest::BindRequestBuffer(const GAIA::GVOID* p, GAIA::NUM sSize)
 		{
 			if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY)
 				return GAIA::False;
@@ -326,15 +461,15 @@ namespace GAIA
 			{
 				if(sSize > 0)
 				{
-					m_bBufOwner = GAIA::True;
-					m_buf.resize(sSize);
+					m_bReqBufOwner = GAIA::True;
+					m_reqbuf.resize(sSize);
 				}
 				else if(sSize == 0)
 				{
-					if(m_bBufOwner)
-						m_buf.destroy();
+					if(m_bReqBufOwner)
+						m_reqbuf.destroy();
 					else
-						m_buf.proxy(GNIL, GNIL);
+						m_reqbuf.proxy(GNIL, GNIL);
 				}
 				else
 				{
@@ -346,12 +481,12 @@ namespace GAIA
 			{
 				if(sSize > 0)
 				{
-					if(m_bBufOwner)
-						m_buf.destroy();
+					if(m_bReqBufOwner)
+						m_reqbuf.destroy();
 					else
-						m_buf.proxy(GNIL, GNIL);
-					m_bBufOwner = GAIA::False;
-					m_buf.proxy((GAIA::U8*)p, (GAIA::U8*)p + sSize - 1);
+						m_reqbuf.proxy(GNIL, GNIL);
+					m_bReqBufOwner = GAIA::False;
+					m_reqbuf.proxy((GAIA::U8*)p, (GAIA::U8*)p + sSize - 1);
 				}
 				else
 				{
@@ -610,6 +745,19 @@ namespace GAIA
 				m_responsinglist.clear();
 			}
 
+			// Release all complete requests.
+			{
+				GAIA::SYNC::Autolock al(m_lrCompleteList);
+				for(__RequestSetType::it it = m_completelist.frontit(); !it.empty(); ++it)
+				{
+					GAIA::NETWORK::HttpRequest* pRequest = *it;
+					GAST(pRequest != GNIL);
+					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
+					pRequest->drop_ref();
+				}
+				m_completelist.clear();
+			}
+
 			// Release all sockets.
 			{
 				GAIA::SYNC::Autolock al(m_lrSocks);
@@ -840,17 +988,17 @@ namespace GAIA
 							{
 								// Collect data what need send.
 								GAIA::BL bBodySendingComplete = GAIA::False;
-								if(!pRequest->m_buf.nill())
+								if(!pRequest->m_reqbuf.nill())
 								{
-									GAIA::NUM sRemain = pRequest->m_buf.remain();
+									GAIA::NUM sRemain = pRequest->m_reqbuf.remain();
 									if(sRemain > 0)
 									{
 										if(sRemain > 1024 * 100)
 											sRemain = 1024 * 100;
 										pReqBuf->resize(sRemain);
-										pRequest->m_buf.read(pReqBuf->fptr(), sRemain);
+										pRequest->m_reqbuf.read(pReqBuf->fptr(), sRemain);
 									}
-									if(pRequest->m_buf.remain() == 0)
+									if(pRequest->m_reqbuf.remain() == 0)
 										bBodySendingComplete = GAIA::True;
 								}
 								else
