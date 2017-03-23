@@ -1082,6 +1082,8 @@ namespace GAIA
 			*/
 			GINL GAIA::NUM GetRelativePartLength() const
 			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return GNIL;
 				if(m_path.psz == GNIL)
 					return 0;
 				return m_url.size() - (GAIA::NUM)(m_path.psz - m_url.fptr());
