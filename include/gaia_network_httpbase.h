@@ -56,6 +56,19 @@ namespace GAIA
 			"CONNECT",	// HTTP_METHOD_CONNECT
 		};
 
+		static const GAIA::NUM HTTP_METHOD_STRING_LEN[] =
+		{
+			7, // "INVALID",	// HTTP_METHOD_INVALID
+			3, // "PUT",		// HTTP_METHOD_PUT
+			4, // "POST",		// HTTP_METHOD_POST
+			3, // "GET",		// HTTP_METHOD_GET
+			4, // "HEAD",		// HTTP_METHOD_HEAD
+			6, // "DELETE",		// HTTP_METHOD_DELETE
+			7, // "OPTIONS",	// HTTP_METHOD_OPTIONS
+			5, // "TRACE",		// HTTP_METHOD_TRACE
+			7, // "CONNECT",	// HTTP_METHOD_CONNECT
+		};
+
 		// Http code declaration here.
 		GAIA_ENUM_BEGIN(HTTP_CODE)
 			/* Information */

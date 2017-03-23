@@ -9,6 +9,7 @@
 #include "gaia_sync_autolockr.h"
 #include "gaia_sync_autolockw.h"
 #include "gaia_sync_autolockrw.h"
+#include "gaia_sync_event.h"
 #include "gaia_ctn_vector.h"
 #include "gaia_ctn_buffer.h"
 #include "gaia_ctn_set.h"
@@ -330,14 +331,14 @@ namespace GAIA
 
 				@return Return http requested size in bytes.
 			*/
-			GAIA::N64 GetRequestedSize() const{return m_lRequestedSize;}
+			GAIA::N64 GetRequestedSize() const{return m_lSentSize;}
 
 			/*!
 				@brief Get http responsed size in bytes.
 
 				@return Return http responsed size in bytes.
 			*/
-			GAIA::N64 GetResponsedSize() const{return m_lResponsedSize;}
+			GAIA::N64 GetResponsedSize() const{return m_lRecvedSize;}
 
 			/*!
 				@brief Get http request's network error.
@@ -376,14 +377,14 @@ namespace GAIA
 
 				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::BL SetNetworkResponseTimeout(const GAIA::U64& uMilliSeconds){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_uNetworkresponseTimeout = uMilliSeconds; return GAIA::True;}
+			GAIA::BL SetNetworkResponseTimeout(const GAIA::U64& uMilliSeconds){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_uNetworkResponseTimeout = uMilliSeconds; return GAIA::True;}
 
 			/*!
 				@brief Get http request network response timeout time in milliseconds.
 
 				@return Return the network response timeout time in milliseconds.
 			*/
-			const GAIA::U64& GetNetworkResponseTimeout() const{return m_uNetworkresponseTimeout;}
+			const GAIA::U64& GetNetworkResponseTimeout() const{return m_uNetworkResponseTimeout;}
 
 			/*!
 				@brief Enable or disable write cookic to RAM.
@@ -548,9 +549,9 @@ namespace GAIA
 			virtual GAIA::GVOID OnResume(){}
 
 			/*!
-				@brief When send a request buffer piece, this function will be callbacked.
+				@brief When sent a request buffer piece, this function will be callbacked.
 
-				@param lOffset [in] Specify the offset position of total sent buffer.
+				@param lOffset [in] Specify the offset position of total sent buffer.\n
 
 				@param pData [in] Specify the data buffer of current sent buffer piece.
 
@@ -559,11 +560,12 @@ namespace GAIA
 				@remarks This function would be callbacked in multi thread.\n
 					One request could cause multiply callbacks of this method.\n
 					This method will be callbacked after send a piece of data by network.\n
+					The head data will be callbacked by this method.\n
 			*/
-			virtual GAIA::GVOID OnWrite(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){}
+			virtual GAIA::GVOID OnSent(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){}
 
 			/*!
-				@brief When receive a response buffer piece, this function will be callbacked.
+				@brief When received a response buffer piece, this function will be callbacked.
 
 				@param lOffset [in] Specify the offset position of total received buffer.
 
@@ -571,27 +573,112 @@ namespace GAIA
 
 				@param sDataSize [in] Specify the data buffer's size of current received buffer piece.
 
-				@param sPracticeDataSize [in] Specify the data buffer's size of current received buffer piece.
+				@remarks This function would be callbacked in multi thread.\n
+					One request could cause multiply callbacks of this method.\n
+					This method will be callbacked after receive a piece of data by network.\n
+					The response head data will be callbacked by this method.\n
+			*/
+			virtual GAIA::GVOID OnRecved(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){}
+
+			/*!
+				@brief When HttpRequest's head be sent, this method will be called.
+
+				@param pszHttpVersion [in] Specify the http version string ended with '\0'.
+
+				@param method [in] Specify the request method.
+
+				@param url [in] Specify the request url.
+
+				@param head [in] Specify the request head.
+
+				@remarks This function would be callbacked in multi thread.\n
+					This method will be callbacked after send a piece of data by network.\n
+					This method will be callbacked after HttpRequest::OnSent.\n
+			*/
+			virtual GAIA::GVOID OnSentHead(const GAIA::CH* pszHttpVersion, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& head){}
+
+			/*!
+				@brief When HttpRequest's body data be sent, this method will be called.
+
+				@param lOffset [in] Specify the offset position of body sent buffer.\n
+
+				@param pData [in] Specify the data buffer of current sent buffer piece.
+
+				@param sDataSize [in] Specify the data buffer's size of current sent buffer piece.
+
+				@remarks This function would be callbacked in multi thread.\n
+					One request could cause multiply callbacks of this method.\n
+					This method will be callbacked after send a piece of data by network.\n
+					This method will be callbacked after HttpRequest::OnSent.\n
+			*/
+			virtual GAIA::GVOID OnSentBody(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){}
+
+			/*!
+				@brief When HttpRequest's response head had received, this method will be called.
+
+				@param pszHttpVersion [in] Specify the response http version.
+
+				@param pszHttpCode [in] Specify the response http code.
+
+				@param pszHttpCodeDesc [in] Specify the response http code description as a text string ended with '\0'.
+
+				@param head [in] Specify the response head.
+
+				@remarks This function would be callbacked in multi thread.\n
+					This method will be callbacked after receive a piece of data by network.\n
+					This method will be callbacked after HttpRequest::OnRecved.\n
+			*/
+			virtual GAIA::GVOID OnRecvedHead(const GAIA::CH* pszHttpVersion, const GAIA::CH* pszHttpCode, const GAIA::CH* pszHttpCodeDesc, const GAIA::NETWORK::HttpHead& head){}
+
+			/*!
+				@brief When HttpRequest's response body had received, this method will be called.
+
+				@param lOffset [in] Specify the offset position of response body received buffer.
+
+				@param pData [in] Specify the data buffer of current received buffer piece.
+
+				@param sDataSize [in] Specify the data buffer's size of current received buffer piece.
 
 				@remarks This function would be callbacked in multi thread.\n
 					One request could cause multiply callbacks of this method.\n
 					This method will be callbacked after receive a piece of data by network.\n
+					This method will be callbacked after HttpRequest::OnRecved.\n
 			*/
-			virtual GAIA::GVOID OnRead(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){}
+			virtual GAIA::GVOID OnRecvedBody(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){}
+
+			/*!
+				@brief When the HttpRequest need to send request body,
+					and there is no request body data set to HttpRequest(like HttpRequest::BindBuffer),
+					this function will be callbacked.
+
+				@param lOffset [in] Specify the offset position of total sending data.
+
+				@param pData [out] Used for saving the data.
+
+				@param sDataSize [in] Specify parameter pData's max size in bytes.
+
+				@return Return the practice data size in bytes.\n
+					If not exist any data to send or send to the end, return 0.\n
+					If exist any error and can't send data, return GINVALID(-1).\n
+
+				@remarks This function would be callbacked in multi thread.\n
+					One request could cause multiply callbacks of this method.\n
+			*/
+			virtual GAIA::N64 OnRequestBodyData(GAIA::N64 lOffset, GAIA::GVOID* pData, GAIA::NUM sMaxDataSize){return 0;}
 
 		private:
 			GINL GAIA::GVOID init()
 			{
 				m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_READY;
 				m_method = GAIA::NETWORK::HTTP_METHOD_INVALID;
+				m_sTotalHeadSize = 0;
 				m_bBufOwner = GAIA::True;
 				m_ResponseCode = GAIA::NETWORK::HTTP_CODE_INVALID;
-				m_lRequestedSize = 0;
-				m_lResponsedSize = 0;
+				m_lSentSize = 0;
+				m_lRecvedSize = 0;
 				m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_INVALID;
 				m_uLogicTimeout = 16 * 1000 * 1000;
-				m_uNetworkresponseTimeout = 4 * 1000 * 1000;
-
+				m_uNetworkResponseTimeout = 4 * 1000 * 1000;
 				m_uRequestTime = 0;
 				m_bEnableWriteCookicRAM = GAIA::False;
 				m_bEnableWriteCookicFile = GAIA::False;
@@ -601,8 +688,12 @@ namespace GAIA
 				m_uReadCookicTime = 0;
 				m_pSock = GNIL;
 				m_uThreadMagicIndex = GINVALID;
-				m_uLastRequestedTime = 0;
-				m_uLastResponsedTime = 0;
+				m_uLastSentTime = 0;
+				m_uLastRecvedTime = 0;
+				m_uLastSendingTime = 0;
+				m_bHeadSendingComplete = GAIA::False;
+				m_bBodySendingComplete = GAIA::False;
+				m_lSendingSize = 0;
 			}
 
 		private:
@@ -611,15 +702,17 @@ namespace GAIA
 			GAIA::NETWORK::HTTP_METHOD m_method;
 			GAIA::NETWORK::HttpURL m_url;
 			GAIA::NETWORK::HttpHead m_head;
+			GAIA::NUM m_sTotalHeadSize;
 			GAIA::CTN::Buffer m_buf;
 			GAIA::BL m_bBufOwner;
 			GAIA::NETWORK::HTTP_CODE m_ResponseCode;
-			GAIA::N64 m_lRequestedSize;
-			GAIA::N64 m_lResponsedSize;
+			GAIA::N64 m_lSentSize;
+			GAIA::N64 m_lRecvedSize;
 			GAIA::NETWORK::NETWORK_ERROR m_NetworkError;
 			GAIA::U64 m_uLogicTimeout;
-			GAIA::U64 m_uNetworkresponseTimeout;
+			GAIA::U64 m_uNetworkResponseTimeout;
 			GAIA::U64 m_uRequestTime;
+			GAIA::SYNC::Event m_eventforcomplete;
 			GAIA::BL m_bEnableWriteCookicRAM;
 			GAIA::BL m_bEnableWriteCookicFile;
 			GAIA::U64 m_uWriteCookicTime;
@@ -628,8 +721,12 @@ namespace GAIA
 			GAIA::U64 m_uReadCookicTime;
 			HttpAsyncSocket* m_pSock;
 			GAIA::U32 m_uThreadMagicIndex;
-			GAIA::U64 m_uLastRequestedTime;
-			GAIA::U64 m_uLastResponsedTime;
+			GAIA::U64 m_uLastSentTime;
+			GAIA::U64 m_uLastRecvedTime;
+			GAIA::U64 m_uLastSendingTime;
+			GAIA::BL m_bHeadSendingComplete;
+			GAIA::BL m_bBodySendingComplete;
+			GAIA::N64 m_lSendingSize;
 		};
 
 		/*!
@@ -841,18 +938,19 @@ namespace GAIA
 				uNotResponseCount = 0;
 
 				uRequestTimeoutCount = 0;
-				uCallBackBeginCount = 0;
-				uCallBackEndCount = 0;
-				uCallBackEndWithCancelCount = 0;
-				uCallBackPendCompleteCount = 0;
-				uCallBackConnectCompleteCount = 0;
-				uCallBackRequestCompleteCount = 0;
-				uCallBackWaitCompleteCount = 0;
-				uCallBackResponseCompleteCount = 0;
-				uCallBackPauseCount = 0;
-				uCallBackResumeCount = 0;
-				uCallBackWriteCount = 0;
-				uCallBackReadCount = 0;
+				uCallBackOnBeginCount = 0;
+				uCallBackOnEndCount = 0;
+				uCallBackOnEndWithCancelCount = 0;
+				uCallBackOnStateCount = 0;
+				uCallBackOnPauseCount = 0;
+				uCallBackOnResumeCount = 0;
+				uCallBackOnSentCount = 0;
+				uCallBackOnRecvedCount = 0;
+				uCallBackOnSentHead = 0;
+				uCallBackOnSentBody = 0;
+				uCallBackOnRecvedHead = 0;
+				uCallBackOnRecvedBody = 0;
+				uCallBackOnRequestBodyData = 0;
 			}
 
 		public:
@@ -965,64 +1063,69 @@ namespace GAIA
 			GAIA::U64 uRequestTimeoutCount;
 
 			/*!
-				@brief Specify callback begin count.
+				@brief Specify callback OnBegin count.
 			*/
-			GAIA::U64 uCallBackBeginCount;
+			GAIA::U64 uCallBackOnBeginCount;
 
 			/*!
-				@brief Specify callback end count.
+				@brief Specify callback OnEnd count.
 			*/
-			GAIA::U64 uCallBackEndCount;
+			GAIA::U64 uCallBackOnEndCount;
 
 			/*!
-				@brief Specify callback end with cancel count.
+				@brief Specify callback OnEnd with cancel count.
 			*/
-			GAIA::U64 uCallBackEndWithCancelCount;
+			GAIA::U64 uCallBackOnEndWithCancelCount;
 
 			/*!
-				@brief Specify callback pend complete count.
+				@brief Specify callback OnState count.
 			*/
-			GAIA::U64 uCallBackPendCompleteCount;
+			GAIA::U64 uCallBackOnStateCount;
 
 			/*!
-				@brief Specify callback connect complete count.
+				@brief Specify callback OnPause count.
 			*/
-			GAIA::U64 uCallBackConnectCompleteCount;
+			GAIA::U64 uCallBackOnPauseCount;
 
 			/*!
-				@brief Specify callback request complete count.
+				@brief Specify callback OnResume count.
 			*/
-			GAIA::U64 uCallBackRequestCompleteCount;
+			GAIA::U64 uCallBackOnResumeCount;
 
 			/*!
-				@brief Specify callback waited complete count.
+				@brief Specify callback OnSent count.
 			*/
-			GAIA::U64 uCallBackWaitCompleteCount;
+			GAIA::U64 uCallBackOnSentCount;
 
 			/*!
-				@brief Specify callback response complete count.
+				@brief Specify callback OnRecved count.
 			*/
-			GAIA::U64 uCallBackResponseCompleteCount;
+			GAIA::U64 uCallBackOnRecvedCount;
 
 			/*!
-				@brief Specify callback pause count.
+				@brief Specify callback OnSentHead count.
 			*/
-			GAIA::U64 uCallBackPauseCount;
+			GAIA::U64 uCallBackOnSentHead;
 
 			/*!
-				@brief Specify callback resume count.
+				@brief Specify callback OnSentBody count.
 			*/
-			GAIA::U64 uCallBackResumeCount;
+			GAIA::U64 uCallBackOnSentBody;
 
 			/*!
-				@brief Specify callback write count.
+				@brief Specify callback OnRecvedHead count.
 			*/
-			GAIA::U64 uCallBackWriteCount;
+			GAIA::U64 uCallBackOnRecvedHead;
 
 			/*!
-				@brief Specify callback read count.
+				@brief Specify callback OnRecvedBody count.
 			*/
-			GAIA::U64 uCallBackReadCount;
+			GAIA::U64 uCallBackOnRecvedBody;
+
+			/*!
+				@brief Specify callback OnRequestBodyData count.
+			*/
+			GAIA::U64 uCallBackOnRequestBodyData;
 		};
 
 		/*!
@@ -1242,9 +1345,6 @@ namespace GAIA
 				m_status.reset();
 				m_uCurrentThreadMagicIndex = 0;
 			}
-			GAIA::U32 InternalRequestThreadMagicIndex();
-			GAIA::BL InternalCheckResponseComplete(GAIA::NETWORK::HttpAsyncSocket& sock);
-			GAIA::GVOID InternalCloseRequest(GAIA::NETWORK::HttpRequest& req, GAIA::NETWORK::NETWORK_ERROR neterr);
 
 		private:
 			GAIA::BL m_bCreated;

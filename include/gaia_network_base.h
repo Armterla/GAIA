@@ -18,8 +18,8 @@ namespace GAIA
 		GAIA_ENUM_BEGIN(NETWORK_ERROR)
 			NETWORK_ERROR_OK,
 			NETWORK_ERROR_UNKNOWN,
-			NETWORK_ERROR_CONNECT_FAILED,
 			NETWORK_ERROR_DOMAIN_ANALYSIS_FAILED,
+			NETWORK_ERROR_CONNECT_FAILED,
 			NETWORK_ERROR_LOSTCONNECTION,
 		GAIA_ENUM_END(NETWORK_ERROR)
 
@@ -28,8 +28,8 @@ namespace GAIA
 			"NetworkErrorInvalid",
 			"NetworkErrorOK",
 			"NetworkErrorUnknown",
-			"NetworkErrorConnectFailed",
 			"NetworkErrorDomainAnalysisFailed",
+			"NetworkErrorConnectFailed",
 			"NetworkErrorLostConnection",
 		};
 
