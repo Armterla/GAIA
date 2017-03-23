@@ -7,13 +7,14 @@ namespace TEST
 	{
 		// HttpURL test.
 		{
-			GAIA::CH szProtocal[32];
-			GAIA::CH szHostName[32];
-			GAIA::CH szPort[32];
-			GAIA::CH szPath[32];
-			GAIA::CH szFullParam[32];
-			GAIA::CH szFullQuery[32];
-			GAIA::CH szFragment[32];
+			GAIA::CH szProtocal[128];
+			GAIA::CH szHostName[128];
+			GAIA::CH szPort[128];
+			GAIA::CH szPath[128];
+			GAIA::CH szFullParam[128];
+			GAIA::CH szFullQuery[128];
+			GAIA::CH szFragment[128];
+			GAIA::CH szRelativePart[128];
 
 			static const GAIA::CH* TEST_URL1 = "127.0.0.1";
 			static const GAIA::CH* TEST_URL2 = "127.0.0.1:1234";
@@ -33,11 +34,19 @@ namespace TEST
 				TERROR;
 			if(hu.GetPath(szPath, sizeof(szPath)) != GNIL)
 				TERROR;
+			if(hu.GetRelativePart(szRelativePart, sizeof(szRelativePart)) != GNIL)
+				TERROR;
+			if(hu.GetRelativePart() != GNIL)
+				TERROR;
 
 			hu.FromString(TEST_URL2);
 			if(!hu.Analyze())
 				TERROR;
 			if(hu.GetHostName(szHostName) == GNIL || !GAIA::ALGO::gstrequal(szHostName, "127.0.0.1"))
+				TERROR;
+			if(hu.GetRelativePart(szRelativePart, sizeof(szRelativePart)) != GNIL)
+				TERROR;
+			if(hu.GetRelativePart() != GNIL)
 				TERROR;
 
 			hu.FromString(TEST_URL3);
@@ -49,6 +58,14 @@ namespace TEST
 				TERROR;
 			if(!GAIA::ALGO::gstrequal(szPath, "/index.html"))
 				TERROR;
+			if(hu.GetRelativePart(szRelativePart, sizeof(szRelativePart)) == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szRelativePart, "/index.html"))
+				TERROR;
+			if(hu.GetRelativePart() == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(hu.GetRelativePart(), "/index.html"))
+				TERROR;
 
 			hu.FromString(TEST_URL4);
 			if(!hu.Analyze())
@@ -58,6 +75,14 @@ namespace TEST
 			if(hu.GetPath(szPath, sizeof(szPath)) == GNIL)
 				TERROR;
 			if(!GAIA::ALGO::gstrequal(szPath, "/path1/path2/path3"))
+				TERROR;
+			if(hu.GetRelativePart(szRelativePart, sizeof(szRelativePart)) == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szRelativePart, "/path1/path2/path3?a=1&b=2&c=3"))
+				TERROR;
+			if(hu.GetRelativePart() == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(hu.GetRelativePart(), "/path1/path2/path3?a=1&b=2&c=3"))
 				TERROR;
 
 			hu.FromString(TEST_URL5);
