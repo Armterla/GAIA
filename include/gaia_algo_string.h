@@ -771,11 +771,10 @@ namespace GAIA
 
 			return pDst;
 		}
-
 		template<typename _SrcDataType> GAIA::U8 ch2hex(_SrcDataType pSrc, GAIA::NUM sSrcLen)
 		{
 			GAST(!!pSrc);
-			GAST(sSrcLen >= 3);
+			GAST(sSrcLen >= 2);
 
 			// Calculate high 4 bit.
 			GAIA::U8 u0;
@@ -807,7 +806,6 @@ namespace GAIA
 
 			return GSCAST(GAIA::U8)((u0 << 4) + u1);
 		}
-
 		template<typename _SrcDataType, typename _DstDataType>
 		_DstDataType int2str(const _SrcDataType& src, _DstDataType pDst)
 		{
