@@ -114,6 +114,15 @@ namespace TEST
 			GAIA::ALGO::str2hex(szTemp, sizeof(u), GRCAST(GAIA::U8*)(&u));
 			if(u != 0x1234567890ABCDEF)
 				TERROR;
+
+			GAIA::U8 uch = 0xEC;
+			GAIA::ALGO::hex2ch(uch, szTemp, sizeof(szTemp));
+			if(GAIA::ALGO::gstrcmp(szTemp, "EC") != 0)
+				TERROR;
+			uch = 0;
+			uch = GAIA::ALGO::ch2hex(szTemp, sizeof(szTemp));
+			if(uch != 0xEC)
+				TERROR;
 		}
 
 		// Punctuation test.

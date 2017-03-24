@@ -747,6 +747,67 @@ namespace GAIA
 			*pTemp = '\0';
 			return p;
 		}
+		template<typename _DstDataType> _DstDataType hex2ch(GAIA::U8 u, _DstDataType pDst, GAIA::NUM sDstLen)
+		{
+			GAST(!!pDst);
+			GAST(sDstLen >= 3);
+
+			// Calculate high 4 bit.
+			GAIA::U8 u0 = (u >> 4) & 0x0F;
+			if(u0 < 10)
+				pDst[0] = '0' + u0;
+			else
+				pDst[0] = 'A' + u0 - 10;
+
+			// Calculate low 4 bit.
+			GAIA::U8 u1 = u & 0x0F;
+			if(u1 < 10)
+				pDst[1] = '0' + u1;
+			else
+				pDst[1] = 'A' + u1 - 10;
+
+			//
+			pDst[2] = '\0';
+
+			return pDst;
+		}
+
+		template<typename _SrcDataType> GAIA::U8 ch2hex(_SrcDataType pSrc, GAIA::NUM sSrcLen)
+		{
+			GAST(!!pSrc);
+			GAST(sSrcLen >= 3);
+
+			// Calculate high 4 bit.
+			GAIA::U8 u0;
+			if(pSrc[0] >= '0' && pSrc[0] <= '9')
+				u0 = pSrc[0] - '0';
+			else if(pSrc[0] >= 'a' && pSrc[0] <= 'f')
+				u0 = pSrc[0] - 'a' + 10;
+			else if(pSrc[0] >= 'A' && pSrc[0] <= 'F')
+				u0 = pSrc[0] - 'A' + 10;
+			else
+			{
+				GASTFALSE;
+				u0 = 0;
+			}
+
+			// Calculate low 4 bit.
+			GAIA::U8 u1;
+			if(pSrc[1] >= '0' && pSrc[1] <= '9')
+				u1 = pSrc[1] - '0';
+			else if(pSrc[1] >= 'a' && pSrc[1] <= 'f')
+				u1 = pSrc[1] - 'a' + 10;
+			else if(pSrc[1] >= 'A' && pSrc[1] <= 'F')
+				u1 = pSrc[1] - 'A' + 10;
+			else
+			{
+				GASTFALSE;
+				u1 = 0;
+			}
+
+			return GSCAST(GAIA::U8)((u0 << 4) + u1);
+		}
+
 		template<typename _SrcDataType, typename _DstDataType>
 		_DstDataType int2str(const _SrcDataType& src, _DstDataType pDst)
 		{
