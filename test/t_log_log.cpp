@@ -7,8 +7,31 @@ namespace TEST
 	{
 		for(GAIA::NUM x = 0; x < 10; ++x)
 		{
+			GAIA::LOG::Log::TYPE logtype = GAIA::LOG::Log::TYPE_LOG;
+			switch(x % 5)
+			{
+			case 0:
+				logtype = GAIA::LOG::Log::TYPE_LOG;
+				break;
+			case 1:
+				logtype = GAIA::LOG::Log::TYPE_WARNING;
+				break;
+			case 2:
+				logtype = GAIA::LOG::Log::TYPE_ERROR;
+				break;
+			case 3:
+				logtype = GAIA::LOG::Log::TYPE_USER;
+				break;
+			case 4:
+				logtype = GAIA::LOG::Log::TYPE_DEVELOP;
+				break;
+			default:
+				logtype = GAIA::LOG::Log::TYPE_LOG;
+				break;
+			}
+
 			g_gaia_log <<
-				g_gaia_log.Type(GAIA::LOG::Log::TYPE_WARNING) <<
+				g_gaia_log.Type(logtype) <<
 				g_gaia_log.UserFilter(0x12345678) <<
 				"Test log " <<
 				(GAIA::U8)1 << " " <<
@@ -28,5 +51,11 @@ namespace TEST
 				(GAIA::WCH*)L"unicode string" <<
 				g_gaia_log.End();
 		}
+
+		GLOG << "Log macro" << GEND;
+		GWAR << "War macro" << GEND;
+		GERR << "Err macro" << GEND;
+		GUSR << "Usr macro" << GEND;
+		GDEV << "Dev macro" << GEND;
 	}
 }

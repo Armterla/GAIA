@@ -331,11 +331,15 @@
 #	define GLOG g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_LOG) << g_gaia_log.UserFilter(0xFFFFFFFF)
 #	define GWAR g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_WARNING) << g_gaia_log.UserFilter(0xFFFFFFFF)
 #	define GERR g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_ERROR) << g_gaia_log.UserFilter(0xFFFFFFFF)
+#	define GUSR g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_USER) << g_gaia_log.UserFilter(0xFFFFFFFF)
+#	define GDEV g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_DEVELOP) << g_gaia_log.UserFilter(0xFFFFFFFF)
 #	define GEND g_gaia_log.End()
 #else
 #	define GLOG g_gaia_invalidlog
 #	define GWAR g_gaia_invalidlog
 #	define GERR g_gaia_invalidlog
+#	define GUSR g_gaia_invalidlog
+#	define GDEV g_gaia_invalidlog
 #	define GEND g_gaia_invalidlog
 #endif
 
