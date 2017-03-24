@@ -183,6 +183,7 @@
 
 #include 	"gaia_digit_crc.h"
 #include	"gaia_digit_base64.h"
+#include	"gaia_digit_percentage.h"
 #include	"gaia_digit_md5.h"
 #include	"gaia_digit_sha1.h"
 #include 	"gaia_digit_regexp.h"
