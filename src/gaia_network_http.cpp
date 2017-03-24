@@ -10,33 +10,6 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
-		GINL GAIA::GVOID PrintBinary(const GAIA::CH* pszInfo, const GAIA::GVOID* pData, GAIA::NUM sDataSize)
-		{
-			GAST(pszInfo != GNIL);
-			GAST(pData != GNIL);
-			GAST(sDataSize > 0);
-			GAIA::CTN::AString strTemp;
-			strTemp.reserve(sDataSize * 2);
-			const GAIA::U8* p = (const GAIA::U8*)pData;
-			for(GAIA::NUM x = 0; x < sDataSize; ++x)
-			{
-				if(p[x] == '\0')
-					strTemp += "\\0";
-				else if(p[x] == '\r')
-					strTemp += "\\r";
-				else if(p[x] == '\n')
-					strTemp += "\\n";
-				else
-				{
-					GAIA::CH szTemp[2];
-					szTemp[0] = p[x];
-					szTemp[1] = '\0';
-					strTemp += szTemp;
-				}
-			}
-			GLOG << pszInfo << ": " << strTemp.fptr() << GEND;
-		}
-
 		class HttpWorkThread : public GAIA::THREAD::Thread
 		{
 			friend class HttpRequest;
@@ -129,6 +102,13 @@ namespace GAIA
 				}
 				GAST(m_pRequest != GNIL);
 
+				if(m_pHttp->m_bLog)
+				{
+					GAIA::CH szTemp[32];
+					addr.tostring(szTemp);
+					GDEV << "[Http] HttpRequest::OnConnected: Connected to " << szTemp << GEND;
+				}
+
 				// Change state.
 				{
 					// Remove from connecting list.
@@ -161,6 +141,14 @@ namespace GAIA
 				}
 				GAST(m_pRequest != GNIL);
 
+				if(m_pHttp->m_bLog)
+				{
+					GAIA::N64 lExpectSize = m_pRequest->m_lExpectRespBodySize;
+					if(lExpectSize == GINVALID)
+						lExpectSize = 0;
+					GDEV << "[Http] HttpRequest::OnDisconnected: Disconnected progress " << m_pRequest->m_lRecvedSize << "/" << m_pRequest->m_sTotalRespHeadSize + lExpectSize << GEND;
+				}
+
 				//
 				m_pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_OK;
 			}
@@ -179,7 +167,8 @@ namespace GAIA
 					return;
 				GAST(m_pRequest != GNIL);
 
-				PrintBinary("Sent", pData, nPracticeSize);
+				if(m_pHttp->m_bLog)
+					GDEV << "[Http] HttpRequest::OnSent: Sent " << nPracticeSize << " bytes, progress " << m_pRequest->m_lSentSize << "/" << m_pRequest->m_lSendingSize << GEND;
 
 				// Callback.
 				m_pRequest->OnSent(m_pRequest->m_lSentSize, pData, nPracticeSize);
@@ -245,7 +234,13 @@ namespace GAIA
 				}
 				GAST(m_pRequest != GNIL);
 
-				PrintBinary("Recv", pData, nSize);
+				if(m_pHttp->m_bLog)
+				{
+					if(m_pRequest->m_lExpectRespBodySize == GINVALID)
+						GDEV << "[Http] HttpRequest::OnRecved: Received " << nSize << " bytes, progress " << m_pRequest->m_lRecvedSize + nSize << "/" << "?" << GEND;
+					else
+						GDEV << "[Http] HttpRequest::OnRecved: Received " << nSize << " bytes, progress " << m_pRequest->m_lRecvedSize + nSize << "/" << m_pRequest->m_sTotalRespHeadSize + m_pRequest->m_lExpectRespBodySize << GEND;
+				}
 
 				// Change state.
 				if(m_pRequest->m_lRecvedSize == 0)
@@ -363,7 +358,11 @@ namespace GAIA
 						}
 						const GAIA::CH* pszContentLength = resphead.GetValueByName(GAIA::NETWORK::HTTP_HEADNAME_CONTENTLENGTH);
 						if(pszContentLength != GNIL)
+						{
 							m_pRequest->m_lExpectRespBodySize = GAIA::ALGO::acasts(pszContentLength);
+							if(m_pHttp->m_bLog)
+								GDEV << "[Http] HttpRequest::OnRecved: Content length is " << pszContentLength << GEND;
+						}
 
 						// Callback head.
 						if(pszHttpVersion != GNIL && pszHttpCode != GNIL && pszHttpCodeDesc != GNIL)

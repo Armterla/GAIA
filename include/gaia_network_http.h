@@ -1337,6 +1337,21 @@ namespace GAIA
 			*/
 			GINL GAIA::NETWORK::HttpStatus& GetStatus(){return m_status;}
 
+			/*!
+				@brief Enable output log.
+
+				@param bEnable [in] Specify enable or disable output log.
+			*/
+			GINL GAIA::GVOID EnableLog(GAIA::BL bEnable){m_bLog = bEnable;}
+
+			/*!
+				@brief Check is enable or disable output log.
+
+				@return If enable output log, return GAIA::True, return GAIA::False.\m
+					Default is disabled.
+			*/
+			GINL GAIA::BL IsEnableLog() const{return m_bLog;}
+
 		private:
 			typedef GAIA::CTN::Set<GAIA::NETWORK::HttpRequest*> __RequestSetType;
 			typedef GAIA::CTN::Set<GAIA::NETWORK::HttpAsyncSocket*> __SockSetType;
@@ -1355,6 +1370,7 @@ namespace GAIA
 				m_bEnableReadCookicFile = GAIA::False;
 				m_disp = GNIL;
 				m_status.reset();
+				m_bLog = GAIA::False;
 				m_uCurrentThreadMagicIndex = 0;
 			}
 			GAIA::GVOID InternalCloseRequest(GAIA::NETWORK::HttpRequest& req);
@@ -1384,6 +1400,7 @@ namespace GAIA
 			GAIA::SYNC::Lock m_lrSocks;
 			__SockSetType m_socks;
 			GAIA::NETWORK::HttpStatus m_status;
+			GAIA::BL m_bLog;
 			GAIA::SYNC::Lock m_lrCurrentThreadMagicIndex;
 			GAIA::U32 m_uCurrentThreadMagicIndex;
 			GAIA::SYNC::LockRW m_rwExecuteRequest;

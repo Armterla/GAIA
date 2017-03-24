@@ -138,6 +138,7 @@ namespace TEST
 		GAIA::NETWORK::Http http;
 		TAST(!http.IsCreated());
 		TAST(!http.IsBegin());
+		http.EnableLog(GAIA::True);
 
 		GAIA::NETWORK::HttpDesc descHttp;
 		descHttp.reset();
