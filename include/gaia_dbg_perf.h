@@ -68,7 +68,6 @@ namespace GAIA
 					{
 						GAIA::LOG::Log& gaialog = *m_pGAIALog;
 						gaialog << gaialog.Type(m_logtype) << gaialog.UserFilter(m_uLogFilter) <<
-									  "\t" <<
 									  pszItemName <<
 									  " Count=" << uTotalCount <<
 									  " Total=" << uTotalTime <<
