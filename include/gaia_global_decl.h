@@ -111,6 +111,27 @@ public:
 		strTemp += " ";
 		strTemp += logobj.GetLineBreak();
 		strTemp1 = strTemp.toUtf8();
+		if(strTemp1.empty())
+		{
+			strTemp1.reserve(strTemp.size() * 3 + 1);
+			GAIA::NUM srclen = strTemp.size();
+			const GAIA::TCH* p = strTemp.fptr();
+			for(GAIA::NUM x = 0; x < srclen; ++x)
+			{
+				if(p[x] < 0 || p[x] >= 128)
+				{
+					strTemp1 += "$W";
+					strTemp1 += (GAIA::N32)p[x];
+				}
+				else
+				{
+					GAIA::CH szTemp[2];
+					szTemp[0] = p[x];
+					szTemp[1] = '\0';
+					strTemp1 += szTemp;
+				}
+			}
+		}
 		m_pFile->Write(strTemp1.fptr(), strTemp1.size());
 
 		/* Increase index. */
