@@ -5,6 +5,7 @@
 #include <gaia_network_http.h>
 #include <gaia_assert_impl.h>
 #include <gaia_thread_base_impl.h>
+#include <gaia_network_base_impl.h>
 
 namespace GAIA
 {
