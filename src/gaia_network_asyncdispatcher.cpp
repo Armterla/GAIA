@@ -732,7 +732,19 @@ namespace GAIA
 
 					GAIA::BL bConnectBroken = GAIA::False;
 					if(e.flags & EV_EOF)
+					{
+						if(e.filter == EVFILT_READ && ctx.type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
+						{
+							GAIA::NUM sRecvAbleSize = (GAIA::NUM)e.data;
+							if(sRecvAbleSize > 0)
+							{
+								pThread->tempbuf.resize(sRecvAbleSize);
+								GAIA::NUM sRecved = (GAIA::NUM)recv(nSocket, pThread->tempbuf.fptr(), sRecvAbleSize, 0);
+								ctx.pSocket->OnRecved(GAIA::True, pThread->tempbuf.fptr(), sRecved);
+							}
+						}
 						bConnectBroken = GAIA::True;
+					}
 					else if(e.flags & EV_ERROR)
 					{
 						GAIA::N32 nErr = (GAIA::N32)e.data;
