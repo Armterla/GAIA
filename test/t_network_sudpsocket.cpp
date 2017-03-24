@@ -212,6 +212,7 @@ namespace TEST
 				addr.uPort = 9010 + x;
 				listAddrs.push_back(addr);
 				SUDPSocketImpl* pSock = gnew SUDPSocketImpl;
+				pSock->EnableLog(TMODULE_LOG_ENABLED);
 				pSock->Create();
 				pSock->Bind(addr);
 				pSock->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);

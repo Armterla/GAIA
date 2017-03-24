@@ -480,6 +480,7 @@ namespace GAIA
 			m_bCreated = GAIA::False;
 			m_bBegin = GAIA::False;
 			m_desc.reset();
+			m_bLog = GAIA::False;
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			m_bPostAcceptAble = GAIA::True;
 		#endif

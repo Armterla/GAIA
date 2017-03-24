@@ -61,6 +61,7 @@ namespace TEST
 		HttpServerCallBackForTest cb1(svr), cb2(svr), cb3(svr);
 		GAIA::NETWORK::HttpServerCallBackForInfo cbi(svr);
 		GAIA::NETWORK::HttpServerCallBackForStaticResource cbsf(svr);
+		svr.EnableLog(TMODULE_LOG_ENABLED);
 
 		TAST(!svr.IsCreated());
 		TAST(svr.Create(descServer));

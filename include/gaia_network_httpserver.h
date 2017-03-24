@@ -1317,6 +1317,21 @@ namespace GAIA
 			*/
 			GAIA::NETWORK::HttpServerAsyncDispatcher* GetAsyncDispatcher() const{return m_disp;}
 
+			/*!
+				@brief Enable output log.
+
+				@param bEnable [in] Specify enable or disable output log.
+			*/
+			GINL GAIA::GVOID EnableLog(GAIA::BL bEnable){m_bLog = bEnable;}
+
+			/*!
+				@brief Check is enable or disable output log.
+
+				@return If enable output log, return GAIA::True, return GAIA::False.\m
+					Default is disabled.
+			*/
+			GINL GAIA::BL IsEnableLog() const{return m_bLog;}
+
 		private:
 			GAIA::BL RecycleLink(GAIA::NETWORK::HttpServerLink& l);
 			GAIA::CTN::Buffer* RequestBuffer();
@@ -1332,6 +1347,7 @@ namespace GAIA
 				m_blackwhitemode = GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE_BLACK;
 				m_disp = GNIL;
 				m_status.reset();
+				m_bLog = GAIA::False;
 			}
 
 		private:
@@ -1385,6 +1401,7 @@ namespace GAIA
 			GAIA::NETWORK::HttpServerAsyncDispatcher* m_disp;
 			GAIA::CTN::Vector<GAIA::NETWORK::HttpServerWorkThread*> m_listWorkThreads;
 			GAIA::NETWORK::HttpServerStatus m_status;
+			GAIA::BL m_bLog;
 		};
 	}
 }

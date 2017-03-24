@@ -388,6 +388,21 @@ namespace GAIA
 			*/
 			GAIA::BL CollectConnectedSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const;
 
+			/*!
+				@brief Enable output log.
+
+				@param bEnable [in] Specify enable or disable output log.
+			*/
+			GINL GAIA::GVOID EnableLog(GAIA::BL bEnable){m_bLog = bEnable;}
+
+			/*!
+				@brief Check is enable or disable output log.
+
+				@return If enable output log, return GAIA::True, return GAIA::False.\m
+					Default is disabled.
+			*/
+			GINL GAIA::BL IsEnableLog() const{return m_bLog;}
+
 		protected:
 
 			/*!
@@ -462,6 +477,7 @@ namespace GAIA
 			GAIA::BL m_bCreated;
 			GAIA::BL m_bBegin;
 			GAIA::NETWORK::AsyncDispatcherDesc m_desc;
+			GAIA::BL m_bLog;
 
 			GAIA::SYNC::LockRW m_rwListenSockets;
 			GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*> m_listen_sockets;

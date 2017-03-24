@@ -235,6 +235,7 @@ namespace TEST
 
 			GAIA::NETWORK::AsyncDispatcher disp;
 			TAST(!disp.IsCreated());
+			disp.EnableLog(TMODULE_LOG_ENABLED);
 
 			TAST(disp.Create(descDisp));
 			{

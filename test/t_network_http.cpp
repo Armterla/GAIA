@@ -138,7 +138,7 @@ namespace TEST
 		GAIA::NETWORK::Http http;
 		TAST(!http.IsCreated());
 		TAST(!http.IsBegin());
-		http.EnableLog(GAIA::True);
+		http.EnableLog(TMODULE_LOG_ENABLED);
 
 		GAIA::NETWORK::HttpDesc descHttp;
 		descHttp.reset();
