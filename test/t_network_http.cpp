@@ -11,6 +11,9 @@ namespace TEST
 		{
 			this->init();
 		}
+		~MyHttpRequest()
+		{
+		}
 
 	public:
 		virtual GAIA::GVOID OnBegin()
@@ -47,7 +50,7 @@ namespace TEST
 			aRecved++;
 			aRecvedSize += sDataSize;
 		}
-		virtual GAIA::GVOID OnSentHead(GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::CH* pszHttpVersion, const GAIA::NETWORK::HttpHead& head)
+		virtual GAIA::GVOID OnSentHead(const GAIA::CH* pszHttpVersion, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& head)
 		{
 			aSentHead++;
 		}
@@ -100,7 +103,6 @@ namespace TEST
 		{
 		}
 
-
 	public:
 		GAIA::SYNC::Atomic aBegin;
 		GAIA::SYNC::Atomic aEnd;
@@ -130,10 +132,16 @@ namespace TEST
 
 	extern GAIA::GVOID t_network_http(GAIA::LOG::Log& logobj)
 	{
-		static const GAIA::CH* TEST_URL = "http://120.26.219.54:48010/httpstat?";
+		static const GAIA::CH* TEST_URL = "http://www.qu.la/book/176/143187.html";
 		static const GAIA::NUM SAMPLE_COUNT = 10;
 
 		GAIA::CTN::Vector<MyHttpRequest*> listRequest;
+
+		GAIA::NETWORK::HttpHead head;
+		head.Set(GAIA::NETWORK::HTTP_HEADNAME_HOST, "www.qu.la");
+		head.Set(GAIA::NETWORK::HTTP_HEADNAME_USERAGENT, "Gaia/0.0.2");
+		head.Set(GAIA::NETWORK::HTTP_HEADNAME_ACCEPT, "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+		head.Optimize();
 
 		GAIA::NETWORK::Http http;
 		TAST(!http.IsCreated());
@@ -164,6 +172,7 @@ namespace TEST
 				MyHttpRequest* pRequest = gnew MyHttpRequest(http);
 				pRequest->SetMethod(GAIA::NETWORK::HTTP_METHOD_GET);
 				pRequest->SetURL(TEST_URL);
+				pRequest->SetHead(head);
 				pRequest->Request();
 				pRequest->Wait();
 				pRequest->drop_ref();
@@ -178,6 +187,7 @@ namespace TEST
 					MyHttpRequest* pRequest = gnew MyHttpRequest(http);
 					pRequest->SetMethod(GAIA::NETWORK::HTTP_METHOD_GET);
 					pRequest->SetURL(TEST_URL);
+					pRequest->SetHead(head);
 					pRequest->Request();
 					pRequest->Wait();
 					pRequest->drop_ref();
@@ -194,6 +204,7 @@ namespace TEST
 					MyHttpRequest* pRequest = gnew MyHttpRequest(http);
 					pRequest->SetMethod(GAIA::NETWORK::HTTP_METHOD_GET);
 					pRequest->SetURL(TEST_URL);
+					pRequest->SetHead(head);
 					pRequest->Request();
 					listRequest.push_back(pRequest);
 				}
