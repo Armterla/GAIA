@@ -97,8 +97,12 @@ namespace GAIA
 				// Check state and parameter.
 				if(!bResult)
 				{
-					if(m_pRequest->m_NetworkError == GAIA::NETWORK::NETWORK_ERROR_INVALID)
-						m_pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_CONNECT_FAILED;
+					//
+					m_pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_CONNECT_FAILED;
+
+					// Swap to complete list.
+					this->SwapToCompleteList();
+
 					return;
 				}
 				GAST(m_pRequest != GNIL);
@@ -136,8 +140,12 @@ namespace GAIA
 				// Check state and parameter.
 				if(!bResult)
 				{
-					if(m_pRequest->m_NetworkError == GAIA::NETWORK::NETWORK_ERROR_INVALID)
-						m_pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_LOSTCONNECTION;
+					//
+					m_pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_LOSTCONNECTION;
+
+					// Swap to complete list.
+					this->SwapToCompleteList();
+
 					return;
 				}
 				GAST(m_pRequest != GNIL);
@@ -160,8 +168,12 @@ namespace GAIA
 				// Check state and parameter.
 				if(!bResult)
 				{
-					if(m_pRequest->m_NetworkError == GAIA::NETWORK::NETWORK_ERROR_INVALID)
-						m_pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_LOSTCONNECTION;
+					//
+					m_pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_LOSTCONNECTION;
+
+					// Swap to complete list.
+					this->SwapToCompleteList();
+
 					return;
 				}
 				if(nPracticeSize == 0)
@@ -176,13 +188,13 @@ namespace GAIA
 				m_pRequest->m_lSentSize += nPracticeSize;
 				m_pRequest->m_uLastSentTime = GAIA::TIME::tick_time();
 
-				if(m_pRequest->m_lSentSize >= m_pRequest->m_sTotalHeadSize &&
-				   m_pRequest->m_lSentSize - nPracticeSize < m_pRequest->m_sTotalHeadSize)
+				if(m_pRequest->m_lSentSize >= m_pRequest->m_sTotalReqHeadSize &&
+				   m_pRequest->m_lSentSize - nPracticeSize < m_pRequest->m_sTotalReqHeadSize)
 					m_pRequest->OnSentHead(m_pHttp->GetDesc().szHttpVer, m_pRequest->GetMethod(), m_pRequest->GetURL(), m_pRequest->GetHead());
 
-				if(m_pRequest->m_lSentSize > m_pRequest->m_sTotalHeadSize)
+				if(m_pRequest->m_lSentSize > m_pRequest->m_sTotalReqHeadSize)
 				{
-					GAIA::N64 lOffset = m_pRequest->m_lSentSize - nPracticeSize - m_pRequest->m_sTotalHeadSize;
+					GAIA::N64 lOffset = m_pRequest->m_lSentSize - nPracticeSize - m_pRequest->m_sTotalReqHeadSize;
 					GAIA::N32 nSize = nPracticeSize;
 					const GAIA::U8* pDataU8 = (const GAIA::U8*)pData;
 					if(lOffset < 0)
@@ -229,8 +241,15 @@ namespace GAIA
 				// Check state and parameter.
 				if(!bResult)
 				{
-					if(m_pRequest->m_NetworkError == GAIA::NETWORK::NETWORK_ERROR_INVALID)
+					if(m_pRequest->m_bHeadRecvedComplete && m_pRequest->m_lExpectRespBodySize != GINVALID &&
+					   m_pRequest->m_lRecvedSize - m_pRequest->m_sTotalRespHeadSize >= m_pRequest->m_lExpectRespBodySize) // If body received complete.
 						m_pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_OK;
+					else
+						m_pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_LOSTCONNECTION;
+
+					// Swap to complete list.
+					this->SwapToCompleteList();
+
 					return;
 				}
 				GAST(m_pRequest != GNIL);
@@ -280,11 +299,11 @@ namespace GAIA
 				m_pRequest->m_lRecvedSize += nSize;
 				m_pRequest->m_uLastRecvedTime = GAIA::TIME::tick_time();
 
-				if(m_pRequest->m_bHeadRecvingComplete)
+				if(m_pRequest->m_bHeadRecvedComplete)
 				{
 					GAIA::N64 lOffset = m_pRequest->m_lRecvedSize - nSize;
-					GAST(lOffset >= m_pRequest->m_sTotalHeadSize);
-					lOffset -= m_pRequest->m_sTotalHeadSize;
+					GAST(lOffset >= m_pRequest->m_sTotalReqHeadSize);
+					lOffset -= m_pRequest->m_sTotalReqHeadSize;
 					m_pRequest->OnRecvedBody(lOffset, pData, nSize);
 				}
 				else
@@ -300,11 +319,12 @@ namespace GAIA
 						{
 							GAIA::NUM sHeadEndOffset = (GAIA::NUM)(pReader - m_pRequest->m_respbuf.fptr() + 3);
 							m_pRequest->m_respbuf.seek_read(sHeadEndOffset);
-							m_pRequest->m_bHeadRecvingComplete = GAIA::True;
+							m_pRequest->m_bHeadRecvedComplete = GAIA::True;
+							break;
 						}
 						++pReader;
 					}
-					if(m_pRequest->m_bHeadRecvingComplete)
+					if(m_pRequest->m_bHeadRecvedComplete)
 					{
 						//
 						m_pRequest->m_sTotalRespHeadSize = m_pRequest->m_respbuf.read_size();
@@ -412,6 +432,51 @@ namespace GAIA
 				m_pHttp = GNIL;
 				m_pRequest = GNIL;
 			}
+			GINL GAIA::GVOID SwapToCompleteList()
+			{
+				// Remove from old list.
+				switch(m_pRequest->GetState())
+				{
+				case GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING:
+					{
+						GAIA::SYNC::Autolock al(m_pHttp->m_lrConnectingList);
+						GAIA::BL bEraseResult = m_pHttp->m_connectinglist.erase(m_pRequest);
+						GAST(bEraseResult);
+					}
+					break;
+				case GAIA::NETWORK::HTTP_REQUEST_STATE_REQUESTING:
+					{
+						GAIA::SYNC::Autolock al(m_pHttp->m_lrRequestingList);
+						GAIA::BL bEraseResult = m_pHttp->m_requestinglist.erase(m_pRequest);
+						GAST(bEraseResult);
+					}
+					break;
+				case GAIA::NETWORK::HTTP_REQUEST_STATE_WAITING:
+					{
+						GAIA::SYNC::Autolock al(m_pHttp->m_lrWaitingList);
+						GAIA::BL bEraseResult = m_pHttp->m_waitinglist.erase(m_pRequest);
+						GAST(bEraseResult);
+					}
+					break;
+				case GAIA::NETWORK::HTTP_REQUEST_STATE_RESPONSING:
+					{
+						GAIA::SYNC::Autolock al(m_pHttp->m_lrResponsingList);
+						GAIA::BL bEraseResult = m_pHttp->m_responsinglist.erase(m_pRequest);
+						GAST(bEraseResult);
+					}
+					break;
+				default:
+					GASTFALSE;
+					break;
+				}
+
+				// Insert to complete list.
+				{
+					GAIA::SYNC::Autolock al(m_pHttp->m_lrCompleteList);
+					GAIA::BL bInsertResult = m_pHttp->m_completelist.insert(m_pRequest);
+					GAST(bInsertResult);
+				}
+			}
 
 		private:
 			GAIA::NETWORK::Http* m_pHttp;
@@ -434,12 +499,14 @@ namespace GAIA
 		protected:
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
+				GASTFALSE;
 				HttpAsyncSocket* pListenSocket = gnew HttpAsyncSocket(*m_pHttp, *this, ASYNC_SOCKET_TYPE_LISTEN);
 				return pListenSocket;
 			}
 
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptingSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
+				GASTFALSE;
 				HttpAsyncSocket* pAcceptingSocket = gnew HttpAsyncSocket(*m_pHttp, *this, ASYNC_SOCKET_TYPE_ACCEPTING);
 				return pAcceptingSocket;
 			}
@@ -466,11 +533,6 @@ namespace GAIA
 				m_reqbuf.destroy();
 			else
 				m_reqbuf.proxy(GNIL, GNIL);
-		}
-
-		Http& HttpRequest::GetHttp()
-		{
-			return *m_pHttp;
 		}
 
 		GAIA::GVOID HttpRequest::Reset()
@@ -536,7 +598,7 @@ namespace GAIA
 			if(sRelativePartLength == 0)
 				sRelativePartLength = 1; // Default root path is "/".
 
-			m_sTotalHeadSize =
+			m_sTotalReqHeadSize =
 					GAIA::NETWORK::HTTP_METHOD_STRING_LEN[m_method] + 1 +
 					sRelativePartLength + 1 +
 					m_pHttp->GetDesc().sHttpVerLen + 2 +
@@ -805,7 +867,7 @@ namespace GAIA
 			GAIA::BL bRet = GAIA::False;
 			GAIA::U64 uCurrentTime = GAIA::TIME::tick_time();
 
-			//
+			// Allocate need close requests list.
 			__RequestVectorType listTempNeedCloseRequests;
 			__RequestVectorType* pNeedCloseRequests = &listTempNeedCloseRequests;
 			if(pWorkThread != GNIL)
@@ -991,16 +1053,18 @@ namespace GAIA
 
 								// Head.
 								GAIA::NETWORK::HttpHead& head = pRequest->GetHead();
+								head.Optimize();
 								GAIA::NUM sHeadSize = head.GetStringSize();
 								GAST(sHeadSize >= 0);
 								if(sHeadSize > 0)
 								{
-									GAIA::U8* pHeadBuf = pReqBuf->alloc(sHeadSize);
+									GAIA::U8* pHeadBuf = pReqBuf->alloc(sHeadSize + 1);
 									GAIA::NUM sPracHeadSize;
 									GAIA::BL bHeadToStringResult;
-									head.ToString((GAIA::CH*)pHeadBuf, sHeadSize, &sPracHeadSize, &bHeadToStringResult);
+									head.ToString((GAIA::CH*)pHeadBuf, sHeadSize + 1, &sPracHeadSize, &bHeadToStringResult);
 									GAST(bHeadToStringResult);
 									GAST(sPracHeadSize == sHeadSize);
+									pReqBuf->resize(pReqBuf->write_size() - 1);
 								}
 
 								// Blank line.
@@ -1008,7 +1072,7 @@ namespace GAIA
 
 								// Send.
 								GAIA::NUM sWriteSize = pReqBuf->write_size();
-								GAST(sWriteSize == pRequest->m_sTotalHeadSize);
+								GAST(sWriteSize == pRequest->m_sTotalReqHeadSize);
 								pRequest->m_lSendingSize += sWriteSize;
 								GAIA::N32 nSendSize = pRequest->m_pSock->Send(pReqBuf->fptr(), sWriteSize);
 								GAST(nSendSize == sWriteSize);
@@ -1048,7 +1112,7 @@ namespace GAIA
 								else
 								{
 									pReqBuf->resize(1024 * 100);
-									GAIA::N64 lPracticeSize = pRequest->OnRequestBodyData(pRequest->m_lSendingSize - pRequest->m_sTotalHeadSize, pReqBuf->fptr(), pReqBuf->write_size());
+									GAIA::N64 lPracticeSize = pRequest->OnRequestBodyData(pRequest->m_lSendingSize - pRequest->m_sTotalReqHeadSize, pReqBuf->fptr(), pReqBuf->write_size());
 									pReqBuf->resize(lPracticeSize);
 									if(lPracticeSize == 0)
 										bBodySendingComplete = GAIA::True;
@@ -1134,12 +1198,27 @@ namespace GAIA
 
 				// Collect timeout request.
 				{
+					GAIA::SYNC::Autolock al(m_lrSocks);
+					for(__SockSetType::it it = m_socks.frontit(); !it.empty(); ++it)
+					{
+						HttpAsyncSocket* pSock = *it;
+						GAST(pSock != GNIL);
+						GAST(pSock->m_pRequest != GNIL);
 
-				}
+						// Check logic timeout.
+						if(pSock->m_pRequest->m_uRequestTime != 0 && uCurrentTime > pSock->m_pRequest->m_uRequestTime &&
+						   uCurrentTime - pSock->m_pRequest->m_uRequestTime > pSock->m_pRequest->m_uLogicTimeout)
+						{
+							pNeedCloseRequests->push_back(pSock->m_pRequest);
+						}
 
-				// Collect lost connection request.
-				{
-
+						// Check network timeout.
+						if(pSock->m_pRequest->m_uLastRecvedTime != 0 && uCurrentTime > pSock->m_pRequest->m_uLastRecvedTime &&
+						   uCurrentTime - pSock->m_pRequest->m_uLastRecvedTime > pSock->m_pRequest->m_uNetworkResponseTimeout)
+						{
+							pNeedCloseRequests->push_back(pSock->m_pRequest);
+						}
+					}
 				}
 
 				// Make element in request list is unique.
@@ -1206,7 +1285,8 @@ namespace GAIA
 					req.m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_OK;
 				if(req.m_NetworkError == GAIA::NETWORK::NETWORK_ERROR_OK)
 				{
-
+					if(req.GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_COMPLETE)
+						req.OnState(GAIA::NETWORK::HTTP_REQUEST_STATE_COMPLETE);
 				}
 
 				// Callback End.
@@ -1217,8 +1297,6 @@ namespace GAIA
 				{
 					switch(req.GetState())
 					{
-					case GAIA::NETWORK::HTTP_REQUEST_STATE_READY:
-						break;
 					case GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING:
 						{
 							GAIA::SYNC::Autolock al(m_lrPendingList);

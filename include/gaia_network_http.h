@@ -95,7 +95,7 @@ namespace GAIA
 
 				@return Return the Http object reference.
 			*/
-			Http& GetHttp();
+			Http& GetHttp(){return *m_pHttp;}
 
 			/*!
 				@brief Reset the request, the request will like a new allocated object.
@@ -352,7 +352,8 @@ namespace GAIA
 			GAIA::NETWORK::NETWORK_ERROR GetNetworkError() const{return m_NetworkError;}
 
 			/*!
-				@brief Set http request logic timeout time in milliseconds.
+				@brief Set http request logic timeout time in milliseconds.\n
+					Default is 60 seconds.
 
 				@param uMilliSeconds [in] Specify the timeout time in milliseconds.
 
@@ -360,17 +361,18 @@ namespace GAIA
 
 				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::BL SetLogicTimeout(const GAIA::U64& uMilliSeconds){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_uLogicTimeout = uMilliSeconds; return GAIA::True;}
+			GAIA::BL SetLogicTimeout(const GAIA::U64& uMilliSeconds){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_uLogicTimeout = uMilliSeconds * 1000; return GAIA::True;}
 
 			/*!
 				@brief Get http request logic timeout time in milliseconds.
 
-				@return Return the logic timeout time in milliseconds.
+				@return Return the logic timeout time in milliseconds. Default is 60 seconds.
 			*/
-			const GAIA::U64& GetLogicTimeout() const{return m_uLogicTimeout;}
+			const GAIA::U64& GetLogicTimeout() const{return m_uLogicTimeout / 1000;}
 
 			/*!
-				@brief Set http request network response timeout time in milliseconds.
+				@brief Set http request network response timeout time in milliseconds.\n
+					Default is 16 seconds.
 
 				@param uMilliSeconds [in] Specify the timeout time in milliseconds.
 
@@ -378,14 +380,14 @@ namespace GAIA
 
 				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::BL SetNetworkResponseTimeout(const GAIA::U64& uMilliSeconds){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_uNetworkResponseTimeout = uMilliSeconds; return GAIA::True;}
+			GAIA::BL SetNetworkResponseTimeout(const GAIA::U64& uMilliSeconds){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_uNetworkResponseTimeout = uMilliSeconds * 1000; return GAIA::True;}
 
 			/*!
 				@brief Get http request network response timeout time in milliseconds.
 
-				@return Return the network response timeout time in milliseconds.
+				@return Return the network response timeout time in milliseconds. Default is 16 seconds.
 			*/
-			const GAIA::U64& GetNetworkResponseTimeout() const{return m_uNetworkResponseTimeout;}
+			const GAIA::U64& GetNetworkResponseTimeout() const{return m_uNetworkResponseTimeout / 1000;}
 
 			/*!
 				@brief Enable or disable write cookic to RAM.
@@ -436,7 +438,7 @@ namespace GAIA
 
 				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::BL SetWriteCookicTime(const GAIA::U64& uMilliSeconds){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_uWriteCookicTime = uMilliSeconds; return GAIA::True;}
+			GAIA::BL SetWriteCookicTime(const GAIA::U64& uMilliSeconds){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_uWriteCookicTime = uMilliSeconds * 1000; return GAIA::True;}
 
 			/*!
 				@brief Get effect time in milliseconds for cookic which will be writen.
@@ -445,7 +447,7 @@ namespace GAIA
 
 				@remarks Default value after a HttpRequest construct is 0.
 			*/
-			const GAIA::U64& GetWriteCookicTime() const{return m_uWriteCookicTime;}
+			const GAIA::U64& GetWriteCookicTime() const{return m_uWriteCookicTime / 1000;}
 
 			/*!
 				@brief Enable or disable read cookic from RAM.
@@ -496,7 +498,7 @@ namespace GAIA
 
 				@remarks When the HttpRequest begin to dispatch, the user can't call this method again, so function call will failed.
 			*/
-			GAIA::BL SetReadCookicTime(const GAIA::U64& uMilliSeconds){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_uReadCookicTime = uMilliSeconds; return GAIA::True;}
+			GAIA::BL SetReadCookicTime(const GAIA::U64& uMilliSeconds){if(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_READY) return GAIA::False; m_uReadCookicTime = uMilliSeconds * 1000; return GAIA::True;}
 
 			/*!
 				@brief Get effect time in milliseconds for cookic which will be read.
@@ -505,7 +507,7 @@ namespace GAIA
 
 				@remarks Default value after a HttpRequest construct is 0.
 			*/
-			const GAIA::U64& GetReadCookicTime() const{return m_uReadCookicTime;}
+			const GAIA::U64& GetReadCookicTime() const{return m_uReadCookicTime / 1000;}
 
 		protected:
 
@@ -674,71 +676,81 @@ namespace GAIA
 		private:
 			GINL GAIA::GVOID init()
 			{
-				m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_READY;
-				m_method = GAIA::NETWORK::HTTP_METHOD_INVALID;
-				m_sTotalHeadSize = 0;
-				m_bReqBufOwner = GAIA::True;
-				m_ResponseCode = GAIA::NETWORK::HTTP_CODE_INVALID;
-				m_lSentSize = 0;
-				m_lRecvedSize = 0;
-				m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_INVALID;
-				m_uLogicTimeout = 16 * 1000 * 1000;
-				m_uNetworkResponseTimeout = 4 * 1000 * 1000;
-				m_uRequestTime = 0;
-				m_bEnableWriteCookicRAM = GAIA::False;
-				m_bEnableWriteCookicFile = GAIA::False;
-				m_uWriteCookicTime = 0;
-				m_bEnableReadCookicRAM = GAIA::False;
-				m_bEnableReadCookicFile = GAIA::False;
-				m_uReadCookicTime = 0;
 				m_pSock = GNIL;
+				m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_READY;
 				m_uThreadMagicIndex = GINVALID;
+
+				m_method = GAIA::NETWORK::HTTP_METHOD_INVALID;
+
+				m_ResponseCode = GAIA::NETWORK::HTTP_CODE_INVALID;
+				m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_INVALID;
+
+				m_uLogicTimeout = 60 * 1000 * 1000;
+				m_uNetworkResponseTimeout = 16 * 1000 * 1000;
+				m_uRequestTime = 0;
+				m_uWriteCookicTime = 0;
+				m_uReadCookicTime = 0;
 				m_uLastSentTime = 0;
 				m_uLastRecvedTime = 0;
 				m_uLastSendingTime = 0;
-				m_bHeadSendingComplete = GAIA::False;
-				m_bBodySendingComplete = GAIA::False;
-				m_lSendingSize = 0;
-				m_bHeadRecvingComplete = GAIA::False;
+
+				m_sTotalReqHeadSize = 0;
 				m_sTotalRespHeadSize = 0;
 				m_lExpectRespBodySize = GINVALID;
+				m_lSendingSize = 0;
+				m_lSentSize = 0;
+				m_lRecvedSize = 0;
+
+				m_bReqBufOwner = GAIA::True;
+				m_bEnableWriteCookicRAM = GAIA::False;
+				m_bEnableWriteCookicFile = GAIA::False;
+				m_bEnableReadCookicRAM = GAIA::False;
+				m_bEnableReadCookicFile = GAIA::False;
+				m_bHeadSendingComplete = GAIA::False;
+				m_bBodySendingComplete = GAIA::False;
+				m_bHeadRecvedComplete = GAIA::False;
 			}
 
 		private:
 			GAIA::NETWORK::Http* m_pHttp;
+			HttpAsyncSocket* m_pSock;
 			GAIA::NETWORK::HTTP_REQUEST_STATE m_state;
+			GAIA::U32 m_uThreadMagicIndex;
+
 			GAIA::NETWORK::HTTP_METHOD m_method;
 			GAIA::NETWORK::HttpURL m_url;
 			GAIA::NETWORK::HttpHead m_head;
-			GAIA::NUM m_sTotalHeadSize;
+
 			GAIA::CTN::Buffer m_reqbuf;
-			GAIA::BL m_bReqBufOwner;
+			GAIA::CTN::Buffer m_respbuf;
 			GAIA::NETWORK::HTTP_CODE m_ResponseCode;
-			GAIA::N64 m_lSentSize;
-			GAIA::N64 m_lRecvedSize;
 			GAIA::NETWORK::NETWORK_ERROR m_NetworkError;
+			GAIA::SYNC::Event m_eventforcomplete;
+
 			GAIA::U64 m_uLogicTimeout;
 			GAIA::U64 m_uNetworkResponseTimeout;
 			GAIA::U64 m_uRequestTime;
-			GAIA::SYNC::Event m_eventforcomplete;
-			GAIA::BL m_bEnableWriteCookicRAM;
-			GAIA::BL m_bEnableWriteCookicFile;
 			GAIA::U64 m_uWriteCookicTime;
-			GAIA::BL m_bEnableReadCookicRAM;
-			GAIA::BL m_bEnableReadCookicFile;
 			GAIA::U64 m_uReadCookicTime;
-			HttpAsyncSocket* m_pSock;
-			GAIA::U32 m_uThreadMagicIndex;
 			GAIA::U64 m_uLastSentTime;
 			GAIA::U64 m_uLastRecvedTime;
 			GAIA::U64 m_uLastSendingTime;
-			GAIA::BL m_bHeadSendingComplete;
-			GAIA::BL m_bBodySendingComplete;
-			GAIA::N64 m_lSendingSize;
-			GAIA::BL m_bHeadRecvingComplete;
+
+			GAIA::NUM m_sTotalReqHeadSize;
 			GAIA::NUM m_sTotalRespHeadSize;
-			GAIA::CTN::Buffer m_respbuf;
 			GAIA::N64 m_lExpectRespBodySize;
+			GAIA::N64 m_lSendingSize;
+			GAIA::N64 m_lSentSize;
+			GAIA::N64 m_lRecvedSize;
+
+			GAIA::BL m_bReqBufOwner : 1;
+			GAIA::BL m_bEnableWriteCookicRAM : 1;
+			GAIA::BL m_bEnableWriteCookicFile : 1;
+			GAIA::BL m_bEnableReadCookicRAM : 1;
+			GAIA::BL m_bEnableReadCookicFile : 1;
+			GAIA::BL m_bHeadSendingComplete : 1;
+			GAIA::BL m_bBodySendingComplete : 1;
+			GAIA::BL m_bHeadRecvedComplete : 1;
 		};
 
 		/*!
