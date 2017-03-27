@@ -150,6 +150,9 @@ namespace TEST
 
 		GAIA::NETWORK::HttpDesc descHttp;
 		descHttp.reset();
+		descHttp.bEnableSocketReuseAddr = GAIA::True;
+		descHttp.nSocketSendBufferSize = 1024 * 4;
+		descHttp.nSocketRecvBufferSize = 1024 * 64;
 		TAST(http.Create(descHttp));
 		{
 			TAST(http.IsCreated());
@@ -199,7 +202,7 @@ namespace TEST
 			TAST(http.Begin());
 			{
 				listRequest.clear();
-				for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
+				for(GAIA::NUM x = 0; x < SAMPLE_COUNT * 10; ++x)
 				{
 					MyHttpRequest* pRequest = gnew MyHttpRequest(http);
 					pRequest->SetMethod(GAIA::NETWORK::HTTP_METHOD_GET);

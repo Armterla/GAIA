@@ -682,7 +682,7 @@ namespace GAIA
 				return GAIA::False;
 
 			// Create work thread.
-			for(GAIA::NUM x = 0; x < m_desc.sWorkThreadCount; ++x)
+			for(GAIA::NUM x = 0; x < desc.sWorkThreadCount; ++x)
 			{
 				HttpWorkThread* pThread = gnew HttpWorkThread(*this);
 				pThread->uThreadIndex = (GAIA::U32)x;
