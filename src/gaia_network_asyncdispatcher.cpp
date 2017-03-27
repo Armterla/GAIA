@@ -760,8 +760,24 @@ namespace GAIA
 						EV_SET(&ke, nSocket, EVFILT_WRITE, EV_DELETE, 0, 0, GNIL);
 						kevent(pThread->kqep, &ke, 1, GNIL, 0, GNIL);
 						EV_SET(&ke, nSocket, EVFILT_READ, EV_DELETE, 0, 0, GNIL);
-						if(kevent(pThread->kqep, &ke, 1, GNIL, 0, GNIL) != GINVALID)
-							ctx.pSocket->drop_ref();
+						if(ctx.type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_ACCEPT ||
+						   ctx.type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
+						{
+							if(kevent(pThread->kqep, &ke, 1, GNIL, 0, GNIL) != GINVALID)
+							{
+								if(ctx.type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
+									ctx.pSocket->drop_ref();
+							}
+							else
+							{
+								GAIA::N32 nErr = errno;
+								if(nErr == ENOENT)
+								{
+									if(ctx.type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
+										ctx.pSocket->drop_ref();
+								}
+							}
+						}
 						continue;
 					}
 
