@@ -55,6 +55,10 @@ namespace GAIA
 			}
 
 			//
+			if(m_pReadAsyncCtx != GNIL && m_pReadAsyncCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
+				m_pDispatcher->pop_for_recycle(*this);
+
+			//
 			if(m_socktype == GAIA::NETWORK::ASYNC_SOCKET_TYPE_ACCEPTING)
 				m_pDispatcher->RemoveAcceptingSocket(*this);
 			else if(m_socktype == GAIA::NETWORK::ASYNC_SOCKET_TYPE_ACCEPTED)

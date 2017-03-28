@@ -235,20 +235,6 @@ namespace GAIA
 				}
 			}
 
-			// Close all need recycle socket.
-			{
-			#if GAIA_OS != GAIA_OS_WINDOWS
-				GAIA::SYNC::Autolock al(m_lrNeedRecycleSockets);
-				for(__SocketSetType::it it = m_needrecycle_sockets.frontit(); !it.empty(); ++it)
-				{
-					GAIA::NETWORK::AsyncSocket* pSocket = *it;
-					GAST(pSocket != GNIL);
-					pSocket->drop_ref();
-				}
-				m_needrecycle_sockets.clear();
-			#endif
-			}
-
 			// Notify the thread exit.
 			for(GAIA::NUM x = 0; x < m_threads.size(); ++x)
 			{
@@ -275,6 +261,20 @@ namespace GAIA
 				close(pThread->kqep);
 				pThread->kqep = GINVALID;
 				pThread->bStopCmd = GAIA::False;
+			#endif
+			}
+
+			// Close all need recycle socket.
+			{
+			#if GAIA_OS != GAIA_OS_WINDOWS
+				GAIA::SYNC::Autolock al(m_lrNeedRecycleSockets);
+				for(__SocketSetType::it it = m_needrecycle_sockets.frontit(); !it.empty(); ++it)
+				{
+					GAIA::NETWORK::AsyncSocket* pSocket = *it;
+					GAST(pSocket != GNIL);
+					pSocket->drop_ref();
+				}
+				m_needrecycle_sockets.clear();
 			#endif
 			}
 
@@ -784,10 +784,7 @@ namespace GAIA
 							if(kevent(pThread->kqep, &ke, 1, GNIL, 0, GNIL) != GINVALID)
 							{
 								if(ctx.type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
-								{
-									this->pop_for_recycle(*ctx.pSocket);
 									ctx.pSocket->drop_ref();
-								}
 							}
 							else
 							{
@@ -795,10 +792,7 @@ namespace GAIA
 								if(nErr == ENOENT)
 								{
 									if(ctx.type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
-									{
-										this->pop_for_recycle(*ctx.pSocket);
 										ctx.pSocket->drop_ref();
-									}
 								}
 							}
 						}
@@ -891,7 +885,6 @@ namespace GAIA
 											kevent(pThread->kqep, &ke, 1, GNIL, 0, GNIL);
 											EV_SET(&ke, nSocket, EVFILT_READ, EV_DELETE, 0, 0, GNIL);
 											kevent(pThread->kqep, &ke, 1, GNIL, 0, GNIL);
-											this->pop_for_recycle(*ctx.pSocket);
 											ctx.pSocket->drop_ref();
 										}
 									}
