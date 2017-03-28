@@ -84,12 +84,38 @@ namespace GAIA
 			virtual GAIA::GVOID OnCreated(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnClosed(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnBound(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
-			virtual GAIA::GVOID OnConnected(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
+			virtual GAIA::GVOID OnConnected(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr)
+			{
+				if(bResult)
+				{
+					if(m_pSvr->m_bLog)
+					{
+						GAIA::CH szAddressPeer[32];
+						addr.tostring(szAddressPeer);
+						GDEV << "[HttpSvr] HttpServerAsyncSocket::OnConnected Connected to" << szAddressPeer << GEND;
+					}
+				}
+				else
+				{
+					if(m_pSvr->m_bLog)
+					{
+						GAIA::CH szAddressPeer[32];
+						addr.tostring(szAddressPeer);
+						GDEV << "[HttpSvr] HttpServerAsyncSocket::OnConnected Connect to " << szAddressPeer << "failed!" << GEND;
+					}
+				}
+			}
 			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult)
 			{
 				GAIA::SYNC::Autolock al(m_lr);
 				if(m_pLink == GNIL)
 					return;
+				if(m_pSvr->m_bLog)
+				{
+					GAIA::CH szAddressPeer[32];
+					m_pLink->GetPeerAddr().tostring(szAddressPeer);
+					GDEV << "[HttpSvr] HttpServerAsyncSocket::OnDisconnected " << szAddressPeer << GEND;
+				}
 				m_pSvr->RecycleLink(*m_pLink);
 			}
 			virtual GAIA::GVOID OnListened(GAIA::BL bResult){}
@@ -101,6 +127,12 @@ namespace GAIA
 				GAIA::SYNC::Autolock al(m_lr);
 				if(m_pLink == GNIL)
 					return;
+				if(m_pSvr->m_bLog)
+				{
+					GAIA::CH szAddressPeer[32];
+					m_pLink->GetPeerAddr().tostring(szAddressPeer);
+					GDEV << "[HttpSvr] HttpServerAsyncSocket::OnSent " << szAddressPeer << " " << nPracticeSize << "/" << nSize << GEND;
+				}
 				GAIA::N64 uRemain = (m_needsendsize -= nPracticeSize);
 				if(uRemain == 0 && m_bClosed)
 					m_pSvr->RecycleLink(*m_pLink);
@@ -109,6 +141,15 @@ namespace GAIA
 			{
 				if(!bResult)
 					return;
+				if(m_pSvr->m_bLog)
+				{
+					GAIA::CH szAddressPeer[32];
+					GAIA::NETWORK::Addr addrPeer;
+					this->GetPeerAddress(addrPeer);
+					addrPeer.tostring(szAddressPeer);
+
+					GDEV << "[HttpSvr] HttpServerAsyncSocket::OnRecved " << szAddressPeer << " " << nSize << GEND;
+				}
 
 				// Try to analyze http information.
 				GAIA::SYNC::Autolock al(m_lr);
@@ -138,7 +179,7 @@ namespace GAIA
 					{
 						GAIA::U8* pBegin = m_pRecvBuf->fptr() + sFindBegin;
 						GAIA::NUM sSize = m_pRecvBuf->write_size() - sFindBegin;
-						GAIA::NUM sValidSize = sSize - 3;
+						GAIA::NUM sValidSize = sSize - 2;
 						GAIA::U8* pHeadEnd = GNIL;
 						for(GAIA::NUM x = 0; x < sValidSize; ++x)
 						{
@@ -281,6 +322,13 @@ namespace GAIA
 				GAIA::NETWORK::Addr addrPeer;
 				GAIA::BL bGetPeerAddrResult = sock.GetPeerAddress(addrPeer);
 				GAST(bGetPeerAddrResult && addrPeer.check());
+
+				if(m_pSvr->m_bLog)
+				{
+					GAIA::CH szAddressPeer[32];
+					addrPeer.tostring(szAddressPeer);
+					GDEV << "[HttpSvr] HttpServerAsyncSocket::OnAcceptSocket Accepted " << szAddressPeer << GEND;
+				}
 
 				// If the IP address is in black list.
 				if(m_pSvr->GetBlackWhiteMode() == GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE_BLACK)
@@ -1024,12 +1072,13 @@ namespace GAIA
 			// Destroy cache.
 			{
 				GAIA::SYNC::AutolockW al(m_rwCache);
-				for(GAIA::CTN::Set<CacheNode>::it it = m_cache.frontit(); !it.empty(); )
+				for(GAIA::CTN::Set<CacheNode>::it it = m_cache.frontit(); !it.empty(); ++it)
 				{
 					CacheNode& cn = *it;
 					if(cn.buf != GNIL)
 						gdel cn.buf;
 				}
+				m_cache.clear();
 			}
 
 			// Destroy buffer pool.
@@ -1502,7 +1551,10 @@ namespace GAIA
 			CacheNode* pFinded = m_cache.find(n);
 			n.strKey.proxy(GNIL, 0, 0);
 			if(pFinded == GNIL)
+			{
+				GASTFALSE;
 				return GAIA::False;
+			}
 			pFinded->nRefCount--;
 			GAST(pFinded->nRefCount >= 0);
 			m_rwCache.LeaveRead();
