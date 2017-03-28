@@ -196,7 +196,14 @@ namespace GAIA
 			struct kevent ke;
 			EV_SET(&ke, this->GetFD(), EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, pCtx);
 			GAIA::NUM sResult = kevent(kqep, &ke, 1, GNIL, 0, GNIL);
-			GAST(sResult != GINVALID);
+			if(sResult == GINVALID)
+			{
+				if(m_pDispatcher->m_bLog)
+				{
+					GAIA::N32 nErr = errno;
+					GERR << "[AsyncSocket] AsyncSocket::Connect: kevent call failed, errno = " << nErr << GEND;
+				}
+			}
 
 			m_sock.Connect(addr);
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
@@ -285,7 +292,14 @@ namespace GAIA
 				struct kevent ke;
 				EV_SET(&ke, this->GetFD(), EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, m_pWriteAsyncCtx);
 				GAIA::NUM sResult = kevent(kqep, &ke, 1, GNIL, 0, GNIL);
-				GAST(sResult != GINVALID);
+				if(sResult == GINVALID)
+				{
+					if(m_pDispatcher->m_bLog)
+					{
+						GAIA::N32 nErr = errno;
+						GERR << "[AsyncSocket] AsyncSocket::Send: kevent call failed, errno = " << nErr << GEND;
+					}
+				}
 		#	elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
 
 		#	endif
