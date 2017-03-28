@@ -311,6 +311,7 @@
 		3B3119D41E6D3652009462C1 /* t_algo_base.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B3119561E6D3652009462C1 /* t_algo_base.cpp */; };
 		3B3119D51E6D3652009462C1 /* preheader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B3119581E6D3652009462C1 /* preheader.cpp */; };
 		3B3119D81E6D36CD009462C1 /* libiconv.2.4.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B3119D71E6D36CD009462C1 /* libiconv.2.4.0.tbd */; };
+		3BD7F6891E8A939E002B7E52 /* t_digit_percentage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BD7F6881E8A939E002B7E52 /* t_digit_percentage.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -964,6 +965,7 @@
 		3B3119571E6D3652009462C1 /* preheader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = preheader.h; path = ../../../test/preheader.h; sourceTree = "<group>"; };
 		3B3119581E6D3652009462C1 /* preheader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = preheader.cpp; path = ../../../test/preheader.cpp; sourceTree = "<group>"; };
 		3B3119D71E6D36CD009462C1 /* libiconv.2.4.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.4.0.tbd; path = usr/lib/libiconv.2.4.0.tbd; sourceTree = SDKROOT; };
+		3BD7F6881E8A939E002B7E52 /* t_digit_percentage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_digit_percentage.cpp; path = ../../../test/t_digit_percentage.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1530,6 +1532,7 @@
 		3B3118D81E6D363E009462C1 /* test */ = {
 			isa = PBXGroup;
 			children = (
+				3BD7F6881E8A939E002B7E52 /* t_digit_percentage.cpp */,
 				3B3118D91E6D3652009462C1 /* tperf_msys_heapesg.cpp */,
 				3B3118DA1E6D3652009462C1 /* tperf_ctn.cpp */,
 				3B3118DB1E6D3652009462C1 /* tperf_ctn_dmpgraph.cpp */,
@@ -1864,6 +1867,7 @@
 				3B3119C31E6D3652009462C1 /* t_ctn_bufferfl.cpp in Sources */,
 				3B31198B1E6D3652009462C1 /* t_img_jpeg.cpp in Sources */,
 				3B31183C1E6D358D009462C1 /* gaia_type.cpp in Sources */,
+				3BD7F6891E8A939E002B7E52 /* t_digit_percentage.cpp in Sources */,
 				3B3118A91E6D358D009462C1 /* pcre16_version.c in Sources */,
 				3B31189E1E6D358D009462C1 /* pcre16_maketables.c in Sources */,
 				3B31187A1E6D358D009462C1 /* infback.c in Sources */,
@@ -2161,6 +2165,7 @@
 				3B3116271E6D3538009462C1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
