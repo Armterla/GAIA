@@ -198,102 +198,153 @@ namespace TEST
 	extern GAIA::GVOID t_network_http(GAIA::LOG::Log& logobj)
 	{
 		static const GAIA::CH* TEST_URL = "http://www.qu.la/book/176/143187.html";
+		static const GAIA::CH* TEST_HOST = "www.qu.la";
 		static const GAIA::NUM SAMPLE_COUNT = 10;
 
-		GAIA::CTN::Vector<MyHttpRequest*> listRequest;
-
-		GAIA::NETWORK::HttpHead head;
-		head.Set(GAIA::NETWORK::HTTP_HEADNAME_HOST, "www.qu.la");
-		head.Set(GAIA::NETWORK::HTTP_HEADNAME_USERAGENT, "Gaia/0.0.2");
-		head.Set(GAIA::NETWORK::HTTP_HEADNAME_ACCEPT, "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-		head.Optimize();
-
-		GAIA::NETWORK::Http http;
-		TAST(!http.IsCreated());
-		TAST(!http.IsBegin());
-		http.EnableLog(TMODULE_LOG_ENABLED);
-
-		GAIA::NETWORK::HttpDesc descHttp;
-		descHttp.reset();
-		descHttp.bEnableSocketReuseAddr = GAIA::True;
-		descHttp.nSocketSendBufferSize = 1024 * 4;
-		descHttp.nSocketRecvBufferSize = 1024 * 64;
-		TAST(http.Create(descHttp));
+		GAIA::NETWORK::HttpServerDesc descServer;
+		descServer.reset();
+		descServer.pszRootPath = "../testres/HTTPSERVER/";
+		descServer.bEnableSocketTCPNoDelay = GAIA::True;
+		descServer.bEnableSocketNoBlock = GAIA::True;
+		descServer.bEnableSocketReuseAddr = GAIA::True;
+		descServer.nListenSocketSendBufferSize = 1024 * 64;
+		descServer.nListenSocketRecvBufferSize = 1024 * 64;
+		descServer.nAcceptedSocketSendBufferSize = 1024 * 64;
+		descServer.nAcceptedSocketRecvBufferSize = 1024 * 64;
+		GAIA::NETWORK::HttpServer svr;
+		GAIA::NETWORK::HttpServerCallBackForInfo cbi(svr);
+		GAIA::NETWORK::HttpServerCallBackForStaticResource cbsf(svr);
+		svr.EnableLog(TMODULE_LOG_ENABLED);
+		TAST(svr.Create(descServer));
 		{
-			TAST(http.IsCreated());
-			TAST(!http.IsBegin());
+			TAST(svr.RegistCallBack(cbi));
+			TAST(svr.RegistCallBack(cbsf));
 
-			// Empty request test.
-			TAST(http.Begin());
+			TAST(svr.Begin());
 			{
-				for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
-				{
-					MyHttpRequest* pRequest = gnew MyHttpRequest(http);
-					pRequest->CheckNotUsed(logobj);
-					pRequest->drop_ref();
-				}
-			}
-			TAST(http.End());
+				GAIA::NETWORK::Addr addrLocal;
+				GAIA::CH szHostName[128];
+				GAIA::NETWORK::GetHostName(szHostName, sizeof(szHostName));
+				GAIA::CTN::Vector<GAIA::NETWORK::IP> listHostIP;
+				GAIA::NETWORK::GetHostIPList(szHostName, listHostIP);
 
-			// Single request test.
-			TAST(http.Begin());
-			{
-				MyHttpRequest* pRequest = gnew MyHttpRequest(http);
-				pRequest->SetMethod(GAIA::NETWORK::HTTP_METHOD_GET);
-				pRequest->SetURL(TEST_URL);
-				pRequest->SetHead(head);
-				pRequest->Request();
-				pRequest->Wait();
-				pRequest->CheckSmallGet(logobj);
-				pRequest->drop_ref();
-			}
-			TAST(http.End());
-
-			// Serial request test.
-			TAST(http.Begin());
-			{
-				for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
+				GAIA::NETWORK::Addr addrService1;
+				if(listHostIP.empty())
+					addrService1 = "127.0.0.1:8903";
+				else
 				{
-					MyHttpRequest* pRequest = gnew MyHttpRequest(http);
-					pRequest->SetMethod(GAIA::NETWORK::HTTP_METHOD_GET);
-					pRequest->SetURL(TEST_URL);
-					pRequest->SetHead(head);
-					pRequest->Request();
-					pRequest->Wait();
-					pRequest->CheckSmallGet(logobj);
-					pRequest->drop_ref();
+					addrService1.ip = listHostIP[0];
+					addrService1.uPort = 8903;
 				}
-			}
-			TAST(http.End());
+				GAIA::CH szMyAddress[32];
+				GAIA::CH szMyUrl[64];
+				addrService1.tostring(szMyAddress);
+				GAIA::ALGO::gstrcpy(szMyUrl, "http://");
+				GAIA::ALGO::gstrcat(szMyUrl, szMyAddress);
+				GAIA::ALGO::gstrcat(szMyUrl, "/httpinfo");
 
-			// Parallel request test.
-			TAST(http.Begin());
-			{
-				listRequest.clear();
-				for(GAIA::NUM x = 0; x < SAMPLE_COUNT * 10; ++x)
+				TAST(svr.OpenAddr(addrService1));
 				{
-					MyHttpRequest* pRequest = gnew MyHttpRequest(http);
-					pRequest->SetMethod(GAIA::NETWORK::HTTP_METHOD_GET);
-					pRequest->SetURL(TEST_URL);
-					pRequest->SetHead(head);
-					pRequest->Request();
-					listRequest.push_back(pRequest);
-				}
+					GAIA::CTN::Vector<MyHttpRequest*> listRequest;
 
-				for(GAIA::NUM x = 0; x < listRequest.size(); ++x)
-				{
-					MyHttpRequest* pRequest = listRequest[x];
-					GAST(pRequest != GNIL);
-					pRequest->Wait();
-					pRequest->CheckSmallGet(logobj);
-					pRequest->drop_ref();
+					GAIA::NETWORK::HttpHead head;
+					head.Set(GAIA::NETWORK::HTTP_HEADNAME_HOST, szMyAddress);
+					head.Set(GAIA::NETWORK::HTTP_HEADNAME_USERAGENT, "Gaia/0.0.2");
+					head.Set(GAIA::NETWORK::HTTP_HEADNAME_ACCEPT, "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+					head.Optimize();
+
+					GAIA::NETWORK::Http http;
+					TAST(!http.IsCreated());
+					TAST(!http.IsBegin());
+					http.EnableLog(TMODULE_LOG_ENABLED);
+
+					GAIA::NETWORK::HttpDesc descHttp;
+					descHttp.reset();
+					descHttp.bEnableSocketReuseAddr = GAIA::True;
+					descHttp.nSocketSendBufferSize = 1024 * 4;
+					descHttp.nSocketRecvBufferSize = 1024 * 64;
+					TAST(http.Create(descHttp));
+					{
+						TAST(http.IsCreated());
+						TAST(!http.IsBegin());
+
+						// Empty request test.
+						TAST(http.Begin());
+						{
+							for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
+							{
+								MyHttpRequest* pRequest = gnew MyHttpRequest(http);
+								pRequest->CheckNotUsed(logobj);
+								pRequest->drop_ref();
+							}
+						}
+						TAST(http.End());
+
+						// Single request test.
+						TAST(http.Begin());
+						{
+							MyHttpRequest* pRequest = gnew MyHttpRequest(http);
+							pRequest->SetMethod(GAIA::NETWORK::HTTP_METHOD_GET);
+							pRequest->SetURL(szMyUrl);
+							pRequest->SetHead(head);
+							pRequest->Request();
+							pRequest->Wait();
+							pRequest->CheckSmallGet(logobj);
+							pRequest->drop_ref();
+						}
+						TAST(http.End());
+
+						// Serial request test.
+						TAST(http.Begin());
+						{
+							for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
+							{
+								MyHttpRequest* pRequest = gnew MyHttpRequest(http);
+								pRequest->SetMethod(GAIA::NETWORK::HTTP_METHOD_GET);
+								pRequest->SetURL(szMyUrl);
+								pRequest->SetHead(head);
+								pRequest->Request();
+								pRequest->Wait();
+								pRequest->CheckSmallGet(logobj);
+								pRequest->drop_ref();
+							}
+						}
+						TAST(http.End());
+
+						// Parallel request test.
+						TAST(http.Begin());
+						{
+							listRequest.clear();
+							for(GAIA::NUM x = 0; x < SAMPLE_COUNT * 10; ++x)
+							{
+								MyHttpRequest* pRequest = gnew MyHttpRequest(http);
+								pRequest->SetMethod(GAIA::NETWORK::HTTP_METHOD_GET);
+								pRequest->SetURL(szMyUrl);
+								pRequest->SetHead(head);
+								pRequest->Request();
+								listRequest.push_back(pRequest);
+							}
+
+							for(GAIA::NUM x = 0; x < listRequest.size(); ++x)
+							{
+								MyHttpRequest* pRequest = listRequest[x];
+								GAST(pRequest != GNIL);
+								pRequest->Wait();
+								pRequest->CheckSmallGet(logobj);
+								pRequest->drop_ref();
+							}
+						}
+						TAST(http.End());
+					}
+					TAST(http.Destroy());
+
+					TAST(!http.IsCreated());
+					TAST(!http.IsBegin());
 				}
+				TAST(svr.CloseAddr(addrService1));
 			}
-			TAST(http.End());
+			TAST(svr.End());
 		}
-		TAST(http.Destroy());
-
-		TAST(!http.IsCreated());
-		TAST(!http.IsBegin());
+		TAST(svr.Destroy());
 	}
 }
