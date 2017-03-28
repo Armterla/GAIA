@@ -302,8 +302,8 @@ namespace GAIA
 				if(m_pRequest->m_bHeadRecvedComplete)
 				{
 					GAIA::N64 lOffset = m_pRequest->m_lRecvedSize - nSize;
-					GAST(lOffset >= m_pRequest->m_sTotalReqHeadSize);
-					lOffset -= m_pRequest->m_sTotalReqHeadSize;
+					GAST(lOffset >= m_pRequest->m_sTotalRespHeadSize);
+					lOffset -= m_pRequest->m_sTotalRespHeadSize;
 					m_pRequest->OnRecvedBody(lOffset, pData, nSize);
 				}
 				else
@@ -961,6 +961,12 @@ namespace GAIA
 							GTRY
 							{
 								pSocket->Connect(addrHost);
+								if(m_bLog)
+								{
+									GAIA::CH szAddress[32];
+									addrHost.tostring(szAddress);
+									GDEV << "[Http] Http::Execute: Connecting to " << szAddress << GEND;
+								}
 								bRet = GAIA::True;
 							}
 							GCATCHALL
@@ -1088,6 +1094,10 @@ namespace GAIA
 								pRequest->m_uLastSendingTime = uCurrentTime;
 								pRequest->m_bHeadSendingComplete = GAIA::True;
 
+								// Logout.
+								if(m_bLog)
+									GDEV << "[Http] Http::Execute: Send head " << sWriteSize << " bytes" << GEND;
+
 								bRet = GAIA::True;
 							}
 
@@ -1138,6 +1148,10 @@ namespace GAIA
 										break;
 									}
 									pReqBuf->clear();
+
+									// Logout.
+									if(m_bLog)
+										GDEV << "[Http] Http::Execute: Send body " << nSendSize << " bytes" << GEND;
 
 									// Update info.
 									pRequest->m_uLastSendingTime = uCurrentTime;
