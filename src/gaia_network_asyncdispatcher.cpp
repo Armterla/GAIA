@@ -741,7 +741,9 @@ namespace GAIA
 							{
 								pThread->tempbuf.resize(sRecvAbleSize);
 								GAIA::NUM sRecved = (GAIA::NUM)recv(nSocket, pThread->tempbuf.fptr(), sRecvAbleSize, 0);
-								ctx.pSocket->OnRecved(GAIA::True, pThread->tempbuf.fptr(), sRecved);
+								GAST(sRecved >= 0);
+								if(sRecved > 0)
+									ctx.pSocket->OnRecved(GAIA::True, pThread->tempbuf.fptr(), sRecved);
 							}
 						}
 						bConnectBroken = GAIA::True;
@@ -850,7 +852,9 @@ namespace GAIA
 								{
 									pThread->tempbuf.resize(sRecvAbleSize);
 									GAIA::NUM sRecved = (GAIA::NUM)recv(nSocket, pThread->tempbuf.fptr(), sRecvAbleSize, 0);
-									ctx.pSocket->OnRecved(GAIA::True, pThread->tempbuf.fptr(), sRecved);
+									GAST(sRecved >= 0);
+									if(sRecved > 0)
+										ctx.pSocket->OnRecved(GAIA::True, pThread->tempbuf.fptr(), sRecved);
 								}
 							}
 							break;
