@@ -53,6 +53,7 @@ namespace TEST
 		virtual GAIA::GVOID OnSentHead(const GAIA::CH* pszHttpVersion, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& head)
 		{
 			aSentHead++;
+			aSentHeadSize += head.GetStringSize();
 		}
 		virtual GAIA::GVOID OnSentBody(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize)
 		{
@@ -62,6 +63,7 @@ namespace TEST
 		virtual GAIA::GVOID OnRecvedHead(const GAIA::CH* pszHttpVersion, const GAIA::CH* pszHttpCode, const GAIA::CH* pszHttpCodeDesc, const GAIA::NETWORK::HttpHead& head)
 		{
 			aRecvedHead++;
+			aRecvedHeadSize += head.GetStringSize();
 		}
 		virtual GAIA::GVOID OnRecvedBody(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize)
 		{
@@ -79,11 +81,74 @@ namespace TEST
 	public:
 		GINL GAIA::GVOID CheckNotUsed(GAIA::LOG::Log& logobj)
 		{
-
+			TAST(aBegin == 0);
+			TAST(aEnd == 0);
+			TAST(aEndWithCancel == 0);
+			TAST(aState == 0);
+			TAST(aPause == 0);
+			TAST(aResume == 0);
+			TAST(aSent == 0);
+			TAST(aRecved == 0);
+			TAST(aSentHead == 0);
+			TAST(aSentBody == 0);
+			TAST(aRecvedHead == 0);
+			TAST(aRecvedBody == 0);
+			TAST(aRequestBodyData == 0);
+			for(GAIA::NUM x = 0; x < sizeofarray(aOldStateList); ++x)
+			{
+				if(aOldStateList[x] != 0)
+				{
+					TERROR;
+					break;
+				}
+			}
+			for(GAIA::NUM x = 0; x < sizeofarray(aNewStateList); ++x)
+			{
+				if(aNewStateList[x] != 0)
+				{
+					TERROR;
+					break;
+				}
+			}
+			TAST(aSentSize == 0);
+			TAST(aRecvedSize == 0);
+			TAST(aSentHeadSize == 0);
+			TAST(aSentBodySize == 0);
+			TAST(aRecvedHeadSize == 0);
+			TAST(aRecvedBodySize == 0);
+			TAST(aRequestBodyDataSize == 0);
 		}
 		GINL GAIA::GVOID CheckSmallGet(GAIA::LOG::Log& logobj)
 		{
-
+			TAST(aBegin == 1);
+			TAST(aEnd == 1);
+			TAST(aEndWithCancel == 0);
+			TAST(aState > 0);
+			TAST(aPause == 0);
+			TAST(aResume == 0);
+			TAST(aSent > 0);
+			TAST(aRecved > 0);
+			TAST(aSentHead > 0);
+			TAST(aRecvedHead > 0);
+			TAST(aRecvedBody > 0);
+			TAST(aRequestBodyData == 1);
+			TAST(aOldStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID] == 0);
+			TAST(aNewStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID] == 0);
+			TAST(aOldStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_READY] == 1);
+			TAST(aNewStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_READY] == 0);
+			TAST(aOldStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING] == 1);
+			TAST(aNewStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING] == 1);
+			TAST(aOldStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING] == 1);
+			TAST(aNewStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING] == 1);
+			TAST(aOldStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_COMPLETE] == 0);
+			TAST(aNewStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_COMPLETE] == 1);
+			TAST(aSentSize > 0);
+			TAST(aRecvedSize > 0);
+			TAST(aSentHeadSize > 0);
+			TAST(aSentBodySize == 0);
+			TAST(aRecvedHeadSize > 0);
+			TAST(aRecvedBodySize > 0);
+			TAST(aRequestBodyDataSize == 0);
 		}
 		GINL GAIA::GVOID CheckSmallPost(GAIA::LOG::Log& logobj)
 		{
@@ -164,6 +229,7 @@ namespace TEST
 				for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 				{
 					MyHttpRequest* pRequest = gnew MyHttpRequest(http);
+					pRequest->CheckNotUsed(logobj);
 					pRequest->drop_ref();
 				}
 			}
@@ -178,6 +244,7 @@ namespace TEST
 				pRequest->SetHead(head);
 				pRequest->Request();
 				pRequest->Wait();
+				pRequest->CheckSmallGet(logobj);
 				pRequest->drop_ref();
 			}
 			TAST(http.End());
@@ -193,6 +260,7 @@ namespace TEST
 					pRequest->SetHead(head);
 					pRequest->Request();
 					pRequest->Wait();
+					pRequest->CheckSmallGet(logobj);
 					pRequest->drop_ref();
 				}
 			}
@@ -217,6 +285,7 @@ namespace TEST
 					MyHttpRequest* pRequest = listRequest[x];
 					GAST(pRequest != GNIL);
 					pRequest->Wait();
+					pRequest->CheckSmallGet(logobj);
 					pRequest->drop_ref();
 				}
 			}
