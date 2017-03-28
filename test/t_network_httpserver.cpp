@@ -66,6 +66,8 @@ namespace TEST
 		TAST(!svr.IsCreated());
 		TAST(svr.Create(descServer));
 		{
+			((GAIA::NETWORK::AsyncDispatcher*)svr.GetAsyncDispatcher())->EnableLog(GAIA::True);
+
 			TAST(svr.RegistCallBack(cb1));
 			TAST(svr.RegistCallBack(cb2));
 			TAST(svr.RegistCallBack(cb3));

@@ -217,6 +217,8 @@ namespace TEST
 		svr.EnableLog(TMODULE_LOG_ENABLED);
 		TAST(svr.Create(descServer));
 		{
+			((GAIA::NETWORK::AsyncDispatcher*)svr.GetAsyncDispatcher())->EnableLog(GAIA::True);
+
 			TAST(svr.RegistCallBack(cbi));
 			TAST(svr.RegistCallBack(cbsf));
 
@@ -274,6 +276,8 @@ namespace TEST
 					descHttp.nSocketRecvBufferSize = 1024 * 64;
 					TAST(http.Create(descHttp));
 					{
+						((GAIA::NETWORK::AsyncDispatcher*)http.GetAsyncDispatcher())->EnableLog(GAIA::True);
+
 						TAST(http.IsCreated());
 						TAST(!http.IsBegin());
 
