@@ -709,6 +709,7 @@ namespace GAIA
 				m_bHeadSendingComplete = GAIA::False;
 				m_bBodySendingComplete = GAIA::False;
 				m_bHeadRecvedComplete = GAIA::False;
+				m_bSwapToCompleteList = GAIA::False;
 			}
 
 		private:
@@ -726,6 +727,7 @@ namespace GAIA
 			GAIA::NETWORK::HTTP_CODE m_ResponseCode;
 			GAIA::NETWORK::NETWORK_ERROR m_NetworkError;
 			GAIA::SYNC::Event m_eventforcomplete;
+			GAIA::SYNC::Lock m_lrState;
 
 			GAIA::U64 m_uLogicTimeout;
 			GAIA::U64 m_uNetworkResponseTimeout;
@@ -751,6 +753,7 @@ namespace GAIA
 			GAIA::BL m_bHeadSendingComplete : 1;
 			GAIA::BL m_bBodySendingComplete : 1;
 			GAIA::BL m_bHeadRecvedComplete : 1;
+			GAIA::BL m_bSwapToCompleteList : 1;
 		};
 
 		/*!
@@ -1348,6 +1351,13 @@ namespace GAIA
 				@return Return http status.
 			*/
 			GINL GAIA::NETWORK::HttpStatus& GetStatus(){return m_status;}
+
+			/*!
+				@brief Get the AsyncDispatcher which derived from GAIA::NETWORK::AsyncDispatcher.
+
+				@return Return the AsyncDispatcher.
+			*/
+			GAIA::NETWORK::HttpAsyncDispatcher* GetAsyncDispatcher() const{return m_disp;}
 
 			/*!
 				@brief Enable output log.
