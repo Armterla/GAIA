@@ -179,13 +179,16 @@ namespace GAIA
 					{
 						GAIA::U8* pBegin = m_pRecvBuf->fptr() + sFindBegin;
 						GAIA::NUM sSize = m_pRecvBuf->write_size() - sFindBegin;
-						GAIA::NUM sValidSize = sSize - 2;
+						GAIA::NUM sValidSize = sSize - 3;
 						GAIA::U8* pHeadEnd = GNIL;
 						for(GAIA::NUM x = 0; x < sValidSize; ++x)
 						{
-							if(pBegin[x] == '\r' && pBegin[x + 1] == '\n' && (pBegin[x + 2] == '\r' || pBegin[x + 2] == '\n'))
+							if(pBegin[x] == '\r' &&
+							   pBegin[x + 1] == '\n' &&
+							   (pBegin[x + 2] == '\r' || pBegin[x + 2] == '\n') &&
+							   (pBegin[x + 3] == '\r' || pBegin[x + 3] == '\n'))
 							{
-								pHeadEnd = pBegin + x + 3;
+								pHeadEnd = pBegin + x + 4;
 								break;
 							}
 						}
@@ -234,7 +237,7 @@ namespace GAIA
 								m_ver.assign(m_pRecvBuf->fptr() + sVerBeginPos, sVerLen);
 
 								// Analyze head.
-								GAIA::NUM sHeadLen = (pHeadEnd - m_pRecvBuf->fptr()) - 1 - sHeadBeginPos;
+								GAIA::NUM sHeadLen = (pHeadEnd - m_pRecvBuf->fptr()) - 2 - sHeadBeginPos;
 								if(sHeadLen <= 2)
 									break;
 								if(!m_head.FromString((const GAIA::CH*)m_pRecvBuf->fptr() + sHeadBeginPos, &sHeadLen))
@@ -463,7 +466,7 @@ namespace GAIA
 				pBuf->resize_keep(pBuf->write_size() - 1);
 				GAST(pBuf->write_size() == sFirstLineSize + pHttpHead->GetStringSize());
 			}
-			pBuf->write("\n", 1);
+			pBuf->write("\r\n", 2);
 
 			// Send.
 			GAIA::NUM sSendedHeadSize = pBuf->write_size();

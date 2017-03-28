@@ -315,9 +315,10 @@ namespace GAIA
 					{
 						if(pReader[0] == '\r' &&
 						   pReader + 1 < pWriter && pReader[1] == '\n' &&
-						   pReader + 2 < pWriter && (pReader[2] == '\r' || pReader[2] == '\n'))
+						   pReader + 2 < pWriter && (pReader[2] == '\r' || pReader[2] == '\n') &&
+						   pReader + 3 < pWriter && (pReader[3] == '\r' || pReader[3] == '\n'))
 						{
-							GAIA::NUM sHeadEndOffset = (GAIA::NUM)(pReader - m_pRequest->m_respbuf.fptr() + 3);
+							GAIA::NUM sHeadEndOffset = (GAIA::NUM)(pReader - m_pRequest->m_respbuf.fptr() + 4);
 							m_pRequest->m_respbuf.seek_read(sHeadEndOffset);
 							m_pRequest->m_bHeadRecvedComplete = GAIA::True;
 							break;
@@ -365,7 +366,7 @@ namespace GAIA
 									pszHttpVersion = GNIL;
 									break;
 								}
-								GAIA::NUM sHeadSize = m_pRequest->m_sTotalRespHeadSize - x - 3;
+								GAIA::NUM sHeadSize = m_pRequest->m_sTotalRespHeadSize - x - 4;
 								if(sHeadSize > 0)
 								{
 									if(!resphead.FromString(&pszHead[x + 2], &sHeadSize))
@@ -602,7 +603,7 @@ namespace GAIA
 					GAIA::NETWORK::HTTP_METHOD_STRING_LEN[m_method] + 1 +
 					sRelativePartLength + 1 +
 					m_pHttp->GetDesc().sHttpVerLen + 2 +
-					m_head.GetStringSize() + 1;
+					m_head.GetStringSize() + 2;
 
 			this->rise_ref();
 
@@ -1074,7 +1075,7 @@ namespace GAIA
 								}
 
 								// Blank line.
-								pReqBuf->write("\n", 1);
+								pReqBuf->write("\r\n", 2);
 
 								// Send.
 								GAIA::NUM sWriteSize = pReqBuf->write_size();
