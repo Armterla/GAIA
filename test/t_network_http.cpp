@@ -238,10 +238,19 @@ namespace TEST
 				}
 				GAIA::CH szMyAddress[32];
 				GAIA::CH szMyUrl[64];
-				addrService1.tostring(szMyAddress);
-				GAIA::ALGO::gstrcpy(szMyUrl, "http://");
-				GAIA::ALGO::gstrcat(szMyUrl, szMyAddress);
-				GAIA::ALGO::gstrcat(szMyUrl, "/httpinfo");
+
+				if(GAIA::True)
+				{
+					addrService1.tostring(szMyAddress);
+					GAIA::ALGO::gstrcpy(szMyUrl, "http://");
+					GAIA::ALGO::gstrcat(szMyUrl, szMyAddress);
+					GAIA::ALGO::gstrcat(szMyUrl, "/httpinfo");
+				}
+				else
+				{
+					GAIA::ALGO::gstrcpy(szMyAddress, TEST_HOST);
+					GAIA::ALGO::gstrcpy(szMyUrl, TEST_URL);
+				}
 
 				TAST(svr.OpenAddr(addrService1));
 				{
