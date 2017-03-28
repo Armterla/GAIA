@@ -317,6 +317,7 @@ namespace GAIA
 			GAIA::CTN::BufferRW m_sendbuf;
 			AsyncContext* m_pReadAsyncCtx;
 			AsyncContext* m_pWriteAsyncCtx;
+			GAIA::U64 m_uRecycleTime;
 		#endif
 		};
 	}

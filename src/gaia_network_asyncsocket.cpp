@@ -117,12 +117,14 @@ namespace GAIA
 
 		GAIA::GVOID AsyncSocket::Close()
 		{
+			m_pDispatcher->push_for_recycle(*this);
 			m_sock.Close();
 			this->OnClosed(GAIA::True);
 		}
 
 		GAIA::GVOID AsyncSocket::Shutdown(GAIA::N32 nShutdownFlag)
 		{
+			m_pDispatcher->push_for_recycle(*this);
 			m_sock.Shutdown(nShutdownFlag);
 			this->OnShutdowned(GAIA::True, nShutdownFlag);
 		}
@@ -198,7 +200,7 @@ namespace GAIA
 			GAIA::NUM sResult = kevent(kqep, &ke, 1, GNIL, 0, GNIL);
 			if(sResult == GINVALID)
 			{
-				if(m_pDispatcher->m_bLog)
+				if(m_pDispatcher->IsEnableLog())
 				{
 					GAIA::N32 nErr = errno;
 					GERR << "[AsyncSocket] AsyncSocket::Connect: kevent call failed, errno = " << nErr << GEND;
@@ -294,7 +296,7 @@ namespace GAIA
 				GAIA::NUM sResult = kevent(kqep, &ke, 1, GNIL, 0, GNIL);
 				if(sResult == GINVALID)
 				{
-					if(m_pDispatcher->m_bLog)
+					if(m_pDispatcher->IsEnableLog())
 					{
 						GAIA::N32 nErr = errno;
 						GERR << "[AsyncSocket] AsyncSocket::Send: kevent call failed, errno = " << nErr << GEND;
@@ -319,6 +321,7 @@ namespace GAIA
 		#else
 			m_pReadAsyncCtx = GNIL;
 			m_pWriteAsyncCtx = GNIL;
+			m_uRecycleTime = 0;
 		#endif
 		}
 	}
