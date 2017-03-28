@@ -42,7 +42,15 @@ namespace TEST
 		// String convert.
 		{
 			static const GAIA::CH TEST_CASE1[] = " 1`~!@#$%^&*()-=_+,.<>/?;':\"[]{}\\|";
-			static const GAIA::WCH TEST_CASE2[] = L"我是GAIA";
+
+			GAIA::CTN::AString strUtf8;
+			GAIA::FSYS::File f;
+			if(f.Open(_T("../testres/LOCALE/iamgaia.txt"), GAIA::FSYS::FileBase::OPEN_TYPE_READ))
+			{
+				strUtf8.resize(f.Size());
+				f.Read(strUtf8.fptr(), f.Size());
+				f.Close();
+			}
 
 			GAIA::CH szEncoded[256];
 			GAIA::CH szDecoded[256];
@@ -65,12 +73,8 @@ namespace TEST
 			if(!GAIA::ALGO::gstrequal(szDecoded, TEST_CASE1))
 				TERROR;
 
-			GAIA::CTN::WString strTestCaseWChar = TEST_CASE2;
-			GAIA::CTN::AString strTestCaseUtf8;
-			strTestCaseUtf8 = strTestCaseWChar.toUtf8();
-
-			sEncodedSize = GAIA::DIGIT::percentage_encode(strTestCaseUtf8.fptr(), strTestCaseUtf8.size(), szEncoded, sizeof(szEncoded));
-			if(sEncodedSize != GAIA::DIGIT::percentage_encode(strTestCaseUtf8.fptr(), strTestCaseUtf8.size(), GNIL, 0))
+			sEncodedSize = GAIA::DIGIT::percentage_encode(strUtf8.fptr(), strUtf8.size(), szEncoded, sizeof(szEncoded));
+			if(sEncodedSize != GAIA::DIGIT::percentage_encode(strUtf8.fptr(), strUtf8.size(), GNIL, 0))
 				TERROR;
 			if(sEncodedSize != GAIA::ALGO::gstrlen("%E6%88%91%E6%98%AFGAIA"))
 				TERROR;
@@ -80,9 +84,9 @@ namespace TEST
 			sDecodedSize = GAIA::DIGIT::percentage_decode(szEncoded, sEncodedSize, szDecoded, sizeof(szDecoded));
 			if(sDecodedSize != GAIA::DIGIT::percentage_decode(szEncoded, sEncodedSize, GNIL, 0))
 				TERROR;
-			if(sDecodedSize != strTestCaseUtf8.size())
+			if(sDecodedSize != strUtf8.size())
 				TERROR;
-			if(!GAIA::ALGO::gstrequal(szDecoded, strTestCaseUtf8.fptr()))
+			if(!GAIA::ALGO::gstrequal(szDecoded, strUtf8.fptr()))
 				TERROR;
 		}
 	}
