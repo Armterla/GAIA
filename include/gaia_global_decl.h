@@ -58,6 +58,8 @@ public:
 			GAIA_DELETE_SAFE(m_pFile);
 		}
 	}
+	GINL GAIA::GVOID SetLogFileName(const GAIA::CH* pszFileName){m_strLogFilePathName = pszFileName;}
+	GINL const GAIA::CH* GetLogFileName() const{return m_strLogFilePathName.fptr();}
 	virtual GAIA::BL WriteLog(
 		GAIA::LOG::Log& logobj,
 		const GAIA::TIME::Time& logtime,
@@ -75,15 +77,16 @@ public:
 		if(m_pFile == GNIL)
 		{
 			m_pFile = gnew GAIA::FSYS::File;
-			GAIA::TCH* pszFileName = gnew GAIA::TCH[GAIA::MAXPL];
-			GAIA::ALGO::gstrcpy(pszFileName, g_gaia_appdocdir);
-			GAIA::ALGO::gstrcat(pszFileName, _T("last.log"));
-			if(!m_pFile->Open(pszFileName, GAIA::FSYS::File::OPEN_TYPE_CREATEALWAYS | GAIA::FSYS::File::OPEN_TYPE_WRITE))
+			GAIA::TCH szFileName[GAIA::MAXPL];
+			if(m_strLogFilePathName.empty() || m_strLogFilePathName.size() >= GAIA::MAXPL)
 			{
-				gdel[] pszFileName;
-				return GAIA::False;
+				GAIA::ALGO::gstrcpy(szFileName, g_gaia_appdocdir);
+				GAIA::ALGO::gstrcat(szFileName, _T("last.log"));
 			}
-			gdel[] pszFileName;
+			else
+				GAIA::ALGO::gstrcpy(szFileName, m_strLogFilePathName.fptr());
+			if(!m_pFile->Open(szFileName, GAIA::FSYS::File::OPEN_TYPE_CREATEALWAYS | GAIA::FSYS::File::OPEN_TYPE_WRITE))
+				return GAIA::False;
 		}
 
 		/* Generate the string. */
@@ -155,6 +158,7 @@ private:
 private:
 	GAIA::FSYS::File* m_pFile;
 	GAIA::NUM m_sIndex;
+	GAIA::CTN::AString m_strLogFilePathName;
 };
 extern DefaultGAIALogCallBack g_gaia_log_callback;
 
