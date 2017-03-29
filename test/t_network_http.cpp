@@ -1,4 +1,4 @@
-#include "preheader.h"
+﻿#include "preheader.h"
 #include "t_common.h"
 
 namespace TEST
@@ -223,7 +223,7 @@ namespace TEST
 		svr.EnableLog(TMODULE_LOG_ENABLED);
 		TAST(svr.Create(descServer));
 		{
-			((GAIA::NETWORK::AsyncDispatcher*)svr.GetAsyncDispatcher())->EnableLog(GAIA::True);
+			((GAIA::NETWORK::AsyncDispatcher*)svr.GetAsyncDispatcher())->EnableLog(TMODULE_LOG_ENABLED);
 
 			TAST(svr.RegistCallBack(cbi));
 			TAST(svr.RegistCallBack(cbsf));
@@ -286,7 +286,7 @@ namespace TEST
 						descHttp.sWorkThreadCount = WORK_THREAD_COUNT;
 					TAST(http.Create(descHttp));
 					{
-						((GAIA::NETWORK::AsyncDispatcher*)http.GetAsyncDispatcher())->EnableLog(GAIA::True);
+						((GAIA::NETWORK::AsyncDispatcher*)http.GetAsyncDispatcher())->EnableLog(TMODULE_LOG_ENABLED);
 
 						TAST(http.IsCreated());
 						TAST(!http.IsBegin());

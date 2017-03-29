@@ -1,4 +1,4 @@
-#include "preheader.h"
+﻿#include "preheader.h"
 #include "t_common.h"
 
 namespace TEST
@@ -67,7 +67,7 @@ namespace TEST
 		TAST(!svr.IsCreated());
 		TAST(svr.Create(descServer));
 		{
-			((GAIA::NETWORK::AsyncDispatcher*)svr.GetAsyncDispatcher())->EnableLog(GAIA::True);
+			((GAIA::NETWORK::AsyncDispatcher*)svr.GetAsyncDispatcher())->EnableLog(TMODULE_LOG_ENABLEDe);
 
 			TAST(svr.RegistCallBack(cb1));
 			TAST(svr.RegistCallBack(cb2));
