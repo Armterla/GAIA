@@ -110,6 +110,7 @@ namespace GAIA
 				nListenSocketRecvBufferSize = GINVALID;
 				nAcceptedSocketSendBufferSize = GINVALID;
 				nAcceptedSocketRecvBufferSize = GINVALID;
+				lSingleCallbackLimitSize = 64 * 1024;
 			}
 
 			/*!
@@ -148,6 +149,8 @@ namespace GAIA
 				if(nAcceptedSocketSendBufferSize != GINVALID && nAcceptedSocketSendBufferSize <= 0)
 					return GAIA::False;
 				if(nAcceptedSocketRecvBufferSize != GINVALID && nAcceptedSocketRecvBufferSize <= 0)
+					return GAIA::False;
+				if(lSingleCallbackLimitSize < 0)
 					return GAIA::False;
 				return GAIA::True;
 			}
@@ -274,6 +277,13 @@ namespace GAIA
 				@brief Specify the accepted socket's receive buffer size in bytes, default is GINVALID means use system default setting.
 			*/
 			GAIA::N32 nAcceptedSocketRecvBufferSize;
+
+			/*!
+				@brief Specify the single callback limit size, default is 64Kb.
+					When a request size(include head and body) below equal current variable,
+					the HttpServerCallBack::OnRequest will be callbacked when all head and body received complete.
+			*/
+			GAIA::N64 lSingleCallbackLimitSize;
 		};
 
 		/*!
@@ -600,6 +610,20 @@ namespace GAIA
 			GINL GAIA::NUM GetResponseTimes() const{return m_sResponseTimes;}
 
 			/*!
+				@brief Check the link is receive all request data(include head and body) or not.
+
+				@return If all request data(include head and body) received complete, return GAIA::True, or return GAIA::False.
+			*/
+			GINL GAIA::BL IsReqComplete() const{return m_bReqComplete;}
+
+			/*!
+				@brief Get http error.
+
+				@return Return http error.
+			*/
+			GINL GAIA::NETWORK::HTTP_ERROR GetHttpError() const{return m_httperr;}
+
+			/*!
 				@brief Compare two HttpServerLink.
 
 				@param Specify the second operator for compare.
@@ -630,6 +654,8 @@ namespace GAIA
 				m_uAcceptTime = GINVALID;
 				m_sRequestTimes = 0;
 				m_sResponseTimes = 0;
+				m_bReqComplete = GAIA::False;
+				m_httperr = GAIA::NETWORK::HTTP_ERROR_OK;
 			}
 			GINL GAIA::GVOID SetPeerAddr(const GAIA::NETWORK::Addr& addrPeer){m_addrPeer = addrPeer;}
 			GINL GAIA::GVOID SetListenAddr(const GAIA::NETWORK::Addr& addrListen){m_addrListen = addrListen;}
@@ -645,6 +671,8 @@ namespace GAIA
 			GAIA::U64 m_uAcceptTime;
 			GAIA::NUM m_sRequestTimes;
 			GAIA::NUM m_sResponseTimes;
+			GAIA::BL m_bReqComplete;
+			GAIA::NETWORK::HTTP_ERROR m_httperr;
 		};
 
 		/*!
@@ -728,6 +756,9 @@ namespace GAIA
 					If the request can't be dispatched by current HttpServerCallBack's sub class(HttpServer's user derived),
 					HttpServer's user will return GAIA::False, and then HttpServer will
 					callback next HttpServerCallBack's OnRequest member function.\n
+
+					If all HttpServerCallBack::OnRequest return GAIA::False, it means this request can't be accepted.
+					HttpServer will response with error code by default.\n
 
 				@remarks
 					This function will be callbacked on multi thread.
