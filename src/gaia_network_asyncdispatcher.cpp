@@ -267,14 +267,27 @@ namespace GAIA
 			// Close all need recycle socket.
 			{
 			#if GAIA_OS != GAIA_OS_WINDOWS
-				GAIA::SYNC::Autolock al(m_lrNeedRecycleSockets);
-				for(__SocketSetType::it it = m_needrecycle_sockets.frontit(); !it.empty(); ++it)
+				__SocketVectorType vecTemp;
+
+				// Swap.
 				{
-					GAIA::NETWORK::AsyncSocket* pSocket = *it;
+					GAIA::SYNC::Autolock al(m_lrNeedRecycleSockets);
+					for(__SocketSetType::it it = m_needrecycle_sockets.frontit(); !it.empty(); ++it)
+					{
+						GAIA::NETWORK::AsyncSocket* pSocket = *it;
+						GAST(pSocket != GNIL);
+						vecTemp.push_back(pSocket);
+					}
+					m_needrecycle_sockets.clear();
+				}
+
+				// Recycle.
+				for(GAIA::NUM x = 0; x < vecTemp.size(); ++x)
+				{
+					GAIA::NETWORK::AsyncSocket* pSocket = vecTemp[x];
 					GAST(pSocket != GNIL);
 					pSocket->drop_ref();
 				}
-				m_needrecycle_sockets.clear();
 			#endif
 			}
 
