@@ -107,14 +107,16 @@ namespace GAIA
 			}
 			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult)
 			{
-				GAIA::SYNC::Autolock al(m_lr);
-				if(m_pLink == GNIL)
-					return;
-				if(m_pSvr->m_bLog)
 				{
-					GAIA::CH szAddressPeer[32];
-					m_pLink->GetPeerAddr().tostring(szAddressPeer);
-					GDEV << "[HttpSvr] HttpServerAsyncSocket::OnDisconnected " << szAddressPeer << GEND;
+					GAIA::SYNC::Autolock al(m_lr);
+					if(m_pLink == GNIL)
+						return;
+					if(m_pSvr->m_bLog)
+					{
+						GAIA::CH szAddressPeer[32];
+						m_pLink->GetPeerAddr().tostring(szAddressPeer);
+						GDEV << "[HttpSvr] HttpServerAsyncSocket::OnDisconnected " << szAddressPeer << GEND;
+					}
 				}
 				m_pSvr->RecycleLink(*m_pLink);
 			}
@@ -124,17 +126,22 @@ namespace GAIA
 			{
 				if(!bResult)
 					return;
-				GAIA::SYNC::Autolock al(m_lr);
-				if(m_pLink == GNIL)
-					return;
-				if(m_pSvr->m_bLog)
+				GAIA::BL bNeedRecycleLink = GAIA::False;
 				{
-					GAIA::CH szAddressPeer[32];
-					m_pLink->GetPeerAddr().tostring(szAddressPeer);
-					GDEV << "[HttpSvr] HttpServerAsyncSocket::OnSent " << szAddressPeer << " " << nPracticeSize << "/" << nSize << GEND;
+					GAIA::SYNC::Autolock al(m_lr);
+					if(m_pLink == GNIL)
+						return;
+					if(m_pSvr->m_bLog)
+					{
+						GAIA::CH szAddressPeer[32];
+						m_pLink->GetPeerAddr().tostring(szAddressPeer);
+						GDEV << "[HttpSvr] HttpServerAsyncSocket::OnSent " << szAddressPeer << " " << nPracticeSize << "/" << nSize << GEND;
+					}
+					GAIA::N64 uRemain = (m_needsendsize -= nPracticeSize);
+					if(uRemain == 0 && m_bClosed)
+						bNeedRecycleLink = GAIA::True;
 				}
-				GAIA::N64 uRemain = (m_needsendsize -= nPracticeSize);
-				if(uRemain == 0 && m_bClosed)
+				if(bNeedRecycleLink)
 					m_pSvr->RecycleLink(*m_pLink);
 			}
 			virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize)
