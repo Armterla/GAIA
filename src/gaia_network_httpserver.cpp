@@ -20,6 +20,7 @@ namespace GAIA
 		{
 			friend class HttpServerLink;
 			friend class HttpServer;
+			friend class HttpServerAsyncDispatcher;
 
 		public:
 			HttpServerAsyncSocket(GAIA::NETWORK::HttpServer& svr, GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::ASYNC_SOCKET_TYPE socktype = GAIA::NETWORK::ASYNC_SOCKET_TYPE_CONNECTED)
@@ -395,14 +396,14 @@ namespace GAIA
 		protected:
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
-				HttpServerAsyncSocket* pListenSocket =
-						gnew HttpServerAsyncSocket(*m_pSvr, *this, ASYNC_SOCKET_TYPE_LISTEN);
+				HttpServerAsyncSocket* pListenSocket = gnew HttpServerAsyncSocket(*m_pSvr, *this, ASYNC_SOCKET_TYPE_LISTEN);
+				pListenSocket->m_bListenSocket = GAIA::True;
 				return pListenSocket;
 			}
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptingSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
-				HttpServerAsyncSocket* pAcceptingSocket =
-						gnew HttpServerAsyncSocket(*m_pSvr, *this, ASYNC_SOCKET_TYPE_ACCEPTING);
+				HttpServerAsyncSocket* pAcceptingSocket = gnew HttpServerAsyncSocket(*m_pSvr, *this, ASYNC_SOCKET_TYPE_ACCEPTING);
+				pAcceptingSocket->m_bListenSocket = GAIA::False;
 				return pAcceptingSocket;
 			}
 			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen)
