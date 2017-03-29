@@ -21,9 +21,11 @@ namespace GAIA
 		public:
 			typedef GAIA::U32 __FilterType;
 			GAIA_ENUM_BEGIN(TYPE)
-				TYPE_LOG = 1 << 0,
-				TYPE_WARNING = 1 << 1,
-				TYPE_ERROR = 1 << 2,
+				TYPE_LOG		= 1 << 0,
+				TYPE_WARNING	= 1 << 1,
+				TYPE_ERROR		= 1 << 2,
+				TYPE_USER		= 1 << 3,
+				TYPE_DEVELOP	= 1 << 4,
 			GAIA_ENUM_END(TYPE)
 			class CallBack : public GAIA::Base
 			{
@@ -255,6 +257,10 @@ namespace GAIA
 					return _T("War");
 				case TYPE_ERROR:
 					return _T("Err");
+				case TYPE_USER:
+					return _T("Usr");
+				case TYPE_DEVELOP:
+					return _T("Dev");
 				default:
 					return GNILTSTR;
 				}

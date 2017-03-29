@@ -20,4 +20,6 @@
 #define TLOG(t) do{logobj << logobj.Type(GAIA::LOG::Log::TYPE_LOG) << "\t\t" << (t) << "\n" << logobj.End();}while(0)
 #define TAST(e) do{if(!(e)) TERROR;}while(0)
 
+#define TMODULE_LOG_ENABLED GAIA::True
+
 #endif

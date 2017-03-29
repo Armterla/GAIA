@@ -1,4 +1,4 @@
-#include <gaia_type.h>
+﻿#include <gaia_type.h>
 #include <gaia_assert.h>
 #include <gaia_sync_base.h>
 #ifdef GAIA_DEBUG_MEMORYLEAK
@@ -16,13 +16,14 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
-		class HttpAsyncSocket : public GAIA::NETWORK::AsyncSocket
+		class HttpServerAsyncSocket : public GAIA::NETWORK::AsyncSocket
 		{
 			friend class HttpServerLink;
 			friend class HttpServer;
+			friend class HttpServerAsyncDispatcher;
 
 		public:
-			HttpAsyncSocket(GAIA::NETWORK::HttpServer& svr, GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::ASYNC_SOCKET_TYPE socktype = GAIA::NETWORK::ASYNC_SOCKET_TYPE_CONNECTED)
+			HttpServerAsyncSocket(GAIA::NETWORK::HttpServer& svr, GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::ASYNC_SOCKET_TYPE socktype = GAIA::NETWORK::ASYNC_SOCKET_TYPE_CONNECTED)
 				: GAIA::NETWORK::AsyncSocket(disp, socktype)
 			{
 				this->init();
@@ -30,7 +31,7 @@ namespace GAIA
 				m_method = GAIA::NETWORK::HTTP_METHOD_INVALID;
 			}
 
-			virtual ~HttpAsyncSocket()
+			virtual ~HttpServerAsyncSocket()
 			{
 				if(m_pRecvBuf != GNIL)
 					m_pSvr->ReleaseBuffer(m_pRecvBuf);
@@ -76,7 +77,7 @@ namespace GAIA
 			virtual GAIA::N32 Send(const GAIA::GVOID* p, GAIA::N32 nSize)
 			{
 				GAIA::N32 nSent = GAIA::NETWORK::AsyncSocket::Send(p, nSize);
-				m_needsendsize += nSent;
+				m_aNeedSendSize += nSent;
 				return nSent;
 			}
 
@@ -84,31 +85,100 @@ namespace GAIA
 			virtual GAIA::GVOID OnCreated(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnClosed(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnBound(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
-			virtual GAIA::GVOID OnConnected(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
+			virtual GAIA::GVOID OnConnected(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr)
+			{
+				GASTFALSE;
+				if(bResult)
+				{
+					if(m_pSvr->m_bLog)
+					{
+						GAIA::CH szAddressPeer[32];
+						addr.tostring(szAddressPeer);
+						GDEV << "[HttpSvr] HttpServerAsyncSocket::OnConnected Connected to" << szAddressPeer << GEND;
+					}
+				}
+				else
+				{
+					if(m_pSvr->m_bLog)
+					{
+						GAIA::CH szAddressPeer[32];
+						addr.tostring(szAddressPeer);
+						GDEV << "[HttpSvr] HttpServerAsyncSocket::OnConnected Connect to " << szAddressPeer << "failed!" << GEND;
+					}
+				}
+			}
 			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult)
 			{
-				GAIA::SYNC::Autolock al(m_lr);
-				if(m_pLink == GNIL)
-					return;
-				m_pSvr->RecycleLink(*m_pLink);
+				//
+				{
+					GAIA::SYNC::Autolock al(m_lr);
+					if(m_pLink == GNIL)
+						return;
+					if(m_pSvr->m_bLog)
+					{
+						GAIA::CH szAddressPeer[32];
+						m_pLink->GetPeerAddr().tostring(szAddressPeer);
+						GDEV << "[HttpSvr] HttpServerAsyncSocket::OnDisconnected " << szAddressPeer << GEND;
+					}
+				}
+
+				//
+				m_bClosed = GAIA::True;
+				m_pLink->rise_ref();
+				GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
+				m_pSvr->m_rclinks.push_back(m_pLink);
+				m_pLink = GNIL;
 			}
 			virtual GAIA::GVOID OnListened(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnAccepted(GAIA::BL bResult, const GAIA::NETWORK::Addr& addrListen){}
 			virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nPracticeSize, GAIA::N32 nSize)
 			{
+				GAIA::BL bNeedCallBackToRecycle = GAIA::False;
 				if(!bResult)
-					return;
-				GAIA::SYNC::Autolock al(m_lr);
-				if(m_pLink == GNIL)
-					return;
-				GAIA::N64 uRemain = (m_needsendsize -= nPracticeSize);
-				if(uRemain == 0 && m_bClosed)
-					m_pSvr->RecycleLink(*m_pLink);
+					bNeedCallBackToRecycle = GAIA::True;
+				else
+				{
+					GAIA::SYNC::Autolock al(m_lr);
+					if(m_pLink == GNIL)
+						return;
+					if(m_pSvr->m_bLog)
+					{
+						GAIA::CH szAddressPeer[32];
+						m_pLink->GetPeerAddr().tostring(szAddressPeer);
+						GDEV << "[HttpSvr] HttpServerAsyncSocket::OnSent " << szAddressPeer << " " << nPracticeSize << "/" << nSize << GEND;
+					}
+					GAIA::N64 uRemain = (m_aNeedSendSize -= nPracticeSize);
+					if(uRemain == 0 && m_bClosed)
+						bNeedCallBackToRecycle = GAIA::True;
+				}
+				if(bNeedCallBackToRecycle)
+				{
+					m_bClosed = GAIA::True;
+					m_pLink->rise_ref();
+					GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
+					m_pSvr->m_rclinks.push_back(m_pLink);
+					m_pLink = GNIL;
+				}
 			}
 			virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize)
 			{
 				if(!bResult)
+				{
+					m_bClosed = GAIA::True;
+					m_pLink->rise_ref();
+					GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
+					m_pSvr->m_rclinks.push_back(m_pLink);
+					m_pLink = GNIL;
 					return;
+				}
+				if(m_pSvr->m_bLog)
+				{
+					GAIA::CH szAddressPeer[32];
+					GAIA::NETWORK::Addr addrPeer;
+					this->GetPeerAddress(addrPeer);
+					addrPeer.tostring(szAddressPeer);
+					GDEV << "[HttpSvr] HttpServerAsyncSocket::OnRecved " << szAddressPeer << " " << nSize << GEND;
+				}
 
 				// Try to analyze http information.
 				GAIA::SYNC::Autolock al(m_lr);
@@ -120,7 +190,9 @@ namespace GAIA
 					m_pRecvBuf->clear();
 				}
 				m_pRecvBuf->write(pData, nSize);
-				if(m_url.Empty())
+				GAIA::BL bNeedCallBack = GAIA::False;
+				GAIA::BL bExistError = GAIA::False;
+				if(m_url.Empty() && m_pLink->GetHttpError() == GAIA::NETWORK::HTTP_ERROR_OK)
 				{
 					GAIA::NUM sFindBegin = m_pRecvBuf->write_size() - nSize;
 					if(sFindBegin >= 2)
@@ -142,9 +214,12 @@ namespace GAIA
 						GAIA::U8* pHeadEnd = GNIL;
 						for(GAIA::NUM x = 0; x < sValidSize; ++x)
 						{
-							if(pBegin[x] == '\r' && pBegin[x + 1] == '\n' && (pBegin[x + 2] == '\r' || pBegin[x + 2] == '\n'))
+							if(pBegin[x] == '\r' &&
+							   pBegin[x + 1] == '\n' &&
+							   (pBegin[x + 2] == '\r' || pBegin[x + 2] == '\n') &&
+							   (pBegin[x + 3] == '\r' || pBegin[x + 3] == '\n'))
 							{
-								pHeadEnd = pBegin + x + 3;
+								pHeadEnd = pBegin + x + 4;
 								break;
 							}
 						}
@@ -161,7 +236,10 @@ namespace GAIA
 								sHeadBeginPos += 2;
 								GAIA::NUM sMethodEndPos = m_pRecvBuf->find(" ", 1, 0);
 								if(sMethodEndPos > sHeadBeginPos)
+								{
+									m_pLink->m_httperr = GAIA::NETWORK::HTTP_ERROR_INVALIDHEAD;
 									break;
+								}
 								GAIA::U8* pMethodBegin = m_pRecvBuf->fptr();
 								for(GAIA::NUM x = 0; x < sizeofarray(GAIA::NETWORK::HTTP_METHOD_STRING); ++x)
 								{
@@ -172,16 +250,25 @@ namespace GAIA
 									}
 								}
 								if(m_method == GAIA::NETWORK::HTTP_METHOD_INVALID)
+								{
+									m_pLink->m_httperr = GAIA::NETWORK::HTTP_ERROR_NOTSUPPORTMETHOD;
 									break;
+								}
 
 								// Analyze URL.
 								GAIA::NUM sUrlBeginPos = sMethodEndPos + 1;
 								GAIA::NUM sUrlEndPos = m_pRecvBuf->find(" ", 1, sUrlBeginPos);
 								if(sUrlEndPos > sHeadBeginPos)
+								{
+									m_pLink->m_httperr = GAIA::NETWORK::HTTP_ERROR_INVALIDURL;
 									break;
+								}
 								GAIA::NUM sUrlLen = sUrlEndPos - sUrlBeginPos;
 								if(sUrlLen <= 0)
+								{
+									m_pLink->m_httperr = GAIA::NETWORK::HTTP_ERROR_INVALIDURL;
 									break;
+								}
 								m_url.FromString((const GAIA::CH*)m_pRecvBuf->fptr() + sUrlBeginPos, &sUrlLen);
 
 								// Analyze http version.
@@ -189,15 +276,28 @@ namespace GAIA
 								GAIA::NUM sVerEndPos = sHeadBeginPos - 2;
 								GAIA::NUM sVerLen = sVerEndPos - sVerBeginPos;
 								if(sVerLen <= 0 || sVerLen > m_ver.capacity())
+								{
+									m_pLink->m_httperr = GAIA::NETWORK::HTTP_ERROR_NOTSUPPORTVERSION;
 									break;
+								}
 								m_ver.assign(m_pRecvBuf->fptr() + sVerBeginPos, sVerLen);
 
 								// Analyze head.
-								GAIA::NUM sHeadLen = (pHeadEnd - m_pRecvBuf->fptr()) - 1 - sHeadBeginPos;
+								GAIA::NUM sHeadLen = (pHeadEnd - m_pRecvBuf->fptr()) - 2 - sHeadBeginPos;
 								if(sHeadLen <= 2)
+								{
+									m_pLink->m_httperr = GAIA::NETWORK::HTTP_ERROR_INVALIDHEADKVPAIRS;
 									break;
+								}
 								if(!m_head.FromString((const GAIA::CH*)m_pRecvBuf->fptr() + sHeadBeginPos, &sHeadLen))
+								{
+									m_pLink->m_httperr = GAIA::NETWORK::HTTP_ERROR_INVALIDHEADKVPAIRS;
 									break;
+								}
+
+								const GAIA::CH* pszContentLength = m_head.GetValueByName(GAIA::NETWORK::HTTP_HEADNAME_CONTENTLENGTH);
+								if(pszContentLength != GNIL)
+									m_lContentLength = GAIA::ALGO::acasts(pszContentLength);
 
 								//
 								bAnalyzeSuccess = GAIA::True;
@@ -206,18 +306,44 @@ namespace GAIA
 							if(bAnalyzeSuccess)
 							{
 								// Remove http information from buffer.
-								m_pRecvBuf->keep(m_pRecvBuf->bptr() - pHeadEnd);
-
-								// Notify callback.
-								m_pLink->rise_ref();
-								GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
-								m_pSvr->m_rclinks.push_back(m_pLink);
+								GAIA::NUM sRemainSize = (GAIA::NUM)(m_pRecvBuf->write_ptr() - pHeadEnd);
+								m_pRecvBuf->keep(sRemainSize);
+								m_lRecvedBodyLength += m_pRecvBuf->remain();
 							}
 							else
 							{
 								m_pSvr->GetStatus().uRequestAnalyzeFailedCount++;
+								bExistError = GAIA::True;
+								GAST(m_pLink->m_httperr != GAIA::NETWORK::HTTP_ERROR_OK);
 							}
+							GAST(m_pLink->m_httperr != GAIA::NETWORK::HTTP_ERROR_INVALID);
+							bNeedCallBack = GAIA::True;
 						}
+					}
+				}
+				else
+				{
+					bNeedCallBack = GAIA::True;
+					m_lRecvedBodyLength += nSize;
+				}
+
+				// If receive body complete, sign HttpServerLink to request complete.
+				if(m_lContentLength == m_lRecvedBodyLength)
+				{
+					GAST(m_lRecvedBodyLength != GINVALID);
+					m_pLink->m_bReqComplete = GAIA::True;
+				}
+
+				// Notify callback.
+				if(bNeedCallBack)
+				{
+					if(bExistError || m_lContentLength == GINVALID ||
+					   m_lRecvedBodyLength >= m_lContentLength ||
+					   m_lContentLength > m_pSvr->GetDesc().lSingleCallbackLimitSize)
+					{
+						m_pLink->rise_ref();
+						GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
+						m_pSvr->m_rclinks.push_back(m_pLink);
 					}
 				}
 			}
@@ -233,6 +359,8 @@ namespace GAIA
 				m_pRecvBufSwap = GNIL;
 				m_method = GAIA::NETWORK::HTTP_METHOD_INVALID;
 				m_bClosed = GAIA::False;
+				m_lContentLength = GINVALID;
+				m_lRecvedBodyLength = 0;
 			}
 
 		private:
@@ -246,8 +374,10 @@ namespace GAIA
 			GAIA::NETWORK::HttpURL m_url;
 			GAIA::NETWORK::HttpHead m_head;
 			GAIA::CTN::BasicChars<GAIA::CH, GAIA::NUM, 16> m_ver;
-			GAIA::SYNC::Atomic m_needsendsize;
+			GAIA::SYNC::Atomic m_aNeedSendSize;
 			GAIA::BL m_bClosed;
+			GAIA::N64 m_lContentLength;
+			GAIA::N64 m_lRecvedBodyLength;
 		};
 
 		class HttpServerAsyncDispatcher : public GAIA::NETWORK::AsyncDispatcher
@@ -266,14 +396,14 @@ namespace GAIA
 		protected:
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
-				HttpAsyncSocket* pListenSocket =
-						gnew HttpAsyncSocket(*m_pSvr, *this, ASYNC_SOCKET_TYPE_LISTEN);
+				HttpServerAsyncSocket* pListenSocket = gnew HttpServerAsyncSocket(*m_pSvr, *this, ASYNC_SOCKET_TYPE_LISTEN);
+				pListenSocket->m_bListenSocket = GAIA::True;
 				return pListenSocket;
 			}
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptingSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
-				HttpAsyncSocket* pAcceptingSocket =
-						gnew HttpAsyncSocket(*m_pSvr, *this, ASYNC_SOCKET_TYPE_ACCEPTING);
+				HttpServerAsyncSocket* pAcceptingSocket = gnew HttpServerAsyncSocket(*m_pSvr, *this, ASYNC_SOCKET_TYPE_ACCEPTING);
+				pAcceptingSocket->m_bListenSocket = GAIA::False;
 				return pAcceptingSocket;
 			}
 			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen)
@@ -281,6 +411,13 @@ namespace GAIA
 				GAIA::NETWORK::Addr addrPeer;
 				GAIA::BL bGetPeerAddrResult = sock.GetPeerAddress(addrPeer);
 				GAST(bGetPeerAddrResult && addrPeer.check());
+
+				if(m_pSvr->m_bLog)
+				{
+					GAIA::CH szAddressPeer[32];
+					addrPeer.tostring(szAddressPeer);
+					GDEV << "[HttpSvr] HttpServerAsyncSocket::OnAcceptSocket Accepted " << szAddressPeer << GEND;
+				}
 
 				// If the IP address is in black list.
 				if(m_pSvr->GetBlackWhiteMode() == GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE_BLACK)
@@ -314,11 +451,11 @@ namespace GAIA
 
 				//
 				GAIA::NETWORK::HttpServerLink* pLink = gnew GAIA::NETWORK::HttpServerLink(*m_pSvr);
-				pLink->m_pSock = (GAIA::NETWORK::HttpAsyncSocket*)&sock;
+				pLink->m_pSock = (GAIA::NETWORK::HttpServerAsyncSocket*)&sock;
 				pLink->SetPeerAddr(addrPeer);
 				pLink->SetListenAddr(addrListen);
 				pLink->SetAcceptTime(GAIA::TIME::gmt_time());
-				((HttpAsyncSocket*)&sock)->SetLink(pLink);
+				((HttpServerAsyncSocket*)&sock)->SetLink(pLink);
 				GAIA::SYNC::AutolockW al(m_pSvr->m_rwLinks);
 				m_pSvr->m_links_bypeeraddr.insert(GAIA::CTN::Ref<GAIA::NETWORK::HttpServerLink>(pLink));
 				return GAIA::True;
@@ -371,8 +508,12 @@ namespace GAIA
 			{
 				if(m_pSock->IsCreated())
 				{
-					m_pSock->Shutdown();
-					m_pSock->Close();
+					GTRY
+					{
+						m_pSock->Shutdown();
+						m_pSock->Close();
+					}
+					GCATCHALL{}
 				}
 				m_pSock->drop_ref();
 				m_pSock = GNIL;
@@ -415,7 +556,7 @@ namespace GAIA
 				pBuf->resize_keep(pBuf->write_size() - 1);
 				GAST(pBuf->write_size() == sFirstLineSize + pHttpHead->GetStringSize());
 			}
-			pBuf->write("\n", 1);
+			pBuf->write("\r\n", 2);
 
 			// Send.
 			GAIA::NUM sSendedHeadSize = pBuf->write_size();
@@ -922,14 +1063,16 @@ namespace GAIA
 		GAIA::BL HttpServer::UnregistCallBackAll()
 		{
 			GPCHR_FALSE_RET(this->IsCreated(), GAIA::False);
+			GAIA::BL bRet = GAIA::False;
 			GAIA::SYNC::AutolockW al(m_rwCBS);
 			for(GAIA::NUM x = 0; x < m_cbs.size(); ++x)
 			{
 				GAIA::NETWORK::HttpServerCallBack* pCB = m_cbs[x];
 				pCB->drop_ref();
+				bRet = GAIA::True;
 			}
 			m_cbs.clear();
-			return GAIA::True;
+			return bRet;
 		}
 
 		GAIA::BL HttpServer::IsRegistedCallBack(GAIA::NETWORK::HttpServerCallBack& cb)
@@ -1024,12 +1167,13 @@ namespace GAIA
 			// Destroy cache.
 			{
 				GAIA::SYNC::AutolockW al(m_rwCache);
-				for(GAIA::CTN::Set<CacheNode>::it it = m_cache.frontit(); !it.empty(); )
+				for(GAIA::CTN::Set<CacheNode>::it it = m_cache.frontit(); !it.empty(); ++it)
 				{
 					CacheNode& cn = *it;
 					if(cn.buf != GNIL)
 						gdel cn.buf;
 				}
+				m_cache.clear();
 			}
 
 			// Destroy buffer pool.
@@ -1140,7 +1284,7 @@ namespace GAIA
 
 			// Execute the link.
 			{
-				HttpAsyncSocket* pSock = pLink->m_pSock;
+				HttpServerAsyncSocket* pSock = pLink->m_pSock;
 				if(!pSock->m_bClosed)
 				{
 					// Swap.
@@ -1161,6 +1305,7 @@ namespace GAIA
 
 					// Response by cache.
 					GAIA::BL bResponsedByCache = GAIA::False;
+					if(pLink->IsReqComplete() && pLink->GetHttpError() == GAIA::NETWORK::HTTP_ERROR_OK)
 					{
 						if(pSock->m_method == GAIA::NETWORK::HTTP_METHOD_GET || pSock->m_method == GAIA::NETWORK::HTTP_METHOD_HEAD)
 						{
@@ -1222,6 +1367,22 @@ namespace GAIA
 						if(!bResponsed)
 						{
 							m_status.uNotResponseCount++;
+							if(pLink->GetHttpError() != GAIA::NETWORK::HTTP_ERROR_OK)
+							{
+								pLink->Response(
+									GAIA::NETWORK::HTTP_CODE_BADREQUEST, GNIL,
+									GAIA::NETWORK::HTTP_CODE_DESCRIPTION[GAIA::NETWORK::HTTP_CODE_BADREQUEST],
+									GAIA::NETWORK::HTTP_CODE_DESCRIPTION_LENGTH[GAIA::NETWORK::HTTP_CODE_BADREQUEST]);
+								pLink->Close();
+							}
+							else
+							{
+								pLink->Response(
+									GAIA::NETWORK::HTTP_CODE_NOTIMPLEMENT, GNIL,
+									GAIA::NETWORK::HTTP_CODE_DESCRIPTION[GAIA::NETWORK::HTTP_CODE_NOTIMPLEMENT],
+									GAIA::NETWORK::HTTP_CODE_DESCRIPTION_LENGTH[GAIA::NETWORK::HTTP_CODE_NOTIMPLEMENT]);
+								pLink->Close();
+							}
 						}
 					}
 
@@ -1232,7 +1393,7 @@ namespace GAIA
 				// Try to recycle link.
 				if(pSock->m_bClosed)
 				{
-					if(pSock->m_needsendsize == 0)
+					if(pSock->m_aNeedSendSize == 0)
 						this->RecycleLink(*pLink);
 				}
 			}
@@ -1502,7 +1663,10 @@ namespace GAIA
 			CacheNode* pFinded = m_cache.find(n);
 			n.strKey.proxy(GNIL, 0, 0);
 			if(pFinded == GNIL)
+			{
+				GASTFALSE;
 				return GAIA::False;
+			}
 			pFinded->nRefCount--;
 			GAST(pFinded->nRefCount >= 0);
 			m_rwCache.LeaveRead();

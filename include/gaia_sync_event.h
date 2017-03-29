@@ -54,7 +54,7 @@ namespace GAIA
 				pthread_mutex_unlock(&m_mutex);
 			#endif
 			}
-			GINL GAIA::BL Wait(GAIA::U32 uMilliSeconds)
+			GINL GAIA::BL Wait(GAIA::U32 uMilliSeconds = GINVALID)
 			{
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				return ::WaitForSingleObject(m_hSem, uMilliSeconds) == WAIT_OBJECT_0;

@@ -69,6 +69,13 @@ namespace GAIA
 					m_pCursor = m_pFront;
 					m_size = size;
 				}
+
+				m_pLastPeekCursor = GNIL;
+				m_pLastPeekReturn = GNIL;
+				m_LastPeekNodeType = GAIA::JSON::JSON_NODE_INVALID;
+				m_LastPeekNodeNameLength = 0;
+				m_pLastPeekNext = GNIL;
+				m_bLastPeekValueIsString = GAIA::False;
 			}
 
 			/*!
@@ -127,6 +134,17 @@ namespace GAIA
 			*/
 			GINL const _DataType* Peek(GAIA::JSON::JSON_NODE& nt, _SizeType& nodenamelen, _DataTypePtr* pNext = GNIL, GAIA::BL* pValueIsString = GNIL)
 			{
+				if(m_pLastPeekCursor == m_pCursor)
+				{
+					nt = m_LastPeekNodeType;
+					nodenamelen = m_LastPeekNodeNameLength;
+					if(pNext != GNIL)
+						*pNext = m_pLastPeekNext;
+					if(pValueIsString != GNIL)
+						*pValueIsString = m_bLastPeekValueIsString;
+					return m_pLastPeekReturn;
+				}
+
 				m_pCursor = this->move_to_next(m_pCursor);
 				if(m_pCursor == GNIL)
 					GTHROW_RET(Illegal, GNIL);
@@ -135,28 +153,12 @@ namespace GAIA
 				const _DataType* pRet = GNIL;
 				switch(*p)
 				{
-				case '{':
-					{
-						nt = GAIA::JSON::JSON_NODE_CONTAINER;
-						nodenamelen = 0;
-						pLocalNext = p + 1;
-						pRet = p;
-					}
-					break;
-				case '[':
-					{
-						nt = GAIA::JSON::JSON_NODE_MULTICONTAINER;
-						nodenamelen = 0;
-						pLocalNext = p + 1;
-						pRet = p;
-					}
-					break;
 				case '\"':
 					{
 						const _DataType* pLastQuote = GNIL;
 						const _DataType* pColon = GNIL;
 						GAIA::BL bInQuote = GAIA::False;
-						while(p <= m_pBack)
+						do
 						{
 							if(*p == ':' && !bInQuote)
 							{
@@ -171,6 +173,9 @@ namespace GAIA
 							}
 							++p;
 						}
+						while(p <= m_pBack);
+						if(p > m_pBack)
+							GTHROW_RET(DataError, GNIL);
 						if(pColon == GNIL)
 							GTHROW_RET(DataError, GNIL);
 						pLocalNext = this->move_to_next(pColon + 1);
@@ -178,6 +183,12 @@ namespace GAIA
 							GTHROW_RET(DataError, GNIL);
 						switch(*pLocalNext)
 						{
+						case '\"':
+							{
+								nt = GAIA::JSON::JSON_NODE_NAME;
+								pLocalNext = pColon;
+							}
+							break;
 						case '{':
 							{
 								nt = GAIA::JSON::JSON_NODE_CONTAINER;
@@ -188,12 +199,6 @@ namespace GAIA
 							{
 								nt = GAIA::JSON::JSON_NODE_MULTICONTAINER;
 								pLocalNext = pLocalNext + 1;
-							}
-							break;
-						case '\"':
-							{
-								nt = GAIA::JSON::JSON_NODE_NAME;
-								pLocalNext = pColon;
 							}
 							break;
 						default:
@@ -224,24 +229,30 @@ namespace GAIA
 						GAIA::BL bValueIsString = GAIA::True;
 						if(*pLocalNext == '\"')
 						{
-							while(pLocalNext <= m_pBack)
+							do
 							{
 								if(*pLocalNext == '\"' && pLocalNext > p && pLocalNext[-1] != '\\')
 									break;
 								++pLocalNext;
 							}
+							while(pLocalNext <= m_pBack);
+							if(pLocalNext > m_pBack)
+								GTHROW_RET(DataError, GNIL);
 							p++;
 							bValueIsString = GAIA::True;
 						}
 						else if(*pLocalNext >= '0' && *pLocalNext <= '9')
 						{
-							while(pLocalNext <= m_pBack)
+							do
 							{
 								if((*pLocalNext >= '0' && *pLocalNext <= '9') || *pLocalNext == '.')
 									++pLocalNext;
 								else
 									break;
 							}
+							while(pLocalNext <= m_pBack);
+							if(pLocalNext > m_pBack)
+								GTHROW_RET(DataError, GNIL);
 							GAIA::BL bExistValidNumber = GAIA::False;
 							_SizeType dotcnt = 0;
 							_SizeType zerocntbefore = 0;
@@ -292,6 +303,23 @@ namespace GAIA
 							pLocalNext = pLocalNext + 1;
 						if(pValueIsString != GNIL)
 							*pValueIsString = bValueIsString;
+						m_bLastPeekValueIsString = bValueIsString;
+						pRet = p;
+					}
+					break;
+				case '{':
+					{
+						nt = GAIA::JSON::JSON_NODE_CONTAINER;
+						nodenamelen = 0;
+						pLocalNext = p + 1;
+						pRet = p;
+					}
+					break;
+				case '[':
+					{
+						nt = GAIA::JSON::JSON_NODE_MULTICONTAINER;
+						nodenamelen = 0;
+						pLocalNext = p + 1;
 						pRet = p;
 					}
 					break;
@@ -318,6 +346,11 @@ namespace GAIA
 				}
 				if(pNext != GNIL)
 					*pNext = pLocalNext;
+				m_pLastPeekCursor = m_pCursor;
+				m_pLastPeekReturn = pRet;
+				m_LastPeekNodeType = nt;
+				m_LastPeekNodeNameLength = nodenamelen;
+				m_pLastPeekNext = pLocalNext;
 				return pRet;
 			}
 
@@ -366,6 +399,11 @@ namespace GAIA
 			/*!
 				@brief Try to end read a container node or a multi container node.
 
+				@param nt [out] Used for saving the json node type.\n
+					Default value is GNIL means this parameter is ignored.\n
+					If current function success, it would be JSON_NODE_CONTAINER or JSON_NODE_MULTICONTAINER.\n
+					If current function failed, it would be JSON_NODE_CONTAINER or JSON_NODE_MULTICONTAINER or JSON_NODE_NAME or JSON_NODE_VALUE.\n
+
 				@return Return the container's name without '\0'.\n
 					If current container is a single container, it will return "}" without '\0'.\n
 					If current container is a multi container, it will return "]" without '\0'.\n
@@ -377,17 +415,18 @@ namespace GAIA
 
 				@exception GAIA::ECT::EctDataError
 					If the source json's format exist error, and can't read, throw it.
-
 			*/
-			GINL const _DataType* End()
+			GINL const _DataType* End(GAIA::JSON::JSON_NODE* nt = GNIL)
 			{
-				GAIA::JSON::JSON_NODE nt;
+				GAIA::JSON::JSON_NODE nodetype;
 				_SizeType nodenamelen;
 				const _DataType* pNext;
-				const _DataType* pRet = this->Peek(nt, nodenamelen, &pNext);
+				const _DataType* pRet = this->Peek(nodetype, nodenamelen, &pNext);
 				if(pRet == GNIL)
 					GTHROW_RET(Illegal, GNIL);
-				switch(nt)
+				if(nt != GNIL)
+					*nt = nodetype;
+				switch(nodetype)
 				{
 				case GAIA::JSON::JSON_NODE_CONTAINER:
 					{
@@ -585,7 +624,10 @@ namespace GAIA
 						else if(GAIA::ALGO::gstrcmp(pRet, "false", nodenamelen) == 0)
 							v = GAIA::False;
 						else
-							GTHROW(Convert);
+						{
+							v = GAIA::False;
+							GTHROW_RET(Convert, v);
+						}
 					}
 					break;
 				default:
@@ -803,20 +845,23 @@ namespace GAIA
 			{
 				m_pFront = m_pBack = m_pCursor = GNIL;
 				m_size = 0;
+
+				m_pLastPeekCursor = GNIL;
+				m_pLastPeekReturn = GNIL;
+				m_LastPeekNodeType = GAIA::JSON::JSON_NODE_INVALID;
+				m_LastPeekNodeNameLength = 0;
+				m_pLastPeekNext = GNIL;
+				m_bLastPeekValueIsString = GAIA::False;
 			}
 			GINL const _DataType* move_to_next(const _DataType* p)
 			{
 				while(p <= m_pBack)
 				{
-					if(*p != ' ' &&
-					   *p != '\t' &&
-					   *p != '\r' &&
-					   *p != '\n' &&
-					   *p != ',')
+					if(*p >= sizeof(ascii_json_validchar) || ascii_json_validchar[*p])
 						return p;
 					++p;
 				}
-				return GNIL;
+				GTHROW_RET(DataError, GNIL);
 			}
 
 		private:
@@ -824,6 +869,13 @@ namespace GAIA
 			const _DataType* m_pBack; // Last valid character.
 			const _DataType* m_pCursor;
 			_SizeType m_size; // Size in bytes.
+
+			const _DataType* m_pLastPeekCursor;
+			const _DataType* m_pLastPeekReturn;
+			GAIA::JSON::JSON_NODE m_LastPeekNodeType;
+			_SizeType m_LastPeekNodeNameLength;
+			const _DataType* m_pLastPeekNext;
+			GAIA::BL m_bLastPeekValueIsString;
 		};
 		class JsonReaderA : public BasicJsonReader<GAIA::CH, GAIA::NUM, GAIA::NUM, 32>{public:};
 		class JsonReaderW : public BasicJsonReader<GAIA::WCH, GAIA::NUM, GAIA::NUM, 32>{public:};

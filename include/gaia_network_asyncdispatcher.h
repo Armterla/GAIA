@@ -388,6 +388,21 @@ namespace GAIA
 			*/
 			GAIA::BL CollectConnectedSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const;
 
+			/*!
+				@brief Enable output log.
+
+				@param bEnable [in] Specify enable or disable output log.
+			*/
+			GINL GAIA::GVOID EnableLog(GAIA::BL bEnable){m_bLog = bEnable;}
+
+			/*!
+				@brief Check is enable or disable output log.
+
+				@return If enable output log, return GAIA::True, return GAIA::False.\m
+					Default is disabled.
+			*/
+			GINL GAIA::BL IsEnableLog() const{return m_bLog;}
+
 		protected:
 
 			/*!
@@ -438,6 +453,11 @@ namespace GAIA
 			}
 
 		private:
+			typedef GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*> __SocketMapType;
+			typedef GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*> __SocketSetType;
+			typedef GAIA::CTN::Vector<GAIA::NETWORK::AsyncSocket*> __SocketVectorType;
+
+		private:
 			GAIA::GVOID init();
 			GAIA::BL AddAcceptingSocket(GAIA::NETWORK::AsyncSocket& sock);
 			GAIA::BL RemoveAcceptingSocket(GAIA::NETWORK::AsyncSocket& sock);
@@ -456,21 +476,24 @@ namespace GAIA
 			GAIA::GVOID request_recv(GAIA::NETWORK::AsyncSocket& datasock);
 		#else
 			GAIA::N32 select_kqep(GAIA::N32 nSocket) const;
+			GAIA::GVOID push_for_recycle(GAIA::NETWORK::AsyncSocket& sock);
+			GAIA::GVOID pop_for_recycle(GAIA::NETWORK::AsyncSocket& sock);
 		#endif
 
 		private:
 			GAIA::BL m_bCreated;
 			GAIA::BL m_bBegin;
 			GAIA::NETWORK::AsyncDispatcherDesc m_desc;
+			GAIA::BL m_bLog;
 
 			GAIA::SYNC::LockRW m_rwListenSockets;
-			GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*> m_listen_sockets;
+			__SocketMapType m_listen_sockets;
 			GAIA::SYNC::LockRW m_rwAcceptingSockets;
-			GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*> m_accepting_sockets;
+			__SocketSetType m_accepting_sockets;
 			GAIA::SYNC::LockRW m_rwAcceptedSockets;
-			GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*> m_accepted_sockets;
+			__SocketSetType m_accepted_sockets;
 			GAIA::SYNC::LockRW m_rwConnectedSockets;
-			GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*> m_connected_sockets;
+			__SocketSetType m_connected_sockets;
 
 			GAIA::CTN::Vector<AsyncDispatcherThread*> m_threads;
 			
@@ -480,7 +503,6 @@ namespace GAIA
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::SYNC::LockRW m_rwPostAcceptAble;
 			GAIA::BL m_bPostAcceptAble;
-
 			GAIA::SYNC::LockRW m_rwAsyncCtxEnding;
 		#endif
 		};

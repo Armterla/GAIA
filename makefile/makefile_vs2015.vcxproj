@@ -1339,6 +1339,7 @@
     <ClCompile Include="..\test\t_digit_base64.cpp" />
     <ClCompile Include="..\test\t_digit_diff.cpp" />
     <ClCompile Include="..\test\t_digit_md5.cpp" />
+    <ClCompile Include="..\test\t_digit_percentage.cpp" />
     <ClCompile Include="..\test\t_digit_rc4.cpp" />
     <ClCompile Include="..\test\t_digit_regexp.cpp" />
     <ClCompile Include="..\test\t_digit_rsa.cpp" />

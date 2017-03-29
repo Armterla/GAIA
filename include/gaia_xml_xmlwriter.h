@@ -230,18 +230,17 @@ namespace GAIA
 				switch(m_LastCNT[m_CNTCursor])
 				{
 				case GAIA::XML::XML_NODE_CONTAINER:
-					{
-						this->write("/>", sizeof("/>") - 1);
-					}
+					this->write("/>", sizeof("/>") - 1);
 					break;
 				case GAIA::XML::XML_NODE_MULTICONTAINER:
 					{
 						if(m_bMultiContainerProperting)
 						{
-							this->write(">", sizeof(">") - 1);
+							this->write("></", sizeof("></") - 1);
 							m_bMultiContainerProperting = GAIA::False;
 						}
-						this->write("</", sizeof("</") - 1);
+						else
+							this->write("</", sizeof("</") - 1);
 						NodeName& nn = m_NodeNameStack[m_CNTCursor];
 						this->write(nn.p, nn.len);
 						this->write(">", sizeof(">") - 1);

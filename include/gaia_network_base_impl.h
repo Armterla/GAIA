@@ -31,8 +31,9 @@ namespace GAIA
 	namespace NETWORK
 	{
 		GINL GAIA::BL GetHostName(GAIA::CH* pszResult, const GAIA::N32& size){return gethostname(pszResult, size) != GINVALID;}
-		GINL GAIA::GVOID GetHostIPList(const GAIA::CH* pszHostName, GAIA::CTN::Vector<GAIA::NETWORK::IP>& listResult)
+		GINL GAIA::BL GetHostIPList(const GAIA::CH* pszHostName, GAIA::CTN::Vector<GAIA::NETWORK::IP>& listResult)
 		{
+			GAIA::BL bRet = GAIA::False;
 			hostent* pHostEnt = gethostbyname(pszHostName);
 			if(pHostEnt != GNIL)
 			{
@@ -50,12 +51,36 @@ namespace GAIA
 						ip.u3 = GSCAST(GAIA::U8)(GSCAST(GAIA::U32)((*(GAIA::U32*)addr) & 0xFF000000) >> 24);
 						listResult.push_back(ip);
 						++nIndex;
+						bRet = GAIA::True;
 					}
 					else if(pHostEnt->h_addrtype == AF_INET6)
 					{
 					}
 				}
 			}
+			return bRet;
+		}
+		GINL GAIA::BL GetHostIP(const GAIA::CH* pszHostName, GAIA::NETWORK::IP& ip)
+		{
+			hostent* pHostEnt = gethostbyname(pszHostName);
+			if(pHostEnt == GNIL)
+				return GAIA::False;
+			in_addr* addr = GRCAST(in_addr*)(pHostEnt->h_addr_list[0]);
+			if(addr == GNIL)
+				return GAIA::False;
+			if(pHostEnt->h_addrtype == AF_INET)
+			{
+				ip.reset();
+				ip.u0 = GSCAST(GAIA::U8)(GSCAST(GAIA::U32)((*(GAIA::U32*)addr) & 0x000000FF) >> 0);
+				ip.u1 = GSCAST(GAIA::U8)(GSCAST(GAIA::U32)((*(GAIA::U32*)addr) & 0x0000FF00) >> 8);
+				ip.u2 = GSCAST(GAIA::U8)(GSCAST(GAIA::U32)((*(GAIA::U32*)addr) & 0x00FF0000) >> 16);
+				ip.u3 = GSCAST(GAIA::U8)(GSCAST(GAIA::U32)((*(GAIA::U32*)addr) & 0xFF000000) >> 24);
+			}
+			else
+			{
+				return GAIA::False;
+			}
+			return GAIA::True;
 		}
 		GINL GAIA::GVOID ip2sip(const GAIA::NETWORK::IP& ip, GAIA::GVOID* sa)
 		{

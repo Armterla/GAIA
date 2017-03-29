@@ -391,12 +391,6 @@ namespace GAIA
 			GAST(sSize > 0);
 			if(sSize <= 0)
 				return GINVALID;
-			GAST(pBegin != GNIL);
-			if(pBegin == GNIL)
-				return GINVALID;
-			GAST(pEnd != GNIL);
-			if(pEnd == GNIL)
-				return GINVALID;
 			for(GAIA::NUM x = 0; x < sSize; ++x)
 			{
 				if(pBuf[x] == '<')

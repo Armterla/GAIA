@@ -25,16 +25,11 @@ namespace GAIA
 	namespace NETWORK
 	{
 		/*!
-			@brief Current supported HTTP protocal version.
-		*/
-		static const GAIA::CH* HTTP_VERSION_STRING = "HTTP/1.1";
-
-		/*!
 			@brief HttpServer's access mode.
 
-				If you set HttpServer use BLACK mode, all requests in BLACK list will be deny.
-				If you set HttpServer use WHITE mode, all requests not in WHITE list will be deny.
-				If you set HttpServer use NONE mode, all requests will be accepted.
+				If you set HttpServer use BLACK mode, all requests in BLACK list will be deny.\n
+				If you set HttpServer use WHITE mode, all requests not in WHITE list will be deny.\n
+				If you set HttpServer use NONE mode, all requests will be accepted.\n
 		*/
 		GAIA_ENUM_BEGIN(HTTP_SERVER_BLACKWHITE_MODE)
 			/*!
@@ -115,6 +110,7 @@ namespace GAIA
 				nListenSocketRecvBufferSize = GINVALID;
 				nAcceptedSocketSendBufferSize = GINVALID;
 				nAcceptedSocketRecvBufferSize = GINVALID;
+				lSingleCallbackLimitSize = 64 * 1024;
 			}
 
 			/*!
@@ -154,16 +150,15 @@ namespace GAIA
 					return GAIA::False;
 				if(nAcceptedSocketRecvBufferSize != GINVALID && nAcceptedSocketRecvBufferSize <= 0)
 					return GAIA::False;
+				if(lSingleCallbackLimitSize < 0)
+					return GAIA::False;
 				return GAIA::True;
 			}
 
 		public:
 
 			/*!
-				@brief Specify network thread count.
-
-					Default value is DEFAULT_NETWORK_THREAD_COUNT.
-					You can call HttpServerDesc::reset function to reset to default value.
+				@brief Specify network thread count, default value is DEFAULT_NETWORK_THREAD_COUNT.
 
 				@see DEFAULT_NETWORK_THREAD_COUNT.
 			*/
@@ -204,7 +199,7 @@ namespace GAIA
 			GAIA::U64 uMaxHarfConnTime;
 
 			/*!
-				@brief Specify the max dynamic cache size in bytes, default value is DEFAUL_MAX_DYNAMIC_CACHE_SIZE.
+				@brief Specify the max dynamic cache size in bytes, default value is DEFAULT_MAX_DYNAMIC_CACHE_SIZE.
 
 				@see DEFAULT_MAX_DYNAMIC_CACHE_SIZE.
 			*/
@@ -282,6 +277,13 @@ namespace GAIA
 				@brief Specify the accepted socket's receive buffer size in bytes, default is GINVALID means use system default setting.
 			*/
 			GAIA::N32 nAcceptedSocketRecvBufferSize;
+
+			/*!
+				@brief Specify the single callback limit size, default is 64Kb.
+					When a request size(include head and body) below equal current variable,
+					the HttpServerCallBack::OnRequest will be callbacked when all head and body received complete.
+			*/
+			GAIA::N64 lSingleCallbackLimitSize;
 		};
 
 		/*!
@@ -513,7 +515,7 @@ namespace GAIA
 			GAIA::U64 uEffectTime; // Relative time in microseconds.
 		};
 
-		class HttpAsyncSocket;
+		class HttpServerAsyncSocket;
 		class HttpServerAsyncDispatcher;
 
 		/*!
@@ -523,7 +525,7 @@ namespace GAIA
 		class HttpServerLink : public GAIA::RefObject
 		{
 			friend class HttpServer;
-			friend class HttpAsyncSocket;
+			friend class HttpServerAsyncSocket;
 			friend class HttpServerAsyncDispatcher;
 
 		public:
@@ -608,14 +610,28 @@ namespace GAIA
 			GINL GAIA::NUM GetResponseTimes() const{return m_sResponseTimes;}
 
 			/*!
+				@brief Check the link is receive all request data(include head and body) or not.
+
+				@return If all request data(include head and body) received complete, return GAIA::True, or return GAIA::False.
+			*/
+			GINL GAIA::BL IsReqComplete() const{return m_bReqComplete;}
+
+			/*!
+				@brief Get http error.
+
+				@return Return http error.
+			*/
+			GINL GAIA::NETWORK::HTTP_ERROR GetHttpError() const{return m_httperr;}
+
+			/*!
 				@brief Compare two HttpServerLink.
 
 				@param Specify the second operator for compare.
 
 				@return 
-					If current HttpServerLink below paramter src, return -1.
-					If current HttpServerLink equal paramter src, return 0.
-					If current HttpServerLink above param src, return +1.
+					If current HttpServerLink below paramter src, return -1.\n
+					If current HttpServerLink equal paramter src, return 0.\n
+					If current HttpServerLink above param src, return +1.\n
 			*/
 			GINL GAIA::N32 compare(const HttpServerLink& src) const
 			{
@@ -638,6 +654,8 @@ namespace GAIA
 				m_uAcceptTime = GINVALID;
 				m_sRequestTimes = 0;
 				m_sResponseTimes = 0;
+				m_bReqComplete = GAIA::False;
+				m_httperr = GAIA::NETWORK::HTTP_ERROR_OK;
 			}
 			GINL GAIA::GVOID SetPeerAddr(const GAIA::NETWORK::Addr& addrPeer){m_addrPeer = addrPeer;}
 			GINL GAIA::GVOID SetListenAddr(const GAIA::NETWORK::Addr& addrListen){m_addrListen = addrListen;}
@@ -647,12 +665,14 @@ namespace GAIA
 
 		private:
 			GAIA::NETWORK::HttpServer* m_pSvr;
-			HttpAsyncSocket* m_pSock;
+			HttpServerAsyncSocket* m_pSock;
 			GAIA::NETWORK::Addr m_addrPeer;
 			GAIA::NETWORK::Addr m_addrListen;
 			GAIA::U64 m_uAcceptTime;
 			GAIA::NUM m_sRequestTimes;
 			GAIA::NUM m_sResponseTimes;
+			GAIA::BL m_bReqComplete;
+			GAIA::NETWORK::HTTP_ERROR m_httperr;
 		};
 
 		/*!
@@ -661,19 +681,19 @@ namespace GAIA
 			@remarks
 				The HttpServer's user have responsibility to derive a sub class from HttpServerCallBack,
 				and the sub class's OnRequest virtual function will be called by HttpServer, the user 
-				will get client request information in OnRequest virtual function.
+				will get client request information in OnRequest virtual function.\n
 
 				Current class derived from GAIA::RefObject, so the object will be managed by thread-safe 
-				reference count.
+				reference count.\n
 
 				If you not need use this class's object later, and the class is allocated in Heap,
-				You will call GAIA::RefObject::drop_ref() to decrease the reference count.
+				You will call GAIA::RefObject::drop_ref() to decrease the reference count.\n
 		*/
 		class HttpServerCallBack : public GAIA::RefObject
 		{
 			friend class HttpServerLink;
 			friend class HttpServer;
-			friend class HttpAsyncSocket;
+			friend class HttpServerAsyncSocket;
 			friend class HttpServerAsyncDispatcher;
 
 		public:
@@ -731,12 +751,14 @@ namespace GAIA
 					If the request is be dispatched by the HttpServerCallBack's sub class(HttpServer's user derived),
 					HttpServer's user will return GAIA::True, and then HttpServer will 
 					not callback next HttpServerCallBack's OnRequest which be registed to 
-					HttpServer(By HttpServer::RegistCallBack).
+					HttpServer(By HttpServer::RegistCallBack).\n
 
 					If the request can't be dispatched by current HttpServerCallBack's sub class(HttpServer's user derived),
 					HttpServer's user will return GAIA::False, and then HttpServer will
-					 callback next HttpServerCallBack's OnRequest member function.
-					
+					callback next HttpServerCallBack's OnRequest member function.\n
+
+					If all HttpServerCallBack::OnRequest return GAIA::False, it means this request can't be accepted.
+					HttpServer will response with error code by default.\n
 
 				@remarks
 					This function will be callbacked on multi thread.
@@ -828,7 +850,7 @@ namespace GAIA
 		{
 			friend class HttpServerLink;
 			friend class HttpServerWorkThread;
-			friend class HttpAsyncSocket;
+			friend class HttpServerAsyncSocket;
 			friend class HttpServerAsyncDispatcher;
 
 		public:
@@ -1162,9 +1184,9 @@ namespace GAIA
 			GAIA::BL CollectWhiteList(GAIA::CTN::Vector<GAIA::NETWORK::HttpServerBlackWhiteNode>& listResult) const;
 
 			/*!
-				@brief Get server status.
+				@brief Get http server status.
 
-				@return Return server status.
+				@return Return http server status.
 			*/
 			GINL GAIA::NETWORK::HttpServerStatus& GetStatus(){return m_status;}
 
@@ -1189,11 +1211,11 @@ namespace GAIA
 
 				@remarks
 					Cache is managed by reference count, call this function will cause reference count increase 1,
-					when a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.
+					when a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.\n
 
 					If current function return GAIA::True, current function will lock cache system's read-lock,
 					the HttpServer's user have responsibility to call HttpServer::ReleaseCache to release it(decrease reference count).
-					If not do it like above, the HttpServer will deadlock or memory leak.
+					If not do it like above, the HttpServer will deadlock or memory leak.\n
 			*/
 			GAIA::BL RequestCache(const GAIA::CH* pszKey, GAIA::NUM sKeyLen, GAIA::NETWORK::HttpHead& resphead, GAIA::GVOID** p, GAIA::NUM& sSize);
 
@@ -1217,11 +1239,11 @@ namespace GAIA
 
 				@remarks
 					Cache is managed by reference count, call this function will cause reference count increase 1,
-					when a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.
+					when a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.\n
 
 					If current function return GAIA::True, current function will lock cache system's read-lock,
 					the HttpServer's user have responsibility to call HttpServer::ReleaseCache to release it(decrease reference count).
-					If not do it like above, the HttpServer will deadlock or memory leak.
+					If not do it like above, the HttpServer will deadlock or memory leak.\n
 			*/
 			GAIA::BL RequestCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& reqhead, GAIA::NETWORK::HttpHead& resphead, GAIA::GVOID** p, GAIA::NUM& sSize);
 
@@ -1238,10 +1260,10 @@ namespace GAIA
 
 				@remarks
 					Cache is managed by reference count, call this function will cause reference count decrease 1,
-					When a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.
+					When a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.\n
 
 					If current function return GAIA::True, current function had release the cache system's read-lock
-					which is locked by HttpServer::RequestCache.
+					which is locked by HttpServer::RequestCache.\n
 			*/
 			GAIA::BL ReleaseCache(const GAIA::CH* pszKey, GAIA::NUM sKeyLen);
 
@@ -1257,10 +1279,10 @@ namespace GAIA
 
 				@remarks
 					Cache is managed by reference count, call this function will cause reference count decrease 1,
-					When a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.
+					When a cache's reference count decreased to 0, it will be recycled by HttpServer::RecycleCache function.\n
 
 					If current function return GAIA::True, current function had release the cache system's read-lock
-					which is locked by HttpServer::RequestCache.
+					which is locked by HttpServer::RequestCache.\n
 			*/
 			GAIA::BL ReleaseCache(const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& reqhead);
 
@@ -1326,6 +1348,21 @@ namespace GAIA
 			*/
 			GAIA::NETWORK::HttpServerAsyncDispatcher* GetAsyncDispatcher() const{return m_disp;}
 
+			/*!
+				@brief Enable output log.
+
+				@param bEnable [in] Specify enable or disable output log.
+			*/
+			GINL GAIA::GVOID EnableLog(GAIA::BL bEnable){m_bLog = bEnable;}
+
+			/*!
+				@brief Check is enable or disable output log.
+
+				@return If enable output log, return GAIA::True, return GAIA::False.\m
+					Default is disabled.
+			*/
+			GINL GAIA::BL IsEnableLog() const{return m_bLog;}
+
 		private:
 			GAIA::BL RecycleLink(GAIA::NETWORK::HttpServerLink& l);
 			GAIA::CTN::Buffer* RequestBuffer();
@@ -1341,6 +1378,7 @@ namespace GAIA
 				m_blackwhitemode = GAIA::NETWORK::HTTP_SERVER_BLACKWHITE_MODE_BLACK;
 				m_disp = GNIL;
 				m_status.reset();
+				m_bLog = GAIA::False;
 			}
 
 		private:
@@ -1394,6 +1432,7 @@ namespace GAIA
 			GAIA::NETWORK::HttpServerAsyncDispatcher* m_disp;
 			GAIA::CTN::Vector<GAIA::NETWORK::HttpServerWorkThread*> m_listWorkThreads;
 			GAIA::NETWORK::HttpServerStatus m_status;
+			GAIA::BL m_bLog;
 		};
 	}
 }

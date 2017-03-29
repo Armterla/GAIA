@@ -26,6 +26,8 @@ namespace TEST
 
 	extern GAIA::GVOID t_dbg_perfcollector(GAIA::LOG::Log& logobj)
 	{
+		static const GAIA::NUM SAMPLE_COUNT = 17;
+
 		PerfCallBack cb(logobj);
 		GAIA::DBG::PerfCollector perf;
 		perf.Reset();
@@ -51,7 +53,7 @@ namespace TEST
 		perf.Reset();
 
 		// Multi.
-		for(GAIA::NUM x = 0; x < 100; ++x)
+		for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 		{
 			GAIA::N64 nInstanceID = x;
 			perf.Begin("TestPerfMulti", nInstanceID);
@@ -83,7 +85,7 @@ namespace TEST
 		perf.Reset();
 
 		// Auto.
-		for(GAIA::NUM x = 0; x < 100; ++x)
+		for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 		{
 			GAIA::DBG::PerfCollectorAuto pca(perf, "TestPerfAuto", GINVALID);
 			GAIA::SYNC::gsleep(1);

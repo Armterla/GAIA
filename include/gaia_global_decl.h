@@ -58,6 +58,8 @@ public:
 			GAIA_DELETE_SAFE(m_pFile);
 		}
 	}
+	GINL GAIA::GVOID SetLogFileName(const GAIA::CH* pszFileName){m_strLogFilePathName = pszFileName;}
+	GINL const GAIA::CH* GetLogFileName() const{return m_strLogFilePathName.fptr();}
 	virtual GAIA::BL WriteLog(
 		GAIA::LOG::Log& logobj,
 		const GAIA::TIME::Time& logtime,
@@ -75,15 +77,16 @@ public:
 		if(m_pFile == GNIL)
 		{
 			m_pFile = gnew GAIA::FSYS::File;
-			GAIA::TCH* pszFileName = gnew GAIA::TCH[GAIA::MAXPL];
-			GAIA::ALGO::gstrcpy(pszFileName, g_gaia_appdocdir);
-			GAIA::ALGO::gstrcat(pszFileName, _T("last.log"));
-			if(!m_pFile->Open(pszFileName, GAIA::FSYS::File::OPEN_TYPE_CREATEALWAYS | GAIA::FSYS::File::OPEN_TYPE_WRITE))
+			GAIA::TCH szFileName[GAIA::MAXPL];
+			if(m_strLogFilePathName.empty() || m_strLogFilePathName.size() >= GAIA::MAXPL)
 			{
-				gdel[] pszFileName;
-				return GAIA::False;
+				GAIA::ALGO::gstrcpy(szFileName, g_gaia_appdocdir);
+				GAIA::ALGO::gstrcat(szFileName, _T("last.log"));
 			}
-			gdel[] pszFileName;
+			else
+				GAIA::ALGO::gstrcpy(szFileName, m_strLogFilePathName.fptr());
+			if(!m_pFile->Open(szFileName, GAIA::FSYS::File::OPEN_TYPE_CREATEALWAYS | GAIA::FSYS::File::OPEN_TYPE_WRITE))
+				return GAIA::False;
 		}
 
 		/* Generate the string. */
@@ -111,6 +114,27 @@ public:
 		strTemp += " ";
 		strTemp += logobj.GetLineBreak();
 		strTemp1 = strTemp.toUtf8();
+		if(strTemp1.empty())
+		{
+			strTemp1.reserve(strTemp.size() * 3 + 1);
+			GAIA::NUM srclen = strTemp.size();
+			const GAIA::TCH* p = strTemp.fptr();
+			for(GAIA::NUM x = 0; x < srclen; ++x)
+			{
+				if(p[x] < 0 || p[x] >= 128)
+				{
+					strTemp1 += "$W";
+					strTemp1 += (GAIA::N32)p[x];
+				}
+				else
+				{
+					GAIA::CH szTemp[2];
+					szTemp[0] = p[x];
+					szTemp[1] = '\0';
+					strTemp1 += szTemp;
+				}
+			}
+		}
 		m_pFile->Write(strTemp1.fptr(), strTemp1.size());
 
 		/* Increase index. */
@@ -134,6 +158,7 @@ private:
 private:
 	GAIA::FSYS::File* m_pFile;
 	GAIA::NUM m_sIndex;
+	GAIA::CTN::AString m_strLogFilePathName;
 };
 extern DefaultGAIALogCallBack g_gaia_log_callback;
 

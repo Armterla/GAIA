@@ -12,6 +12,26 @@ namespace GAIA
 	namespace NETWORK
 	{
 		static const GAIA::NUM GAIA_NETWORK_MTU = 1200;
+		static const GAIA::CH GAIA_LOCAL_HOST[] = "localhost";
+		static const GAIA::CH GAIA_LOCAL_HOST_IP[] = "127.0.0.1";
+
+		GAIA_ENUM_BEGIN(NETWORK_ERROR)
+			NETWORK_ERROR_OK,
+			NETWORK_ERROR_UNKNOWN,
+			NETWORK_ERROR_DOMAIN_ANALYSIS_FAILED,
+			NETWORK_ERROR_CONNECT_FAILED,
+			NETWORK_ERROR_LOSTCONNECTION,
+		GAIA_ENUM_END(NETWORK_ERROR)
+
+		static const GAIA::CH* NETWORK_ERROR_STRING[] =
+		{
+			"NetworkErrorInvalid",
+			"NetworkErrorOK",
+			"NetworkErrorUnknown",
+			"NetworkErrorDomainAnalysisFailed",
+			"NetworkErrorConnectFailed",
+			"NetworkErrorLostConnection",
+		};
 
 		/*!
 			@brief Get host name.
@@ -19,9 +39,14 @@ namespace GAIA
 		GINL GAIA::BL GetHostName(GAIA::CH* pszResult, const GAIA::N32& size);
 
 		/*!
-			@brief Get current host ip list.
+			@brief Get host ip list.
 		*/
-		GINL GAIA::GVOID GetHostIPList(const GAIA::CH* pszHostName, GAIA::CTN::Vector<GAIA::NETWORK::IP>& listResult);
+		GINL GAIA::BL GetHostIPList(const GAIA::CH* pszHostName, GAIA::CTN::Vector<GAIA::NETWORK::IP>& listResult);
+
+		/*!
+			@brief Get host ip.
+		*/
+		GINL GAIA::BL GetHostIP(const GAIA::CH* pszHostName, GAIA::NETWORK::IP& ip);
 
 		/*!
 			@brief Convert GAIA IP to socket sockaddr_in.

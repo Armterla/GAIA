@@ -139,6 +139,34 @@ namespace GAIA
 				return GAIA::True;
 			}
 			GINL GAIA::GVOID keep_remain(){this->keep(this->remain());}
+			GINL GAIA::U8* alloc(const _SizeType& size)
+			{
+				if(size == 0)
+					return GNIL;
+				GAST(m_pBack >= m_pWrite);
+				if(this->capacity() - this->write_size() >= size)
+				{
+					GAIA::U8* pRet = m_pWrite;
+					m_pWrite += size;
+					return pRet;
+				}
+				_ExtendType increaser;
+				_SizeType newsize = GAIA::ALGO::gmax(
+					increaser.Increase(this->write_size()),
+					this->write_size() + size);
+				GAIA::U8* pNew = gnew GAIA::U8[newsize];
+				if(m_pWrite != m_pFront)
+					GAIA::ALGO::gmemcpy(pNew, m_pFront, this->write_size());
+				if(m_pFront != GNIL)
+					gdel[] m_pFront;
+				m_pWrite = pNew + this->write_size();
+				m_pRead = pNew + this->read_size();
+				m_pFront = pNew;
+				m_pBack = pNew + newsize;
+				U8* pRet = m_pWrite;
+				m_pWrite += size;
+				return pRet;
+			}
 			GINL GAIA::GVOID write(const GAIA::GVOID* p, const _SizeType& size)
 			{
 				GAST(!!p);
@@ -353,34 +381,6 @@ namespace GAIA
 			GINL operator GAIA::U8*(){return m_pFront;}
 		private:
 			GINL GAIA::GVOID init(){m_pFront = m_pBack = m_pWrite = m_pRead = GNIL;}
-			GINL GAIA::U8* alloc(const _SizeType& size)
-			{
-				if(size == 0)
-					return GNIL;
-				GAST(m_pBack >= m_pWrite);
-				if(this->capacity() - this->write_size() >= size)
-				{
-					GAIA::U8* pRet = m_pWrite;
-					m_pWrite += size;
-					return pRet;
-				}
-				_ExtendType increaser;
-				_SizeType newsize = GAIA::ALGO::gmax(
-					increaser.Increase(this->write_size()),
-					this->write_size() + size);
-				GAIA::U8* pNew = gnew GAIA::U8[newsize];
-				if(m_pWrite != m_pFront)
-					GAIA::ALGO::gmemcpy(pNew, m_pFront, this->write_size());
-				if(m_pFront != GNIL)
-					gdel[] m_pFront;
-				m_pWrite = pNew + this->write_size();
-				m_pRead = pNew + this->read_size();
-				m_pFront = pNew;
-				m_pBack = pNew + newsize;
-				U8* pRet = m_pWrite;
-				m_pWrite += size;
-				return pRet;
-			}
 			GINL GAIA::BL seek_ptr(const _SizeType& size, SEEK_TYPE seektype, GAIA::U8*& p)
 			{
 				switch(seektype)

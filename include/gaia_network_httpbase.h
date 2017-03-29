@@ -24,6 +24,12 @@ namespace GAIA
 {
 	namespace NETWORK
 	{
+		/*!
+			@brief Current supported HTTP protocal version.
+		*/
+		static const GAIA::CH* HTTP_VERSION_STRING = "HTTP/1.1";
+		static const GAIA::U16 HTTP_DEFAULT_PORT = 80;
+
 		// Http method.
 		GAIA_ENUM_BEGIN(HTTP_METHOD)
 			HTTP_METHOD_PUT,
@@ -48,6 +54,19 @@ namespace GAIA
 			"OPTIONS",	// HTTP_METHOD_OPTIONS
 			"TRACE",	// HTTP_METHOD_TRACE
 			"CONNECT",	// HTTP_METHOD_CONNECT
+		};
+
+		static const GAIA::NUM HTTP_METHOD_STRING_LEN[] =
+		{
+			7, // "INVALID",	// HTTP_METHOD_INVALID
+			3, // "PUT",		// HTTP_METHOD_PUT
+			4, // "POST",		// HTTP_METHOD_POST
+			3, // "GET",		// HTTP_METHOD_GET
+			4, // "HEAD",		// HTTP_METHOD_HEAD
+			6, // "DELETE",		// HTTP_METHOD_DELETE
+			7, // "OPTIONS",	// HTTP_METHOD_OPTIONS
+			5, // "TRACE",		// HTTP_METHOD_TRACE
+			7, // "CONNECT",	// HTTP_METHOD_CONNECT
 		};
 
 		// Http code declaration here.
@@ -533,6 +552,30 @@ namespace GAIA
 			HTTP_HEADNAME_WWWAUTHENTICATE,
 		};
 
+		GAIA_ENUM_BEGIN(HTTP_ERROR)
+			HTTP_ERROR_OK,
+			HTTP_ERROR_UNKNOWN,
+			HTTP_ERROR_NOTSUPPORTMETHOD,
+			HTTP_ERROR_NOTSUPPORTVERSION,
+			HTTP_ERROR_INVALIDURL,
+			HTTP_ERROR_INVALIDHEADKVPAIRS,
+			HTTP_ERROR_INVALIDHEAD,
+			HTTP_ERROR_TOOLARGEHEAD,
+		GAIA_ENUM_END(HTTP_ERROR)
+
+		static const GAIA::CH* HTTP_ERROR_STRING[] =
+		{
+			"HTTP_ERROR_INVALID",
+			"HTTP_ERROR_OK",
+			"HTTP_ERROR_UNKNOWN",
+			"HTTP_ERROR_NOTSUPPORTMETHOD",
+			"HTTP_ERROR_NOTSUPPORTVERSION",
+			"HTTP_ERROR_INVALIDURL",
+			"HTTP_ERROR_INVALIDHEADKVPAIRS",
+			"HTTP_ERROR_INVALIDHEAD",
+			"HTTP_ERROR_TOOLARGEHEAD",
+		};
+
 		/*!
 			@brief Http url management class.
 
@@ -932,7 +975,8 @@ namespace GAIA
 
 				@param pResultSize [out] Used for saving the result protocal string's size in characters(without '\0').
 
-				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.\n
+					If parameter psz is GNIL, current function return GNIL, and parameter pResultSize will be filled result length.\n
 			*/
 			GINL GAIA::CH* GetProtocal(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
@@ -951,7 +995,8 @@ namespace GAIA
 
 				@param pResultSize [out] Use for saving the result protocal string's size in characters(without '\0').
 
-				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.\n
+					If parameter psz is GNIL, current function return GNIL, and parameter pResultSize will be filled result length.\n
 			*/
 			GINL GAIA::CH* GetHostName(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
@@ -970,13 +1015,28 @@ namespace GAIA
 
 				@param pResultSize [out] Used for saving the result port string's size in characters(without '\0').
 
-				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.\n
+					If parameter psz is GNIL, current function return GNIL, and parameter pResultSize will be filled result length.\n
 			*/
 			GINL GAIA::CH* GetPort(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
 				if(!GCCAST(HttpURL*)(this)->Analyze())
 					return GNIL;
 				return this->get_analyzed_node(m_port, psz, sMaxSize, pResultSize);
+			}
+
+			/*!
+				@brief Get integer port in HttpURL.
+
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return 0.
+			*/
+			GINL GAIA::U16 GetPort() const
+			{
+				GAIA::CH szPort[32];
+				GAIA::CH* pszPort = this->GetPort(szPort, sizeof(szPort));
+				if(pszPort == GNIL)
+					return 0;
+				return GAIA::ALGO::acasts(pszPort);
 			}
 
 			/*!
@@ -989,13 +1049,68 @@ namespace GAIA
 
 				@param pResultSize [out] Used for saving the result paths string's size in characters(without '\0').
 
-				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.\n
+					If parameter psz is GNIL, current function return GNIL, and parameter pResultSize will be filled result length.\n
 			*/
 			GINL GAIA::CH* GetPath(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
 				if(!GCCAST(HttpURL*)(this)->Analyze())
 					return GNIL;
 				return this->get_analyzed_node(m_path, psz, sMaxSize, pResultSize);
+			}
+
+			/*!
+				@brief Get relative part.
+
+				@param psz [out] Used for saving the relative part string.
+
+				@param sMaxSize [in] Specify parameter psz's max size in characters.
+					If it is GINVALID, means parameter psz's buffer size is enough.
+
+				@param pResultSize [out] Used for saving the result relative part string's size in characters(without '\0').
+
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.\n
+					If parameter psz is GNIL, current function return GNIL, and parameter pResultSize will be filled result length.\n
+			*/
+			GINL GAIA::CH* GetRelativePart(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return GNIL;
+				Node n;
+				n.psz = m_path.psz;
+				if(m_path.psz == GNIL)
+					n.sLen = 0;
+				else
+					n.sLen = m_url.size() - (GAIA::NUM)(m_path.psz - m_url.fptr());
+				return this->get_analyzed_node(n, psz, sMaxSize, pResultSize);
+			}
+
+			/*!
+				@brief Get relative part.
+
+				@return Return relative part.
+
+				@remarks If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.\n
+			*/
+			GINL const GAIA::CH* GetRelativePart() const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return GNIL;
+				return m_path.psz;
+			}
+
+			/*!
+				@brief Get relative part length in characters.
+
+				@return Return relative part length in characters.
+			*/
+			GINL GAIA::NUM GetRelativePartLength() const
+			{
+				if(!GCCAST(HttpURL*)(this)->Analyze())
+					return GNIL;
+				if(m_path.psz == GNIL)
+					return 0;
+				return m_url.size() - (GAIA::NUM)(m_path.psz - m_url.fptr());
 			}
 
 			/*!
@@ -1008,7 +1123,8 @@ namespace GAIA
 
 				@param pResultSize [out] Used for saving the result parameters string's size in characters(without '\0').
 
-				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.\n
+					If parameter psz is GNIL, current function return GNIL, and parameter pResultSize will be filled result length.\n
 			*/
 			GINL GAIA::CH* GetFullParam(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
@@ -1027,7 +1143,8 @@ namespace GAIA
 
 				@param pResultSize [out] Used for saving the result queries string's size in characters(without '\0').
 
-				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.\n
+					If parameter psz is GNIL, current function return GNIL, and parameter pResultSize will be filled result length.\n
 			*/
 			GINL GAIA::CH* GetFullQuery(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
@@ -1046,7 +1163,8 @@ namespace GAIA
 
 				@param pResultSize [out] Used for saving the result fragment string's size in characters(without '\0').
 
-				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.
+				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.\n
+					If parameter psz is GNIL, current function return GNIL, and parameter pResultSize will be filled result length.\n
 			*/
 			GINL GAIA::CH* GetFragment(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
@@ -1095,7 +1213,8 @@ namespace GAIA
 
 				@param pResultSize [out] Used for saving the result parameter's size in characters(without '\0').
 
-				@return If get the parameter successfully, return GAIA::True, or will return GAIA::False.
+				@return If get the parameter successfully, return GAIA::True, or will return GAIA::False.\n
+					If parameter psz is GNIL, current function return GNIL, and parameter pResultSize will be filled result length.\n
 			*/
 			GINL GAIA::BL GetParam(GAIA::NUM sIndex, GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
@@ -1329,10 +1448,12 @@ namespace GAIA
 				}
 				else
 				{
-					if(sMaxSize != GINVALID && n.sLen >= sMaxSize)
-						return GNIL;
 					if(pResultSize != GNIL)
 						*pResultSize = n.sLen;
+					if(sMaxSize != GINVALID && n.sLen >= sMaxSize)
+						return GNIL;
+					if(n.psz == GNIL)
+						return GNIL;
 					GAIA::ALGO::gstrcpy(psz, n.psz, n.sLen);
 					return psz;
 				}
@@ -1773,6 +1894,41 @@ namespace GAIA
 				*ppName = (GAIA::CH*)n.pszName;
 				*ppValue = (GAIA::CH*)n.pszValue;
 				return GAIA::True;
+			}
+
+			/*!
+				@brief Get the Name-Value pair's value by a name.
+
+				@param pszName [in] Specify the Name-Value pair's name.
+
+				@return If Name-Value pair is exist which specified by parameter pszName,
+					current function call will success, and return the value string,
+					or will return GNIL.
+
+				@remarks If the Name-Value pair list is not sorted, this function will loop check every node match the parameter pszName,
+					If the Name-Value pair list is sorted, this function will binary search the matched node by parameter pszName.
+			*/
+			GINL const GAIA::CH* GetValueByName(const GAIA::CH* pszName) const
+			{
+				GAST(!GAIA::ALGO::gstremp(pszName));
+				Node nfinder;
+				nfinder.pszName = pszName;
+				if(m_bSorted)
+				{
+					GAIA::NUM sFinded = m_nodes.binary_search(nfinder);
+					if(sFinded >= 0)
+						return m_nodes[sFinded].pszValue;
+				}
+				else
+				{
+					for(GAIA::NUM x = 0; x < m_nodes.size(); ++x)
+					{
+						const Node& n = m_nodes[x];
+						if(n == nfinder)
+							return n.pszValue;
+					}
+				}
+				return GNIL;
 			}
 
 			/*!

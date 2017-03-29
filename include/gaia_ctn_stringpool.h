@@ -1,4 +1,4 @@
-#ifndef 	__GAIA_CTN_STRINGPOOL_H__
+﻿#ifndef 	__GAIA_CTN_STRINGPOOL_H__
 #define 	__GAIA_CTN_STRINGPOOL_H__
 
 #include "gaia_type.h"
@@ -158,11 +158,11 @@ namespace GAIA
 		private:
 			GINL GAIA::GVOID destroy_content_all()
 			{
-				typename __NodeSetType::it it = m_nodeset.frontit();
-				for(; !it.empty(); ++it)
+				for(typename __NodeSetType::it it = m_nodeset.frontit(); !it.empty(); )
 				{
-					NodeCmp& n = *it;
-					gdel[] n.data;
+					_DataType* p = (*it).data;
+					it.erase();
+					gdel[] p;
 				}
 			}
 		private:

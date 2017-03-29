@@ -33,20 +33,22 @@ namespace GAIA
 			}
 			GINL GAIA::GVOID clear()
 			{
-				for(typename __NodesType::it it = m_nodes.frontit(); !it.empty(); ++it)
+				for(typename __NodesType::it it = m_nodes.frontit(); !it.empty(); )
 				{
-					Node& n = *it;
-					gdel[] n.data;
+					_DataType* p = (*it).data;
+					it.erase();
+					gdel[] p;
 				}
 				m_nodelist.clear();
 				m_nodes.clear();
 			}
 			GINL GAIA::GVOID destroy()
 			{
-				for(typename __NodesType::it it = m_nodes.frontit(); !it.empty(); ++it)
+				for(typename __NodesType::it it = m_nodes.frontit(); !it.empty(); )
 				{
-					Node& n = *it;
-					gdel[] n.data;
+					_DataType* p = (*it).data;
+					it.erase();
+					gdel[] p;
 				}
 				m_nodelist.destroy();
 				m_nodes.destroy();

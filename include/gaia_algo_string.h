@@ -12,8 +12,8 @@ namespace GAIA
 	{
 		template<typename _DataType> _DataType tolower(const _DataType& c){if(c >= 'A' && c <= 'Z') return c - 'A' + 'a'; return c;}
 		template<typename _DataType> _DataType toupper(const _DataType& c){if(c >= 'a' && c <= 'z') return c - 'a' + 'A'; return c;}
-		template<typename _DataType> _DataType tolowers(_DataType p){GAST(!!p); _DataType ret = p; while(*p != '\0'){*p = GAIA::ALGO::tolower(*p);p++;} return ret;}
-		template<typename _DataType> _DataType touppers(_DataType p){GAST(!!p); _DataType ret = p; while(*p != '\0'){*p = GAIA::ALGO::toupper(*p);p++;} return ret;}
+		template<typename _DataType> _DataType tolowers(_DataType p){GAST(!!p); _DataType ret = p; while(*p != '\0'){*p = GAIA::ALGO::tolower(*p); p++;} return ret;}
+		template<typename _DataType> _DataType touppers(_DataType p){GAST(!!p); _DataType ret = p; while(*p != '\0'){*p = GAIA::ALGO::toupper(*p); p++;} return ret;}
 		template<typename _DataType> GAIA::BL islower(const _DataType& c){return c >= 'a' && c <= 'z';}
 		template<typename _DataType> GAIA::BL isupper(const _DataType& c){return c >= 'A' && c <= 'Z';}
 		template<typename _DataType> GAIA::BL isexistlower(_DataType p){GAST(!!p); while(*p != '\0'){if(GAIA::ALGO::islower(*p)) return GAIA::True; p++;} return GAIA::False;}
@@ -399,6 +399,20 @@ namespace GAIA
 			GAST(!!p2);
 			return GAIA::ALGO::gstricmp(p1, p2) == 0;
 		}
+		template<typename _DataType1, typename _DataType2, typename _SizeType>
+		GAIA::BL gstrequal(_DataType1 p1, _DataType2 p2, _SizeType size)
+		{
+			GAST(!!p1);
+			GAST(!!p2);
+			return GAIA::ALGO::gstrcmp(p1, p2, size) == 0;
+		}
+		template<typename _DataType1, typename _DataType2, typename _SizeType>
+		GAIA::BL gstriequal(_DataType1 p1, _DataType2 p2, _SizeType size)
+		{
+			GAST(!!p1);
+			GAST(!!p2);
+			return GAIA::ALGO::gstricmp(p1, p2, size) == 0;
+		}
 		template<typename _DataType1, typename _DataType2>
 		_DataType1 gstrstr(_DataType1 p1, _DataType2 p2)
 		{
@@ -732,6 +746,65 @@ namespace GAIA
 				return GNIL;
 			*pTemp = '\0';
 			return p;
+		}
+		template<typename _DstDataType> _DstDataType hex2ch(GAIA::U8 u, _DstDataType pDst, GAIA::NUM sDstLen)
+		{
+			GAST(!!pDst);
+			GAST(sDstLen >= 3);
+
+			// Calculate high 4 bit.
+			GAIA::U8 u0 = (u >> 4) & 0x0F;
+			if(u0 < 10)
+				pDst[0] = '0' + u0;
+			else
+				pDst[0] = 'A' + u0 - 10;
+
+			// Calculate low 4 bit.
+			GAIA::U8 u1 = u & 0x0F;
+			if(u1 < 10)
+				pDst[1] = '0' + u1;
+			else
+				pDst[1] = 'A' + u1 - 10;
+
+			//
+			pDst[2] = '\0';
+
+			return pDst;
+		}
+		template<typename _SrcDataType> GAIA::U8 ch2hex(_SrcDataType pSrc, GAIA::NUM sSrcLen)
+		{
+			GAST(!!pSrc);
+			GAST(sSrcLen >= 2);
+
+			// Calculate high 4 bit.
+			GAIA::U8 u0;
+			if(pSrc[0] >= '0' && pSrc[0] <= '9')
+				u0 = pSrc[0] - '0';
+			else if(pSrc[0] >= 'a' && pSrc[0] <= 'f')
+				u0 = pSrc[0] - 'a' + 10;
+			else if(pSrc[0] >= 'A' && pSrc[0] <= 'F')
+				u0 = pSrc[0] - 'A' + 10;
+			else
+			{
+				GASTFALSE;
+				u0 = 0;
+			}
+
+			// Calculate low 4 bit.
+			GAIA::U8 u1;
+			if(pSrc[1] >= '0' && pSrc[1] <= '9')
+				u1 = pSrc[1] - '0';
+			else if(pSrc[1] >= 'a' && pSrc[1] <= 'f')
+				u1 = pSrc[1] - 'a' + 10;
+			else if(pSrc[1] >= 'A' && pSrc[1] <= 'F')
+				u1 = pSrc[1] - 'A' + 10;
+			else
+			{
+				GASTFALSE;
+				u1 = 0;
+			}
+
+			return GSCAST(GAIA::U8)((u0 << 4) + u1);
 		}
 		template<typename _SrcDataType, typename _DstDataType>
 		_DstDataType int2str(const _SrcDataType& src, _DstDataType pDst)

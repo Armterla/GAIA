@@ -1,4 +1,4 @@
-#ifndef		__GAIA_ALLOCATOR_LEAKDETECTOR_H__
+﻿#ifndef		__GAIA_ALLOCATOR_LEAKDETECTOR_H__
 #define		__GAIA_ALLOCATOR_LEAKDETECTOR_H__
 
 #include "gaia_type.h"
@@ -49,8 +49,8 @@ namespace GAIA
 					nAllocTimesSum = 0;
 					nReleaseSizeSum = 0;
 					nReleaseTimesSum = 0;
-					nMinAllocSize = GAIA::N64MAX;
-					nMaxAllocSize = GAIA::N64MIN;
+					nMinAllocSize = +(GAIA::N64)0x4000000000000000;
+					nMaxAllocSize = -(GAIA::N64)0x4000000000000000;
 				}
 				GINL GAIA::BL isreset() const
 				{
@@ -62,9 +62,9 @@ namespace GAIA
 						return GAIA::False;
 					if(nReleaseTimesSum != 0)
 						return GAIA::False;
-					if(nMinAllocSize != GAIA::N64MAX)
+					if(nMinAllocSize != +(GAIA::N64)0x4000000000000000)
 						return GAIA::False;
-					if(nMaxAllocSize != GAIA::N64MIN)
+					if(nMaxAllocSize != -(GAIA::N64)0x4000000000000000)
 						return GAIA::False;
 					return GAIA::True;
 				}

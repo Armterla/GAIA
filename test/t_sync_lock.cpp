@@ -9,7 +9,7 @@ namespace TEST
 		GINL ThdLock(){this->init();}
 		virtual GAIA::GVOID Run()
 		{
-			for(GAIA::NUM x = 0; x < 100; ++x)
+			for(GAIA::NUM x = 0; x < 10; ++x)
 			{
 				GAIA::SYNC::Autolock al(*m_pLock);
 				for(GAIA::NUM y = 0; y < 10; ++y)
@@ -37,7 +37,7 @@ namespace TEST
 		GINL ThdLockPure(){this->init();}
 		virtual GAIA::GVOID Run()
 		{
-			for(GAIA::NUM x = 0; x < 100; ++x)
+			for(GAIA::NUM x = 0; x < 10; ++x)
 			{
 				GAIA::SYNC::AutolockPure al(*m_pLock);
 				for(GAIA::NUM y = 0; y < 10; ++y)
@@ -61,7 +61,7 @@ namespace TEST
 		GINL ThdLockW(){this->init();}
 		virtual GAIA::GVOID Run()
 		{
-			for(GAIA::NUM x = 0; x < 100; ++x)
+			for(GAIA::NUM x = 0; x < 10; ++x)
 			{
 				GAIA::SYNC::AutolockW al(*m_pLockRW);
 				for(GAIA::NUM y = 0; y < 10; ++y)
@@ -69,7 +69,7 @@ namespace TEST
 					GAIA::SYNC::AutolockW al(*m_pLockRW);
 					for(GAIA::NUM z = 0; z < 10; ++z)
 					{
-						GAIA::SYNC::AutolockW al(*m_pLockRW);
+						GAIA::SYNC::AutolockRW al(*m_pLockRW, GAIA::False);
 						*m_p += 1;
 					}
 				}
@@ -89,14 +89,14 @@ namespace TEST
 		GINL ThdLockR(){this->init();}
 		virtual GAIA::GVOID Run()
 		{
-			for(GAIA::NUM x = 0; x < 100; ++x)
+			for(GAIA::NUM x = 0; x < 10; ++x)
 			{
 				GAIA::SYNC::AutolockR al(*m_pLockRW);
 				for(GAIA::NUM y = 0; y < 10; ++y)
 				{
 					GAIA::SYNC::AutolockR al(*m_pLockRW);
 					for(GAIA::NUM z = 0; z < 10; ++z)
-						GAIA::SYNC::AutolockR al(*m_pLockRW);
+						GAIA::SYNC::AutolockRW al(*m_pLockRW, GAIA::True);
 				}
 			}
 		}
@@ -129,7 +129,7 @@ namespace TEST
 				t[x].Start();
 			for(GAIA::NUM x = 0; x < THREAD_COUNT; ++x)
 				t[x].Wait();
-			if(u != THREAD_COUNT * 10000)
+			if(u != THREAD_COUNT * 1000)
 				TERROR;
 		}
 
@@ -148,7 +148,7 @@ namespace TEST
 				t[x].Start();
 			for(GAIA::NUM x = 0; x < THREAD_COUNT; ++x)
 				t[x].Wait();
-			if(u != THREAD_COUNT * 10000)
+			if(u != THREAD_COUNT * 1000)
 				TERROR;
 		}
 		
@@ -188,7 +188,7 @@ namespace TEST
 				tW[x].Wait();
 				tR[x].Wait();
 			}
-			if(u != THREAD_COUNT * 10000)
+			if(u != THREAD_COUNT * 1000)
 				TERROR;
 		}
 	}

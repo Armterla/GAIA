@@ -212,6 +212,7 @@ namespace TEST
 				addr.uPort = 9010 + x;
 				listAddrs.push_back(addr);
 				SUDPSocketImpl* pSock = gnew SUDPSocketImpl;
+				pSock->EnableLog(TMODULE_LOG_ENABLED);
 				pSock->Create();
 				pSock->Bind(addr);
 				pSock->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
@@ -339,7 +340,7 @@ namespace TEST
 							continue;
 
 						if(sRecvCount % 10 == 0)
-							logobj << "\tRecvMsg Count = " << sRecvCount << logobj.End();
+							GLOG << "\tRecvMsg Count = " << sRecvCount << GEND;
 						sRecvCount++;
 
 						SUDPSocketRecv& sockrecv = listRecv[x];

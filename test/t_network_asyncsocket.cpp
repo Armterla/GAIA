@@ -59,6 +59,7 @@ namespace TEST
 			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, 1024 * 1024);
 			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, 1024 * 1024);
 			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
+			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEADDR, GAIA::True);
 		#else
 			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY, GAIA::True);
 		#endif
@@ -235,6 +236,7 @@ namespace TEST
 
 			GAIA::NETWORK::AsyncDispatcher disp;
 			TAST(!disp.IsCreated());
+			disp.EnableLog(TMODULE_LOG_ENABLED);
 
 			TAST(disp.Create(descDisp));
 			{

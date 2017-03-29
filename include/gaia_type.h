@@ -617,6 +617,169 @@ namespace GAIA
 #endif
 
 	static const GAIA::NUM THREAD_STACK_SIZE = 1024 * 1024;
+
+	static const GAIA::CH ascii[128] =
+	{
+		/* 1-8 */
+		'\0', //	'\0'	NUL(null)
+		1	, //			SOH(start of headline)
+		2	, //			STX(start of text)
+		3	, //			ETX(end of text)
+		4	, //			EOT(end of transmission)
+		5	, //			ENQ(enquiry)
+		6	, //			ACK(acknowledge)
+		7	, //			BEL(bell)
+
+		/* 9-16 */
+		8	, //			BS(backspace)
+		9	, //			HT(horizontal tab)
+		10	, //	'\n'	LF(NL line feed, new line)
+		11	, //			VT(vertical tab)
+		12	, //			FF(NP form feed, new page)
+		13	, //	'\r'	CR(carriage return)
+		14	, //			SO(shift out)
+		15	, //			SI(shift in)
+
+		/* 17-24 */
+		16	, //			DLE(data link escape)
+		17	, //			DC1(device control 1)
+		18	, //			DC2(device control 2)
+		19	, //			DC3(device control 3)
+		20	, //			DC4(device control 4)
+		21	, //			NAK(negative acknowledge)
+		22	, //			SYN(synchronous idle)
+		23	, //			ETB(end of trans. block)
+
+		/* 25-32 */
+		24	, //			CAN(cancel)
+		25	, //			EM(end of medium)
+		26	, //			SUB(substitute)
+		27	, //			ESC(escape)
+		28	, //			FS(file separator)
+		29	, //			GS(group separator)
+		30	, //			RS(record separator)
+		31	, //			US(unit separator)
+
+		/* 33-40 */
+		' '	, //	' '		(space)
+		'!'	, //	'!'		CH
+		'\"', //	'\"'	CH
+		'#'	, //	'#'		CH
+		'$'	, //	'$'		CH
+		'%'	, //	'%'		CH
+		'&'	, //	'&'		CH
+		'\''	, //	'\''	CH
+
+		/* 41-48 */
+		'('	, //	'('		CH
+		')'	, //	')'		CH
+		'*'	, //	'*'		CH
+		'+'	, //	'+'		CH
+		','	, //	','		CH
+		'-'	, //	'-'		CH
+		'.'	, //	'.'		CH
+		'/'	, //	'/'		CH
+
+		/* 49-56 */
+		'0'	, //	'0'		CH
+		'1'	, //	'1'		CH
+		'2'	, //	'2'		CH
+		'3'	, //	'3'		CH
+		'4'	, //	'4'		CH
+		'5'	, //	'5'		CH
+		'6'	, //	'6'		CH
+		'7'	, //	'7'		CH
+
+		/* 57-64 */
+		'8'	, //	'8'		CH
+		'9'	, //	'9'		CH
+		':'	, //	':'		CH
+		';'	, //	';'		CH
+		'<'	, //	'<'		CH
+		'='	, //	'='		CH
+		'>'	, //	'>'		CH
+		'?'	, //	'?'		CH
+
+		/* 65-72 */
+		'@'	, //	'@'		CH
+		'A'	, //	'A'		CH
+		'B'	, //	'B'		CH
+		'C'	, //	'C'		CH
+		'D'	, //	'D'		CH
+		'E'	, //	'E'		CH
+		'F'	, //	'F'		CH
+		'G'	, //	'G'		CH
+
+		/* 73-80 */
+		'H'	, //	'H'		CH
+		'I'	, //	'I'		CH
+		'J'	, //	'J'		CH
+		'K'	, //	'K'		CH
+		'L'	, //	'L'		CH
+		'M'	, //	'M'		CH
+		'N'	, //	'N'		CH
+		'O'	, //	'O'		CH
+
+		/* 81-88 */
+		'P'	, //	'P'		CH
+		'Q'	, //	'Q'		CH
+		'R'	, //	'R'		CH
+		'S'	, //	'S'		CH
+		'T'	, //	'T'		CH
+		'U'	, //	'U'		CH
+		'V'	, //	'V'		CH
+		'W'	, //	'W'		CH
+
+		/* 89-96 */
+		'X'	, //	'X'		CH
+		'Y'	, //	'Y'		CH
+		'Z'	, //	'Z'		CH
+		'['	, //	'['		CH
+		'\\', //	'\\'	CH
+		']'	, //	']'		CH
+		'^'	, //	'^'		CH
+		'_'	, //	'_'		CH
+
+		/* 97-104 */
+		'`'	, //	'`'		CH
+		'a'	, //	'a'		CH
+		'b'	, //	'b'		CH
+		'c'	, //	'c'		CH
+		'd'	, //	'd'		CH
+		'e'	, //	'e'		CH
+		'f'	, //	'f'		CH
+		'g'	, //	'g'		CH
+
+		/* 105-112 */
+		'h'	, //	'h'		CH
+		'i'	, //	'i'		CH
+		'j'	, //	'j'		CH
+		'k'	, //	'k'		CH
+		'l'	, //	'l'		CH
+		'm'	, //	'm'		CH
+		'n'	, //	'n'		CH
+		'o'	, //	'o'		CH
+
+		/* 113-120 */
+		'p'	, //	'p'		CH
+		'q'	, //	'q'		CH
+		'r'	, //	'r'		CH
+		's'	, //	's'		CH
+		't'	, //	't'		CH
+		'u'	, //	'u'		CH
+		'v'	, //	'v'		CH
+		'w'	, //	'w'		CH
+
+		/* 121-128 */
+		'x'	, //	'x'		CH
+		'y'	, //	'y'		CH
+		'z'	, //	'z'		CH
+		'{'	, //	'{'		CH
+		'|'	, //	'|'		CH
+		'}'	, //	'}'		CH
+		'~'	, //	'~'		CH
+		127	, //			DEL(delete)
+	};
 }
 
 namespace GAIA{namespace MSYS{class HeapESG; class LeakDetector;}}
