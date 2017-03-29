@@ -1,4 +1,4 @@
-#include "preheader.h"
+﻿#include "preheader.h"
 #include "t_common.h"
 
 namespace TEST
@@ -122,24 +122,27 @@ namespace TEST
 			}
 		}
 
+		static const GAIA::CH* K1 = "HelloWorld";
+		static const GAIA::CH* K2 = "HelloKitty";
+		static const GAIA::CH* K3 = "HelloGAIA";
 		GAIA::CTN::HashMap<const GAIA::CH*, GAIA::N32> hmbystr;
-		if(!hmbystr.insert("HelloWorld", 0))
+		if(!hmbystr.insert(K1, 0))
 			TERROR;
-		if(!hmbystr.insert("HelloKitty", 1))
+		if(!hmbystr.insert(K2, 1))
 			TERROR;
-		if(!hmbystr.insert("HelloGAIA", 2))
+		if(!hmbystr.insert(K3, 2))
 			TERROR;
-		GAIA::N32* pFinded = hmbystr.find("HelloWorld");
+		GAIA::N32* pFinded = hmbystr.find(K1);
 		if(pFinded == GNIL)
 			TERROR;
 		else if(*pFinded != 0)
 			TERROR;
-		pFinded = hmbystr.find("HelloKitty");
+		pFinded = hmbystr.find(K2);
 		if(pFinded == GNIL)
 			TERROR;
 		else if(*pFinded != 1)
 			TERROR;
-		pFinded = hmbystr.find("HelloGAIA");
+		pFinded = hmbystr.find(K3);
 		if(pFinded == GNIL)
 			TERROR;
 		else if(*pFinded != 2)

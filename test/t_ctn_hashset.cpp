@@ -1,4 +1,4 @@
-#include "preheader.h"
+﻿#include "preheader.h"
 #include "t_common.h"
 
 namespace TEST
@@ -125,27 +125,30 @@ namespace TEST
 			}
 		}
 
+		static const GAIA::CH* K1 = "HelloWorld";
+		static const GAIA::CH* K2 = "HelloKitty";
+		static const GAIA::CH* K3 = "HelloGAIA";
 		GAIA::CTN::HashSet<const GAIA::CH*> hsbystr;
-		if(!hsbystr.insert("HelloWorld"))
+		if(!hsbystr.insert(K1))
 			TERROR;
-		if(!hsbystr.insert("HelloKitty"))
+		if(!hsbystr.insert(K2))
 			TERROR;
-		if(!hsbystr.insert("HelloGAIA"))
+		if(!hsbystr.insert(K3))
 			TERROR;
-		const GAIA::CH** ppFinded = hsbystr.find("HelloWorld");
+		const GAIA::CH** ppFinded = hsbystr.find(K1);
 		if(ppFinded == GNIL)
 			TERROR;
-		else if(!GAIA::ALGO::gstrequal(*ppFinded, "HelloWorld"))
+		else if(!GAIA::ALGO::gstrequal(*ppFinded, K1))
 			TERROR;
-		ppFinded = hsbystr.find("HelloKitty");
+		ppFinded = hsbystr.find(K2);
 		if(ppFinded == GNIL)
 			TERROR;
-		else if(!GAIA::ALGO::gstrequal(*ppFinded, "HelloKitty"))
+		else if(!GAIA::ALGO::gstrequal(*ppFinded, K2))
 			TERROR;
-		ppFinded = hsbystr.find("HelloGAIA");
+		ppFinded = hsbystr.find(K3);
 		if(ppFinded == GNIL)
 			TERROR;
-		else if(!GAIA::ALGO::gstrequal(*ppFinded, "HelloGAIA"))
+		else if(!GAIA::ALGO::gstrequal(*ppFinded, K3))
 			TERROR;
 	}
 }
