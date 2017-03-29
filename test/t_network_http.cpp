@@ -200,6 +200,8 @@ namespace TEST
 		static const GAIA::CH* TEST_URL = "http://www.qu.la/book/176/143187.html";
 		static const GAIA::CH* TEST_HOST = "www.qu.la";
 		static const GAIA::NUM SAMPLE_COUNT = 10;
+		static const GAIA::NUM NETWORK_THREAD_COUNT = GINVALID;
+		static const GAIA::NUM WORK_THREAD_COUNT = GINVALID;
 
 		GAIA::NETWORK::HttpServerDesc descServer;
 		descServer.reset();
@@ -211,6 +213,10 @@ namespace TEST
 		descServer.nListenSocketRecvBufferSize = 1024 * 64;
 		descServer.nAcceptedSocketSendBufferSize = 1024 * 64;
 		descServer.nAcceptedSocketRecvBufferSize = 1024 * 64;
+		if(NETWORK_THREAD_COUNT != GINVALID)
+			descServer.sNetworkThreadCount = NETWORK_THREAD_COUNT;
+		if(WORK_THREAD_COUNT != GINVALID)
+			descServer.sWorkThreadCount = WORK_THREAD_COUNT;
 		GAIA::NETWORK::HttpServer svr;
 		GAIA::NETWORK::HttpServerCallBackForInfo cbi(svr);
 		GAIA::NETWORK::HttpServerCallBackForStaticResource cbsf(svr);
@@ -274,6 +280,10 @@ namespace TEST
 					descHttp.bEnableSocketReuseAddr = GAIA::True;
 					descHttp.nSocketSendBufferSize = 1024 * 4;
 					descHttp.nSocketRecvBufferSize = 1024 * 64;
+					if(NETWORK_THREAD_COUNT != GINVALID)
+						descHttp.sNetworkThreadCount = NETWORK_THREAD_COUNT;
+					if(WORK_THREAD_COUNT != GINVALID)
+						descHttp.sWorkThreadCount = WORK_THREAD_COUNT;
 					TAST(http.Create(descHttp));
 					{
 						((GAIA::NETWORK::AsyncDispatcher*)http.GetAsyncDispatcher())->EnableLog(GAIA::True);
