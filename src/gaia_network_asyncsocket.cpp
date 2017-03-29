@@ -55,8 +55,10 @@ namespace GAIA
 			}
 
 			//
+		#if GAIA_OS != GAIA_OS_WINDOWS
 			if(m_pReadAsyncCtx != GNIL && m_pReadAsyncCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
 				m_pDispatcher->pop_for_recycle(*this);
+		#endif
 
 			//
 			if(m_socktype == GAIA::NETWORK::ASYNC_SOCKET_TYPE_ACCEPTING)
@@ -114,23 +116,26 @@ namespace GAIA
 					 &dwBytes, GNIL, GNIL);
 		#else
 			m_sock.Create(GAIA::NETWORK::Socket::SOCKET_TYPE_STREAM);
-		#endif
-
 			m_nBackupSocket = m_sock.GetFD();
+		#endif
 
 			this->OnCreated(GAIA::True);
 		}
 
 		GAIA::GVOID AsyncSocket::Close()
 		{
+		#if GAIA_OS != GAIA_OS_WINDOWS
 			m_pDispatcher->push_for_recycle(*this);
+		#endif
 			m_sock.Close();
 			this->OnClosed(GAIA::True);
 		}
 
 		GAIA::GVOID AsyncSocket::Shutdown(GAIA::N32 nShutdownFlag)
 		{
+		#if GAIA_OS != GAIA_OS_WINDOWS
 			m_pDispatcher->push_for_recycle(*this);
+		#endif
 			m_sock.Shutdown(nShutdownFlag);
 			this->OnShutdowned(GAIA::True, nShutdownFlag);
 		}

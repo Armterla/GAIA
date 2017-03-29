@@ -91,7 +91,7 @@ namespace GAIA
 		protected:
 			virtual GAIA::GVOID OnCreated(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnClosed(GAIA::BL bResult){}
-			virtual GAIA::GVOID OnBound(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){GASTFALSE;}
+			virtual GAIA::GVOID OnBound(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
 			virtual GAIA::GVOID OnConnected(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr)
 			{
 				// Check state and parameter.
