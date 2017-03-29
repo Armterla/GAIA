@@ -1,4 +1,4 @@
-#include <gaia_type.h>
+﻿#include <gaia_type.h>
 #include <gaia_assert.h>
 #include <gaia_sync_base.h>
 #ifdef GAIA_DEBUG_MEMORYLEAK
@@ -485,8 +485,12 @@ namespace GAIA
 			{
 				if(m_pSock->IsCreated())
 				{
-					m_pSock->Shutdown();
-					m_pSock->Close();
+					GTRY
+					{
+						m_pSock->Shutdown();
+						m_pSock->Close();
+					}
+					GCATCHALL{}
 				}
 				m_pSock->drop_ref();
 				m_pSock = GNIL;

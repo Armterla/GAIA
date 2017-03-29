@@ -1,4 +1,4 @@
-#include <gaia_type.h>
+﻿#include <gaia_type.h>
 #include <gaia_assert.h>
 #include <gaia_sync_base.h>
 #include <gaia_time.h>
@@ -1341,12 +1341,15 @@ namespace GAIA
 					}
 
 					// Close socket.
-					GTRY
+					if(pSocket->IsCreated())
 					{
-						pSocket->Shutdown();
-						pSocket->Close();
+						GTRY
+						{
+							pSocket->Shutdown();
+							pSocket->Close();
+						}
+						GCATCHALL{}
 					}
-					GCATCHALL{}
 
 					// Release.
 					pSocket->drop_ref();
@@ -1441,12 +1444,15 @@ namespace GAIA
 				// Unreference socket.
 				if(req.m_pSock != GNIL)
 				{
-					GTRY
+					if(req.m_pSock->IsCreated())
 					{
-						req.m_pSock->Shutdown();
-						req.m_pSock->Close();
+						GTRY
+						{
+							req.m_pSock->Shutdown();
+							req.m_pSock->Close();
+						}
+						GCATCHALL{}
 					}
-					GCATCHALL{}
 					req.m_pSock->drop_ref();
 				}
 
