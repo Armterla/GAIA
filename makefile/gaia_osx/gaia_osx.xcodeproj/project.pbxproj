@@ -312,6 +312,11 @@
 		3B3119D51E6D3652009462C1 /* preheader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B3119581E6D3652009462C1 /* preheader.cpp */; };
 		3B3119D81E6D36CD009462C1 /* libiconv.2.4.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B3119D71E6D36CD009462C1 /* libiconv.2.4.0.tbd */; };
 		3BD7F6891E8A939E002B7E52 /* t_digit_percentage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BD7F6881E8A939E002B7E52 /* t_digit_percentage.cpp */; };
+		3BF28B781E8BE22800265CB5 /* t_digit_aes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF28B771E8BE22800265CB5 /* t_digit_aes.cpp */; };
+		3BF28B7B1E8BE25E00265CB5 /* t_xml_xmlwriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF28B791E8BE25E00265CB5 /* t_xml_xmlwriter.cpp */; };
+		3BF28B7C1E8BE25E00265CB5 /* t_xml_xmlreader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF28B7A1E8BE25E00265CB5 /* t_xml_xmlreader.cpp */; };
+		3BF28B7F1E8BE26F00265CB5 /* t_json_jsonwriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF28B7D1E8BE26F00265CB5 /* t_json_jsonwriter.cpp */; };
+		3BF28B801E8BE26F00265CB5 /* t_json_jsonreader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BF28B7E1E8BE26F00265CB5 /* t_json_jsonreader.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -966,6 +971,11 @@
 		3B3119581E6D3652009462C1 /* preheader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = preheader.cpp; path = ../../../test/preheader.cpp; sourceTree = "<group>"; };
 		3B3119D71E6D36CD009462C1 /* libiconv.2.4.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.4.0.tbd; path = usr/lib/libiconv.2.4.0.tbd; sourceTree = SDKROOT; };
 		3BD7F6881E8A939E002B7E52 /* t_digit_percentage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_digit_percentage.cpp; path = ../../../test/t_digit_percentage.cpp; sourceTree = "<group>"; };
+		3BF28B771E8BE22800265CB5 /* t_digit_aes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_digit_aes.cpp; path = ../../../test/t_digit_aes.cpp; sourceTree = "<group>"; };
+		3BF28B791E8BE25E00265CB5 /* t_xml_xmlwriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_xml_xmlwriter.cpp; path = ../../../test/t_xml_xmlwriter.cpp; sourceTree = "<group>"; };
+		3BF28B7A1E8BE25E00265CB5 /* t_xml_xmlreader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_xml_xmlreader.cpp; path = ../../../test/t_xml_xmlreader.cpp; sourceTree = "<group>"; };
+		3BF28B7D1E8BE26F00265CB5 /* t_json_jsonwriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_json_jsonwriter.cpp; path = ../../../test/t_json_jsonwriter.cpp; sourceTree = "<group>"; };
+		3BF28B7E1E8BE26F00265CB5 /* t_json_jsonreader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_json_jsonreader.cpp; path = ../../../test/t_json_jsonreader.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1532,6 +1542,11 @@
 		3B3118D81E6D363E009462C1 /* test */ = {
 			isa = PBXGroup;
 			children = (
+				3BF28B7D1E8BE26F00265CB5 /* t_json_jsonwriter.cpp */,
+				3BF28B7E1E8BE26F00265CB5 /* t_json_jsonreader.cpp */,
+				3BF28B791E8BE25E00265CB5 /* t_xml_xmlwriter.cpp */,
+				3BF28B7A1E8BE25E00265CB5 /* t_xml_xmlreader.cpp */,
+				3BF28B771E8BE22800265CB5 /* t_digit_aes.cpp */,
 				3BD7F6881E8A939E002B7E52 /* t_digit_percentage.cpp */,
 				3B3118D91E6D3652009462C1 /* tperf_msys_heapesg.cpp */,
 				3B3118DA1E6D3652009462C1 /* tperf_ctn.cpp */,
@@ -1764,6 +1779,7 @@
 				3B31189D1E6D358D009462C1 /* pcre16_jit_compile.c in Sources */,
 				3B31184C1E6D358D009462C1 /* hpdf_encoder_cnt.c in Sources */,
 				3B3119781E6D3652009462C1 /* t_math_random.cpp in Sources */,
+				3BF28B7B1E8BE25E00265CB5 /* t_xml_xmlwriter.cpp in Sources */,
 				3B3118B41E6D358D009462C1 /* pcre32_jit_compile.c in Sources */,
 				3B3119991E6D3652009462C1 /* t_digit_base64.cpp in Sources */,
 				3B3118981E6D358D009462C1 /* pcre16_dfa_exec.c in Sources */,
@@ -1815,6 +1831,7 @@
 				3B31189F1E6D358D009462C1 /* pcre16_newline.c in Sources */,
 				3B3119831E6D3652009462C1 /* t_math_argb.cpp in Sources */,
 				3B3119B91E6D3652009462C1 /* t_ctn_hashset.cpp in Sources */,
+				3BF28B7F1E8BE26F00265CB5 /* t_json_jsonwriter.cpp in Sources */,
 				3B3119AC1E6D3652009462C1 /* t_ctn_stackbitset.cpp in Sources */,
 				3B3119B31E6D3652009462C1 /* t_ctn_ptr.cpp in Sources */,
 				3B3118BF1E6D358D009462C1 /* pcre32_valid_utf32.c in Sources */,
@@ -1838,6 +1855,7 @@
 				3B31197C1E6D3652009462C1 /* t_math_mtx43.cpp in Sources */,
 				3B3118691E6D358D009462C1 /* hpdf_mmgr.c in Sources */,
 				3B3118431E6D358D009462C1 /* hpdf_array.c in Sources */,
+				3BF28B7C1E8BE25E00265CB5 /* t_xml_xmlreader.cpp in Sources */,
 				3B31186B1E6D358D009462C1 /* hpdf_namedict.c in Sources */,
 				3B31186E1E6D358D009462C1 /* hpdf_objects.c in Sources */,
 				3B3118AC1E6D358D009462C1 /* pcre32_chartables.c in Sources */,
@@ -1845,6 +1863,7 @@
 				3B3118481E6D358D009462C1 /* hpdf_dict.c in Sources */,
 				3B31183E1E6D358D009462C1 /* gzlib.c in Sources */,
 				3B3118541E6D358D009462C1 /* hpdf_exdata.c in Sources */,
+				3BF28B781E8BE22800265CB5 /* t_digit_aes.cpp in Sources */,
 				3B3119B21E6D3652009462C1 /* t_ctn_queue.cpp in Sources */,
 				3B3119B41E6D3652009462C1 /* t_ctn_pool.cpp in Sources */,
 				3B3118C11E6D358D009462C1 /* pcre32_xclass.c in Sources */,
@@ -1902,6 +1921,7 @@
 				3B3118251E6D358D009462C1 /* adler32.c in Sources */,
 				3B3118A41E6D358D009462C1 /* pcre16_study.c in Sources */,
 				3B3118281E6D358D009462C1 /* crc32.c in Sources */,
+				3BF28B801E8BE26F00265CB5 /* t_json_jsonreader.cpp in Sources */,
 				3B3119891E6D3652009462C1 /* t_iterator.cpp in Sources */,
 				3B3119C71E6D3652009462C1 /* t_ctn_avltree.cpp in Sources */,
 				3B3119771E6D3652009462C1 /* t_math_vec2.cpp in Sources */,
