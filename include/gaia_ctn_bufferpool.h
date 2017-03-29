@@ -1,4 +1,4 @@
-#ifndef		__GAIA_CTN_BUFFERPOOL_H__
+﻿#ifndef		__GAIA_CTN_BUFFERPOOL_H__
 #define		__GAIA_CTN_BUFFERPOOL_H__
 
 #include "gaia_type.h"
@@ -160,12 +160,14 @@ namespace GAIA
 		private:
 			GINL GAIA::GVOID destroy_content_all()
 			{
-				for(typename __NodeSet::it it = m_nodeset.frontit(); !it.empty(); ++it)
+				for(typename __NodeSet::it it = m_nodeset.frontit(); !it.empty(); )
 				{
 					NodeCmp& nc = *it;
 					GAST(nc.data != GNIL);
 					GAST(nc.datasize >= 0);
-					gdel[] nc.data;
+					GAIA::U8* p = nc.data;
+					it.erase();
+					gdel[] p;
 				}
 			}
 		private:

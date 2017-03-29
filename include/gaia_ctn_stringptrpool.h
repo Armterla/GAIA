@@ -53,15 +53,17 @@ namespace GAIA
 			}
 			GINL GAIA::GVOID destroy()
 			{
-				for(typename __NodesType::it it = m_nodes.frontit(); !it.empty(); ++it)
+				for(typename __NodesType::it it = m_nodes.frontit(); !it.empty(); )
 				{
-					Node& n = *it;
-					gdel[] n.data;
+					_DataType* p = (*it).data;
+					it.erase();
+					gdel[] p;
 				}
-				for(typename __FreesType::it it = m_frees.frontit(); !it.empty(); ++it)
+				for(typename __FreesType::it it = m_frees.frontit(); !it.empty(); )
 				{
-					NodeByLen& n = *it;
-					gdel[] n.data;
+					_DataType* p = (*it).data;
+					it.erase();
+					gdel[] p;
 				}
 				m_nodelist.destroy();
 				m_freestack.destroy();
@@ -151,8 +153,9 @@ namespace GAIA
 						break;
 					NodeByLen& n = *it;
 					recyclesize -= n.len;
-					gdel[] n.data;
+					_DataType* p = n.data;
 					it.erase();
+					gdel[] p;
 				}
 			}
 			GINL GAIA::GVOID recycle_bycount(_SizeType recyclecount)
@@ -164,16 +167,18 @@ namespace GAIA
 						break;
 					NodeByLen& n = *it;
 					recyclecount--;
-					gdel[] n.data;
+					_DataType* p = n.data;
 					it.erase();
+					gdel[] p;
 				}
 			}
 			GINL GAIA::GVOID recycle()
 			{
-				for(typename __FreesType::it it = m_frees.frontit(); !it.empty(); ++it)
+				for(typename __FreesType::it it = m_frees.frontit(); !it.empty(); )
 				{
-					NodeByLen& n = *it;
-					gdel[] n.data;
+					_DataType* p = (*it).data;
+					it.erase();
+					gdel[] p;
 				}
 				m_frees.clear();
 			}
