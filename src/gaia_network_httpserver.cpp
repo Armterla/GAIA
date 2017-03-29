@@ -86,6 +86,7 @@ namespace GAIA
 			virtual GAIA::GVOID OnBound(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
 			virtual GAIA::GVOID OnConnected(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr)
 			{
+				GASTFALSE;
 				if(bResult)
 				{
 					if(m_pSvr->m_bLog)
@@ -107,6 +108,7 @@ namespace GAIA
 			}
 			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult)
 			{
+				//
 				{
 					GAIA::SYNC::Autolock al(m_lr);
 					if(m_pLink == GNIL)
@@ -118,15 +120,22 @@ namespace GAIA
 						GDEV << "[HttpSvr] HttpServerAsyncSocket::OnDisconnected " << szAddressPeer << GEND;
 					}
 				}
-				m_pSvr->RecycleLink(*m_pLink);
+
+				//
+				m_bClosed = GAIA::True;
+				m_pLink->rise_ref();
+				GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
+				m_pSvr->m_rclinks.push_back(m_pLink);
+				m_pLink = GNIL;
 			}
 			virtual GAIA::GVOID OnListened(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnAccepted(GAIA::BL bResult, const GAIA::NETWORK::Addr& addrListen){}
 			virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nPracticeSize, GAIA::N32 nSize)
 			{
+				GAIA::BL bNeedCallBackToRecycle = GAIA::False;
 				if(!bResult)
-					return;
-				GAIA::BL bNeedRecycleLink = GAIA::False;
+					bNeedCallBackToRecycle = GAIA::True;
+				else
 				{
 					GAIA::SYNC::Autolock al(m_lr);
 					if(m_pLink == GNIL)
@@ -139,15 +148,28 @@ namespace GAIA
 					}
 					GAIA::N64 uRemain = (m_aNeedSendSize -= nPracticeSize);
 					if(uRemain == 0 && m_bClosed)
-						bNeedRecycleLink = GAIA::True;
+						bNeedCallBackToRecycle = GAIA::True;
 				}
-				if(bNeedRecycleLink)
-					m_pSvr->RecycleLink(*m_pLink);
+				if(bNeedCallBackToRecycle)
+				{
+					m_bClosed = GAIA::True;
+					m_pLink->rise_ref();
+					GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
+					m_pSvr->m_rclinks.push_back(m_pLink);
+					m_pLink = GNIL;
+				}
 			}
 			virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize)
 			{
 				if(!bResult)
+				{
+					m_bClosed = GAIA::True;
+					m_pLink->rise_ref();
+					GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
+					m_pSvr->m_rclinks.push_back(m_pLink);
+					m_pLink = GNIL;
 					return;
+				}
 				if(m_pSvr->m_bLog)
 				{
 					GAIA::CH szAddressPeer[32];
