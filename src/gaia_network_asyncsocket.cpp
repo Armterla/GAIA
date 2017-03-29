@@ -116,6 +116,8 @@ namespace GAIA
 			m_sock.Create(GAIA::NETWORK::Socket::SOCKET_TYPE_STREAM);
 		#endif
 
+			m_nBackupSocket = m_sock.GetFD();
+
 			this->OnCreated(GAIA::True);
 		}
 
@@ -326,6 +328,7 @@ namespace GAIA
 			m_pReadAsyncCtx = GNIL;
 			m_pWriteAsyncCtx = GNIL;
 			m_uRecycleTime = 0;
+			m_nBackupSocket = GINVALID;
 		#endif
 		}
 	}

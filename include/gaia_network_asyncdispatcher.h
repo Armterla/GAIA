@@ -504,9 +504,6 @@ namespace GAIA
 			GAIA::SYNC::LockRW m_rwPostAcceptAble;
 			GAIA::BL m_bPostAcceptAble;
 			GAIA::SYNC::LockRW m_rwAsyncCtxEnding;
-		#else
-			GAIA::SYNC::Lock m_lrNeedRecycleSockets;
-			__SocketSetType m_needrecycle_sockets;
 		#endif
 		};
 	}

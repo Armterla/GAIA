@@ -318,6 +318,7 @@ namespace GAIA
 			AsyncContext* m_pReadAsyncCtx;
 			AsyncContext* m_pWriteAsyncCtx;
 			GAIA::U64 m_uRecycleTime;
+			GAIA::N32 m_nBackupSocket;
 		#endif
 		};
 	}
