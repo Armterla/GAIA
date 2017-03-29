@@ -55,6 +55,10 @@ namespace GAIA
 			}
 
 			//
+			if(m_pReadAsyncCtx != GNIL && m_pReadAsyncCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
+				m_pDispatcher->pop_for_recycle(*this);
+
+			//
 			if(m_socktype == GAIA::NETWORK::ASYNC_SOCKET_TYPE_ACCEPTING)
 				m_pDispatcher->RemoveAcceptingSocket(*this);
 			else if(m_socktype == GAIA::NETWORK::ASYNC_SOCKET_TYPE_ACCEPTED)
@@ -112,17 +116,21 @@ namespace GAIA
 			m_sock.Create(GAIA::NETWORK::Socket::SOCKET_TYPE_STREAM);
 		#endif
 
+			m_nBackupSocket = m_sock.GetFD();
+
 			this->OnCreated(GAIA::True);
 		}
 
 		GAIA::GVOID AsyncSocket::Close()
 		{
+			m_pDispatcher->push_for_recycle(*this);
 			m_sock.Close();
 			this->OnClosed(GAIA::True);
 		}
 
 		GAIA::GVOID AsyncSocket::Shutdown(GAIA::N32 nShutdownFlag)
 		{
+			m_pDispatcher->push_for_recycle(*this);
 			m_sock.Shutdown(nShutdownFlag);
 			this->OnShutdowned(GAIA::True, nShutdownFlag);
 		}
@@ -196,7 +204,14 @@ namespace GAIA
 			struct kevent ke;
 			EV_SET(&ke, this->GetFD(), EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, pCtx);
 			GAIA::NUM sResult = kevent(kqep, &ke, 1, GNIL, 0, GNIL);
-			GAST(sResult != GINVALID);
+			if(sResult == GINVALID)
+			{
+				if(m_pDispatcher->IsEnableLog())
+				{
+					GAIA::N32 nErr = errno;
+					GERR << "[AsyncSocket] AsyncSocket::Connect: kevent call failed, errno = " << nErr << GEND;
+				}
+			}
 
 			m_sock.Connect(addr);
 		#elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
@@ -285,7 +300,14 @@ namespace GAIA
 				struct kevent ke;
 				EV_SET(&ke, this->GetFD(), EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, m_pWriteAsyncCtx);
 				GAIA::NUM sResult = kevent(kqep, &ke, 1, GNIL, 0, GNIL);
-				GAST(sResult != GINVALID);
+				if(sResult == GINVALID)
+				{
+					if(m_pDispatcher->IsEnableLog())
+					{
+						GAIA::N32 nErr = errno;
+						GERR << "[AsyncSocket] AsyncSocket::Send: kevent call failed, errno = " << nErr << GEND;
+					}
+				}
 		#	elif GAIA_OS == GAIA_OS_LINUX || GAIA_OS == GAIA_OS_ANDROID
 
 		#	endif
@@ -305,6 +327,8 @@ namespace GAIA
 		#else
 			m_pReadAsyncCtx = GNIL;
 			m_pWriteAsyncCtx = GNIL;
+			m_uRecycleTime = 0;
+			m_nBackupSocket = GINVALID;
 		#endif
 		}
 	}

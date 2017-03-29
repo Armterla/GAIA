@@ -111,16 +111,19 @@ namespace GAIA
 				{
 					GAIA::CH szTemp[32];
 					addr.tostring(szTemp);
-					GDEV << "[Http] HttpRequest::OnConnected: Connected to " << szTemp << GEND;
+					GDEV << "[Http] HttpAsyncSocket::OnConnected: Connected to " << szTemp << GEND;
 				}
 
 				// Change state.
 				{
+					GAIA::SYNC::Autolock al(m_pRequest->m_lrState);
+
 					// Remove from connecting list.
 					{
 						GAIA::SYNC::Autolock al(m_pHttp->m_lrConnectingList);
 						GAIA::BL bEraseResult = m_pHttp->m_connectinglist.erase(m_pRequest);
-						GAST(bEraseResult);
+						if(!bEraseResult && m_pHttp->m_bLog)
+							GERR << "[Http] HttpAsyncSocket::OnConnected: Erase request from connecting list failed!" << GEND;
 					}
 
 					// Insert to requesting list.
@@ -131,7 +134,8 @@ namespace GAIA
 						GAIA::SYNC::Autolock al(m_pHttp->m_lrRequestingList);
 						m_pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_REQUESTING;
 						GAIA::BL bInsertResult = m_pHttp->m_requestinglist.insert(m_pRequest);
-						GAST(bInsertResult);
+						if(!bInsertResult && m_pHttp->m_bLog)
+							GERR << "[Http] HttpAsyncSocket::OnConnected: Insert request to requesting list failed!" << GEND;
 					}
 				}
 			}
@@ -155,7 +159,7 @@ namespace GAIA
 					GAIA::N64 lExpectSize = m_pRequest->m_lExpectRespBodySize;
 					if(lExpectSize == GINVALID)
 						lExpectSize = 0;
-					GDEV << "[Http] HttpRequest::OnDisconnected: Disconnected progress " << m_pRequest->m_lRecvedSize << "/" << m_pRequest->m_sTotalRespHeadSize + lExpectSize << GEND;
+					GDEV << "[Http] HttpAsyncSocket::OnDisconnected: Disconnected progress " << m_pRequest->m_lRecvedSize << "/" << m_pRequest->m_sTotalRespHeadSize + lExpectSize << GEND;
 				}
 
 				//
@@ -181,7 +185,7 @@ namespace GAIA
 				GAST(m_pRequest != GNIL);
 
 				if(m_pHttp->m_bLog)
-					GDEV << "[Http] HttpRequest::OnSent: Sent " << nPracticeSize << " bytes, progress " << m_pRequest->m_lSentSize << "/" << m_pRequest->m_lSendingSize << GEND;
+					GDEV << "[Http] HttpAsyncSocket::OnSent: Sent " << nPracticeSize << " bytes, progress " << m_pRequest->m_lSentSize << "/" << m_pRequest->m_lSendingSize << GEND;
 
 				// Callback.
 				m_pRequest->OnSent(m_pRequest->m_lSentSize, pData, nPracticeSize);
@@ -208,17 +212,21 @@ namespace GAIA
 				}
 
 				// Change state.
-				GAST(m_pRequest->m_lSentSize <= m_pRequest->m_lSendingSize);
+				if(m_pRequest->m_lSentSize > m_pRequest->m_lSendingSize && m_pHttp->m_bLog)
+					GERR << "[Http] HttpAsyncSocket::OnSent: SentSize above sending size, " << m_pRequest->m_lSentSize << ">" << m_pRequest->m_lSendingSize << GEND;
 				if(m_pRequest->m_bHeadSendingComplete && m_pRequest->m_bBodySendingComplete &&
 				   m_pRequest->m_lSentSize == m_pRequest->m_lSendingSize)
 				{
 					if(m_pRequest->GetState() == GAIA::NETWORK::HTTP_REQUEST_STATE_REQUESTING)
 					{
+						GAIA::SYNC::Autolock al(m_pRequest->m_lrState);
+
 						// Remove from requesting list.
 						{
 							GAIA::SYNC::Autolock al(m_pHttp->m_lrRequestingList);
 							GAIA::BL bEraseResult = m_pHttp->m_requestinglist.erase(m_pRequest);
-							GAST(bEraseResult);
+							if(!bEraseResult && m_pHttp->m_bLog)
+								GERR << "[Http] HttpAsyncSocket::OnSent: Erase request from requesting list failed!" << GEND;
 						}
 
 						// Insert to waiting list.
@@ -229,7 +237,8 @@ namespace GAIA
 							GAIA::SYNC::Autolock al(m_pHttp->m_lrWaitingList);
 							m_pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_WAITING;
 							GAIA::BL bInsertResult = m_pHttp->m_waitinglist.insert(m_pRequest);
-							GAST(bInsertResult);
+							if(!bInsertResult && m_pHttp->m_bLog)
+								GERR << "[Http] HttpAsyncSocket::OnSent: Insert request to waiting list failed!" << GEND;
 						}
 					}
 					else
@@ -257,27 +266,31 @@ namespace GAIA
 				if(m_pHttp->m_bLog)
 				{
 					if(m_pRequest->m_lExpectRespBodySize == GINVALID)
-						GDEV << "[Http] HttpRequest::OnRecved: Received " << nSize << " bytes, progress " << m_pRequest->m_lRecvedSize + nSize << "/" << "?" << GEND;
+						GDEV << "[Http] HttpAsyncSocket::OnRecved: Received " << nSize << " bytes, progress " << m_pRequest->m_lRecvedSize + nSize << "/" << "?" << GEND;
 					else
-						GDEV << "[Http] HttpRequest::OnRecved: Received " << nSize << " bytes, progress " << m_pRequest->m_lRecvedSize + nSize << "/" << m_pRequest->m_sTotalRespHeadSize + m_pRequest->m_lExpectRespBodySize << GEND;
+						GDEV << "[Http] HttpAsyncSocket::OnRecved: Received " << nSize << " bytes, progress " << m_pRequest->m_lRecvedSize + nSize << "/" << m_pRequest->m_sTotalRespHeadSize + m_pRequest->m_lExpectRespBodySize << GEND;
 				}
 
 				// Change state.
 				if(m_pRequest->m_lRecvedSize == 0)
 				{
+					GAIA::SYNC::Autolock al(m_pRequest->m_lrState);
+
 					if(m_pRequest->GetState() == GAIA::NETWORK::HTTP_REQUEST_STATE_REQUESTING)
 					{
 						// Remove from requesting list.
 						GAIA::SYNC::Autolock al(m_pHttp->m_lrRequestingList);
 						GAIA::BL bEraseResult = m_pHttp->m_requestinglist.erase(m_pRequest);
-						GAST(bEraseResult);
+						if(!bEraseResult && m_pHttp->m_bLog)
+							GERR << "[Http] HttpAsyncSocket::OnRecved: Erase request from requesting list failed!" << GEND;
 					}
 					else if(m_pRequest->GetState() == GAIA::NETWORK::HTTP_REQUEST_STATE_WAITING)
 					{
 						// Remove from waiting list.
 						GAIA::SYNC::Autolock al(m_pHttp->m_lrWaitingList);
 						GAIA::BL bEraseResult = m_pHttp->m_waitinglist.erase(m_pRequest);
-						GAST(bEraseResult);
+						if(!bEraseResult && m_pHttp->m_bLog)
+							GERR << "[Http] HttpAsyncSocket::OnRecved: Erase request from waiting list failed!" << GEND;
 					}
 					else
 						GASTFALSE;
@@ -290,7 +303,8 @@ namespace GAIA
 						GAIA::SYNC::Autolock al(m_pHttp->m_lrResponsingList);
 						m_pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_RESPONSING;
 						GAIA::BL bInsertResult = m_pHttp->m_responsinglist.insert(m_pRequest);
-						GAST(bInsertResult);
+						if(!bInsertResult && m_pHttp->m_bLog)
+							GERR << "[Http] HttpAsyncSocket::OnRecved: Insert request to responsing list failed!" << GEND;
 					}
 				}
 
@@ -383,7 +397,7 @@ namespace GAIA
 						{
 							m_pRequest->m_lExpectRespBodySize = GAIA::ALGO::acasts(pszContentLength);
 							if(m_pHttp->m_bLog)
-								GDEV << "[Http] HttpRequest::OnRecved: Content length is " << pszContentLength << GEND;
+								GDEV << "[Http] HttpAsyncSocket::OnRecved: Content length is " << pszContentLength << GEND;
 						}
 
 						// Callback head.
@@ -405,11 +419,14 @@ namespace GAIA
 					if(m_pRequest->m_lExpectRespBodySize != GINVALID &&
 					   m_pRequest->m_lRecvedSize - m_pRequest->m_sTotalRespHeadSize >= m_pRequest->m_lExpectRespBodySize)
 					{
+						GAIA::SYNC::Autolock al(m_pRequest->m_lrState);
+
 						// Remove from responsing list.
 						{
 							GAIA::SYNC::Autolock al(m_pHttp->m_lrResponsingList);
 							GAIA::BL bEraseResult = m_pHttp->m_responsinglist.erase(m_pRequest);
-							GAST(bEraseResult);
+							if(!bEraseResult && m_pHttp->m_bLog)
+								GERR << "[Http] HttpAsyncSocket::OnRecved: Erase request from responsing list failed!" << GEND;
 						}
 
 						// Insert to complete list.
@@ -420,7 +437,8 @@ namespace GAIA
 							GAIA::SYNC::Autolock al(m_pHttp->m_lrCompleteList);
 							m_pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_COMPLETE;
 							GAIA::BL bInsertResult = m_pHttp->m_completelist.insert(m_pRequest);
-							GAST(bInsertResult);
+							if(!bInsertResult && m_pHttp->m_bLog)
+								GERR << "[Http] HttpAsyncSocket::OnRecved: Insert request to complete list failed!" << GEND;
 						}
 					}
 				}
@@ -435,6 +453,12 @@ namespace GAIA
 			}
 			GINL GAIA::GVOID SwapToCompleteList()
 			{
+				//
+				GAIA::SYNC::Autolock al(m_pRequest->m_lrState);
+
+				//
+				m_pRequest->m_bSwapToCompleteList = GAIA::True;
+
 				// Remove from old list.
 				switch(m_pRequest->GetState())
 				{
@@ -442,28 +466,32 @@ namespace GAIA
 					{
 						GAIA::SYNC::Autolock al(m_pHttp->m_lrConnectingList);
 						GAIA::BL bEraseResult = m_pHttp->m_connectinglist.erase(m_pRequest);
-						GAST(bEraseResult);
+						if(!bEraseResult && m_pHttp->m_bLog)
+							GERR << "[Http] HttpAsyncSocket::SwapToCompleteList: Erase request from connecting list failed!" << GEND;
 					}
 					break;
 				case GAIA::NETWORK::HTTP_REQUEST_STATE_REQUESTING:
 					{
 						GAIA::SYNC::Autolock al(m_pHttp->m_lrRequestingList);
 						GAIA::BL bEraseResult = m_pHttp->m_requestinglist.erase(m_pRequest);
-						GAST(bEraseResult);
+						if(!bEraseResult && m_pHttp->m_bLog)
+							GERR << "[Http] HttpAsyncSocket::SwapToCompleteList: Erase request from requesting list failed!" << GEND;
 					}
 					break;
 				case GAIA::NETWORK::HTTP_REQUEST_STATE_WAITING:
 					{
 						GAIA::SYNC::Autolock al(m_pHttp->m_lrWaitingList);
 						GAIA::BL bEraseResult = m_pHttp->m_waitinglist.erase(m_pRequest);
-						GAST(bEraseResult);
+						if(!bEraseResult && m_pHttp->m_bLog)
+							GERR << "[Http] HttpAsyncSocket::SwapToCompleteList: Erase request from waiting list failed!" << GEND;
 					}
 					break;
 				case GAIA::NETWORK::HTTP_REQUEST_STATE_RESPONSING:
 					{
 						GAIA::SYNC::Autolock al(m_pHttp->m_lrResponsingList);
 						GAIA::BL bEraseResult = m_pHttp->m_responsinglist.erase(m_pRequest);
-						GAST(bEraseResult);
+						if(!bEraseResult && m_pHttp->m_bLog)
+							GERR << "[Http] HttpAsyncSocket::SwapToCompleteList: Erase request from responsing list failed!" << GEND;
 					}
 					break;
 				default:
@@ -475,7 +503,8 @@ namespace GAIA
 				{
 					GAIA::SYNC::Autolock al(m_pHttp->m_lrCompleteList);
 					GAIA::BL bInsertResult = m_pHttp->m_completelist.insert(m_pRequest);
-					GAST(bInsertResult);
+					if(!bInsertResult && m_pHttp->m_bLog)
+						GERR << "[Http] HttpAsyncSocket::SwapToCompleteList: Insert request to complete list failed!" << GEND;
 				}
 			}
 
@@ -609,21 +638,26 @@ namespace GAIA
 
 			m_uRequestTime = GAIA::TIME::tick_time();
 
-			// Request thread magic index.
 			{
-				GAIA::SYNC::Autolock al(m_pHttp->m_lrCurrentThreadMagicIndex);
-				m_uThreadMagicIndex = m_pHttp->m_uCurrentThreadMagicIndex++;
-			}
+				GAIA::SYNC::Autolock al(m_lrState);
 
-			// Push to pending list.
-			{
-				GAST(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING);
-				this->OnState(GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING);
+				// Request thread magic index.
+				{
+					GAIA::SYNC::Autolock al(m_pHttp->m_lrCurrentThreadMagicIndex);
+					m_uThreadMagicIndex = m_pHttp->m_uCurrentThreadMagicIndex++;
+				}
 
-				GAIA::SYNC::Autolock al(m_pHttp->m_lrPendingList);
-				m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING;
-				GAIA::BL bInsertResult = m_pHttp->m_pendinglist.insert(this);
-				GAST(bInsertResult);
+				// Push to pending list.
+				{
+					GAST(this->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING);
+					this->OnState(GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING);
+
+					GAIA::SYNC::Autolock al(m_pHttp->m_lrPendingList);
+					m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING;
+					GAIA::BL bInsertResult = m_pHttp->m_pendinglist.insert(this);
+					if(!bInsertResult && m_pHttp->m_bLog)
+						GERR << "[Http] HttpRequest::Request: Insert request to pending list failed!" << GEND;
+				}
 			}
 
 			return GAIA::True;
@@ -941,7 +975,8 @@ namespace GAIA
 							{
 								GAIA::SYNC::Autolock al(m_lrSocks);
 								GAIA::BL bInsertResult = m_socks.insert(pSocket);
-								GAST(bInsertResult);
+								if(!bInsertResult && m_bLog)
+									GERR << "[Http] Http::Execute: Insert socket to socket list failed!" << GEND;
 							}
 
 							// Create socket.
@@ -949,13 +984,18 @@ namespace GAIA
 
 							// Insert to connecting list.
 							{
+								GAIA::SYNC::Autolock al(pRequest->m_lrState);
+
 								GAST(pRequest->GetState() != GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING);
 								pRequest->OnState(GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING);
 
-								GAIA::SYNC::Autolock al(m_lrConnectingList);
-								pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING;
-								GAIA::BL bInsertResult = m_connectinglist.insert(pRequest);
-								GAST(bInsertResult);
+								{
+									GAIA::SYNC::Autolock al(m_lrConnectingList);
+									pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING;
+									GAIA::BL bInsertResult = m_connectinglist.insert(pRequest);
+									if(!bInsertResult && m_bLog)
+										GERR << "[Http] Http::Execute: Insert request to connecting list failed!" << GEND;
+								}
 							}
 
 							// Connect to server.
@@ -1078,28 +1118,38 @@ namespace GAIA
 								pReqBuf->write("\r\n", 2);
 
 								// Send.
-								GAIA::NUM sWriteSize = pReqBuf->write_size();
-								GAST(sWriteSize == pRequest->m_sTotalReqHeadSize);
-								pRequest->m_lSendingSize += sWriteSize;
-								GAIA::N32 nSendSize = pRequest->m_pSock->Send(pReqBuf->fptr(), sWriteSize);
-								GAST(nSendSize == sWriteSize);
-								if(nSendSize != sWriteSize)
+								GTRY
+								{
+									GAIA::NUM sWriteSize = pReqBuf->write_size();
+									GAST(sWriteSize == pRequest->m_sTotalReqHeadSize);
+									pRequest->m_lSendingSize += sWriteSize;
+
+									GAIA::N32 nSendSize = pRequest->m_pSock->Send(pReqBuf->fptr(), sWriteSize);
+									GAST(nSendSize == sWriteSize);
+									if(nSendSize != sWriteSize)
+									{
+										pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_UNKNOWN;
+										pNeedCloseRequests->push_back(pRequest);
+										break;
+									}
+									pReqBuf->clear();
+
+									// Update info.
+									pRequest->m_uLastSendingTime = uCurrentTime;
+									pRequest->m_bHeadSendingComplete = GAIA::True;
+
+									// Logout.
+									if(m_bLog)
+										GDEV << "[Http] Http::Execute: Send head " << sWriteSize << " bytes" << GEND;
+
+									bRet = GAIA::True;
+								}
+								GCATCHALL
 								{
 									pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_UNKNOWN;
 									pNeedCloseRequests->push_back(pRequest);
 									break;
 								}
-								pReqBuf->clear();
-
-								// Update info.
-								pRequest->m_uLastSendingTime = uCurrentTime;
-								pRequest->m_bHeadSendingComplete = GAIA::True;
-
-								// Logout.
-								if(m_bLog)
-									GDEV << "[Http] Http::Execute: Send head " << sWriteSize << " bytes" << GEND;
-
-								bRet = GAIA::True;
 							}
 
 							// Send body.
@@ -1138,26 +1188,35 @@ namespace GAIA
 								// If exist data need send, send it.
 								if(pReqBuf->write_size() > 0)
 								{
-									// Send.
-									pRequest->m_lSendingSize += pReqBuf->write_size();
-									GAIA::N32 nSendSize = pRequest->m_pSock->Send(pReqBuf->fptr(), pReqBuf->write_size());
-									GAST(nSendSize == pReqBuf->write_size());
-									if(nSendSize != pReqBuf->write_size())
+									GTRY
+									{
+										// Send.
+										pRequest->m_lSendingSize += pReqBuf->write_size();
+										GAIA::N32 nSendSize = pRequest->m_pSock->Send(pReqBuf->fptr(), pReqBuf->write_size());
+										GAST(nSendSize == pReqBuf->write_size());
+										if(nSendSize != pReqBuf->write_size())
+										{
+											pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_UNKNOWN;
+											pNeedCloseRequests->push_back(pRequest);
+											break;
+										}
+										pReqBuf->clear();
+
+										// Logout.
+										if(m_bLog)
+											GDEV << "[Http] Http::Execute: Send body " << nSendSize << " bytes" << GEND;
+
+										// Update info.
+										pRequest->m_uLastSendingTime = uCurrentTime;
+
+										bRet = GAIA::True;
+									}
+									GCATCHALL
 									{
 										pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_UNKNOWN;
 										pNeedCloseRequests->push_back(pRequest);
 										break;
 									}
-									pReqBuf->clear();
-
-									// Logout.
-									if(m_bLog)
-										GDEV << "[Http] Http::Execute: Send body " << nSendSize << " bytes" << GEND;
-
-									// Update info.
-									pRequest->m_uLastSendingTime = uCurrentTime;
-
-									bRet = GAIA::True;
 								}
 
 								// If body complete, record it.
@@ -1277,7 +1336,8 @@ namespace GAIA
 					{
 						GAIA::SYNC::Autolock al(m_lrSocks);
 						GAIA::BL bEraseResult = m_socks.erase(pSocket);
-						GAST(bEraseResult);
+						if(!bEraseResult && m_bLog)
+							GERR << "[Http] Http::InternalCloseSocket: Erase socket from socket list failed!" << GEND;
 					}
 
 					// Close socket.
@@ -1310,53 +1370,71 @@ namespace GAIA
 
 				// Remove from list.
 				{
-					switch(req.GetState())
+					GAIA::SYNC::Autolock al(req.m_lrState);
+
+					if(req.m_bSwapToCompleteList)
 					{
-					case GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING:
+						GAIA::SYNC::Autolock al(m_lrCompleteList);
+						GAIA::BL bEraseResult = m_completelist.erase(&req);
+						if(!bEraseResult && m_bLog)
+							GERR << "[Http] Http::InternalCloseSocket: Erase request from complete list failed for complete flag set!" << GEND;
+					}
+					else
+					{
+						switch(req.GetState())
 						{
-							GAIA::SYNC::Autolock al(m_lrPendingList);
-							GAIA::BL bEraseResult = m_pendinglist.erase(&req);
-							GAST(bEraseResult);
+						case GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING:
+							{
+								GAIA::SYNC::Autolock al(m_lrPendingList);
+								GAIA::BL bEraseResult = m_pendinglist.erase(&req);
+								if(!bEraseResult && m_bLog)
+									GERR << "[Http] Http::InternalCloseSocket: Erase request from pending list failed!" << GEND;
+							}
+							break;
+						case GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING:
+							{
+								GAIA::SYNC::Autolock al(m_lrConnectingList);
+								GAIA::BL bEraseResult = m_connectinglist.erase(&req);
+								if(!bEraseResult && m_bLog)
+									GERR << "[Http] Http::InternalCloseSocket: Erase request from connecting list failed!" << GEND;
+							}
+							break;
+						case GAIA::NETWORK::HTTP_REQUEST_STATE_REQUESTING:
+							{
+								GAIA::SYNC::Autolock al(m_lrRequestingList);
+								GAIA::BL bEraseResult = m_requestinglist.erase(&req);
+								if(!bEraseResult && m_bLog)
+									GERR << "[Http] Http::InternalCloseSocket: Erase request from requesting list failed!" << GEND;
+							}
+							break;
+						case GAIA::NETWORK::HTTP_REQUEST_STATE_WAITING:
+							{
+								GAIA::SYNC::Autolock al(m_lrWaitingList);
+								GAIA::BL bEraseResult = m_waitinglist.erase(&req);
+								if(!bEraseResult && m_bLog)
+									GERR << "[Http] Http::InternalCloseSocket: Erase request from waiting list failed!" << GEND;
+							}
+							break;
+						case GAIA::NETWORK::HTTP_REQUEST_STATE_RESPONSING:
+							{
+								GAIA::SYNC::Autolock al(m_lrResponsingList);
+								GAIA::BL bEraseResult = m_responsinglist.erase(&req);
+								if(!bEraseResult && m_bLog)
+									GERR << "[Http] Http::InternalCloseSocket: Erase request from responsing list failed!" << GEND;
+							}
+							break;
+						case GAIA::NETWORK::HTTP_REQUEST_STATE_COMPLETE:
+							{
+								GAIA::SYNC::Autolock al(m_lrCompleteList);
+								GAIA::BL bEraseResult = m_completelist.erase(&req);
+								if(!bEraseResult && m_bLog)
+									GERR << "[Http] Http::InternalCloseSocket: Erase request from complete list failed!" << GEND;
+							}
+							break;
+						default:
+							GASTFALSE;
+							break;
 						}
-						break;
-					case GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING:
-						{
-							GAIA::SYNC::Autolock al(m_lrConnectingList);
-							GAIA::BL bEraseResult = m_connectinglist.erase(&req);
-							GAST(bEraseResult);
-						}
-						break;
-					case GAIA::NETWORK::HTTP_REQUEST_STATE_REQUESTING:
-						{
-							GAIA::SYNC::Autolock al(m_lrRequestingList);
-							GAIA::BL bEraseResult = m_requestinglist.erase(&req);
-							GAST(bEraseResult);
-						}
-						break;
-					case GAIA::NETWORK::HTTP_REQUEST_STATE_WAITING:
-						{
-							GAIA::SYNC::Autolock al(m_lrWaitingList);
-							GAIA::BL bEraseResult = m_waitinglist.erase(&req);
-							GAST(bEraseResult);
-						}
-						break;
-					case GAIA::NETWORK::HTTP_REQUEST_STATE_RESPONSING:
-						{
-							GAIA::SYNC::Autolock al(m_lrResponsingList);
-							GAIA::BL bEraseResult = m_responsinglist.erase(&req);
-							GAST(bEraseResult);
-						}
-						break;
-					case GAIA::NETWORK::HTTP_REQUEST_STATE_COMPLETE:
-						{
-							GAIA::SYNC::Autolock al(m_lrCompleteList);
-							GAIA::BL bEraseResult = m_completelist.erase(&req);
-							GAST(bEraseResult);
-						}
-						break;
-					default:
-						GASTFALSE;
-						break;
 					}
 				}
 

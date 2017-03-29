@@ -33,9 +33,10 @@ namespace TEST
 				return GAIA::False;
 
 			GAIA::NETWORK::HttpHead head;
-			l.Response(GAIA::NETWORK::HTTP_CODE_NOTFOUND, GNIL,
-					   GAIA::NETWORK::HTTP_CODE_DESCRIPTION[GAIA::NETWORK::HTTP_CODE_NOTFOUND],
-					GAIA::NETWORK::HTTP_CODE_DESCRIPTION_LENGTH[GAIA::NETWORK::HTTP_CODE_NOTFOUND]);
+			l.Response(
+				GAIA::NETWORK::HTTP_CODE_NOTFOUND, GNIL,
+				GAIA::NETWORK::HTTP_CODE_DESCRIPTION[GAIA::NETWORK::HTTP_CODE_NOTFOUND],
+				GAIA::NETWORK::HTTP_CODE_DESCRIPTION_LENGTH[GAIA::NETWORK::HTTP_CODE_NOTFOUND]);
 			l.Close();
 
 			return GAIA::True;
@@ -66,6 +67,8 @@ namespace TEST
 		TAST(!svr.IsCreated());
 		TAST(svr.Create(descServer));
 		{
+			((GAIA::NETWORK::AsyncDispatcher*)svr.GetAsyncDispatcher())->EnableLog(GAIA::True);
+
 			TAST(svr.RegistCallBack(cb1));
 			TAST(svr.RegistCallBack(cb2));
 			TAST(svr.RegistCallBack(cb3));
@@ -123,8 +126,8 @@ namespace TEST
 				TAST(!svr.OpenAddr(addrService2));
 				{
 					// Sleep.
-					for(GAIA::NUM x = 0; x < 100000; ++x)
-						GAIA::SYNC::gsleep(1000);
+					for(GAIA::NUM x = 0; x < 10; ++x)
+						GAIA::SYNC::gsleep(10);
 				}
 				TAST(svr.CloseAddr(addrService1));
 				TAST(svr.CloseAddrAll());

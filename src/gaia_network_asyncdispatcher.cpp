@@ -12,7 +12,6 @@
 #	include <mswsock.h>
 #	include <winsock2.h>
 #	include <windows.h>
-//#	pragma comment(lib, "mswsock.lib")
 #elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 #	include <sys/types.h>
 #	include <sys/event.h>
@@ -57,6 +56,7 @@ namespace GAIA
 			#else
 				kqep = GINVALID;
 				bStopCmd = GAIA::False;
+				uLastKQEPFreeAndRecycleTime = GINVALID;
 			#endif
 			}
 
@@ -84,6 +84,10 @@ namespace GAIA
 			GAIA::N32 kqep; // kqueue or epoll.
 			GAIA::BL bStopCmd;
 			GAIA::CTN::Buffer tempbuf;
+			GAIA::CTN::Vector<GAIA::NETWORK::AsyncSocket*> listTempSocket;
+			GAIA::U64 uLastKQEPFreeAndRecycleTime;
+			GAIA::SYNC::Lock lrNeedRecycleSockets;
+			GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*> needrecycle_sockets;
 		#endif
 		};
 
@@ -200,9 +204,9 @@ namespace GAIA
 				// Close all listen sockets.
 				{
 					GAIA::SYNC::AutolockW al(m_rwListenSockets);
-					GAIA::CTN::Vector<GAIA::NETWORK::AsyncSocket*> vecTemp;
+					__SocketVectorType vecTemp;
 					vecTemp.reserve(m_listen_sockets.size());
-					for(GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*>::it it = m_listen_sockets.frontit(); !it.empty(); ++it)
+					for(__SocketMapType::it it = m_listen_sockets.frontit(); !it.empty(); ++it)
 						vecTemp.push_back(*it);
 					m_listen_sockets.clear();
 
@@ -217,9 +221,9 @@ namespace GAIA
 				// Close all accepting sockets.
 				{
 					GAIA::SYNC::AutolockW al(m_rwAcceptingSockets);
-					GAIA::CTN::Vector<GAIA::NETWORK::AsyncSocket*> vecTemp;
+					__SocketVectorType vecTemp;
 					vecTemp.reserve(m_accepting_sockets.size());
-					for(GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*>::it it = m_accepting_sockets.frontit(); !it.empty(); ++it)
+					for(__SocketSetType::it it = m_accepting_sockets.frontit(); !it.empty(); ++it)
 						vecTemp.push_back(*it);
 					m_accepting_sockets.clear();
 
@@ -258,6 +262,38 @@ namespace GAIA
 				close(pThread->kqep);
 				pThread->kqep = GINVALID;
 				pThread->bStopCmd = GAIA::False;
+			#endif
+			}
+
+			// Close all need recycle socket.
+			{
+			#if GAIA_OS != GAIA_OS_WINDOWS
+				__SocketVectorType vecTemp;
+				for(GAIA::NUM x = 0; x < m_threads.size(); ++x)
+				{
+					AsyncDispatcherThread* pThread = m_threads[x];
+					vecTemp.clear();
+
+					// Swap.
+					{
+						GAIA::SYNC::Autolock al(pThread->lrNeedRecycleSockets);
+						for(__SocketSetType::it it = pThread->needrecycle_sockets.frontit(); !it.empty(); ++it)
+						{
+							GAIA::NETWORK::AsyncSocket* pSocket = *it;
+							GAST(pSocket != GNIL);
+							vecTemp.push_back(pSocket);
+						}
+						pThread->needrecycle_sockets.clear();
+					}
+
+					// Recycle.
+					for(GAIA::NUM x = 0; x < vecTemp.size(); ++x)
+					{
+						GAIA::NETWORK::AsyncSocket* pSocket = vecTemp[x];
+						GAST(pSocket != GNIL);
+						pSocket->drop_ref();
+					}
+				}
 			#endif
 			}
 
@@ -349,7 +385,7 @@ namespace GAIA
 			if(m_listen_sockets.empty())
 				return GAIA::False;
 
-			for(GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*>::it it = m_listen_sockets.frontit(); !it.empty(); ++it)
+			for(__SocketMapType::it it = m_listen_sockets.frontit(); !it.empty(); ++it)
 			{
 				GAIA::NETWORK::AsyncSocket* pSock = *it;
 				pSock->Shutdown();
@@ -364,7 +400,7 @@ namespace GAIA
 		GAIA::BL AsyncDispatcher::IsExistListenSocket(const GAIA::NETWORK::Addr& addrListen) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwListenSockets);
-			const GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*>::_datatype* ppFinded = m_listen_sockets.find(addrListen);
+			const __SocketMapType::_datatype* ppFinded = m_listen_sockets.find(addrListen);
 			if(ppFinded == GNIL)
 				return GAIA::False;
 			return GAIA::True;
@@ -379,7 +415,7 @@ namespace GAIA
 		GAIA::BL AsyncDispatcher::CollectListenSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwListenSockets);
-			for(GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*>::const_it it = m_listen_sockets.const_frontit(); !it.empty(); ++it)
+			for(__SocketMapType::const_it it = m_listen_sockets.const_frontit(); !it.empty(); ++it)
 			{
 				GAIA::NETWORK::AsyncSocket* pSock = *it;
 				if(!cb.OnCollectAsyncSocket(*GCCAST(AsyncDispatcher*)(this), *pSock))
@@ -392,7 +428,7 @@ namespace GAIA
 		{
 			GAIA::BL bRet = GAIA::False;
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwListenSockets);
-			for(GAIA::CTN::Map<GAIA::NETWORK::Addr, GAIA::NETWORK::AsyncSocket*>::const_it it = m_listen_sockets.const_frontit(); !it.empty(); ++it)
+			for(__SocketMapType::const_it it = m_listen_sockets.const_frontit(); !it.empty(); ++it)
 			{
 				listResult.push_back(*it.key());
 				bRet = GAIA::True;
@@ -415,7 +451,7 @@ namespace GAIA
 		GAIA::BL AsyncDispatcher::CollectAcceptingSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwAcceptingSockets);
-			for(GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*>::const_it it = m_accepting_sockets.const_frontit(); !it.empty(); ++it)
+			for(__SocketSetType::const_it it = m_accepting_sockets.const_frontit(); !it.empty(); ++it)
 			{
 				GAIA::NETWORK::AsyncSocket* pSock = *it;
 				GAST(pSock != GNIL);
@@ -440,7 +476,7 @@ namespace GAIA
 		GAIA::BL AsyncDispatcher::CollectAcceptedSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwAcceptedSockets);
-			for(GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*>::const_it it = m_accepted_sockets.const_frontit(); !it.empty(); ++it)
+			for(__SocketSetType::const_it it = m_accepted_sockets.const_frontit(); !it.empty(); ++it)
 			{
 				GAIA::NETWORK::AsyncSocket* pSock = *it;
 				GAST(pSock != GNIL);
@@ -465,7 +501,7 @@ namespace GAIA
 		GAIA::BL AsyncDispatcher::CollectConnectedSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwConnectedSockets);
-			for(GAIA::CTN::Set<GAIA::NETWORK::AsyncSocket*>::const_it it = m_connected_sockets.const_frontit(); !it.empty(); ++it)
+			for(__SocketSetType::const_it it = m_connected_sockets.const_frontit(); !it.empty(); ++it)
 			{
 				GAIA::NETWORK::AsyncSocket* pSock = *it;
 				GAST(pSock != GNIL);
@@ -741,7 +777,6 @@ namespace GAIA
 							{
 								pThread->tempbuf.resize(sRecvAbleSize);
 								GAIA::NUM sRecved = (GAIA::NUM)recv(nSocket, pThread->tempbuf.fptr(), sRecvAbleSize, 0);
-								GAST(sRecved >= 0);
 								if(sRecved > 0)
 									ctx.pSocket->OnRecved(GAIA::True, pThread->tempbuf.fptr(), sRecved);
 							}
@@ -801,6 +836,7 @@ namespace GAIA
 										ctx.pSocket->GetBindedAddress(addrListen);
 										GAIA::NETWORK::AsyncSocket* pAcceptedSock = this->OnCreateAcceptingSocket(addrListen);
 										pAcceptedSock->SetFD(nNewSocket);
+										pAcceptedSock->m_nBackupSocket = nNewSocket;
 										pAcceptedSock->SetType(GAIA::NETWORK::Socket::SOCKET_TYPE_STREAM);
 										pAcceptedSock->SetBinded(GAIA::True);
 										pAcceptedSock->SetConnected(GAIA::True);
@@ -852,9 +888,26 @@ namespace GAIA
 								{
 									pThread->tempbuf.resize(sRecvAbleSize);
 									GAIA::NUM sRecved = (GAIA::NUM)recv(nSocket, pThread->tempbuf.fptr(), sRecvAbleSize, 0);
-									GAST(sRecved >= 0);
 									if(sRecved > 0)
 										ctx.pSocket->OnRecved(GAIA::True, pThread->tempbuf.fptr(), sRecved);
+									else if(sRecved < 0)
+									{
+										GAIA::N32 nErr = errno;
+										if(nErr == ENOTCONN || nErr == ENOENT)
+										{
+											if(ctx.pSocket->IsConnected())
+											{
+												ctx.pSocket->SetConnected(GAIA::False);
+												ctx.pSocket->OnDisconnected(GAIA::True);
+											}
+											struct kevent ke;
+											EV_SET(&ke, nSocket, EVFILT_WRITE, EV_DELETE, 0, 0, GNIL);
+											kevent(pThread->kqep, &ke, 1, GNIL, 0, GNIL);
+											EV_SET(&ke, nSocket, EVFILT_READ, EV_DELETE, 0, 0, GNIL);
+											kevent(pThread->kqep, &ke, 1, GNIL, 0, GNIL);
+											ctx.pSocket->drop_ref();
+										}
+									}
 								}
 							}
 							break;
@@ -902,22 +955,25 @@ namespace GAIA
 								{
 									pThread->tempbuf.resize(sSendAbleSize);
 									{
-										GAIA::SYNC::Autolock al(ctx.pSocket->m_lrSend);
-										GAIA::NUM sNeedSendSize = ctx.pSocket->m_sendbuf.read(pThread->tempbuf.fptr(), sSendAbleSize);
-										if(sNeedSendSize > 0)
+										ctx.pSocket->rise_ref();
 										{
-											GAIA::NUM sSendedSize = (GAIA::NUM)send(nSocket, pThread->tempbuf.fptr(), sNeedSendSize, 0);
-											GAST(sSendedSize == sNeedSendSize);
-											ctx.pSocket->OnSent(GAIA::True, pThread->tempbuf.fptr(), sSendedSize, sSendedSize + pThread->tempbuf.remain());
+											GAIA::SYNC::Autolock al(ctx.pSocket->m_lrSend);
+											GAIA::NUM sNeedSendSize = ctx.pSocket->m_sendbuf.read(pThread->tempbuf.fptr(), sSendAbleSize);
+											if(sNeedSendSize > 0)
+											{
+												GAIA::NUM sSendedSize = (GAIA::NUM)send(nSocket, pThread->tempbuf.fptr(), sNeedSendSize, 0);
+												ctx.pSocket->OnSent(GAIA::True, pThread->tempbuf.fptr(), sSendedSize, sSendedSize + pThread->tempbuf.remain());
+											}
+											if(!ctx.pSocket->m_sendbuf.empty())
+											{
+												GAST(ctx.pSocket->m_pWriteAsyncCtx != GNIL);
+												struct kevent ke;
+												EV_SET(&ke, nSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, ctx.pSocket->m_pWriteAsyncCtx);
+												GAIA::NUM sResult = kevent(pThread->kqep, &ke, 1, GNIL, 0, GNIL);
+												GAST(sResult != GINVALID);
+											}
 										}
-										if(!ctx.pSocket->m_sendbuf.empty())
-										{
-											GAST(ctx.pSocket->m_pWriteAsyncCtx != GNIL);
-											struct kevent ke;
-											EV_SET(&ke, nSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, ctx.pSocket->m_pWriteAsyncCtx);
-											GAIA::NUM sResult = kevent(pThread->kqep, &ke, 1, GNIL, 0, GNIL);
-											GAST(sResult != GINVALID);
-										}
+										ctx.pSocket->drop_ref();
 									}
 								}
 							}
@@ -926,6 +982,45 @@ namespace GAIA
 							GASTFALSE;
 							break;
 						}
+					}
+				}
+			}
+			else
+			{
+				GAIA::U64 uCurrentTime = GAIA::TIME::tick_time();
+				if(pThread->uLastKQEPFreeAndRecycleTime == GINVALID)
+					pThread->uLastKQEPFreeAndRecycleTime = uCurrentTime;
+				if(uCurrentTime - pThread->uLastKQEPFreeAndRecycleTime > 1000 * 1000)
+				{
+					pThread->uLastKQEPFreeAndRecycleTime = uCurrentTime;
+					pThread->listTempSocket.clear();
+
+					// Swap.
+					{
+						GAIA::SYNC::Autolock al(pThread->lrNeedRecycleSockets);
+						for(__SocketSetType::it it = pThread->needrecycle_sockets.frontit(); !it.empty();)
+						{
+							GAIA::NETWORK::AsyncSocket* pSock = *it;
+							GAST(pSock != GNIL);
+							if(uCurrentTime - pSock->m_uRecycleTime > 1000 * 1000)
+							{
+								pThread->listTempSocket.push_back(pSock);
+								it.erase();
+							}
+							else
+								++it;
+						}
+					}
+
+					// Recycle.
+					{
+						for(GAIA::NUM x = 0; x < pThread->listTempSocket.size(); ++x)
+						{
+							GAIA::NETWORK::AsyncSocket* pSock = pThread->listTempSocket[x];
+							GAST(pSock != GNIL);
+							pSock->drop_ref();
+						}
+						pThread->listTempSocket.clear();
 					}
 				}
 			}
@@ -1041,6 +1136,39 @@ namespace GAIA
 			GAIA::NUM sIndex = nSocket / sizeof(GAIA::GVOID*) % m_threads.size();
 			GAIA::N32 kqep = m_threads[sIndex]->kqep;
 			return kqep;
+		}
+		GAIA::GVOID AsyncDispatcher::push_for_recycle(GAIA::NETWORK::AsyncSocket& sock)
+		{
+			if(sock.m_pReadAsyncCtx == GNIL)
+				return;
+			if(sock.m_pReadAsyncCtx->type != GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
+				return;
+			if(!sock.IsCreated())
+				return;
+
+			GAST(sock.m_nBackupSocket != GINVALID);
+			GAIA::NUM sIndex = sock.m_nBackupSocket / sizeof(GAIA::GVOID*) % m_threads.size();
+			GAST(sIndex >= 0);
+			GAIA::NETWORK::AsyncDispatcherThread* pThread = m_threads[sIndex];
+			GAST(pThread != GNIL);
+			GAIA::U64 uTickTime = GAIA::TIME::tick_time();
+
+			GAIA::SYNC::Autolock al(pThread->lrNeedRecycleSockets);
+			sock.m_uRecycleTime = uTickTime;
+			pThread->needrecycle_sockets.insert(&sock);
+		}
+		GAIA::GVOID AsyncDispatcher::pop_for_recycle(GAIA::NETWORK::AsyncSocket& sock)
+		{
+			if(sock.m_nBackupSocket == GINVALID)
+				return;
+
+			GAIA::NUM sIndex = sock.m_nBackupSocket / sizeof(GAIA::GVOID*) % m_threads.size();
+			GAST(sIndex >= 0);
+			GAIA::NETWORK::AsyncDispatcherThread* pThread = m_threads[sIndex];
+			GAST(pThread != GNIL);
+
+			GAIA::SYNC::Autolock al(pThread->lrNeedRecycleSockets);
+			pThread->needrecycle_sockets.erase(&sock);
 		}
 	#endif
 	}

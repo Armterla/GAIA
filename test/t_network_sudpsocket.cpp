@@ -340,7 +340,7 @@ namespace TEST
 							continue;
 
 						if(sRecvCount % 10 == 0)
-							logobj << "\tRecvMsg Count = " << sRecvCount << logobj.End();
+							GLOG << "\tRecvMsg Count = " << sRecvCount << GEND;
 						sRecvCount++;
 
 						SUDPSocketRecv& sockrecv = listRecv[x];
