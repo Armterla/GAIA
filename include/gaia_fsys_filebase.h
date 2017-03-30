@@ -9,11 +9,14 @@ namespace GAIA
 {
 	namespace FSYS
 	{
+		/*!
+			@brief File information class.
+		*/
 		class FileInfo : public GAIA::Base
 		{
 		public:
 			/*!
-				@brief
+				@brief Reset all member variables to default value.
 			*/
 			GINL GAIA::GVOID reset()
 			{
@@ -25,7 +28,9 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Check current FileInfo's member variables is all valid or not.
+			 
+				@return If current FileInfo's member variables is all value, return GAIA::True, or will return GAIA::False.
 			*/
 			GINL GAIA::BL check() const
 			{
@@ -36,32 +41,35 @@ namespace GAIA
 
 		public:
 			/*!
-				@brief
+				@brief Specify the file's name.
 			*/
 			const GAIA::TCH* pszName;
 
 			/*!
-				@brief
+				@brief Specify the file's create time.
 			*/
 			GAIA::U64 uCreateTime;
 
 			/*!
-				@brief
+				@brief Specify the file's last write time(modify time).
 			*/
 			GAIA::U64 uLastWriteTime;
 
 			/*!
-				@brief
+				@brief Specify the file's last read time(access time).
 			*/
 			GAIA::U64 uLastReadTime;
 
 			/*!
-				@brief
+				@brief Specify the file is a directory or not.
 			*/
 			GAIA::BL bDirectory : 1;
 
 		};
 
+		/*!
+			@brief File's base class.
+		*/
 		class FileBase : public GAIA::Entity
 		{
 		public:
@@ -76,17 +84,17 @@ namespace GAIA
 
 		public:
 			/*!
-				@brief
+				@brief Open the file.
 			*/
 			virtual GAIA::BL Open(const GAIA::TCH* filekey, const GAIA::UM& opentype) = 0;
 
 			/*!
-				@brief
+				@brief Close the file.
 			*/
 			virtual GAIA::BL Close() = 0;
 
 			/*!
-				@brief
+				@brief Check current file is open or not.
 			*/
 			virtual GAIA::BL IsOpen() const = 0;
 
@@ -96,47 +104,53 @@ namespace GAIA
 			virtual const GAIA::TCH* GetFileKey() const = 0;
 
 			/*!
-				@brief
+				@brief Get file's open type.
+			 
+				@see GAIA::FSYS::FileBase::OPEN_TYPE.
 			*/
 			virtual GAIA::UM GetOpenType() const = 0;
 
 			/*!
-				@brief
+				@brief Get file's size in bytes.
 			*/
 			virtual GAIA::FSYS::FileBase::__FileSizeType Size() const = 0;
 
 			/*!
-				@brief
+				@brief Resize the file.
 			*/
 			virtual GAIA::BL Resize(const GAIA::FSYS::FileBase::__FileSizeType& size) = 0;
 
 			/*!
-				@brief
+				@brief Read data from file.
 			*/
 			virtual GAIA::N32 Read(GAIA::GVOID* pDst, GAIA::N32 size) = 0;
 
 			/*!
-				@brief
+				@brief Write data to file.
 			*/
 			virtual GAIA::N32 Write(const GAIA::GVOID* pSrc, GAIA::N32 size) = 0;
 
 			/*!
-				@brief
+				@brief Seek file pointer.
 			*/
 			virtual GAIA::BL Seek(const GAIA::FSYS::FileBase::__FileSizeType& offset, GAIA::SEEK_TYPE seektype = GAIA::SEEK_TYPE_BEGIN) = 0;
 
 			/*!
-				@brief
+				@brief Retrieve the file pointer.
 			*/
 			virtual GAIA::FSYS::FileBase::__FileSizeType Tell() const = 0;
 
 			/*!
-				@brief
+				@brief Flush the file's write buffer.
 			*/
 			virtual GAIA::BL Flush() = 0;
 
 			/*!
-				@brief
+				@brief Read a object from file.
+			 
+				@remarks The object must be a base c data type, or a struct with all c data type member variables,\n
+					c data type is char, short, int, long long, float, double, bool.\n
+					The integer type support "unsigned" indicator.\n
 			*/
 			template<typename _ObjType> GAIA::BL ReadObj(_ObjType& obj)
 			{
@@ -151,7 +165,11 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Write a object to file.
+			 
+				@remarks The object must be a base c data type, or a struct with all c data type member variables,\n
+					c data type is char, short, int, long long, float, double, bool.\n
+					The integer type support "unsigned" indicator.\n
 			*/
 			template<typename _ObjType> GAIA::BL WriteObj(const _ObjType& obj)
 			{
@@ -164,7 +182,9 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Write a string to file.
+			 
+				@remarks This method write a integer(int) type for string length first, and then write the string without '\0'.
 			*/
 			template<typename _ParamType> GAIA::BL WriteString(const _ParamType* pszString)
 			{
@@ -183,7 +203,10 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Read a string from file.
+			 
+				@remarks This method read a integer(int) type from file for string length first, and then read the string without '\0'.\n
+					But '\0' will be filled to the last location of parameter pszString.
 			*/
 			template<typename _ParamType> GAIA::BL ReadString(_ParamType* pszString, GAIA::N32 nLen, GAIA::N32& nResultLen)
 			{
@@ -207,7 +230,9 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Write a text string to the file.
+			 
+				@remarks This method write the string without '\0'.
 			*/
 			template<typename _ParamType> GAIA::BL WriteText(const _ParamType* pszText)
 			{
@@ -220,113 +245,82 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Stream operator for read object.
+			 
+				@remarks The object must be a base c data type, or a struct with all c data type member variables,\n
+					c data type is char, short, int, long long, float, double, bool.\n
+					The integer type support "unsigned" indicator.\n
 			*/
 			template<typename _ObjType> FileBase& operator >> (_ObjType& t){this->ReadObj(t); return *this;}
 
 			/*!
-				@brief
+				@brief Stream operator for write object.
+			 
+				@remarks The object must be a base c data type, or a struct with all c data type member variables,\n
+					c data type is char, short, int, long long, float, double, bool.\n
+					The integer type support "unsigned" indicator.\n
 			*/
 			template<typename _ObjType> FileBase& operator << (const _ObjType& t){this->WriteObj(t); return *this;}
+			
 	#ifdef GAIA_DEBUG_MACHINELENGTH
+			
 		private: // Protect for 32-64bit error.
-			/*!
-				@brief Access denied overload function.
-			*/
-			GINL FileBase& operator = (const FileBase& src)
-			{
-				GAST(&src != this);
-				return *this;
-			}
+			
+			/*! @brief Access denied overload function. */
+			GINL FileBase& operator = (const FileBase& src){GAST(&src != this); return *this;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL GAIA::BL Read(GAIA::NM& obj){return GAIA::False;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL GAIA::BL Write(const GAIA::NM& obj){return GAIA::False;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL GAIA::BL Read(GAIA::UM& obj){return GAIA::False;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL GAIA::BL Write(const GAIA::UM& obj){return GAIA::False;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL GAIA::BL Read(GAIA::WCH& obj){return GAIA::False;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL GAIA::BL Write(const GAIA::WCH& obj){return GAIA::False;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL FileBase& operator >> (GAIA::NM& t){return *this;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL FileBase& operator << (const GAIA::NM& t){return *this;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL FileBase& operator >> (GAIA::UM& t){return *this;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL FileBase& operator << (const GAIA::UM& t){return *this;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL FileBase& operator >> (GAIA::WCH& t){return *this;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL FileBase& operator << (const GAIA::WCH& t){return *this;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL GAIA::N32 Read(GAIA::NM* pDst, const GAIA::FSYS::FileBase::__FileSizeType& size){return GINVALID;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL GAIA::N32 Write(const GAIA::NM* pDst, const GAIA::FSYS::FileBase::__FileSizeType& size){return GINVALID;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL GAIA::N32 Write(GAIA::NM* pDst, const GAIA::FSYS::FileBase::__FileSizeType& size){return GINVALID;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL GAIA::N32 Read(GAIA::UM* pDst, const GAIA::FSYS::FileBase::__FileSizeType& size){return GINVALID;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL GAIA::N32 Write(const GAIA::UM* pDst, const GAIA::FSYS::FileBase::__FileSizeType& size){return GINVALID;}
 
-			/*!
-				@brief Access denied overload function.
-			*/
+			/*! @brief Access denied overload function. */
 			GINL GAIA::N32 Write(GAIA::UM* pDst, const GAIA::FSYS::FileBase::__FileSizeType& size){return GINVALID;}
 	#endif
 		};
