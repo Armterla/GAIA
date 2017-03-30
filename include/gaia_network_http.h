@@ -662,7 +662,7 @@ namespace GAIA
 
 				@param pData [out] Used for saving the data.
 
-				@param sDataSize [in] Specify parameter pData's max size in bytes.
+				@param sMaxDataSize [in] Specify parameter pData's max size in bytes.
 
 				@return Return the practice data size in bytes.\n
 					If not exist any data to send or send to the end, return 0.\n

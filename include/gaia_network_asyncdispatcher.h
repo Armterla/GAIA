@@ -20,9 +20,9 @@ namespace GAIA
 	namespace NETWORK
 	{
 		/*!
-			@brief
-
-			@remarks
+			@brief AsyncDispatcher's description.
+		 
+			@remarks It will be used when AsyncDispatcher::Create method.
 		*/
 		class AsyncDispatcherDesc : public GAIA::Base
 		{
@@ -36,13 +36,7 @@ namespace GAIA
 		public:
 
 			/*!
-				@brief
-
-				@param
-
-				@return
-
-				@remarks
+				@brief Reset all variables to default value.
 			*/
 			GINL GAIA::GVOID reset()
 			{
@@ -54,13 +48,9 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief Check current AsyncDispatcherDesc is valid or not.
 
-				@param
-
-				@return
-
-				@remarks
+				@return If current AsyncDispatcherDesc is valid(all of member variables are valid), return GAIA::True, or will return GAIA::False.
 			*/
 			GINL GAIA::BL check() const
 			{
@@ -78,37 +68,43 @@ namespace GAIA
 
 		public:
 			/*!
-				@brief
+				@brief Specify the network thread count. Default is AsyncDispatcherDesc::DEFAULT_THREAD_COUNT.
 			*/
 			GAIA::NUM sThreadCount;
 
 			/*!
-				@brief
+				@brief Specify the max connection count at same time. Default is AsyncDispatcherDesc::DEFAULT_MAX_CONNECTION_COUNT.
 			*/
 			GAIA::NUM sMaxConnectionCount;
 
 			/*!
-				@brief
+				@brief Specify the IOCP accept event count that will be pre-delivered.
+			 
+				@remarks It used in Windows OS only, Other OS will ignore this parameter.
 			*/
 			GAIA::NUM sWinIOCPAcceptEventCount;
 
 			/*!
-				@brief
+				@brief Specify the IOCP receive event count that will be pre-delivered.
+			 
+				@remarks It used in Windows OS only, Other OS will ignore this parameter.
 			*/
 			GAIA::NUM sWinIOCPRecvEventCount;
 		};
 
 		/*!
-			@brief
+			@brief AsyncDispatcher's AsyncSocket collect callback class.
 		*/
 		class AsyncDispatcherCallBack : public GAIA::Base
 		{
 		public:
 
 			/*!
-				@brief
+				@brief When collect a AsyncSocket, this function will be callbacked.
 
-				@param
+				@param disp [in] Specify the AsyncDispatcher.
+			 
+				@param sock [in] Specify the AsyncSocket which had collected..
 
 				@return
 
@@ -118,6 +114,10 @@ namespace GAIA
 		};
 
 		class AsyncDispatcherThread;
+		
+		/*!
+			@brief TCP async socket dispatcher.
+		*/
 		class AsyncDispatcher : public GAIA::Base
 		{
 			friend class AsyncSocket;
@@ -136,7 +136,7 @@ namespace GAIA
 			~AsyncDispatcher();
 
 			/*!
-				@brief
+				@brief Create current AsyncDispatcher.
 
 				@param
 
@@ -147,7 +147,7 @@ namespace GAIA
 			GAIA::BL Create(const GAIA::NETWORK::AsyncDispatcherDesc& desc);
 
 			/*!
-				@brief
+				@brief Destroy current AsyncDispatcher.
 
 				@param
 
@@ -158,29 +158,23 @@ namespace GAIA
 			GAIA::BL Destroy();
 
 			/*!
-				@brief
+				@brief Check current AsyncDispatcher is created or not.
 
-				@param
-
-				@return
-
-				@remarks
+				@return If current AsyncDispatcher is created, return GAIA::True, or will return GAIA::False.
 			*/
 			GAIA::BL IsCreated() const{return m_bCreated;}
 
 			/*!
-				@brief
+				@brief Get current AsyncDispatcher's description which be set by AsyncDispatcher::Create member function.
 
-				@param
+				@return Return current AsyncDispatcher's description.
 
-				@return
-
-				@remarks
+				@see GAIA::NETWORK::AsyncDispatcherDesc.
 			*/
 			const GAIA::NETWORK::AsyncDispatcherDesc& GetDesc() const{return m_desc;}
 
 			/*!
-				@brief
+				@brief Begin current AsyncDispatcher.
 
 				@param
 
@@ -191,7 +185,7 @@ namespace GAIA
 			GAIA::BL Begin();
 
 			/*!
-				@brief
+				@brief End current AsyncDispatcher.
 
 				@param
 
@@ -202,13 +196,9 @@ namespace GAIA
 			GAIA::BL End();
 
 			/*!
-				@brief
+				@brief Check current AsyncDispatcher is began or not.
 
-				@param
-
-				@return
-
-				@remarks
+				@return If current AsyncDispatcher is began, return GAIA::True, or will return GAIA::False.
 			*/
 			GAIA::BL IsBegin() const{return m_bBegin;}
 
@@ -406,7 +396,7 @@ namespace GAIA
 		protected:
 
 			/*!
-				@brief
+				@brief When AsyncDispatcher need create a listen socket(AsyncSocket), this function will be callbacked.
 
 				@param
 
@@ -422,7 +412,7 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief When AsyncDispatcher need create a accepting socket(AsyncSocket), this function will be callbacked.
 
 				@param
 
@@ -438,7 +428,7 @@ namespace GAIA
 			}
 
 			/*!
-				@brief
+				@brief When AsyncDispatcher accept a AsyncSocket by a listen socket, this function will be callbacked.
 
 				@param
 

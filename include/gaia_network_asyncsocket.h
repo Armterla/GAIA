@@ -17,7 +17,7 @@ namespace GAIA
 	namespace NETWORK
 	{
 		/*!
-			@brief
+			@brief Async context type.
 		*/
 		GAIA_ENUM_BEGIN(ASYNC_CONTEXT_TYPE)
 			ASYNC_CONTEXT_TYPE_STOP,
@@ -29,7 +29,7 @@ namespace GAIA
 		GAIA_ENUM_END(ASYNC_CONTEXT_TYPE)
 
 		/*!
-			@brief
+			@brief Async context.
 		*/
 		class AsyncContext : public GAIA::Base
 		{
@@ -47,9 +47,7 @@ namespace GAIA
 		};
 
 		/*!
-			@brief
-
-			@remarks
+			@brief Async socket type.
 		*/
 		GAIA_ENUM_BEGIN(ASYNC_SOCKET_TYPE)
 			ASYNC_SOCKET_TYPE_CONNECTED,
@@ -59,7 +57,7 @@ namespace GAIA
 		GAIA_ENUM_END(ASYNC_SOCKET_TYPE)
 
 		/*!
-			@brief Async socket.
+			@brief TCP Async socket.
 
 				This async socket class support stream socket only(TCP).
 		*/

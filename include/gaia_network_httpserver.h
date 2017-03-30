@@ -1080,7 +1080,7 @@ namespace GAIA
 
 				@param ip [in] Speicify a IP to add to black list.
 
-				@return uEffectTime [in] Specify the take effect time in microseconds.
+				@param uEffectTime [in] Specify the take effect time in microseconds.
 
 				@remarks
 					If the node is not exist which specified by parameter ip, the node will be created to black lsit.
