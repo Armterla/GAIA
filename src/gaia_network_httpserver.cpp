@@ -10,6 +10,7 @@
 
 #include <gaia_assert_impl.h>
 #include <gaia_thread_base_impl.h>
+#include <gaia_network_base_impl.h>
 #include <gaia_network_socket_impl.h>
 
 namespace GAIA
@@ -283,7 +284,7 @@ namespace GAIA
 								m_ver.assign(m_pRecvBuf->fptr() + sVerBeginPos, sVerLen);
 
 								// Analyze head.
-								GAIA::NUM sHeadLen = (pHeadEnd - m_pRecvBuf->fptr()) - 2 - sHeadBeginPos;
+								GAIA::NUM sHeadLen = (GAIA::NUM)((pHeadEnd - m_pRecvBuf->fptr()) - 2 - sHeadBeginPos);
 								if(sHeadLen <= 2)
 								{
 									m_pLink->m_httperr = GAIA::NETWORK::HTTP_ERROR_INVALIDHEADKVPAIRS;
@@ -668,7 +669,7 @@ namespace GAIA
 					if(nFileSize < 1024 * 128)
 					{
 						GAIA::CTN::Buffer buf;
-						buf.resize(nFileSize);
+						buf.resize((GAIA::NUM)nFileSize);
 						if(f.Read(buf.fptr(), buf.write_size()) == nFileSize)
 						{
 							GAIA::CH szContentLen[32];

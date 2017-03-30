@@ -203,7 +203,7 @@ namespace GAIA
 							break;
 						default:
 							{
-								if(*pLocalNext >= '0' && *pLocalNext <= '9' ||
+								if((*pLocalNext >= '0' && *pLocalNext <= '9') ||
 								   *pLocalNext == 't' ||
 								   *pLocalNext == 'f')
 								{

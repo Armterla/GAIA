@@ -6,6 +6,7 @@
 #include <gaia_assert_impl.h>
 #include <gaia_thread_base_impl.h>
 #include <gaia_network_base_impl.h>
+#include <gaia_network_socket_impl.h>
 
 namespace GAIA
 {
@@ -1174,7 +1175,7 @@ namespace GAIA
 								{
 									pReqBuf->resize(1024 * 100);
 									GAIA::N64 lPracticeSize = pRequest->OnRequestBodyData(pRequest->m_lSendingSize - pRequest->m_sTotalReqHeadSize, pReqBuf->fptr(), pReqBuf->write_size());
-									pReqBuf->resize(lPracticeSize);
+									pReqBuf->resize((GAIA::NUM)lPracticeSize);
 									if(lPracticeSize == 0)
 										bBodySendingComplete = GAIA::True;
 									else if(lPracticeSize == GINVALID)
