@@ -368,7 +368,7 @@ namespace GAIA
 
 				@return Return the logic timeout time in milliseconds. Default is 60 seconds.
 			*/
-			const GAIA::U64& GetLogicTimeout() const{return m_uLogicTimeout / 1000;}
+			GAIA::U64 GetLogicTimeout() const{return m_uLogicTimeout / 1000;}
 
 			/*!
 				@brief Set http request network response timeout time in milliseconds.\n
