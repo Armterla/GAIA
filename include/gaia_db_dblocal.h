@@ -17,6 +17,10 @@ namespace GAIA
 
 		class DBLocal;
 		class DBLocalQueryContext;
+
+		/*!
+			@brief DBLocalQuery class.
+		*/
 		class DBLocalQuery : public GAIA::Base
 		{
 		public:
@@ -191,6 +195,10 @@ namespace GAIA
 		GAIA_ENUM_END(DB_SYNC_MODE)
 
 		class DBLocalContext;
+
+		/*!
+			@brief DBLocal class.
+		*/
 		class DBLocal : public GAIA::Base
 		{
 			friend class DBLocalQuery;
