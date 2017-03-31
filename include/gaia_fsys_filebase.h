@@ -86,7 +86,7 @@ namespace GAIA
 			/*!
 				@brief Open the file.
 			*/
-			virtual GAIA::BL Open(const GAIA::TCH* filekey, const GAIA::UM& opentype) = 0;
+			virtual GAIA::BL Open(const GAIA::TCH* fileurl, const GAIA::UM& opentype) = 0;
 
 			/*!
 				@brief Close the file.
@@ -101,7 +101,7 @@ namespace GAIA
 			/*!
 				@brief
 			*/
-			virtual const GAIA::TCH* GetFileKey() const = 0;
+			virtual const GAIA::TCH* GetFileUrl() const = 0;
 
 			/*!
 				@brief Get file's open type.

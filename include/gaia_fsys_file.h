@@ -25,64 +25,64 @@ namespace GAIA
 		public:
 			GINL File(){m_fileopentype = OPEN_TYPE_INVALID; m_size = m_offset = 0; m_pFile = GNIL;}
 			GINL virtual ~File(){if(this->IsOpen()) this->Close();}
-			GINL virtual GAIA::BL Open(const GAIA::TCH* filekey, const GAIA::UM& opentype)
+			GINL virtual GAIA::BL Open(const GAIA::TCH* fileurl, const GAIA::UM& opentype)
 			{
 				if(this->IsOpen())
 					this->Close();
-				GAST(!!filekey);
+				GAST(!!fileurl);
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				if(opentype & OPEN_TYPE_CREATEALWAYS)
 			#	if GAIA_CHARSET == GAIA_CHARSET_ANSI
-					m_pFile = (GAIA::GVOID*)fopen(filekey, "wb+"); // Create for read and write.
+					m_pFile = (GAIA::GVOID*)fopen(fileurl, "wb+"); // Create for read and write.
 			#	elif GAIA_CHARSET == GAIA_CHARSET_UNICODE
-					m_pFile = (GAIA::GVOID*)_wfopen(filekey, _T("wb+"));
+					m_pFile = (GAIA::GVOID*)_wfopen(fileurl, _T("wb+"));
 			#	endif
 				else if(opentype & OPEN_TYPE_WRITE)
 			#	if GAIA_CHARSET == GAIA_CHARSET_ANSI
-					m_pFile = (GAIA::GVOID*)fopen(filekey, "rb+"); // Open for read and write.
+					m_pFile = (GAIA::GVOID*)fopen(fileurl, "rb+"); // Open for read and write.
 			#	elif GAIA_CHARSET == GAIA_CHARSET_UNICODE
-					m_pFile = (GAIA::GVOID*)_wfopen(filekey, _T("rb+"));
+					m_pFile = (GAIA::GVOID*)_wfopen(fileurl, _T("rb+"));
 			#	endif
 				else if(opentype == OPEN_TYPE_READ)
 			#	if GAIA_CHARSET == GAIA_CHARSET_ANSI
-					m_pFile = (GAIA::GVOID*)fopen(filekey, "rb"); // Open for read.
+					m_pFile = (GAIA::GVOID*)fopen(fileurl, "rb"); // Open for read.
 			#	elif GAIA_CHARSET == GAIA_CHARSET_UNICODE
-					m_pFile = (GAIA::GVOID*)_wfopen(filekey, _T("rb"));
+					m_pFile = (GAIA::GVOID*)_wfopen(fileurl, _T("rb"));
 			#	endif
 				else
 					return GAIA::False;
 			#else
 				if(opentype & OPEN_TYPE_CREATEALWAYS)
 			#	if GAIA_CHARSET == GAIA_CHARSET_ANSI
-					m_pFile = (GAIA::GVOID*)fopen(filekey, "wb+"); // Create for read and write.
+					m_pFile = (GAIA::GVOID*)fopen(fileurl, "wb+"); // Create for read and write.
 			#	elif GAIA_CHARSET == GAIA_CHARSET_UNICODE
 				{
-					GAIA::CH szTempFileKey[GAIA::MAXPL];
-					GAIA::NUM sLen = GAIA::LOCALE::w2m(filekey, GINVALID, szTempFileKey, GAIA::MAXPL, GAIA::CHARSET_TYPE_ASCII);
-					szTempFileKey[sLen] = '\0';
-					m_pFile = (GAIA::GVOID*)fopen(szTempFileKey, "wb+");
+					GAIA::CH szTempFileUrl[GAIA::MAXPL];
+					GAIA::NUM sLen = GAIA::LOCALE::w2m(fileurl, GINVALID, szTempFileUrl, GAIA::MAXPL, GAIA::CHARSET_TYPE_ASCII);
+					szTempFileUrl[sLen] = '\0';
+					m_pFile = (GAIA::GVOID*)fopen(szTempFileUrl, "wb+");
 				}
 			#	endif
 				else if(opentype & OPEN_TYPE_WRITE)
 			#	if GAIA_CHARSET == GAIA_CHARSET_ANSI
-					m_pFile = (GAIA::GVOID*)fopen(filekey, "rb+"); // Open for read and write.
+					m_pFile = (GAIA::GVOID*)fopen(fileurl, "rb+"); // Open for read and write.
 			#	elif GAIA_CHARSET == GAIA_CHARSET_UNICODE
 				{
-					GAIA::CH szTempFileKey[GAIA::MAXPL];
-					GAIA::NUM sLen = GAIA::LOCALE::w2m(filekey, GINVALID, szTempFileKey, GAIA::MAXPL, GAIA::CHARSET_TYPE_ASCII);
-					szTempFileKey[sLen] = '\0';
-					m_pFile = (GAIA::GVOID*)fopen(szTempFileKey, "rb+");
+					GAIA::CH szTempFileUrl[GAIA::MAXPL];
+					GAIA::NUM sLen = GAIA::LOCALE::w2m(fileurl, GINVALID, szTempFileUrl, GAIA::MAXPL, GAIA::CHARSET_TYPE_ASCII);
+					szTempFileUrl[sLen] = '\0';
+					m_pFile = (GAIA::GVOID*)fopen(szTempFileUrl, "rb+");
 				}
 			#	endif
 				else if(opentype == OPEN_TYPE_READ)
 			#	if GAIA_CHARSET == GAIA_CHARSET_ANSI
-					m_pFile = (GAIA::GVOID*)fopen(filekey, "rb"); // Open for read.
+					m_pFile = (GAIA::GVOID*)fopen(fileurl, "rb"); // Open for read.
 			#	elif GAIA_CHARSET == GAIA_CHARSET_UNICODE
 				{
-					GAIA::CH szTempFileKey[GAIA::MAXPL];
-					GAIA::NUM sLen = GAIA::LOCALE::w2m(filekey, GINVALID, szTempFileKey, GAIA::MAXPL, GAIA::CHARSET_TYPE_ASCII);
-					szTempFileKey[sLen] = '\0';
-					m_pFile = (GAIA::GVOID*)fopen(szTempFileKey, "rb");
+					GAIA::CH szTempFileUrl[GAIA::MAXPL];
+					GAIA::NUM sLen = GAIA::LOCALE::w2m(fileurl, GINVALID, szTempFileUrl, GAIA::MAXPL, GAIA::CHARSET_TYPE_ASCII);
+					szTempFileUrl[sLen] = '\0';
+					m_pFile = (GAIA::GVOID*)fopen(szTempFileUrl, "rb");
 				}
 			#	endif
 				else
@@ -126,7 +126,7 @@ namespace GAIA
 					this->Close();
 					return GAIA::False;
 				}
-				m_strFileKey = filekey;
+				m_strFileUrl = fileurl;
 				m_fileopentype = opentype;
 				return GAIA::True;
 			}
@@ -137,14 +137,14 @@ namespace GAIA
 					fclose((FILE*)m_pFile);
 					m_pFile = GNIL;
 					m_fileopentype = OPEN_TYPE_INVALID;
-					m_strFileKey.destroy();
+					m_strFileUrl.destroy();
 					m_size = m_offset = 0;
 					return GAIA::True;
 				}
 				return GAIA::False;
 			}
 			GINL virtual GAIA::BL IsOpen() const{return m_pFile != GNIL;}
-			GINL virtual const GAIA::TCH* GetFileKey() const{return m_strFileKey.fptr();}
+			GINL virtual const GAIA::TCH* GetFileUrl() const{return m_strFileUrl.fptr();}
 			GINL virtual GAIA::UM GetOpenType() const{return m_fileopentype;}
 			GINL virtual GAIA::FSYS::FileBase::__FileSizeType Size() const{return m_size;}
 			GINL virtual GAIA::BL Resize(const GAIA::FSYS::FileBase::__FileSizeType& size)
@@ -286,7 +286,7 @@ namespace GAIA
 				return GAIA::False;
 			}
 		private:
-			GAIA::CTN::TCharsString m_strFileKey;
+			GAIA::CTN::TCharsString m_strFileUrl;
 			GAIA::UM m_fileopentype;
 			GAIA::FSYS::FileBase::__FileSizeType m_size;
 			GAIA::FSYS::FileBase::__FileSizeType m_offset;

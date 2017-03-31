@@ -235,7 +235,7 @@ namespace GAIA
 			}
 		}
 
-		GINL GAIA::BL percentage_decode(GAIA::CH* pszPercentage, GAIA::NUM sPercentageLen, GAIA::CH& ch)
+		GINL GAIA::BL percentage_decode(const GAIA::CH* pszPercentage, GAIA::NUM sPercentageLen, GAIA::CH& ch)
 		{
 			GAST(pszPercentage != GNIL);
 			if(pszPercentage == GNIL)
