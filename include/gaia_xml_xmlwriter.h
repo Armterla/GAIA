@@ -98,7 +98,7 @@ namespace GAIA
 
 				@return Return the buffer's size in bytes.
 			*/
-			GINL _SizeType GetWriteSize() const{return (m_pCursor - m_pFront) * sizeof(_DataType);}
+			GINL _SizeType GetWriteSize() const{return (_SizeType)((m_pCursor - m_pFront) * sizeof(_DataType));}
 
 			/*!
 				@brief Get the buffer's remain size in bytes.

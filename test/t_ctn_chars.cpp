@@ -772,8 +772,11 @@ namespace TEST
 
 		chs = _T("Hello World, 测试utf8字符串！");
 		GAIA::CTN::AChars chsUtf8 = chs.toUtf8();
+		GAIA::CTN::WChars chsWCharsFromUtf8 = chsUtf8.toWString(GAIA::CHARSET_TYPE_UTF8);
 		GAIA::CTN::WChars chsWChars = chs.toWString(GAIA::CHARSET_TYPE_UTF8);
 		if(chsWChars != chs)
+			TERROR;
+		if(chsWChars != chsWCharsFromUtf8)
 			TERROR;
 
 		GAIA::CTN::WChars chsLocale(_T("Hello World, 测试utf8字符串！"));
