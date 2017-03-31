@@ -1490,13 +1490,13 @@ namespace GAIA
 			m_BlackList.insert(n);
 		}
 
-		GAIA::GVOID HttpServer::RemoveBlackList(const GAIA::NETWORK::IP& ip)
+		GAIA::BL HttpServer::RemoveBlackList(const GAIA::NETWORK::IP& ip)
 		{
-			GPCHR_FALSE(ip.check());
+			GPCHR_FALSE_RET(ip.check(), GAIA::False);
 			GAIA::SYNC::AutolockW al(m_rwBlackList);
 			GAIA::NETWORK::HttpServerBlackWhiteNode n;
 			n.ip = ip;
-			m_BlackList.erase(n);
+			return m_BlackList.erase(n);
 		}
 
 		GAIA::GVOID HttpServer::RemoveBlackListAll()
@@ -1545,13 +1545,13 @@ namespace GAIA
 			m_WhiteList.insert(n);
 		}
 
-		GAIA::GVOID HttpServer::RemoveWhiteList(const GAIA::NETWORK::IP& ip)
+		GAIA::BL HttpServer::RemoveWhiteList(const GAIA::NETWORK::IP& ip)
 		{
-			GPCHR_FALSE(ip.check());
+			GPCHR_FALSE_RET(ip.check(), GAIA::False);
 			GAIA::SYNC::AutolockW al(m_rwWhiteList);
 			GAIA::NETWORK::HttpServerBlackWhiteNode n;
 			n.ip = ip;
-			m_WhiteList.erase(n);
+			return m_WhiteList.erase(n);
 		}
 
 		GAIA::GVOID HttpServer::RemoveWhiteListAll()

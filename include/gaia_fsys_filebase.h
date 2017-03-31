@@ -85,21 +85,33 @@ namespace GAIA
 		public:
 			/*!
 				@brief Open the file.
+			 
+				@param fileurl [in] Specify the file's url.
+			 
+				@param opentype [in] Specify the file's open type.
+			 
+				@return If open file successfully, return GAIA::True, or will return GAIA::False.
 			*/
 			virtual GAIA::BL Open(const GAIA::TCH* fileurl, const GAIA::UM& opentype) = 0;
 
 			/*!
 				@brief Close the file.
+			 
+				@return If close file successfully, return GAIA::True, or will return GAIA::False.
 			*/
 			virtual GAIA::BL Close() = 0;
 
 			/*!
 				@brief Check current file is open or not.
+			 
+				@return If the file is openned, return GAIA::True, or will return GAIA::False.
 			*/
 			virtual GAIA::BL IsOpen() const = 0;
 
 			/*!
-				@brief
+				@brief Get file url.
+			 
+				@return Return file url.
 			*/
 			virtual const GAIA::TCH* GetFileUrl() const = 0;
 

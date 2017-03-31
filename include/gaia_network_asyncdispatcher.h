@@ -1,4 +1,4 @@
-﻿#ifndef		__GAIA_NETWORK_ASYNCDISPATCHER_H__
+#ifndef		__GAIA_NETWORK_ASYNCDISPATCHER_H__
 #define		__GAIA_NETWORK_ASYNCDISPATCHER_H__
 
 #include "gaia_type.h"
@@ -106,9 +106,9 @@ namespace GAIA
 			 
 				@param sock [in] Specify the AsyncSocket which had collected..
 
-				@return
+				@return Return GAIA::True means need collect more async socket, return GAIA::False means stop collect async socket.
 
-				@remarks
+				@remarks If you want use a collected async socket out of current callback, you need add AsyncSocket's reference count(AsyncSocket::rise_ref) manually.
 			*/
 			virtual GAIA::BL OnCollectAsyncSocket(GAIA::NETWORK::AsyncDispatcher& disp, GAIA::NETWORK::AsyncSocket& sock){return GAIA::False;}
 		};
@@ -132,28 +132,29 @@ namespace GAIA
 
 			/*!
 				@brief Destructor.
+
+				@remarks If current AsyncDispatcher is created, this metod will destroy it first(by AsyncDispatcher::Destroy).
 			*/
 			~AsyncDispatcher();
 
 			/*!
 				@brief Create current AsyncDispatcher.
 
-				@param
+				@param desc [in] Specify the AsyncDispatcher's description.
 
-				@return
+				@return If create successfully, return GAIA::True, or will return GAIA::False.
 
-				@remarks
+				@remarks This method will allocate the some internal object, after this function call,
+					most of methods in current class could take work.
 			*/
 			GAIA::BL Create(const GAIA::NETWORK::AsyncDispatcherDesc& desc);
 
 			/*!
 				@brief Destroy current AsyncDispatcher.
 
-				@param
+				@return If destroy successfully, return GAIA::True, or will return GAIA::False.
 
-				@return
-
-				@remarks
+				@remarks If current AsyncDispatcher is began, this method will end it first(by AsyncDispatcher::End), and then destroy the context.
 			*/
 			GAIA::BL Destroy();
 
@@ -176,22 +177,18 @@ namespace GAIA
 			/*!
 				@brief Begin current AsyncDispatcher.
 
-				@param
+				@return If begin successfully, return GAIA::True, or will return GAIA::False.
 
-				@return
-
-				@remarks
+				@remarks This method will start the network threads.
 			*/
 			GAIA::BL Begin();
 
 			/*!
 				@brief End current AsyncDispatcher.
 
-				@param
+				@return If end successfully, return GAIA::True, or will return GAIA::False.
 
-				@return
-
-				@remarks
+				@remarks This method will stop the network thread.
 			*/
 			GAIA::BL End();
 
@@ -203,178 +200,136 @@ namespace GAIA
 			GAIA::BL IsBegin() const{return m_bBegin;}
 
 			/*!
-				@brief
+				@brief Add a network address for listen.
 
-				@param
+				@param addrListen [in] Specify the network address.
 
-				@return
-
-				@remarks
+				@return If add a network address for listen successfully, return GAIA::True, or will return GAIA::False.
 			*/
 			GAIA::BL AddListenSocket(const GAIA::NETWORK::Addr& addrListen);
 
 			/*!
-				@brief
+				@brief Remove a added network address for stop listen.
 
-				@param
+				@param addrListen [in] Specify the network address.
 
-				@return
-
-				@remarks
+				@return If remove a added network address for stop listen successfully, return GAIA::True, or will return GAIA::False.
 			*/
 			GAIA::BL RemoveListenSocket(const GAIA::NETWORK::Addr& addrListen);
 
 			/*!
-				@brief
+				@brief Remove all of the listening network address.
 
-				@param
-
-				@return
-
-				@remarks
+				@return If exist any listened network address be closed, return GAIA::True, or will return GAIA::False.
 			*/
 			GAIA::BL RemoveListenSocketAll();
 
 			/*!
-				@brief
+				@brief Check the network address is listening or not.
 
-				@param
+				@param addrListen [in] Specify the network address.
 
-				@return
-
-				@remarks
+				@return If the network address is listening, return GAIA::True, or will return GAIA:False.
 			*/
 			GAIA::BL IsExistListenSocket(const GAIA::NETWORK::Addr& addrListen) const;
 
 			/*!
-				@brief
+				@brief Get curernt listening socket count.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return current listening socket count.
 			*/
 			GAIA::NUM GetListenSocketCount() const;
 
 			/*!
-				@brief
+				@brief Collect current listening socket by a GAIA::NETWORK::AsyncDispatcherCallBack object.
 
-				@param
+				@param cb [in] Specified the sub class derived from GAIA::NETWORK::AsyncDispatcherCallBack for callback.
 
-				@return
-
-				@remarks
+				@return If the callback loop be canceled by parameter cb, return GAIA::False, or return GAIA::True.
 			*/
 			GAIA::BL CollectListenSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const;
 
 			/*!
-				@brief
+				@brief Collect current listening network address and save to a list.
 
-				@param
+				@param listResult [in] Used for save the collected result.
 
-				@return
-
-				@remarks
+				@return If collected any listening network address, return GAIA::True, or will return GAIA::False.
 			*/
 			GAIA::BL CollectListenSocket(GAIA::CTN::Vector<GAIA::NETWORK::Addr>& listResult) const;
 
 			/*!
-				@brief
+				@brief Check a socket is a accepting socket or not.
 
-				@param
+				@param sock [in] Specify the socket to check.
 
-				@return
-
-				@remarks
+				@return If the socket which specified by parameter sock is a accepting socket, return GAIA::True, or will return GAIA::False.
 			*/
 			GAIA::BL IsExistAcceptingSocket(GAIA::NETWORK::AsyncSocket& sock) const;
 
 			/*!
-				@brief
+				@brief Get current accepting socket count.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return current accepting socket count.
 			*/
 			GAIA::NUM GetAcceptingSocketCount() const;
 
 			/*!
-				@brief
+				@brief Collect current accepting socket by a GAIA::NETWORK::AsyncDispatcherCallBack object.
 
-				@param
+				@param cb [in] Specified the sub class derived from GAIA::NETWORK::AsyncDispatcherCallBack for callback.
 
-				@return
-
-				@remarks
+				@return If the callback loop be canceled by parameter cb, return GAIA::False, return GAIA::True.
 			*/
 			GAIA::BL CollectAcceptingSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const;
 
 			/*!
-				@brief
+				@brief Check the socket is a accepted socket or not.
 
-				@param
+				@param sock [in] Specified the socket to check.
 
-				@return
-
-				@remarks
+				@return If the socket which specified by parameter sock is a accepted socket, return GAIA::Tre, or will return GAIA::False.
 			*/
 			GAIA::BL IsExistAcceptedSocket(GAIA::NETWORK::AsyncSocket& sock) const;
 
 			/*!
-				@brief
+				@brief Get current accepted socket count.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return current accepted socket count.
 			*/
 			GAIA::NUM GetAcceptedSocketCount() const;
 
 			/*!
-				@brief
+				@brief Collect current accepted socket by a GAIA::NETWORK::AsyncDispatcherCallback object.
 
-				@param
+				@param cb [in] Specified the sub class derived from GAIA::NETWORK::AsyncDispatcherCallBack for callback.
 
-				@return
-
-				@remarks
+				@return If the callback loop be canceled by parameter cb, return GAIA::False, return GAIA::True.
 			*/
 			GAIA::BL CollectAcceptedSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const;
 
 			/*!
-				@brief
+				@brief Check the socket is a connected socket or not.
 
-				@param
+				@param sock [in] Spcified the socket to check.
 
-				@return
-
-				@remarks
+				@return If the socket which specified by parameter sock is a connected socket, return GAIA::True, or will return GAIA::False.
 			*/
 			GAIA::BL IsExistConnectedSocket(GAIA::NETWORK::AsyncSocket& sock) const;
 
 			/*!
-				@brief
+				@brief Get current connected socket count.
 
-				@param
-
-				@return
-
-				@remarks
+				@return Return current connected socket count.
 			*/
 			GAIA::NUM GetConnectedSocketCount() const;
 
 			/*!
-				@brief
+				@brief Collect current connected socket by a GAIA::NETWORK::AsyncDispatcherCallBack object.
 
-				@param
+				@param cb [in] Specified the sub class derived from GAIA::NETWORK::AsyncDispatcherCallBack for callback.
 
-				@return
-
-				@remarks
+				@return If the callback loop be canceled by parameter cb, return GAIA::False, return GAIA::True.
 			*/
 			GAIA::BL CollectConnectedSocket(GAIA::NETWORK::AsyncDispatcherCallBack& cb) const;
 
@@ -398,43 +353,49 @@ namespace GAIA
 			/*!
 				@brief When AsyncDispatcher need create a listen socket(AsyncSocket), this function will be callbacked.
 
-				@param
+				@param addrListen [in] Specify the network address for listen.
 
-				@return
+				@return Return a GAIA::NETWORK::AsyncSocket or it's sub class.
 
-				@remarks
+				@remarks This function is used for obtain a AsyncSocket object instance by AsyncDispatcher, so it is like a factory method.\n
+					The user must return a new allocated AsyncSocket, and the socket must not created.\n
 			*/
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateListenSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
-				GAIA::NETWORK::AsyncSocket* pListenSocket =
-						gnew GAIA::NETWORK::AsyncSocket(*this, ASYNC_SOCKET_TYPE_LISTEN);
+				GAIA::NETWORK::AsyncSocket* pListenSocket = gnew GAIA::NETWORK::AsyncSocket(*this, ASYNC_SOCKET_TYPE_LISTEN);
 				return pListenSocket;
 			}
 
 			/*!
 				@brief When AsyncDispatcher need create a accepting socket(AsyncSocket), this function will be callbacked.
 
-				@param
+				@param addrListen [in] Specify the network addresss that the new accepting socket will be accept.
 
-				@return
+				@return Return a GAIA::NETWORK::AsyncSocket or it's sub class.
 
-				@remarks
+				@remarks This function is used for obtain a AsyncSocket object instance by AsyncDispatcher, so it is like a factory method.\n
+					The user must return a new allocated AsyncSocket, and the socket must not created.\n
 			*/
 			virtual GAIA::NETWORK::AsyncSocket* OnCreateAcceptingSocket(const GAIA::NETWORK::Addr& addrListen)
 			{
-				GAIA::NETWORK::AsyncSocket* pAcceptingSocket =
-						gnew GAIA::NETWORK::AsyncSocket(*this, ASYNC_SOCKET_TYPE_ACCEPTING);
+				GAIA::NETWORK::AsyncSocket* pAcceptingSocket = gnew GAIA::NETWORK::AsyncSocket(*this, ASYNC_SOCKET_TYPE_ACCEPTING);
 				return pAcceptingSocket;
 			}
 
 			/*!
 				@brief When AsyncDispatcher accept a AsyncSocket by a listen socket, this function will be callbacked.
 
-				@param
+				@param sock [in] Specify the new accepted socket.
 
-				@return
+				@param addrListen [in] Specify the network address where parameter sock come from.
 
-				@remarks
+				@return If the socket is ignored by user(function overwriter), the user have responsibility to return GAIA::False, or will return GAIA::True.
+
+				@remarks If this function is called by AsyncDispatcher,
+					the user(function overwriter) will be the parameter sock's instance-owner,
+					so, the user could use the sock after this function call. \n
+					If the user need return GAIA::False to ignore this socket, the user have responsibility to decrease
+					the reference count of parameter sock(call AsyncSock::drop_ref).\n
 			*/
 			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen)
 			{

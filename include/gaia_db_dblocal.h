@@ -130,12 +130,12 @@ namespace GAIA
 			GAIA::TYPEID GetFieldType(GAIA::NUM sColumn = GINVALID);
 
 			/*!
-				@brief
+				@brief Seek the bind cursor for bind parameter.
 			*/
 			GAIA::BL SeekBind(GAIA::NUM sOffset);
 
 			/*!
-				@brief
+				@brief Seek the field cursor for get query result.
 			*/
 			GAIA::BL SeekField(GAIA::NUM sOffset);
 
@@ -145,37 +145,37 @@ namespace GAIA
 			GAIA::BL Step();
 
 			/*!
-				@brief
+				@brief Get a GAIA::N32 column value of query result record.
 			*/
 			GAIA::N32 GetN32(GAIA::NUM sColumn = GINVALID);
 
 			/*!
-				@brief
+				@brief Get a GAIA::N64 column value of query result record.
 			*/
 			GAIA::N64 GetN64(GAIA::NUM sColumn = GINVALID);
 
 			/*!
-				@brief
+				@brief Get a GAIA::F32 column value of query result record.
 			*/
 			GAIA::F32 GetF32(GAIA::NUM sColumn = GINVALID);
 
 			/*!
-				@brief
+				@brief Get a GAIA::F64 column value of query result record.
 			*/
 			GAIA::F64 GetF64(GAIA::NUM sColumn = GINVALID);
 
 			/*!
-				@brief
+				@brief Get a char string column value of query result record.
 			*/
 			const GAIA::CH* GetStringA(GAIA::NUM sColumn = GINVALID);
 
 			/*!
-				@brief
+				@brief Get a wchar string column value of query result record.
 			*/
 			const GAIA::WCH* GetStringW(GAIA::NUM sColumn = GINVALID);
 
 			/*!
-				@brief
+				@brief Get a blob column value of query result record.
 			*/
 			const GAIA::GVOID* GetBlob(GAIA::NUM& sSize, GAIA::NUM sColumn = GINVALID);
 
@@ -285,6 +285,9 @@ namespace GAIA
 			DBLocalContext* m_ctx;
 		};
 
+		/*!
+			@brief DBLocal auto transcation class.
+		*/
 		class DBLocalAutoTransaction : public GAIA::Base
 		{
 		public:

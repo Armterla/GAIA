@@ -426,6 +426,7 @@ namespace GAIA
 
 		GAIA::BL AsyncDispatcher::CollectListenSocket(GAIA::CTN::Vector<GAIA::NETWORK::Addr>& listResult) const
 		{
+			listResult.clear();
 			GAIA::BL bRet = GAIA::False;
 			GAIA::SYNC::AutolockR al(GCCAST(AsyncDispatcher*)(this)->m_rwListenSockets);
 			for(__SocketMapType::const_it it = m_listen_sockets.const_frontit(); !it.empty(); ++it)

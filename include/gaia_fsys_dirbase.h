@@ -74,7 +74,9 @@ namespace GAIA
 			virtual GAIA::BL Exist(const GAIA::TCH* pszName) = 0;
 
 			/*!
-				@brief
+				@brief Check a directory is empty or not.
+			 
+				@return If the directory is empty, return GAIA::True, or will return GAIA::False.
 			*/
 			virtual GAIA::BL Empty(const GAIA::TCH* pszName, GAIA::BL& bEmpty) = 0;
 
