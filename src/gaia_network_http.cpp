@@ -1318,7 +1318,7 @@ namespace GAIA
 				GAIA::SYNC::Autolock al(m_lrExecuteRecycleCache);
 			}
 
-			return GAIA::True;
+			return bRet;
 		}
 
 		GAIA::BL Http::CleanupCookic(GAIA::BL bRAM, GAIA::BL bFile, const GAIA::U64& uBeyondTime)

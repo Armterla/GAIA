@@ -23,6 +23,7 @@ namespace TEST
 					const GAIA::CH* psz;
 
 					psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+					GAST(psz != GNIL);
 
 					psz = xr.Begin(nt, sNodeNameLen);
 					TAST(psz != GNIL);
@@ -31,6 +32,7 @@ namespace TEST
 					TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 					{
 						psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 
 						for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 						{
@@ -44,6 +46,7 @@ namespace TEST
 							GAIA::ALGO::gstrcat(szTempValue, szTempIndexY);
 
 							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+							GAST(psz != GNIL);
 
 							psz = xr.Read(nt, sNodeNameLen);
 							TAST(psz != GNIL);
@@ -51,6 +54,7 @@ namespace TEST
 							TAST(GAIA::ALGO::gstrequal(szTempName, psz, sNodeNameLen));
 
 							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+							GAST(psz != GNIL);
 
 							psz = xr.Read(nt, sNodeNameLen);
 							TAST(psz != GNIL);
@@ -58,6 +62,7 @@ namespace TEST
 							TAST(GAIA::ALGO::gstrequal(szTempValue, psz, sNodeNameLen));
 
 							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+							GAST(psz != GNIL);
 						}
 					}
 					psz = xr.End(&nt);
@@ -79,6 +84,7 @@ namespace TEST
 					const GAIA::CH* psz;
 
 					psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+					GAST(psz != GNIL);
 
 					psz = xr.Begin(nt, sNodeNameLen);
 					TAST(psz != GNIL);
@@ -87,6 +93,7 @@ namespace TEST
 					TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 					{
 						psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 
 						for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 						{
@@ -100,6 +107,7 @@ namespace TEST
 							GAIA::ALGO::gstrcat(szTempValue, szTempIndexX);
 
 							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+							GAST(psz != GNIL);
 
 							psz = xr.Read(nt, sNodeNameLen);
 							TAST(psz != GNIL);
@@ -107,6 +115,7 @@ namespace TEST
 							TAST(GAIA::ALGO::gstrequal(szTempName, psz, sNodeNameLen));
 
 							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+							GAST(psz != GNIL);
 
 							psz = xr.Read(nt, sNodeNameLen);
 							TAST(psz != GNIL);
@@ -114,6 +123,7 @@ namespace TEST
 							TAST(GAIA::ALGO::gstrequal(szTempValue, psz, sNodeNameLen));
 
 							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+							GAST(psz != GNIL);
 						}
 					}
 					psz = xr.End(&nt);
@@ -138,6 +148,7 @@ namespace TEST
 					const GAIA::CH* psz;
 
 					psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+					GAST(psz != GNIL);
 
 					psz = xr.Begin(nt, sNodeNameLen);
 					TAST(psz != GNIL);
@@ -146,6 +157,7 @@ namespace TEST
 					TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 					{
 						psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 
 						for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 						{
@@ -156,6 +168,7 @@ namespace TEST
 							GAIA::ALGO::gstrcat(szTempNode, szTempIndexX);
 
 							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+							GAST(psz != GNIL);
 
 							psz = xr.Begin(nt, sNodeNameLen);
 							TAST(psz != GNIL);
@@ -164,6 +177,7 @@ namespace TEST
 							TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 							{
 								psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+								GAST(psz != GNIL);
 
 								for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
 								{
@@ -177,6 +191,7 @@ namespace TEST
 									GAIA::ALGO::gstrcat(szTempValue, szTempIndexY);
 
 									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+									GAST(psz != GNIL);
 
 									psz = xr.Read(nt, sNodeNameLen);
 									TAST(psz != GNIL);
@@ -184,6 +199,7 @@ namespace TEST
 									TAST(GAIA::ALGO::gstrequal(szTempName, psz, sNodeNameLen));
 
 									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+									GAST(psz != GNIL);
 
 									psz = xr.Read(nt, sNodeNameLen);
 									TAST(psz != GNIL);
@@ -200,6 +216,7 @@ namespace TEST
 									GAIA::ALGO::gstrcat(szTempName, szTempIndexY);
 
 									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+									GAST(psz != GNIL);
 
 									psz = xr.Begin(nt, sNodeNameLen);
 									TAST(psz != GNIL);
@@ -208,6 +225,7 @@ namespace TEST
 									TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 									{
 										psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+										GAST(psz != GNIL);
 
 										for(GAIA::NUM z = 0; z < SAMPLE_COUNT; ++z)
 										{
@@ -221,6 +239,7 @@ namespace TEST
 											GAIA::ALGO::gstrcat(szTempValue, szTempIndexZ);
 
 											psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+											GAST(psz != GNIL);
 
 											psz = xr.Read(nt, sNodeNameLen);
 											TAST(psz != GNIL);
@@ -228,6 +247,7 @@ namespace TEST
 											TAST(GAIA::ALGO::gstrequal(szTempName, psz, sNodeNameLen));
 
 											psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+											GAST(psz != GNIL);
 
 											psz = xr.Read(nt, sNodeNameLen);
 											TAST(psz != GNIL);
@@ -235,6 +255,7 @@ namespace TEST
 											TAST(GAIA::ALGO::gstrequal(szTempValue, psz, sNodeNameLen));
 
 											psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+											GAST(psz != GNIL);
 										}
 									}
 									psz = xr.End(&nt);
@@ -243,6 +264,7 @@ namespace TEST
 									TAST(*psz == '/');
 
 									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+									GAST(psz != GNIL);
 								}
 							}
 							psz = xr.End(&nt);
@@ -251,6 +273,7 @@ namespace TEST
 							TAST(*psz != '/');
 
 							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+							GAST(psz != GNIL);
 						}
 					}
 					psz = xr.End(&nt);
@@ -275,6 +298,7 @@ namespace TEST
 					const GAIA::CH* psz;
 
 					psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+					GAST(psz != GNIL);
 
 					psz = xr.Begin(nt, sNodeNameLen);
 					TAST(psz != GNIL);
@@ -283,6 +307,7 @@ namespace TEST
 					TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 					{
 						psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 
 						for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 						{
@@ -293,6 +318,7 @@ namespace TEST
 							GAIA::ALGO::gstrcat(szTempNode, szTempIndexX);
 
 							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+							GAST(psz != GNIL);
 
 							psz = xr.Begin(nt, sNodeNameLen);
 							TAST(psz != GNIL);
@@ -301,6 +327,7 @@ namespace TEST
 							TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 							{
 								psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+								GAST(psz != GNIL);
 
 								for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
 								{
@@ -311,6 +338,7 @@ namespace TEST
 									GAIA::ALGO::gstrcat(szTempName, szTempIndexY);
 
 									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+									GAST(psz != GNIL);
 
 									psz = xr.Read(nt, sNodeNameLen);
 									TAST(psz != GNIL);
@@ -318,12 +346,14 @@ namespace TEST
 									TAST(GAIA::ALGO::gstrequal(szTempName, psz, sNodeNameLen));
 
 									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+									GAST(psz != GNIL);
 
 									GAIA::N32 nValue = -1;
 									TAST(xr.ReadValue(nValue) == y);
 									TAST(nValue == y);
 
 									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+									GAST(psz != GNIL);
 								}
 
 								for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
@@ -335,6 +365,7 @@ namespace TEST
 									GAIA::ALGO::gstrcat(szTempName, szTempIndexY);
 
 									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+									GAST(psz != GNIL);
 
 									psz = xr.Begin(nt, sNodeNameLen);
 									TAST(psz != GNIL);
@@ -343,6 +374,7 @@ namespace TEST
 									TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 									{
 										psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+										GAST(psz != GNIL);
 
 										for(GAIA::NUM z = 0; z < SAMPLE_COUNT; ++z)
 										{
@@ -353,6 +385,7 @@ namespace TEST
 											GAIA::ALGO::gstrcat(szTempName, szTempIndexZ);
 
 											psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+											GAST(psz != GNIL);
 
 											psz = xr.Read(nt, sNodeNameLen);
 											TAST(psz != GNIL);
@@ -364,6 +397,7 @@ namespace TEST
 											TAST(nValue == z);
 
 											psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+											GAST(psz != GNIL);
 										}
 									}
 									psz = xr.End(&nt);
@@ -372,6 +406,7 @@ namespace TEST
 									TAST(*psz == '/');
 
 									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+									GAST(psz != GNIL);
 								}
 							}
 							psz = xr.End(&nt);
@@ -380,6 +415,7 @@ namespace TEST
 							TAST(*psz != '/');
 
 							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
+							GAST(psz != GNIL);
 						}
 					}
 					psz = xr.End(&nt);
