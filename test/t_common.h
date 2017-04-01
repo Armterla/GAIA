@@ -16,7 +16,7 @@
 						bOutputTime = !bOutputTime;\
 						logobj << "\t" << (sz) << logobj.End(); \
 					}while(0)
-#define TERROR do{logobj << logobj.Type(GAIA::LOG::Log::TYPE_ERROR) << "\t\t" << __FILE__ << "(" << __LINE__ << ")" << "\n" << logobj.End();}while(0)
+#define TERROR do{logobj << logobj.Type(GAIA::LOG::Log::TYPE_ERROR) << "\t\tTErr at : " << __FILE__ << "(" << __LINE__ << ")" << "\n" << logobj.End();}while(0)
 #define TLOG(t) do{logobj << logobj.Type(GAIA::LOG::Log::TYPE_LOG) << "\t\t" << (t) << "\n" << logobj.End();}while(0)
 #define TAST(e) do{if(!(e)) TERROR;}while(0)
 
