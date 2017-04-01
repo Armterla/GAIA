@@ -317,6 +317,14 @@ namespace GAIA
 					for(GAIA::NUM y = 0; decl.paramdecls.size(); ++y)
 					{
 						const ParamDecl& pd = decl.paramdecls[y];
+						str += "[";
+						str += pd.start_param_index;
+						str += " ,";
+						str += pd.end_param_index;
+						str += "] ";
+						str += GAIA::MISC::PARAM_TYPE_NAME[pd.type];
+						str += " ";
+						str += pd.desc;
 						str += "\n";
 					}
 				}
@@ -626,6 +634,7 @@ namespace GAIA
 					return *this;
 				}
 				GCLASS_COMPARE2(start_param_index, end_param_index, ParamDecl)
+			public:
 				GAIA::NUM start_param_index;
 				GAIA::NUM end_param_index;
 				__StringType desc;
@@ -647,6 +656,7 @@ namespace GAIA
 					return *this;
 				}
 				GCLASS_COMPARE2(cmd, min_param_size, CmdDecl)
+			public:
 				GAIA::NUM index;
 				__StringType cmd;
 				__StringType desc;
