@@ -9,6 +9,7 @@
 #include <gaia_ctn_charsstring.h>
 #include <gaia_ctn_map.h>
 #include <gaia_doc_pdf.h>
+#include <gaia_type_impl.h>
 #include <gaia_assert_impl.h>
 #include <gaia_thread_base_impl.h>
 #include <hpdf.h>

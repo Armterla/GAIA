@@ -3,6 +3,7 @@
 #include <gaia_ctn_buffer.h>
 #include <gaia_network_asyncdispatcher.h>
 
+#include <gaia_type_impl.h>
 #include <gaia_assert_impl.h>
 #include <gaia_thread_base_impl.h>
 #include <gaia_network_base_impl.h>

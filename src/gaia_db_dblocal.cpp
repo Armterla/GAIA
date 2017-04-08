@@ -4,6 +4,7 @@
 #include <gaia_ctn_string.h>
 #include <gaia_ctn_charsstring.h>
 #include <gaia_db_dblocal.h>
+#include <gaia_type_impl.h>
 #include <gaia_assert_impl.h>
 #include <gaia_thread_base_impl.h>
 

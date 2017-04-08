@@ -1,6 +1,7 @@
 #include <gaia_type.h>
 #include <gaia_assert.h>
 #include <gaia_global_decl.h>
+#include <gaia_type_impl.h>
 #include <gaia_assert_impl.h>
 #include <gaia_thread_base_impl.h>
 
@@ -107,6 +108,31 @@ namespace GAIA
 			free(p);
 		#endif
 		}
+#endif
+
+#ifdef GAIA_DEBUG_SELFCHECK
+	RefObject::~RefObject()
+	{
+		GAST(!m_bDestructingByDropRef || (this->get_ref() >= 0 && this->get_ref() <= 1));
+	}
+#endif
+
+#ifdef GAIA_DEBUG_SOLUTION
+	GAIA::GVOID RefObject::debug_change_ref(GAIA::BL bRise, GAIA::NM nNewRef, const GAIA::CH* pszReason)
+	{
+		if(nNewRef < 0)
+			GERR << "GAIA::RefObject::debug_change_ref: Object reference count drop to below zero!" << GEND;
+		if(m_bDestructingByDropRef)
+			GERR << "GAIA::RefObject::debug_change_ref: Change reference count when destructing!" << GEND;
+		GAST(nNewRef >= 0);
+		GAST(!m_bDestructingByDropRef);
+		if(bRise)
+		{
+		}
+		else
+		{
+		}
+	}
 #endif
 }
 #if defined(GAIA_HEAP)

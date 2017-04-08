@@ -7,7 +7,7 @@
 #include <gaia_fsys_file.h>
 #include <gaia_fsys_dir.h>
 #include <gaia_network_httpserver.h>
-
+#include <gaia_type_impl.h>
 #include <gaia_assert_impl.h>
 #include <gaia_thread_base_impl.h>
 #include <gaia_network_base_impl.h>

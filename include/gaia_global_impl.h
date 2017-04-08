@@ -15,6 +15,7 @@
 #include "gaia_ctn_stringptrpool.h"
 #include "gaia_ctn_staticbufferpool.h"
 #include "gaia_ctn_bufferpool.h"
+#include "gaia_ctn_hashmap.h"
 #include "gaia_log.h"
 #include "gaia_global_decl.h"
 

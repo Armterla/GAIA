@@ -153,6 +153,7 @@ namespace GAIA
 		GINL X128(GAIA::U32 u){(*this) = u;}
 		GINL GAIA::BL empty() const{return u64_0 == 0 && u64_1 == 0;}
 		GINL GAIA::GVOID clear(){u64_0 = u64_1 = 0;}
+		GINL GAIA::GVOID uuid();
 		template<typename _ParamDataType> GAIA::BL check(const _ParamDataType* psz) const;
 		template<typename _ParamDataType> GAIA::GVOID fromstring(const _ParamDataType* psz);
 		template<typename _ParamDataType> _ParamDataType* tostring(_ParamDataType* psz) const;
@@ -341,30 +342,44 @@ namespace GAIA
 	#	pragma clang diagnostic ignored"-Wdeprecated-declarations"
 	#endif
 	public:
-		GINL RefObject(){m_nRef = 1; m_bDestructing = GAIA::False;}
-		GINL GAIA::N64 rise_ref()
+		GINL RefObject()
+		{
+			m_nRef = 1;
+			m_bDestructingByDropRef = GAIA::False;
+		#ifdef GAIA_DEBUG_SOLUTION
+			m_uuid.uuid();
+		#endif
+		}
+	#ifdef GAIA_DEBUG_SELFCHECK
+		virtual ~RefObject();
+	#endif
+		GINL GAIA::N64 rise_ref(const GAIA::CH* pszReason = GNIL)
 		{
 		#if GAIA_OS == GAIA_OS_WINDOWS
 		#	if GAIA_MACHINE == GAIA_MACHINE64
-				return InterlockedIncrement64(&m_nRef);
+				GAIA::NM nNew = InterlockedIncrement64(&m_nRef);
 		#	else
-				return InterlockedIncrement(&m_nRef);
+				GAIA::NM nNew = InterlockedIncrement(&m_nRef);
 		#	endif
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 		#	if GAIA_MACHINE == GAIA_MACHINE64
-				return OSAtomicIncrement64(&m_nRef);
+				GAIA::NM nNew = OSAtomicIncrement64(&m_nRef);
 		#	else
-				return OSAtomicIncrement32(&m_nRef);
+				GAIA::NM nNew = OSAtomicIncrement32(&m_nRef);
 		#	endif
 		#else
 		#	if GAIA_COMPILER == GAIA_COMPILER_GCC && GAIA_COMPILER_GCCVER >= GAIA_COMPILER_GCCVER_USESYNCXX
-				return __sync_add_and_fetch(&m_nRef, 1);
+				GAIA::NM nNew = __sync_add_and_fetch(&m_nRef, 1);
 		#	else
-				return atomic_inc_return(&m_nRef);
+				GAIA::NM nNew = atomic_inc_return(&m_nRef);
 		#	endif
 		#endif
+		#ifdef GAIA_DEBUG_SOLUTION
+			this->debug_change_ref(GAIA::True, nNew, pszReason);
+		#endif
+			return nNew;
 		}
-		GINL GAIA::N64 drop_ref()
+		GINL GAIA::N64 drop_ref(const GAIA::CH* pszReason = GNIL)
 		{
 		#if GAIA_OS == GAIA_OS_WINDOWS
 		#	if GAIA_MACHINE == GAIA_MACHINE64
@@ -385,9 +400,12 @@ namespace GAIA
 				GAIA::NM nNew = atomic_dec_return(&m_nRef);
 		#	endif
 		#endif
-			if(nNew == 0 && !m_bDestructing)
+		#ifdef GAIA_DEBUG_SOLUTION
+			this->debug_change_ref(GAIA::False, nNew, pszReason);
+		#endif
+			if(nNew == 0 && !m_bDestructingByDropRef)
 			{
-				m_bDestructing = GAIA::True;
+				m_bDestructingByDropRef = GAIA::True;
 				this->RefObjectDestruct();
 				gdel this;
 			}
@@ -398,6 +416,9 @@ namespace GAIA
 		virtual GAIA::GVOID RefObjectDestruct(){}
 	private:
 		GINL RefObject& operator = (const RefObject& src){return *this;}
+	#ifdef GAIA_DEBUG_SOLUTION
+		virtual GAIA::GVOID debug_change_ref(GAIA::BL bRise, GAIA::NM nNewRef, const GAIA::CH* pszReason);
+	#endif
 	private:
 	#if GAIA_OS == GAIA_OS_WINDOWS
 	#	if GAIA_MACHINE == GAIA_MACHINE64
@@ -414,7 +435,10 @@ namespace GAIA
 	#else
 		volatile GAIA::N32 m_nRef;
 	#endif
-		GAIA::U8 m_bDestructing : 1;
+	#ifdef GAIA_DEBUG_SOLUTION
+		X128 m_uuid;
+	#endif
+		GAIA::U8 m_bDestructingByDropRef : 1;
 	#ifdef __APPLE__
 	#	pragma clang diagnostic pop
 	#endif

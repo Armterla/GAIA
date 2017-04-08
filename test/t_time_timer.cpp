@@ -204,7 +204,7 @@ namespace TEST
 			TERROR;
 
 		/* Release instance. */
-		GAIA_RELEASE_SAFE(pTimerMgr);
 		GAIA_RELEASE_SAFE(pTimer3);
+		gdel pTimerMgr;
 	}
 }
