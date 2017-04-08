@@ -126,6 +126,7 @@ namespace GAIA
 			GERR << "GAIA::RefObject::debug_change_ref: Change reference count when destructing!" << GEND;
 		GAST(nNewRef >= 0);
 		GAST(!m_bDestructingByDropRef);
+		GAST(nNewRef <= 0xFF);
 		if(bRise)
 		{
 		}
