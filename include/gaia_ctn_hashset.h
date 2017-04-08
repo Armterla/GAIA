@@ -362,23 +362,33 @@ namespace GAIA
 			}
 			GINL _DataType* find(const _DataType& t)
 			{
-				if(m_groups.empty())
+				Node* pNode = this->findnode(t);
+				if(pNode == GNIL)
 					return GNIL;
-				_HashType h = (_HashType)GAIA::ALGO::hash(t);
-				_SizeType hm = h % m_groups.size();
-				Group& g = m_groups[hm];
-				Node* pNode = g.pLocalFront;
-				while(pNode != GNIL)
-				{
-					if(pNode->t == t)
-						return &pNode->t;
-					pNode = pNode->pLocalNext;
-				}
-				return GNIL;
+				return &pNode->t;
 			}
 			GINL const _DataType* find(const _DataType& t) const
 			{
 				return GCCAST(__MyType*)(this)->find(t);
+			}
+			GINL it findit(const _DataType& t)
+			{
+				it ret;
+				Node* pNode = this->findnode(t);
+				if(pNode == GNIL)
+					return ret;
+				ret.m_pContainer = this;
+				ret.m_pNode = pNode;
+				return ret;
+			}
+			GINL const_it const_findit(const _DataType& t) const
+			{
+				const_it ret;
+				Node* pNode = this->findnode(t);
+				if(pNode == GNIL)
+					return ret;
+				ret.m_pNode = pNode;
+				return ret;
 			}
 			GINL _DataType& front(){return m_pFront->t;}
 			GINL const _DataType& front() const{return m_pFront->t;}
@@ -412,6 +422,22 @@ namespace GAIA
 			}
 		private:
 			GINL GAIA::GVOID init(){m_pFront = GNIL; m_pBack = GNIL;}
+			GINL Node* findnode(const _DataType& t) const
+			{
+				if(m_groups.empty())
+					return GNIL;
+				_HashType h = (_HashType)GAIA::ALGO::hash(t);
+				_SizeType hm = h % m_groups.size();
+				const Group& g = m_groups[hm];
+				Node* pNode = g.pLocalFront;
+				while(pNode != GNIL)
+				{
+					if(pNode->t == t)
+						return pNode;
+					pNode = pNode->pLocalNext;
+				}
+				return GNIL;
+			}
 			GINL GAIA::GVOID optimize(const _SizeType& targetsize)
 			{
 				if(targetsize == this->size())
