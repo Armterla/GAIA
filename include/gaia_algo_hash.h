@@ -90,6 +90,14 @@ namespace GAIA
 		{
 			return *(GAIA::U64*)&d;
 		}
+		GINL GAIA::U64 hash(const GAIA::GVOID* p)
+		{
+			return GAIA::ALGO::hash((GAIA::U64)p);
+		}
+		GINL GAIA::U64 hash(GAIA::GVOID* p)
+		{
+			return GAIA::ALGO::hash((GAIA::U64)p);
+		}
 	}
 }
 
