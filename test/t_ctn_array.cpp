@@ -390,5 +390,33 @@ namespace TEST
 			TERROR;
 		if(!arr.empty())
 			TERROR;
+
+		arr.resize(10);
+		arr.reset(-1);
+		for(__ArrayType::_sizetype x = 0; x < 10; ++x)
+			arr[x] = x;
+		arr.resize_keep(20);
+		for(__ArrayType::_sizetype x = 0; x < 10; ++x)
+		{
+			if(arr[x] != x)
+			{
+				TERROR;
+				break;
+			}
+		}
+
+		arr.clear();
+		for(__ArrayType::_datatype x = 0; x < 10; ++x)
+			arr.push_back(x);
+		TAST(arr.keep(5));
+		TAST(arr.size() == 5);
+		for(__ArrayType::_datatype x = 0; x < 5; ++x)
+		{
+			if(arr[x] != x + 5)
+			{
+				TERROR;
+				break;
+			}
+		}
 	}
 }

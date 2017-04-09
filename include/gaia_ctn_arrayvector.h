@@ -275,6 +275,18 @@ namespace GAIA
 					m_vec.destroy();
 				}
 			}
+			GINL GAIA::BL keep(const _SizeType& size)
+			{
+				if(size > this->size())
+					return GAIA::False;
+				if(size == this->size())
+					return GAIA::True;
+				_SizeType srcbegin = this->size() - size;
+				for(_SizeType x = 0; x < size; ++x)
+					(*this)[x] = (*this)[srcbegin + x];
+				this->resize(size);
+				return GAIA::True;
+			}
 			GINL GAIA::GVOID clear(){m_arr.clear(); m_vec.clear();}
 			GINL GAIA::GVOID destroy(){m_arr.clear(); m_vec.destroy();}
 			GINL GAIA::GVOID push_back(const _DataType& t)

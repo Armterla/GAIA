@@ -396,5 +396,19 @@ namespace TEST
 			TERROR;
 		if(!av.empty())
 			TERROR;
+
+		av.destroy();
+		for(__ArrayVectorType::_datatype x = 0; x < 10; ++x)
+			av.push_back(x);
+		TAST(av.keep(5));
+		TAST(av.size() == 5);
+		for(__ArrayVectorType::_datatype x = 0; x < 5; ++x)
+		{
+			if(av[x] != x + 5)
+			{
+				TERROR;
+				break;
+			}
+		}
 	}
 }

@@ -207,6 +207,22 @@ namespace GAIA
 				}
 				return GAIA::False;
 			}
+			GINL GAIA::GVOID resize_keep(const _SizeType& size)
+			{
+				this->resize(size);
+			}
+			GINL GAIA::BL keep(const _SizeType& size)
+			{
+				if(size > this->size())
+					return GAIA::False;
+				if(size == this->size())
+					return GAIA::True;
+				_SizeType srcbegin = m_size - size;
+				for(_SizeType x = 0; x < size; ++x)
+					m_data[x] = m_data[srcbegin + x];
+				m_size = size;
+				return GAIA::True;
+			}
 			GINL GAIA::GVOID reset(const _DataType& t){GAIA::ALGO::reset(this->fptr(), t, this->size());}
 			GINL _SizeType count(const _DataType& t) const
 			{

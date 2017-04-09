@@ -233,6 +233,18 @@ namespace GAIA
 				else
 					this->destroy();
 			}
+			GINL GAIA::BL keep(const _SizeType& size)
+			{
+				if(size > this->size())
+					return GAIA::False;
+				if(size == this->size())
+					return GAIA::True;
+				_SizeType srcbegin = m_size - size;
+				for(_SizeType x = 0; x < size; ++x)
+					m_pFront[x] = m_pFront[srcbegin + x];
+				m_size = size;
+				return GAIA::True;
+			}
 			GINL GAIA::GVOID clear(){m_size = 0;}
 			GINL GAIA::GVOID destroy()
 			{

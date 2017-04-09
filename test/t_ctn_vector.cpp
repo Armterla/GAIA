@@ -479,5 +479,19 @@ namespace TEST
 			TERROR;
 		if(!vec.empty())
 			TERROR;
+
+		vec.destroy();
+		for(__VectorType::_datatype x = 0; x < 10; ++x)
+			vec.push_back(x);
+		TAST(vec.keep(5));
+		TAST(vec.size() == 5);
+		for(__VectorType::_datatype x = 0; x < 5; ++x)
+		{
+			if(vec[x] != x + 5)
+			{
+				TERROR;
+				break;
+			}
+		}
 	}
 }
