@@ -34,6 +34,7 @@ namespace GAIA
 					uid.clear();
 					sObjType = GINVALID;
 					uTime = 0;
+					szInfo[0] = '\0';
 					pszInfo = GNIL;
 				}
 				GINL GAIA::N32 compare(const Record& src) const
@@ -51,8 +52,10 @@ namespace GAIA
 				GAIA::X128 uid;
 				GAIA::NUM sObjType;
 				GAIA::U64 uTime;
+				GAIA::CH szInfo[33];
 				const GAIA::CH* pszInfo;
 			};
+			typedef GAIA::CTN::Vector<Record> __RecordVector;
 
 			class Obj : public GAIA::Base
 			{
@@ -61,6 +64,7 @@ namespace GAIA
 				{
 					p = GNIL;
 					records.clear();
+					nBeginCount = 0;
 					bBegin = GAIA::False;
 				}
 				GINL GAIA::N32 compare(const Obj& src) const
@@ -75,17 +79,24 @@ namespace GAIA
 
 			public:
 				const GAIA::GVOID* p;
-				GAIA::CTN::Vector<Record> records;
+				__RecordVector records;
+				GAIA::N32 nBeginCount;
 				GAIA::BL bBegin;
 			};
 
 		public:
 			GINL ObjWatcher()
 			{
+				m_uRecycleTime = 1000 * 1000 * 60;
+				m_sRecycleBeginCount = 16;
 			}
 			GINL ~ObjWatcher()
 			{
 			}
+			GINL GAIA::GVOID SetRecycleTime(const GAIA::U64& uRecycleTime){m_uRecycleTime = uRecycleTime;}
+			GINL const GAIA::U64& GetRecycleTime() const{return m_uRecycleTime;}
+			GINL GAIA::GVOID SetRecycleBeginCount(GAIA::NUM sRecycleBeginCount){m_sRecycleBeginCount = sRecycleBeginCount;}
+			GINL GAIA::NUM GetRecycleBeginCount() const{return m_sRecycleBeginCount;}
 			GINL GAIA::BL Begin(const GAIA::GVOID* p, GAIA::X128* uid = GNIL, GAIA::NUM sObjType = GINVALID)
 			{
 				GAST(p != GNIL);
@@ -112,6 +123,7 @@ namespace GAIA
 				if(pObj->bBegin)
 					return GAIA::False;
 
+				pObj->nBeginCount++;
 				pObj->bBegin = GAIA::True;
 
 				Record r;
@@ -119,7 +131,7 @@ namespace GAIA
 				if(uid != GNIL)
 					r.uid = *uid;
 				else
-					r.uid.clear();
+					r.uid.uuid();
 				r.sObjType = sObjType;
 				r.uTime = GAIA::TIME::tick_time();
 				r.pszInfo = OBJ_WATCHER_CTOR;
@@ -176,7 +188,7 @@ namespace GAIA
 				if(uid != GNIL)
 					r.uid = *uid;
 				else
-					r.uid.clear();
+					r.uid = pObj->records.back().uid;
 				r.sObjType = sObjType;
 				r.uTime = GAIA::TIME::tick_time();
 				r.pszInfo = OBJ_WATCHER_DTOR;
@@ -267,6 +279,8 @@ namespace GAIA
 							return GAIA::True;
 					}
 				}
+				else
+					return GAIA::True;
 
 				return GAIA::False;
 			}
@@ -321,26 +335,21 @@ namespace GAIA
 				if(uid != GNIL)
 					r.uid = *uid;
 				else
-					r.uid.clear();
+					r.uid = pObj->records.back().uid;
 				r.sObjType = sObjType;
 				r.uTime = GAIA::TIME::tick_time();
-				r.pszInfo = OBJ_WATCHER_CTOR;
-				pObj->records.push_back(r);
-
-				return GAIA::True;
-			}
-			GINL GAIA::BL Recycle(const GAIA::GVOID* p = GNIL, GAIA::X128* uid = GNIL, GAIA::NUM sObjType = GINVALID)
-			{
-				GAIA::SYNC::Autolock al(m_lr);
-
-				if(p == GNIL)
+				GAIA::NUM sInfoLen = GAIA::ALGO::gstrlen(pszInfo);
+				if(sInfoLen < sizeof(r.szInfo))
 				{
-
+					r.pszInfo = r.szInfo;
+					GAIA::ALGO::gstrcpy((GAIA::CH*)r.pszInfo, pszInfo);
 				}
 				else
 				{
-
+					// TODO:
 				}
+				r.pszInfo = OBJ_WATCHER_CTOR;
+				pObj->records.push_back(r);
 
 				return GAIA::True;
 			}
@@ -352,39 +361,120 @@ namespace GAIA
 
 				if(p == GNIL)
 				{
-
+					for(__ObjHashMap::it it = m_objs.frontit(); !it.empty(); ++it)
+					{
+						Obj* pObj = *it;
+						GAST(pObj != GNIL);
+						for(__RecordVector::it itt = pObj->records.frontit(); !itt.empty(); ++itt)
+						{
+							const Record& r = *itt;
+							if(uid != GNIL)
+							{
+								if(r.uid != *uid)
+									continue;
+							}
+							if(sObjType != GINVALID)
+							{
+								if(r.sObjType != sObjType)
+									continue;
+							}
+							listResult.push_back(r);
+						}
+					}
 				}
 				else
 				{
+					Obj** ppObj = m_objs.find(p);
+					if(ppObj != GNIL)
+					{
+						Obj* pObj = *ppObj;
+						GAST(pObj != GNIL);
 
+						for(__RecordVector::it it = pObj->records.frontit(); !it.empty(); ++it)
+						{
+							const Record& r = *it;
+							if(uid != GNIL)
+							{
+								if(r.uid != *uid)
+									continue;
+							}
+							if(sObjType != GINVALID)
+							{
+								if(r.sObjType != sObjType)
+									continue;
+							}
+							listResult.push_back(r);
+						}
+					}
 				}
+
+				if(listResult.empty())
+					return GAIA::False;
+
+				listResult.sort();
 
 				return GAIA::True;
 			}
-			GINL GAIA::BL CollectObjs(GAIA::CTN::Vector<Obj*>& listResult, const GAIA::GVOID* p = GNIL, GAIA::X128* uid = GNIL, GAIA::NUM sObjType = GINVALID)
+			GINL GAIA::BL Recycle()
 			{
-				listResult.clear();
+				GAIA::U64 uCurrentTime = GAIA::TIME::tick_time();
 
 				GAIA::SYNC::Autolock al(m_lr);
 
-				if(p == GNIL)
+				for(__ObjHashMap::it it = m_objs.frontit(); !it.empty(); )
 				{
+					Obj* pObj = *it;
+					GAST(pObj != GNIL);
 
-				}
-				else
-				{
+					if(pObj->bBegin)
+					{
+						++it;
+						continue;
+					}
 
+					if(pObj->records.empty() || uCurrentTime - pObj->records.back().uTime > m_uRecycleTime)
+					{
+						pObj->records.clear();
+						m_objpool.release(pObj);
+						it.erase();
+						continue;
+					}
+
+					if(pObj->nBeginCount > m_sRecycleBeginCount)
+					{
+						GAIA::X128 lastuid = pObj->records.front().uid;
+						GAIA::NUM sOffset = 0;
+						for(GAIA::NUM x = 0; x < pObj->records.size(); ++x)
+						{
+							const Record& r = pObj->records[x];
+							if(r.uid != lastuid)
+							{
+								lastuid = r.uid;
+								sOffset = x;
+								pObj->nBeginCount--;
+								if(pObj->nBeginCount <= m_sRecycleBeginCount)
+									break;
+							}
+						}
+						pObj->records.keep(pObj->records.size() - sOffset);
+					}
+
+					++it;
 				}
 
 				return GAIA::True;
 			}
+
 		private:
 			typedef Obj* ObjPtr;
+			typedef GAIA::CTN::HashMap<const GAIA::GVOID*, Obj*> __ObjHashMap;
 
 		private:
 			GAIA::CTN::Pool<Obj> m_objpool;
 			GAIA::SYNC::Lock m_lr;
-			GAIA::CTN::HashMap<const GAIA::GVOID*, Obj*> m_objs;
+			__ObjHashMap m_objs;
+			GAIA::U64 m_uRecycleTime;
+			GAIA::NUM m_sRecycleBeginCount;
 		};
 	}
 }
