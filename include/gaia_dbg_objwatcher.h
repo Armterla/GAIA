@@ -12,8 +12,12 @@
 #include "gaia_ctn_vector.h"
 #include "gaia_ctn_pool.h"
 #include "gaia_ctn_hashmap.h"
+#include "gaia_ctn_stringptrpool.h"
 #include "gaia_time.h"
 #include "gaia_log.h"
+
+extern GAIA::LOG::Log g_gaia_log;
+extern GAIA::LOG::InvalidLog g_gaia_invalidlog;
 
 namespace GAIA
 {
@@ -89,14 +93,21 @@ namespace GAIA
 			{
 				m_uRecycleTime = 1000 * 1000 * 60;
 				m_sRecycleBeginCount = 16;
+				m_pLog = GNIL;
+				m_bEnableLog = GAIA::False;
 			}
 			GINL ~ObjWatcher()
 			{
+				//// NOT NEED RECYCLE ALL THE STRING TO STRPOOL, BECAUSE OF STRING POOL IS THE MEMBER VARIABLES.
 			}
 			GINL GAIA::GVOID SetRecycleTime(const GAIA::U64& uRecycleTime){m_uRecycleTime = uRecycleTime;}
 			GINL const GAIA::U64& GetRecycleTime() const{return m_uRecycleTime;}
 			GINL GAIA::GVOID SetRecycleBeginCount(GAIA::NUM sRecycleBeginCount){m_sRecycleBeginCount = sRecycleBeginCount;}
 			GINL GAIA::NUM GetRecycleBeginCount() const{return m_sRecycleBeginCount;}
+			GINL GAIA::GVOID SetLog(GAIA::LOG::Log* pLog){m_pLog = pLog;}
+			GINL GAIA::LOG::Log* GetLog() const{return m_pLog;}
+			GINL GAIA::GVOID EnableLog(GAIA::BL bEnable){m_bEnableLog = bEnable;}
+			GINL GAIA::BL IsEnableLog() const{return m_bEnableLog;}
 			GINL GAIA::BL Begin(const GAIA::GVOID* p, GAIA::X128* uid = GNIL, GAIA::NUM sObjType = GINVALID)
 			{
 				GAST(p != GNIL);
@@ -136,6 +147,8 @@ namespace GAIA
 				r.uTime = GAIA::TIME::tick_time();
 				r.pszInfo = OBJ_WATCHER_CTOR;
 				pObj->records.push_back(r);
+
+				this->logout_record(r);
 
 				return GAIA::True;
 			}
@@ -189,10 +202,15 @@ namespace GAIA
 					r.uid = *uid;
 				else
 					r.uid = pObj->records.back().uid;
-				r.sObjType = sObjType;
+				if(sObjType != GINVALID)
+					r.sObjType = sObjType;
+				else
+					r.sObjType = pObj->records.back().sObjType;
 				r.uTime = GAIA::TIME::tick_time();
 				r.pszInfo = OBJ_WATCHER_DTOR;
 				pObj->records.push_back(r);
+
+				this->logout_record(r);
 
 				return GAIA::True;
 			}
@@ -336,7 +354,10 @@ namespace GAIA
 					r.uid = *uid;
 				else
 					r.uid = pObj->records.back().uid;
-				r.sObjType = sObjType;
+				if(sObjType != GINVALID)
+					r.sObjType = sObjType;
+				else
+					r.sObjType = pObj->records.back().sObjType;
 				r.uTime = GAIA::TIME::tick_time();
 				GAIA::NUM sInfoLen = GAIA::ALGO::gstrlen(pszInfo);
 				if(sInfoLen < sizeof(r.szInfo))
@@ -345,11 +366,10 @@ namespace GAIA
 					GAIA::ALGO::gstrcpy((GAIA::CH*)r.pszInfo, pszInfo);
 				}
 				else
-				{
-					// TODO:
-				}
-				r.pszInfo = OBJ_WATCHER_CTOR;
+					r.pszInfo = m_strpool.alloc(pszInfo);
 				pObj->records.push_back(r);
+
+				this->logout_record(r);
 
 				return GAIA::True;
 			}
@@ -434,6 +454,14 @@ namespace GAIA
 
 					if(pObj->records.empty() || uCurrentTime - pObj->records.back().uTime > m_uRecycleTime)
 					{
+						for(GAIA::NUM x = 0; x < pObj->records.size(); ++x)
+						{
+							Record& r = pObj->records[x];
+							if(r.pszInfo != r.szInfo &&
+							   r.pszInfo != OBJ_WATCHER_CTOR &&
+							   r.pszInfo != OBJ_WATCHER_DTOR)
+								m_strpool.release(r.pszInfo);
+						}
 						pObj->records.clear();
 						m_objpool.release(pObj);
 						it.erase();
@@ -456,6 +484,14 @@ namespace GAIA
 									break;
 							}
 						}
+						for(GAIA::NUM x = 0; x < sOffset; ++x)
+						{
+							Record& r = pObj->records[x];
+							if(r.pszInfo != r.szInfo &&
+							   r.pszInfo != OBJ_WATCHER_CTOR &&
+							   r.pszInfo != OBJ_WATCHER_DTOR)
+								m_strpool.release(r.pszInfo);
+						}
 						pObj->records.keep(pObj->records.size() - sOffset);
 					}
 
@@ -470,11 +506,50 @@ namespace GAIA
 			typedef GAIA::CTN::HashMap<const GAIA::GVOID*, Obj*> __ObjHashMap;
 
 		private:
-			GAIA::CTN::Pool<Obj> m_objpool;
+			GINL GAIA::GVOID logout_record(const Record& r)
+			{
+				if(!m_bEnableLog)
+					return;
+
+				// Select log object.
+				GAIA::LOG::Log* pLog;
+				if(m_pLog == GNIL)
+				{
+				#ifdef GAIA_DEBUG_LOG
+					pLog = &g_gaia_log;
+				#else
+					pLog = &g_gaia_invalidlog;
+				#endif
+				}
+				else
+					pLog = m_pLog;
+
+				// Convert data to string.
+				GAIA::CH szUid[33];
+				r.uid.tostring(szUid);
+
+				// Log out.
+				GAIA::LOG::Log& l = *pLog;
+				l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0xFFFFFFFF);
+				{
+					l << "ObjWatch " << r.p <<
+						 ", Uid = " << szUid <<
+						 ", ObjType = " << r.sObjType <<
+						 ", Time = " << r.uTime <<
+						 ", Info = " << r.pszInfo;
+				}
+				l << pLog->End();
+			}
+
+		private:
 			GAIA::SYNC::Lock m_lr;
+			GAIA::CTN::Pool<Obj> m_objpool;
+			GAIA::CTN::StringPtrPool<GAIA::CH> m_strpool;
 			__ObjHashMap m_objs;
 			GAIA::U64 m_uRecycleTime;
 			GAIA::NUM m_sRecycleBeginCount;
+			GAIA::LOG::Log* m_pLog;
+			GAIA::BL m_bEnableLog;
 		};
 	}
 }

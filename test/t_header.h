@@ -101,6 +101,7 @@ namespace TEST
 	extern GAIA::GVOID t_time_timer(GAIA::LOG::Log& logobj);
 
 	extern GAIA::GVOID t_dbg_perfcollector(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_dbg_objwatcher(GAIA::LOG::Log& logobj);
 
 	extern GAIA::GVOID t_sync_atomic(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_sync_event(GAIA::LOG::Log& logobj);
@@ -270,6 +271,7 @@ namespace TEST
 			TITEM("Time: Timer test begin!"); t_time_timer(logobj); TITEM("End"); TTEXT("\t");
 
 			TITEM("Dbg: PerfCollector test begin!"); t_dbg_perfcollector(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Dbg: ObjWatcher test begin!"); t_dbg_objwatcher(logobj); TITEM("End"); TTEXT("\t");
 
 			TITEM("Sync: Atomic test begin!"); t_sync_atomic(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Sync: Event test begin!"); t_sync_event(logobj); TITEM("End"); TTEXT("\t");

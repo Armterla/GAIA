@@ -146,6 +146,10 @@ GAIA::BL gaia_release_buffer(const GAIA::GVOID* p, GAIA::NUM sSize)
 /* PerfCollector. */
 GAIA::DBG::PerfCollector g_gaia_perf;
 
+/* ObjWatcher. */
+GAIA::DBG::ObjWatcher g_gaia_objwatcher;
+
+/* Global variable management. */
 GAIA::GVOID gaia_reset_global_variables()
 {
 	g_gaia_log.Destroy();

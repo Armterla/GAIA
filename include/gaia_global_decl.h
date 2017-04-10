@@ -13,6 +13,7 @@
 #include "gaia_fsys_file.h"
 #include "gaia_log.h"
 #include "gaia_dbg_perf.h"
+#include "gaia_dbg_objwatcher.h"
 
 /* Global std stream. */
 extern GAIA::STREAM::STDStream g_gaia_stdstream;
@@ -175,6 +176,9 @@ extern GAIA::BL gaia_release_buffer(const GAIA::GVOID* p, GAIA::NUM sSize);
 
 /* PerfCollector. */
 extern GAIA::DBG::PerfCollector g_gaia_perf;
+
+/* ObjWatcher. */
+extern GAIA::DBG::ObjWatcher g_gaia_objwatcher;
 
 /* Global variable management. */
 extern GAIA::GVOID gaia_reset_global_variables();
