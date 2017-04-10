@@ -348,9 +348,10 @@ namespace GAIA
 			m_bDestructingByDropRef = GAIA::False;
 		#ifdef GAIA_DEBUG_SOLUTION
 			m_uuid.uuid();
+			this->debug_constructor();
 		#endif
 		}
-	#ifdef GAIA_DEBUG_SELFCHECK
+	#if defined(GAIA_DEBUG_SELFCHECK) || defined(GAIA_DEBUG_SOLUTION)
 		virtual ~RefObject();
 	#endif
 		GINL GAIA::N64 rise_ref(const GAIA::CH* pszReason = GNIL)
@@ -417,6 +418,7 @@ namespace GAIA
 	private:
 		GINL RefObject& operator = (const RefObject& src){return *this;}
 	#ifdef GAIA_DEBUG_SOLUTION
+		GAIA::GVOID debug_constructor();
 		virtual GAIA::GVOID debug_change_ref(GAIA::BL bRise, GAIA::NM nNewRef, const GAIA::CH* pszReason);
 	#endif
 	private:

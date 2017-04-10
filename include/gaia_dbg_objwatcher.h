@@ -16,6 +16,17 @@
 #include "gaia_time.h"
 #include "gaia_log.h"
 
+/*
+	ObjType predeclaration :
+
+		Default C++ class	0
+		GAIA::Base			1
+		GAIA::Entity		2
+		GAIA::Object		3
+		GAIA::RefObject		4
+		Other class			N
+*/
+
 extern GAIA::LOG::Log g_gaia_log;
 extern GAIA::LOG::InvalidLog g_gaia_invalidlog;
 
@@ -100,6 +111,13 @@ namespace GAIA
 			{
 				//// NOT NEED RECYCLE ALL THE STRING TO STRPOOL, BECAUSE OF STRING POOL IS THE MEMBER VARIABLES.
 			}
+			GINL GAIA::GVOID Reset()
+			{
+				GAIA::SYNC::Autolock al(m_lr);
+				m_objpool.destroy();
+				m_strpool.destroy();
+				m_objs.destroy();
+			}
 			GINL GAIA::GVOID SetRecycleTime(const GAIA::U64& uRecycleTime){m_uRecycleTime = uRecycleTime;}
 			GINL const GAIA::U64& GetRecycleTime() const{return m_uRecycleTime;}
 			GINL GAIA::GVOID SetRecycleBeginCount(GAIA::NUM sRecycleBeginCount){m_sRecycleBeginCount = sRecycleBeginCount;}
@@ -144,7 +162,7 @@ namespace GAIA
 				else
 					r.uid.uuid();
 				r.sObjType = sObjType;
-				r.uTime = GAIA::TIME::tick_time();
+				r.uTime = GAIA::TIME::process_time();
 				r.pszInfo = OBJ_WATCHER_CTOR;
 				pObj->records.push_back(r);
 
@@ -206,7 +224,7 @@ namespace GAIA
 					r.sObjType = sObjType;
 				else
 					r.sObjType = pObj->records.back().sObjType;
-				r.uTime = GAIA::TIME::tick_time();
+				r.uTime = GAIA::TIME::process_time();
 				r.pszInfo = OBJ_WATCHER_DTOR;
 				pObj->records.push_back(r);
 
@@ -358,7 +376,7 @@ namespace GAIA
 					r.sObjType = sObjType;
 				else
 					r.sObjType = pObj->records.back().sObjType;
-				r.uTime = GAIA::TIME::tick_time();
+				r.uTime = GAIA::TIME::process_time();
 				GAIA::NUM sInfoLen = GAIA::ALGO::gstrlen(pszInfo);
 				if(sInfoLen < sizeof(r.szInfo))
 				{
@@ -437,7 +455,7 @@ namespace GAIA
 			}
 			GINL GAIA::BL Recycle()
 			{
-				GAIA::U64 uCurrentTime = GAIA::TIME::tick_time();
+				GAIA::U64 uCurrentTime = GAIA::TIME::process_time();
 
 				GAIA::SYNC::Autolock al(m_lr);
 
@@ -530,13 +548,16 @@ namespace GAIA
 
 				// Log out.
 				GAIA::LOG::Log& l = *pLog;
-				l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0xFFFFFFFF);
+				l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002);
 				{
-					l << "ObjWatch " << r.p <<
-						 ", Uid = " << szUid <<
-						 ", ObjType = " << r.sObjType <<
-						 ", Time = " << r.uTime <<
-						 ", Info = " << r.pszInfo;
+					GAIA::CH szTime[32];
+					GAIA::TIME::deltatime2string(r.uTime, szTime);
+
+					l << "Watch " << (GAIA::U64)r.p <<
+						 ", Uid=" << szUid <<
+						 ", ObjType=" << r.sObjType <<
+						 ", Time=" << szTime <<
+						 ", Info=" << r.pszInfo;
 				}
 				l << pLog->End();
 			}

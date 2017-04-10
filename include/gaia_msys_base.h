@@ -43,7 +43,7 @@ namespace GAIA
 	#	endif
 	#endif
 
-		class Heap : public GAIA::RefObject
+		class Heap : public GAIA::Entity
 		{
 		public:
 			/*!

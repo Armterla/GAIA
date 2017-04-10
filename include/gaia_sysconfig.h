@@ -261,6 +261,10 @@
 #	define GAIA_DEBUG_PERF
 #endif
 
+#ifndef __GAIA_NO_DEBUG_OBJWATCH
+#	define GAIA_DEBUG_OBJWATCH
+#endif
+
 /* Debug const flag. */
 #ifdef GAIA_DEBUG_CODING
 #	define GAIA_DEBUG_CONST

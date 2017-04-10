@@ -110,14 +110,21 @@ namespace GAIA
 		}
 #endif
 
-#ifdef GAIA_DEBUG_SELFCHECK
+#if defined(GAIA_DEBUG_SELFCHECK) || defined(GAIA_DEBUG_SOLUTION)
 	RefObject::~RefObject()
 	{
 		GAST(!m_bDestructingByDropRef || (this->get_ref() >= 0 && this->get_ref() <= 1));
+	#ifdef GAIA_DEBUG_SOLUTION
+		GWATCH_END(this, &m_uuid, 4);
+	#endif
 	}
 #endif
 
 #ifdef GAIA_DEBUG_SOLUTION
+	GAIA::GVOID RefObject::debug_constructor()
+	{
+		GWATCH_BEGIN(this, &m_uuid, 4);
+	}
 	GAIA::GVOID RefObject::debug_change_ref(GAIA::BL bRise, GAIA::NM nNewRef, const GAIA::CH* pszReason)
 	{
 		if(nNewRef < 0)
@@ -127,12 +134,28 @@ namespace GAIA
 		GAST(nNewRef >= 0);
 		GAST(!m_bDestructingByDropRef);
 		GAST(nNewRef <= 0xFF);
+		GAIA::CTN::ACharsString strTemp;
+		GAIA::CH szNewRef[32];
+		GAIA::ALGO::castv(nNewRef, szNewRef, sizeof(szNewRef));
 		if(bRise)
 		{
+			strTemp = "RefObject refcnt rise to ";
+			strTemp += szNewRef;
 		}
 		else
 		{
+			strTemp = "RefObject refcnt drop to ";
+			strTemp += szNewRef;
 		}
+		if(pszReason != GNIL)
+		{
+			strTemp += ", Reason = ";
+			if(pszReason[0] == '\0')
+				strTemp += "reason string is a empty(\\0) string.";
+			else
+				strTemp += pszReason;
+		}
+		GWATCH_UPDATE(this, strTemp.fptr(), &m_uuid, 4);
 	}
 #endif
 }

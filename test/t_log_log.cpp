@@ -32,7 +32,7 @@ namespace TEST
 
 			g_gaia_log <<
 				g_gaia_log.Type(logtype) <<
-				g_gaia_log.UserFilter(0x12345678) <<
+				g_gaia_log.UserFilter(0x1234) <<
 				"Test log " <<
 				(GAIA::U8)1 << " " <<
 				(GAIA::U16)2 << " " <<

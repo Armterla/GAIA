@@ -328,11 +328,11 @@
 #endif
 
 #ifdef GAIA_DEBUG_LOG
-#	define GLOG g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_LOG) << g_gaia_log.UserFilter(0xFFFFFFFF)
-#	define GWAR g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_WARNING) << g_gaia_log.UserFilter(0xFFFFFFFF)
-#	define GERR g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_ERROR) << g_gaia_log.UserFilter(0xFFFFFFFF)
-#	define GUSR g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_USER) << g_gaia_log.UserFilter(0xFFFFFFFF)
-#	define GDEV g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_DEVELOP) << g_gaia_log.UserFilter(0xFFFFFFFF)
+#	define GLOG g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_LOG) << g_gaia_log.UserFilter(0xFFFF)
+#	define GWAR g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_WARNING) << g_gaia_log.UserFilter(0xFFFF)
+#	define GERR g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_ERROR) << g_gaia_log.UserFilter(0xFFFF)
+#	define GUSR g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_USER) << g_gaia_log.UserFilter(0xFFFF)
+#	define GDEV g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_DEVELOP) << g_gaia_log.UserFilter(0xFFFF)
 #	define GEND g_gaia_log.End()
 #else
 #	define GLOG g_gaia_invalidlog
@@ -357,6 +357,16 @@
 #	define GPERFEX(name, instanceid)
 #	define GPERFBEGINEX(name, instanceid)
 #	define GPERFENDEX(name, instanceid)
+#endif
+
+#ifdef GAIA_DEBUG_OBJWATCH
+#	define GWATCH_BEGIN(p, uid, type) g_gaia_objwatcher.Begin(p, uid, type)
+#	define GWATCH_END(p, uid, type) g_gaia_objwatcher.End(p, uid, type)
+#	define GWATCH_UPDATE(p, info, uid, type) g_gaia_objwatcher.Update(p, info, uid, type)
+#else
+#	define GWATCH_BEGIN(p, uid, type)
+#	define GWATCH_END(p, uid, type)
+#	define GWATCH_UPDATE(p, info, uid, type)
 #endif
 
 #define GAIA_EXCEPTION(name) \

@@ -15,6 +15,9 @@
 #include "gaia_dbg_perf.h"
 #include "gaia_dbg_objwatcher.h"
 
+/* Process time. */
+extern GAIA::U64 g_gaia_processlaunchtime;
+
 /* Global std stream. */
 extern GAIA::STREAM::STDStream g_gaia_stdstream;
 extern GAIA::STREAM::InvalidStream g_gaia_invalidstream;
@@ -103,7 +106,7 @@ public:
 		/* Write log to file. */
 		GAIA::CTN::BasicCharsString<GAIA::TCH, GAIA::NUM, 1024> strTemp;
 		GAIA::CTN::BasicCharsString<GAIA::CH, GAIA::NUM, 1024> strTemp1;
-		strTemp += szLogTimeAux;
+		strTemp += szLogTimeAux + 2; // +2 means not need year's thousand place and hundred place.
 		strTemp += " ";
 		strTemp += logobj.GetLogTypeString(type);
 		strTemp += " ";
