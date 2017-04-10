@@ -155,6 +155,7 @@ namespace GAIA
 					GAIA::LOG::Log& l = this->select_log();
 					l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002);
 					l << "Watch " << (GAIA::U64)p << ", found a error: Cannot begin again";
+					l << ", Tid=" << GAIA::THREAD::threadid();
 					if(uid != GNIL)
 					{
 						GAIA::CH szUid[33];
@@ -210,6 +211,7 @@ namespace GAIA
 					GAIA::LOG::Log& l = this->select_log();
 					l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002);
 					l << "Watch " << (GAIA::U64)p << ", found a error: Cannot end a when have not began";
+					l << ", Tid=" << GAIA::THREAD::threadid();
 					if(uid != GNIL)
 					{
 						GAIA::CH szUid[33];
@@ -234,6 +236,7 @@ namespace GAIA
 							GAIA::LOG::Log& l = this->select_log();
 							l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002);
 							l << "Watch " << (GAIA::U64)p << ", found a error: Last uuid is not match when end";
+							l << ", Tid=" << GAIA::THREAD::threadid();
 							if(uid != GNIL)
 							{
 								GAIA::CH szUid[33];
@@ -257,6 +260,7 @@ namespace GAIA
 							GAIA::LOG::Log& l = this->select_log();
 							l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002);
 							l << "Watch " << (GAIA::U64)p << ", found a error: Last ObjType is not match when end";
+							l << ", Tid=" << GAIA::THREAD::threadid();
 							if(uid != GNIL)
 							{
 								GAIA::CH szUid[33];
@@ -328,6 +332,7 @@ namespace GAIA
 							GAIA::LOG::Log& l = this->select_log();
 							l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002);
 							l << "Watch " << (GAIA::U64)p << ", found a error: Last uuid is not match when check began";
+							l << ", Tid=" << GAIA::THREAD::threadid();
 							if(uid != GNIL)
 							{
 								GAIA::CH szUid[33];
@@ -351,6 +356,7 @@ namespace GAIA
 							GAIA::LOG::Log& l = this->select_log();
 							l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002);
 							l << "Watch " << (GAIA::U64)p << ", found a error: Last ObjType is not match when check began";
+							l << ", Tid=" << GAIA::THREAD::threadid();
 							if(uid != GNIL)
 							{
 								GAIA::CH szUid[33];
@@ -445,6 +451,7 @@ namespace GAIA
 					GAIA::LOG::Log& l = this->select_log();
 					l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002);
 					l << "Watch " << (GAIA::U64)p << ", found a error: Cannot update when have not began";
+					l << ", Tid=" << GAIA::THREAD::threadid();
 					l << ", Info=" << pszInfo;
 					if(uid != GNIL)
 					{
@@ -470,6 +477,7 @@ namespace GAIA
 							GAIA::LOG::Log& l = this->select_log();
 							l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002);
 							l << "Watch " << (GAIA::U64)p << ", found a error: Last uuid is not match when update";
+							l << ", Tid=" << GAIA::THREAD::threadid();
 							l << ", Info=" << pszInfo;
 							if(uid != GNIL)
 							{
@@ -494,6 +502,7 @@ namespace GAIA
 							GAIA::LOG::Log& l = this->select_log();
 							l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002);
 							l << "Watch " << (GAIA::U64)p << ", found a error: Last ObjType is not match when update";
+							l << ", Tid=" << GAIA::THREAD::threadid();
 							l << ", Info=" << pszInfo;
 							if(uid != GNIL)
 							{
