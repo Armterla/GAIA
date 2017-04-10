@@ -290,7 +290,7 @@ namespace GAIA
 				return GAIA::True;
 			}
 
-			GINL GAIA::BL DumpToLog(GAIA::LOG::Log* pLog = GNIL, GAIA::LOG::Log::TYPE logtype = GAIA::LOG::Log::TYPE_LOG, GAIA::U32 uLogFilter = 0xFFFFFFFF)
+			GINL GAIA::BL DumpToLog(GAIA::LOG::Log* pLog = GNIL, GAIA::LOG::Log::TYPE logtype = GAIA::LOG::Log::TYPE_LOG, GAIA::U32 uLogFilter = 0x0003)
 			{
 				if(pLog == GNIL)
 				{

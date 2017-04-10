@@ -15,8 +15,10 @@
 /*
 	Filter predeclaration :
 
-		Default			0xFFFF
-		ObjWatcher		0x0002
+		Assert				0x0001
+		ObjWatcher			0x0002
+		PerfCollector		0x0003
+		Log by macro		0x0004
 
 */
 

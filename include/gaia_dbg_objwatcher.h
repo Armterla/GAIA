@@ -150,9 +150,26 @@ namespace GAIA
 					GAST(pObj != GNIL);
 				}
 
-				GAST(!pObj->bBegin);
 				if(pObj->bBegin)
+				{
+					GAIA::LOG::Log& l = this->select_log();
+					l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002) <<
+						"Watch " << (GAIA::U64)p <<
+						" found a error: Cannot begin again";
+					if(uid != GNIL)
+					{
+						GAIA::CH szUid[33];
+						uid->tostring(szUid);
+						l << ", NewUid=" << szUid;
+					}
+					if(sObjType != GINVALID)
+						l << ", NewObjType=" << sObjType;
+					l << ", see the records followed for more details";
+					l << l.End();
+					this->logout_obj(*pObj);
+					GAST(!pObj->bBegin);
 					return GAIA::False;
+				}
 
 				pObj->nBeginCount++;
 				pObj->bBegin = GAIA::True;
@@ -169,7 +186,8 @@ namespace GAIA
 				r.pszInfo = OBJ_WATCHER_CTOR;
 				pObj->records.push_back(r);
 
-				this->logout_record(r);
+				if(m_bEnableLog)
+					this->logout_record(r);
 
 				return GAIA::True;
 			}
@@ -188,30 +206,78 @@ namespace GAIA
 				Obj* pObj = *ppObj;
 				GAST(pObj != GNIL);
 
-				GAST(pObj->bBegin);
 				if(!pObj->bBegin)
+				{
+					GAIA::LOG::Log& l = this->select_log();
+					l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002)
+						<< "Watch " << (GAIA::U64)p <<
+						" found a error: Cannot end a when have not began";
+					if(uid != GNIL)
+					{
+						GAIA::CH szUid[33];
+						uid->tostring(szUid);
+						l << ", NewUid=" << szUid;
+					}
+					if(sObjType != GINVALID)
+						l << ", NewObjType=" << sObjType;
+					l << ", see the records followed for more details";
+					l << l.End();
+					this->logout_obj(*pObj);
+					GAST(pObj->bBegin);
 					return GAIA::False;
+				}
 
-				GAST(!pObj->records.empty());
 				if(!pObj->records.empty())
 				{
 					if(uid != GNIL)
 					{
-						GAST(pObj->records.back().uid == *uid);
 						if(pObj->records.back().uid != *uid)
+						{
+							GAIA::LOG::Log& l = this->select_log();
+							l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002) << "Watch " << (GAIA::U64)p <<
+								" found a error: Last uuid is not match when end";
+							if(uid != GNIL)
+							{
+								GAIA::CH szUid[33];
+								uid->tostring(szUid);
+								l << ", NewUid=" << szUid;
+							}
+							if(sObjType != GINVALID)
+								l << ", NewObjType=" << sObjType;
+							l << ", see the records followed for more details";
+							l << l.End();
+							this->logout_obj(*pObj);
+							GAST(pObj->records.back().uid == *uid);
 							return GAIA::False;
+						}
 					}
 
 					if(sObjType != GINVALID)
 					{
-						GAST(pObj->records.back().sObjType == sObjType);
 						if(pObj->records.back().sObjType != sObjType)
+						{
+							GAIA::LOG::Log& l = this->select_log();
+							l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002) << "Watch " << (GAIA::U64)p <<
+								" found a error: Last ObjType is not match when end";
+							if(uid != GNIL)
+							{
+								GAIA::CH szUid[33];
+								uid->tostring(szUid);
+								l << ", NewUid=" << szUid;
+							}
+							if(sObjType != GINVALID)
+								l << ", NewObjType=" << sObjType;
+							l << ", see the records followed for more details";
+							l << l.End();
+							this->logout_obj(*pObj);
+							GAST(pObj->records.back().sObjType == sObjType);
 							return GAIA::False;
+						}
 					}
 				}
 				else
 				{
-					GASTFALSE;
+					GAST(!pObj->records.empty());
 					return GAIA::False;
 				}
 
@@ -232,7 +298,8 @@ namespace GAIA
 				r.pszInfo = OBJ_WATCHER_DTOR;
 				pObj->records.push_back(r);
 
-				this->logout_record(r);
+				if(m_bEnableLog)
+					this->logout_record(r);
 
 				return GAIA::True;
 			}
@@ -258,21 +325,53 @@ namespace GAIA
 				{
 					if(uid != GNIL)
 					{
-						GAST(pObj->records.back().uid == *uid);
 						if(pObj->records.back().uid != *uid)
+						{
+							GAIA::LOG::Log& l = this->select_log();
+							l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002) << "Watch " << (GAIA::U64)p <<
+								" found a error: Last uuid is not match when check began";
+							if(uid != GNIL)
+							{
+								GAIA::CH szUid[33];
+								uid->tostring(szUid);
+								l << ", NewUid=" << szUid;
+							}
+							if(sObjType != GINVALID)
+								l << ", NewObjType=" << sObjType;
+							l << ", see the records followed for more details";
+							l << l.End();
+							this->logout_obj(*pObj);
+							GAST(pObj->records.back().uid == *uid);
 							return GAIA::False;
+						}
 					}
 
 					if(sObjType != GINVALID)
 					{
-						GAST(pObj->records.back().sObjType == sObjType);
 						if(pObj->records.back().sObjType != sObjType)
+						{
+							GAIA::LOG::Log& l = this->select_log();
+							l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002) << "Watch " << (GAIA::U64)p <<
+								" found a error: Last ObjType is not match when check began";
+							if(uid != GNIL)
+							{
+								GAIA::CH szUid[33];
+								uid->tostring(szUid);
+								l << ", NewUid=" << szUid;
+							}
+							if(sObjType != GINVALID)
+								l << ", NewObjType=" << sObjType;
+							l << ", see the records followed for more details";
+							l << l.End();
+							this->logout_obj(*pObj);
+							GAST(pObj->records.back().sObjType == sObjType);
 							return GAIA::False;
+						}
 					}
 				}
 				else
 				{
-					GASTFALSE;
+					GAST(!pObj->records.empty());
 					return GAIA::False;
 				}
 
@@ -343,30 +442,80 @@ namespace GAIA
 				Obj* pObj = *ppObj;
 				GAST(pObj != GNIL);
 
-				GAST(pObj->bBegin);
 				if(!pObj->bBegin)
+				{
+					GAIA::LOG::Log& l = this->select_log();
+					l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002) << "Watch " << (GAIA::U64)p <<
+						" found a error: Cannot update when have not began";
+					l << ", Info=" << pszInfo;
+					if(uid != GNIL)
+					{
+						GAIA::CH szUid[33];
+						uid->tostring(szUid);
+						l << ", NewUid=" << szUid;
+					}
+					if(sObjType != GINVALID)
+						l << ", NewObjType=" << sObjType;
+					l << ", see the records followed for more details";
+					l << l.End();
+					this->logout_obj(*pObj);
+					GAST(pObj->bBegin);
 					return GAIA::False;
+				}
 
-				GAST(!pObj->records.empty());
 				if(!pObj->records.empty())
 				{
 					if(uid != GNIL)
 					{
-						GAST(pObj->records.back().uid == *uid);
 						if(pObj->records.back().uid != *uid)
+						{
+							GAIA::LOG::Log& l = this->select_log();
+							l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002) << "Watch " << (GAIA::U64)p <<
+								" found a error: Last uuid is not match when update";
+							l << ", Info=" << pszInfo;
+							if(uid != GNIL)
+							{
+								GAIA::CH szUid[33];
+								uid->tostring(szUid);
+								l << ", NewUid=" << szUid;
+							}
+							if(sObjType != GINVALID)
+								l << ", NewObjType=" << sObjType;
+							l << ", see the records followed for more details";
+							l << l.End();
+							this->logout_obj(*pObj);
+							GAST(pObj->records.back().uid == *uid);
 							return GAIA::False;
+						}
 					}
 
 					if(sObjType != GINVALID)
 					{
-						GAST(pObj->records.back().sObjType == sObjType);
 						if(pObj->records.back().sObjType != sObjType)
+						{
+							GAIA::LOG::Log& l = this->select_log();
+							l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002) << "Watch " << (GAIA::U64)p <<
+								" found a error: Last ObjType is not match when update";
+							l << ", Info=" << pszInfo;
+							if(uid != GNIL)
+							{
+								GAIA::CH szUid[33];
+								uid->tostring(szUid);
+								l << ", NewUid=" << szUid;
+							}
+							if(sObjType != GINVALID)
+								l << ", NewObjType=" << sObjType;
+							l << ", see the records followed for more details";
+							l << l.End();
+							this->logout_obj(*pObj);
+							GAST(pObj->records.back().sObjType == sObjType);
 							return GAIA::False;
+						}
 					}
 				}
 				else
 				{
-					GASTFALSE;
+					GAST(!pObj->records.empty());
 					return GAIA::False;
 				}
 
@@ -392,7 +541,8 @@ namespace GAIA
 					r.pszInfo = m_strpool.alloc(pszInfo);
 				pObj->records.push_back(r);
 
-				this->logout_record(r);
+				if(m_bEnableLog)
+					this->logout_record(r);
 
 				return GAIA::True;
 			}
@@ -529,12 +679,8 @@ namespace GAIA
 			typedef GAIA::CTN::HashMap<const GAIA::GVOID*, Obj*> __ObjHashMap;
 
 		private:
-			GINL GAIA::GVOID logout_record(const Record& r)
+			GINL GAIA::LOG::Log& select_log() const
 			{
-				if(!m_bEnableLog)
-					return;
-
-				// Select log object.
 				GAIA::LOG::Log* pLog;
 				if(m_pLog == GNIL)
 				{
@@ -546,13 +692,34 @@ namespace GAIA
 				}
 				else
 					pLog = m_pLog;
+				return *pLog;
+			}
+			GINL GAIA::GVOID logout_obj(const Obj& obj) const
+			{
+				GAIA::LOG::Log& l = this->select_log();
+				l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002);
+				{
+					l << "Watch " << (GAIA::U64)obj.p <<
+						 ", RecordCnt=" << obj.records.size() <<
+						 ", BeginCnt=" << obj.nBeginCount <<
+						 ", IsBegan=" << obj.bBegin;
+				}
+				l << l.End();
 
+				for(GAIA::NUM x = 0; x < obj.records.size(); ++x)
+				{
+					const Record& r = obj.records[x];
+					this->logout_record(r);
+				}
+			}
+			GINL GAIA::GVOID logout_record(const Record& r) const
+			{
 				// Convert data to string.
 				GAIA::CH szUid[33];
 				r.uid.tostring(szUid);
 
 				// Log out.
-				GAIA::LOG::Log& l = *pLog;
+				GAIA::LOG::Log& l = this->select_log();
 				l << l.Type(GAIA::LOG::Log::TYPE_LOG) << l.UserFilter(0x0002);
 				{
 					GAIA::CH szTime[32];
@@ -565,7 +732,7 @@ namespace GAIA
 						 ", Time=" << szTime <<
 						 ", Info=" << r.pszInfo;
 				}
-				l << pLog->End();
+				l << l.End();
 			}
 
 		private:

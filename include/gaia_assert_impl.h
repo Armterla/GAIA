@@ -14,7 +14,11 @@ namespace GAIA
 	{
 		GINL GAIA::GVOID debuglog(const GAIA::CH* pszHead, const GAIA::CH* pszFileName, GAIA::NUM sCodeLine)
 		{
-			GERR << pszHead << pszFileName << "(" << sCodeLine << ")" << GEND;
+			g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_ERROR)
+					   << g_gaia_log.UserFilter(0x0001)
+					   << pszHead
+					   << pszFileName << "(" << sCodeLine << ")"
+					   << g_gaia_log.End();
 			g_gaia_log.Flush();
 		}
 	}

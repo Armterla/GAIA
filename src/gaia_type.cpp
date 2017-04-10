@@ -127,13 +127,6 @@ namespace GAIA
 	}
 	GAIA::GVOID RefObject::debug_change_ref(GAIA::BL bRise, GAIA::NM nNewRef, const GAIA::CH* pszReason)
 	{
-		if(nNewRef < 0)
-			GERR << "GAIA::RefObject::debug_change_ref: Object reference count drop to below zero!" << GEND;
-		if(m_bDestructingByDropRef)
-			GERR << "GAIA::RefObject::debug_change_ref: Change reference count when destructing!" << GEND;
-		GAST(nNewRef >= 0);
-		GAST(!m_bDestructingByDropRef);
-		GAST(nNewRef <= 0xFF);
 		GAIA::CTN::ACharsString strTemp;
 		GAIA::CH szNewRef[32];
 		GAIA::ALGO::castv(nNewRef, szNewRef, sizeof(szNewRef));
@@ -156,6 +149,13 @@ namespace GAIA
 				strTemp += pszReason;
 		}
 		GWATCH_UPDATE(this, strTemp.fptr(), &m_uuid, 4);
+		if(nNewRef < 0)
+			GERR << "GAIA::RefObject::debug_change_ref: Object reference count drop to below zero!" << GEND;
+		if(m_bDestructingByDropRef)
+			GERR << "GAIA::RefObject::debug_change_ref: Change reference count when destructing!" << GEND;
+		GAST(nNewRef >= 0);
+		GAST(!m_bDestructingByDropRef);
+		GAST(nNewRef <= 0xFF);
 	}
 #endif
 }
