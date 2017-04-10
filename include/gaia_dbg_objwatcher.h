@@ -48,6 +48,7 @@ namespace GAIA
 					p = GNIL;
 					uid.clear();
 					sObjType = GINVALID;
+					uThreadID = 0;
 					uTime = 0;
 					szInfo[0] = '\0';
 					pszInfo = GNIL;
@@ -66,6 +67,7 @@ namespace GAIA
 				const GAIA::GVOID* p;
 				GAIA::X128 uid;
 				GAIA::NUM sObjType;
+				GAIA::UM uThreadID;
 				GAIA::U64 uTime;
 				GAIA::CH szInfo[33];
 				const GAIA::CH* pszInfo;
@@ -162,6 +164,7 @@ namespace GAIA
 				else
 					r.uid.uuid();
 				r.sObjType = sObjType;
+				r.uThreadID = GAIA::THREAD::threadid();
 				r.uTime = GAIA::TIME::process_time();
 				r.pszInfo = OBJ_WATCHER_CTOR;
 				pObj->records.push_back(r);
@@ -224,6 +227,7 @@ namespace GAIA
 					r.sObjType = sObjType;
 				else
 					r.sObjType = pObj->records.back().sObjType;
+				r.uThreadID = GAIA::THREAD::threadid();
 				r.uTime = GAIA::TIME::process_time();
 				r.pszInfo = OBJ_WATCHER_DTOR;
 				pObj->records.push_back(r);
@@ -376,6 +380,7 @@ namespace GAIA
 					r.sObjType = sObjType;
 				else
 					r.sObjType = pObj->records.back().sObjType;
+				r.uThreadID = GAIA::THREAD::threadid();
 				r.uTime = GAIA::TIME::process_time();
 				GAIA::NUM sInfoLen = GAIA::ALGO::gstrlen(pszInfo);
 				if(sInfoLen < sizeof(r.szInfo))
@@ -556,6 +561,7 @@ namespace GAIA
 					l << "Watch " << (GAIA::U64)r.p <<
 						 ", Uid=" << szUid <<
 						 ", ObjType=" << r.sObjType <<
+						 ", Tid=" << r.uThreadID <<
 						 ", Time=" << szTime <<
 						 ", Info=" << r.pszInfo;
 				}
