@@ -163,27 +163,39 @@
 
 /* Heap. */
 #ifndef __GAIA_NO_HEAP__
-#	define GAIA_HEAP
+#	ifndef GAIA_HEAP
+#		define GAIA_HEAP
+#	endif
 #endif
 
 #ifndef __GAIA_NO_LIMIT4G_HEAP__
-#	define GAIA_HEAP_LIMIT4G
+#	ifndef GAIA_HEAP_LIMIT4G
+#		define GAIA_HEAP_LIMIT4G
+#	endif
 #endif
 
 #ifndef __GAIA_NO_HEAP_THREADSAFE__
-#	define GAIA_HEAP_THREADSAFE
+#	ifndef GAIA_HEAP_THREADSAFE
+#		define GAIA_HEAP_THREADSAFE
+#	endif
 #endif
 
 #ifndef __GAIA_NO_HEAP_FORGLOBAL__
-#	define GAIA_HEAP_FORGLOBAL
+#	ifndef GAIA_HEAP_FORGLOBAL
+#		define GAIA_HEAP_FORGLOBAL
+#	endif
 #endif
 
 #ifndef	__GAIA_NO_HEAP_FORCLASS__
-#	define GAIA_HEAP_FORCLASS
+#	ifndef GAIA_HEAP_FORCLASS
+#		define GAIA_HEAP_FORCLASS
+#	endif
 #endif
 
 #ifndef	__GAIA_NO_HEAP_FORCUSTOM__
-#	define GAIA_HEAP_FORCUSTOM
+#	ifndef GAIA_HEAP_FORCUSTOM
+#		define GAIA_HEAP_FORCUSTOM
+#	endif
 #endif
 
 /* Strategy */
@@ -200,69 +212,132 @@
 #	define GAIA_STRATEGY GAIA_STRATEGY_SPEEDPRIORITY
 #endif
 
+/* Feature mode. */
+#ifndef __GAIA_NO_FEATURE_SQLITE__
+#	ifndef GAIA_FEATURE_SQLITE
+#		define GAIA_FEATURE_SQLITE
+#	endif
+#endif
+
+#ifndef	__GAIA_NO_FEATURE_PCRE__
+#	ifndef GAIA_FEATURE_PCRE
+#		define GAIA_FEATURE_PCRE
+#	endif
+#endif
+
+#ifndef __GAIA_NO_FEATURE_JPEG__
+#	ifndef GAIA_FEATURE_JPEG
+#		define GAIA_FEATURE_JPEG
+#	endif
+#endif
+
+#ifndef __GAIA_NO_FEATURE_PNG__
+#	ifndef GAIA_FEATURE_PNG
+#		define GAIA_FEATURE_PNG
+#	endif
+#endif
+
+#ifndef __GAIA_NO_FEATURE_HPDF__
+#	ifndef GAIA_FEATURE_HPDF
+#		define GAIA_FEATURE_HPDF
+#	endif
+#endif
+
 /* Debug mode. */
 #ifndef __GAIA_NO_DEBUG_SOLUTION__
-#	define GAIA_DEBUG_SOLUTION
+#	ifndef GAIA_DEBUG_SOLUTION
+#		define GAIA_DEBUG_SOLUTION
+#	endif
 #endif
 
 #ifndef __GAIA_NO_DEBUG_SELFCHECK__
-#	define GAIA_DEBUG_SELFCHECK
+#	ifndef GAIA_DEBUG_SELFCHECK
+#		define GAIA_DEBUG_SELFCHECK
+#	endif
 #endif
 
 #ifndef __GAIA_NO_DEBUG_ROUTINE__
-#	define GAIA_DEBUG_ROUTINE
+#	ifndef GAIA_DEBUG_ROUTINE
+#		define GAIA_DEBUG_ROUTINE
+#	endif
 #endif
 
 #ifndef __GAIA_NO_DEBUG_WARNING__
-#	define GAIA_DEBUG_WARNING
+#	ifndef GAIA_DEBUG_WARNING
+#		define GAIA_DEBUG_WARNING
+#	endif
 #endif
 
 #ifndef __GAIA_NO_DEBUG_CODING__
-#	define GAIA_DEBUG_CODING
+#	ifndef GAIA_DEBUG_CODING
+#		define GAIA_DEBUG_CODING
+#	endif
 #endif
 
 #ifndef __GAIA_NO_DEBUG_AST__
-#	define GAIA_DEBUG_AST
+#	ifndef GAIA_DEBUG_AST
+#		define GAIA_DEBUG_AST
+#	endif
 #endif
 
 #ifndef __GAIA_NO_DEBUG_STATICAST__
-#	define GAIA_DEBUG_STATICAST
+#	ifndef GAIA_DEBUG_STATICAST
+#		define GAIA_DEBUG_STATICAST
+#	endif
 #endif
 
 #ifndef __GAIA_NO_DEBUG_MACHINELENGTH__
-#	define GAIA_DEBUG_MACHINELENGTH
+#	ifndef GAIA_DEBUG_MACHINELENGTH
+#		define GAIA_DEBUG_MACHINELENGTH
+#	endif
 #endif
 
 #ifndef __GAIA_NO_DEBUG_MEMORYLEAK__
-#	define GAIA_DEBUG_MEMORYLEAK
+#	ifndef GAIA_DEBUG_MEMORYLEAK
+#		define GAIA_DEBUG_MEMORYLEAK
+#	endif
 #endif
 
 #ifndef __GAIA_NO_DEBUG_PLATFORM__
-#	define GAIA_DEBUG_PLATFORM
+#	ifndef GAIA_DEBUG_PLATFORM
+#		define GAIA_DEBUG_PLATFORM
+#	endif
 #endif
 
 #ifndef __GAIA_NO_DEBUG_LOG__
-#	define GAIA_DEBUG_LOG
+#	ifndef GAIA_DEBUG_LOG
+#		define GAIA_DEBUG_LOG
+#	endif
 #endif
 
 #ifndef __GAIA_NO_DEBUG_THROWEXCEPTION
-#	define GAIA_DEBUG_THROWEXCEPTION
+#	ifndef GAIA_DEBUG_THROWEXCEPTION
+#		define GAIA_DEBUG_THROWEXCEPTION
+#	endif
 #endif
 
 #ifndef __GAIA_NO_DEBUG_CACHEEXCEPTION
-#	define GAIA_DEBUG_CATCHEXCEPTION
+#	ifndef GAIA_DEBUG_CATCHEXCEPTION
+#		define GAIA_DEBUG_CATCHEXCEPTION
+#	endif
 #endif
 
 #ifndef __GAIA_NO_DEBUG_ASTDEBUG
-#	define GAIA_DEBUG_ASTDEBUG
+#	ifndef GAIA_DEBUG_ASTDEBUG
+#		define GAIA_DEBUG_ASTDEBUG
+#	endif
 #endif
 
 #ifndef	__GAIA_NO_DEBUG_PERF
-#	define GAIA_DEBUG_PERF
+#	ifndef GAIA_DEBUG_PERF
+#		define GAIA_DEBUG_PERF
+#	endif
 #endif
 
 #ifndef __GAIA_NO_DEBUG_OBJWATCH
-#	define GAIA_DEBUG_OBJWATCH
+#	ifndef GAIA_DEBUG_OBJWATCH
+#		define GAIA_DEBUG_OBJWATCH
+#	endif
 #endif
 
 /* Debug const flag. */
