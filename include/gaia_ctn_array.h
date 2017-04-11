@@ -3,6 +3,7 @@
 
 #include "gaia_type.h"
 #include "gaia_assert.h"
+#include "gaia_algo_compare.h"
 #include "gaia_algo_search.h"
 #include "gaia_algo_sort.h"
 #include "gaia_algo_unique.h"
@@ -165,7 +166,7 @@ namespace GAIA
 			GINL _SizeType typesize() const{return sizeof(_DataType);}
 			GINL _SizeType datasize() const{return this->typesize() * this->size();}
 			GINL GAIA::GVOID clear(){m_size = 0;}
-			GINL GAIA::BL push_back(const _DataType& t){if(this->size() < this->capacity()){m_data[m_size++] = t; return GAIA::True;} else return GAIA::False;}
+			GINL GAIA::BL push_back(const _DataType& t){if(this->size() < this->capacity()){m_pFront[m_size++] = t; return GAIA::True;} else return GAIA::False;}
 			GINL GAIA::BL push_back(const _DataType* p, const _SizeType& size)
 			{
 				GAST(!!p);
@@ -174,7 +175,7 @@ namespace GAIA
 				if(newsize > this->capacity())
 					return GAIA::False;
 				for(_SizeType x = 0; x < size; ++x)
-					m_data[m_size++] = p[x];
+					m_pFront[m_size++] = p[x];
 				return GAIA::True;
 			}
 			GINL GAIA::BL pop_back(){GAST(!this->empty()); if(!this->empty()){m_size--; return GAIA::True;} return GAIA::False;}
@@ -185,7 +186,7 @@ namespace GAIA
 				if(size > this->size())
 					return GAIA::False;
 				for(_SizeType x = 0; x < size; ++x)
-					p[x] = m_data[this->size() - size + x];
+					p[x] = m_pFront[this->size() - size + x];
 				m_size -= size;
 				return GAIA::True;
 			}
@@ -219,7 +220,7 @@ namespace GAIA
 					return GAIA::True;
 				_SizeType srcbegin = m_size - size;
 				for(_SizeType x = 0; x < size; ++x)
-					m_data[x] = m_data[srcbegin + x];
+					m_pFront[x] = m_pFront[srcbegin + x];
 				m_size = size;
 				return GAIA::True;
 			}
@@ -232,7 +233,7 @@ namespace GAIA
 				GAIA::ALGO::count(this->fptr(), this->bptr(), t, ret);
 				return ret;
 			}
-			GINL GAIA::GVOID sort(){if(this->empty()) return; GAIA::ALGO::sort(m_data, &m_data[this->size() - 1]);}
+			GINL GAIA::GVOID sort(){if(this->empty()) return; GAIA::ALGO::sort(m_pFront, &m_pFront[this->size() - 1]);}
 			GINL _SizeType unique()
 			{
 				if(this->empty())
@@ -255,10 +256,10 @@ namespace GAIA
 			{
 				if(this->size() <= 0)
 					return (_SizeType)GINVALID;
-				const _DataType* pFinded = GAIA::ALGO::gbinary_search(m_data, &m_data[this->size() - 1], t);
+				const _DataType* pFinded = GAIA::ALGO::gbinary_search(m_pFront, &m_pFront[this->size() - 1], t);
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;
-				return (_SizeType)(pFinded - m_data);
+				return (_SizeType)(pFinded - m_pFront);
 			}
 			GINL it binary_searchit(const _DataType& t)
 			{
@@ -311,7 +312,7 @@ namespace GAIA
 				const _DataType* pFinded = GAIA::ALGO::find(this->fptr() + index, this->bptr(), t);
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;
-				return (_SizeType)(pFinded - m_data);
+				return (_SizeType)(pFinded - m_pFront);
 			}
 			GINL _SizeType rfind(const _DataType& t, _SizeType index = GINVALID) const
 			{
@@ -324,7 +325,7 @@ namespace GAIA
 				const _DataType* pFinded = GAIA::ALGO::rfind(this->fptr(), this->fptr() + index, t);
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;
-				return (_SizeType)(pFinded - m_data);
+				return (_SizeType)(pFinded - m_pFront);
 			}
 			GINL _SizeType replace(const _DataType& tOld, const _DataType& tNew)
 			{
@@ -400,6 +401,72 @@ namespace GAIA
 					++ret;
 				}
 				return ret;
+			}
+			template<typename _ParamDataType> _SizeType extract(_SizeType index_start, _SizeType index_end, _ParamDataType* pResult, const _SizeType& nResultSize) const
+			{
+				if(index_start < GINVALID || index_start >= this->size())
+					return GINVALID;
+				if(index_end < GINVALID || index_end >= this->size())
+					return GINVALID;
+				if(index_start == GINVALID)
+					index_start = 0;
+				if(index_end == GINVALID)
+					index_end = this->size() - 1;
+				if(index_start > index_end)
+					return GINVALID;
+				if(pResult == GNIL)
+					return GINVALID;
+				if(this->empty())
+					return 0;
+				_SizeType nResult = GAIA::ALGO::gmin(index_end - index_start + 1, nResultSize);
+				GAIA::ALGO::copy(pResult, m_pFront + index_start, nResult);
+				return nResult;
+			}
+			template<typename _ParamDataType> _SizeType extract_left(_SizeType index, _ParamDataType* pResult, const _SizeType& nResultSize) const
+			{
+				return this->extract(0, index - 1, pResult, nResultSize);
+			}
+			template<typename _ParamDataType> _SizeType extract_right(_SizeType index, _ParamDataType* pResult, const _SizeType& nResultSize) const
+			{
+				return this->extract(index + 1, GINVALID, pResult, nResultSize);
+			}
+			template<typename _ParamDataType> _SizeType extract_mid(_SizeType index_start, _SizeType index_end, _ParamDataType* pResult, const _SizeType& nResultSize) const
+			{
+				return this->extract(index_start, index_end, pResult, nResultSize);
+			}
+			GINL _SizeType extract(_SizeType index_start, _SizeType index_end, __MyType& res) const
+			{
+				if(index_start < GINVALID || index_start >= this->size())
+					return GINVALID;
+				if(index_end < GINVALID || index_end >= this->size())
+					return GINVALID;
+				if(index_start == GINVALID)
+					index_start = 0;
+				if(index_end == GINVALID)
+					index_end = this->size() - 1;
+				if(index_start > index_end)
+					return GINVALID;
+				if(this->empty())
+				{
+					res.clear();
+					return 0;
+				}
+				_SizeType require = index_end - index_start + 1;
+				_SizeType old_length = res.size();
+				res.resize_keep(old_length + require);
+				return this->extract(index_start, index_end, res.m_pFront + old_length, require);
+			}
+			GINL _SizeType extract_left(_SizeType index, __MyType& res) const
+			{
+				return this->extract(0, index - 1, res);
+			}
+			GINL _SizeType extract_right(_SizeType index, __MyType& res) const
+			{
+				return this->extract(index + 1, GINVALID, res);
+			}
+			GINL _SizeType extract_mid(_SizeType index_start, _SizeType index_end, __MyType& res) const
+			{
+				return this->extract(index_start, index_end, res);
 			}
 			GINL it findit(const _DataType& t, const _SizeType& index = 0)
 			{
@@ -546,8 +613,8 @@ namespace GAIA
 				}
 				return *this;
 			}
-			GINL const _DataType& operator [] (const _SizeType& index) const{return m_data[index];}
-			GINL _DataType& operator [] (const _SizeType& index){return m_data[index];}
+			GINL const _DataType& operator [] (const _SizeType& index) const{return m_pFront[index];}
+			GINL _DataType& operator [] (const _SizeType& index){return m_pFront[index];}
 			GINL __MyType& operator = (const __MyType& src)
 			{
 				GAST(&src != this);
@@ -580,7 +647,7 @@ namespace GAIA
 		private:
 			GINL GAIA::GVOID init(){m_size = 0;}
 		private:
-			_DataType m_data[_Size];
+			_DataType m_pFront[_Size];
 			_SizeType m_size;
 		};
 		template<typename _DataType, GAIA::NUM _Size> class Array : public BasicArray<_DataType, GAIA::NUM, _Size>{public:};
