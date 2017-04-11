@@ -1484,6 +1484,18 @@ namespace GAIA
 		typedef GAIA::CTN::BasicCharsString<GAIA::CH, GAIA::NUM, GAIA::MAXPL> ACharsString;
 		typedef GAIA::CTN::BasicCharsString<GAIA::WCH, GAIA::NUM, GAIA::MAXPL> WCharsString;
 		typedef GAIA::CTN::BasicCharsString<GAIA::TCH, GAIA::NUM, GAIA::MAXPL> TCharsString;
+		typedef GAIA::CTN::BasicCharsString<GAIA::CH, GAIA::NUM, 16> ACharsString16;
+		typedef GAIA::CTN::BasicCharsString<GAIA::WCH, GAIA::NUM, 16> WCharsString16;
+		typedef GAIA::CTN::BasicCharsString<GAIA::TCH, GAIA::NUM, 16> TCharsString16;
+		typedef GAIA::CTN::BasicCharsString<GAIA::CH, GAIA::NUM, 32> ACharsString32;
+		typedef GAIA::CTN::BasicCharsString<GAIA::WCH, GAIA::NUM, 32> WCharsString32;
+		typedef GAIA::CTN::BasicCharsString<GAIA::TCH, GAIA::NUM, 32> TCharsString32;
+		typedef GAIA::CTN::BasicCharsString<GAIA::CH, GAIA::NUM, 64> ACharsString64;
+		typedef GAIA::CTN::BasicCharsString<GAIA::WCH, GAIA::NUM, 64> WCharsString64;
+		typedef GAIA::CTN::BasicCharsString<GAIA::TCH, GAIA::NUM, 64> TCharsString64;
+		typedef GAIA::CTN::BasicCharsString<GAIA::CH, GAIA::NUM, 128> ACharsString128;
+		typedef GAIA::CTN::BasicCharsString<GAIA::WCH, GAIA::NUM, 128> WCharsString128;
+		typedef GAIA::CTN::BasicCharsString<GAIA::TCH, GAIA::NUM, 128> TCharsString128;
 	}
 }
 
