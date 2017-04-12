@@ -331,8 +331,10 @@ namespace GAIA
 				switch(nt)
 				{
 				case GAIA::XML::XML_NODE_CONTAINER:
+					GAST(nodenamelen > 0);
 					break;
 				case GAIA::XML::XML_NODE_MULTICONTAINER:
+					GAST(nodenamelen > 0);
 					break;
 				default:
 					GTHROW_RET(Illegal, GNIL);
@@ -377,6 +379,7 @@ namespace GAIA
 					GAST(nodenamelen == 0);
 					break;
 				case GAIA::XML::XML_NODE_MULTICONTAINER:
+					GAST(nodenamelen > 0);
 					break;
 				default:
 					GTHROW_RET(Illegal, GNIL);

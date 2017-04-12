@@ -383,11 +383,7 @@ namespace GAIA
 					GAST(nodenamelen >= 0);
 					break;
 				case GAIA::JSON::JSON_NODE_MULTICONTAINER:
-					{
-						GAST(nodenamelen == 0);
-						if(*pRet != '[')
-							GTHROW_RET(Illegal, GNIL);
-					}
+					GAST(nodenamelen >= 0);
 					break;
 				default:
 					GTHROW_RET(Illegal, GNIL);
