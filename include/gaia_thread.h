@@ -167,7 +167,11 @@ namespace GAIA
 		GINL static DWORD WINAPI gaia_native_thread_procedure(GAIA::GVOID* p)
 		{
 			Thread* pThread = GSCAST(Thread*)(p);
-			GAST(GAIA::THREAD::threadid() == pThread->GetThreadID());
+		#ifdef GAIA_DEBUG_AST
+			GAIA::UM uThreadIDByOS = GAIA::THREAD::threadid();
+			GAIA::UM uThreadIDByThread = pThread->GetThreadID();
+			GAST(uThreadIDByOS == uThreadIDByThread);
+		#endif
 			pThread->Run();
 			return 0;
 		}
@@ -176,7 +180,11 @@ namespace GAIA
 		{
 			signal(SIGPIPE, SIG_IGN);
 			Thread* pThread = GSCAST(Thread*)(p);
-			GAST(GAIA::THREAD::threadid() == pThread->GetThreadID());
+		#ifdef GAIA_DEBUG_AST
+			GAIA::UM uThreadIDByOS = GAIA::THREAD::threadid();
+			GAIA::UM uThreadIDByThread = pThread->GetThreadID();
+			GAST(uThreadIDByOS == uThreadIDByThread);
+		#endif
 			pThread->Run();
 			pthread_exit(0);
 		}
