@@ -376,7 +376,7 @@ namespace GAIA
 		#	endif
 		#endif
 		#ifdef GAIA_DEBUG_SOLUTION
-			this->debug_change_ref(GAIA::True, nNew, pszReason);
+			this->debug_change_ref(GAIA::True, nNew, pszReason, m_bDestructingByDropRef);
 		#endif
 			return nNew;
 		}
@@ -402,7 +402,7 @@ namespace GAIA
 		#	endif
 		#endif
 		#ifdef GAIA_DEBUG_SOLUTION
-			this->debug_change_ref(GAIA::False, nNew, pszReason);
+			this->debug_change_ref(GAIA::False, nNew, pszReason, m_bDestructingByDropRef);
 		#endif
 			if(nNew == 0 && !m_bDestructingByDropRef)
 			{
@@ -419,7 +419,7 @@ namespace GAIA
 		GINL RefObject& operator = (const RefObject& src){return *this;}
 	#ifdef GAIA_DEBUG_SOLUTION
 		GAIA::GVOID debug_constructor();
-		virtual GAIA::GVOID debug_change_ref(GAIA::BL bRise, GAIA::NM nNewRef, const GAIA::CH* pszReason);
+		virtual GAIA::GVOID debug_change_ref(GAIA::BL bRise, GAIA::NM nNewRef, const GAIA::CH* pszReason, GAIA::BL bDestructingByDropRef);
 	#endif
 	private:
 	#if GAIA_OS == GAIA_OS_WINDOWS
@@ -440,7 +440,7 @@ namespace GAIA
 	#ifdef GAIA_DEBUG_SOLUTION
 		X128 m_uuid;
 	#endif
-		GAIA::U8 m_bDestructingByDropRef : 1;
+		GAIA::BL m_bDestructingByDropRef;
 	#ifdef __APPLE__
 	#	pragma clang diagnostic pop
 	#endif

@@ -125,7 +125,7 @@ namespace GAIA
 	{
 		GWATCH_BEGIN(this, &m_uuid, 4);
 	}
-	GAIA::GVOID RefObject::debug_change_ref(GAIA::BL bRise, GAIA::NM nNewRef, const GAIA::CH* pszReason)
+	GAIA::GVOID RefObject::debug_change_ref(GAIA::BL bRise, GAIA::NM nNewRef, const GAIA::CH* pszReason, GAIA::BL bDestructingByDropRef)
 	{
 		GAIA::CTN::ACharsString strTemp;
 		GAIA::CH szNewRef[32];
@@ -142,19 +142,85 @@ namespace GAIA
 		}
 		if(pszReason != GNIL)
 		{
-			strTemp += ", Reason = ";
+			strTemp += ", Reason=";
 			if(pszReason[0] == '\0')
-				strTemp += "reason string is a empty(\\0) string.";
+				strTemp += "reason string is a empty(\\0) string";
 			else
 				strTemp += pszReason;
 		}
 		GWATCH_UPDATE(this, strTemp.fptr(), &m_uuid, 4);
+
 		if(nNewRef < 0)
-			GERR << "GAIA::RefObject::debug_change_ref: Object reference count drop to below zero!" << GEND;
-		if(m_bDestructingByDropRef)
-			GERR << "GAIA::RefObject::debug_change_ref: Change reference count when destructing!" << GEND;
+		{
+			strTemp.clear();
+			if(pszReason != GNIL)
+			{
+				strTemp = ", Reason=";
+				if(pszReason[0] == '\0')
+					strTemp += "reason string is a empty(\\0) string";
+				else
+					strTemp += pszReason;
+			}
+
+			GAIA::CH szUid[33];
+			m_uuid.tostring(szUid);
+			GAIA::UM uThreadID = GAIA::THREAD::threadid();
+			if(bRise)
+			{
+				GERR << "GAIA::RefObject::debug_change_ref: "
+					 << (GAIA::U64)this
+					 << ", Uid=" << szUid
+					 << ", Tid=" << uThreadID
+					 << ", object reference count rise to " << szNewRef << strTemp.fptr()
+					 << GEND;
+			}
+			else
+			{
+				GERR << "GAIA::RefObject::debug_change_ref: "
+					 << (GAIA::U64)this
+					 << ", Uid=" << szUid
+					 << ", Tid=" << uThreadID
+					 << ", object reference count drop to " << szNewRef << strTemp.fptr()
+					 << GEND;
+			}
+		}
+
+		if(bDestructingByDropRef)
+		{
+			strTemp.clear();
+			if(pszReason != GNIL)
+			{
+				strTemp = ", Reason=";
+				if(pszReason[0] == '\0')
+					strTemp += "reason string is a empty(\\0) string";
+				else
+					strTemp += pszReason;
+			}
+
+			GAIA::CH szUid[33];
+			m_uuid.tostring(szUid);
+			GAIA::UM uThreadID = GAIA::THREAD::threadid();
+			if(bRise)
+			{
+				GERR << "GAIA::RefObject::debug_change_ref: "
+					 << (GAIA::U64)this
+					 << ", Uid=" << szUid
+					 << ", Tid=" << uThreadID
+					 << ", rise reference count to " << szNewRef << " when destructing" << strTemp.fptr()
+					 << GEND;
+			}
+			else
+			{
+				GERR << "GAIA::RefObject::debug_change_ref: "
+					 << (GAIA::U64)this
+					 << ", Uid=" << szUid
+					 << ", Tid=" << uThreadID
+					 << ", drop reference count to " << szNewRef << " when destructing" << strTemp.fptr()
+					 << GEND;
+			}
+		}
 		GAST(nNewRef >= 0);
-		GAST(!m_bDestructingByDropRef);
+		GAST(!bDestructingByDropRef);
 		GAST(nNewRef <= 0xFF);
 	}
 #endif
