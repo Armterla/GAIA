@@ -1183,6 +1183,9 @@ namespace GAIA
 				m_bufpool.destroy();
 			}
 
+			// Unregist all callbacks.
+			this->UnregistCallBackAll();
+
 			gdel[] m_desc.pszRootPath;
 			m_desc.reset();
 			m_bCreated = GAIA::False;
