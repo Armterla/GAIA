@@ -106,8 +106,8 @@ namespace GAIA
 				m_state = STATE_RUNNING;
 				if(pthread_create(&m_thread, &attr, gaia_native_thread_procedure, GSCAST(GAIA::GVOID*)(this)) != 0)
 					return GAIA::False;
-				pthread_attr_destroy(&attr);
 				m_uThreadID = (GAIA::UM)m_thread;
+				pthread_attr_destroy(&attr);
 				m_bCreated = GAIA::True;
 				return GAIA::True;
 			#endif
@@ -183,7 +183,8 @@ namespace GAIA
 		#ifdef GAIA_DEBUG_AST
 			GAIA::UM uThreadIDByOS = GAIA::THREAD::threadid();
 			GAIA::UM uThreadIDByThread = pThread->GetThreadID();
-			GAST(uThreadIDByOS == uThreadIDByThread);
+			if(uThreadIDByThread != GINVALID)
+				GAST(uThreadIDByOS == uThreadIDByThread);
 		#endif
 			pThread->Run();
 			pthread_exit(0);
