@@ -412,13 +412,13 @@ namespace GAIA
 				switch(nt)
 				{
 				case GAIA::XML::XML_NODE_NAME:
+					GAST(nodenamelen != 0);
 					break;
 				case GAIA::XML::XML_NODE_VALUE:
 					break;
 				default:
 					GTHROW_RET(Illegal, GNIL);
 				}
-				GAST(nodenamelen != 0);
 				m_pCursor = pNext;
 				return pRet;
 			}
