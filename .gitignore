@@ -24,3 +24,6 @@ Doxygen/html/
 build*qt*/
 *.pro.user
 *.xcbkptlist
+
+*.xcscheme
+xcschememanagement.plist
