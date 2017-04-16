@@ -16,7 +16,7 @@ namespace GAIA
 	{
 	#if GAIA_OS == GAIA_OS_WINDOWS
 	#	if GAIA_PROFILE == GAIA_PROFILE_DEBUG
-		inline GAIA::N32 crt_alloc_hook(
+		GINL GAIA::N32 crt_alloc_hook(
 			GAIA::N32 nAllocType,
 			GAIA::GVOID* pUserData,
 		#if GAIA_MACHINE == GAIA_MACHINE32

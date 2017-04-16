@@ -104,6 +104,36 @@ namespace GAIA
 		}
 		return TYPEID_INVALID;
 	}
+	
+	GINL GAIA::RELATION_TYPE GetRelationTypeByString(const GAIA::CH* psz, GAIA::NUM sLen)
+	{
+		GAST(psz != GNIL && *psz != '\0');
+		GAST(sLen == GINVALID || sLen > 0);
+		if(sLen == GINVALID)
+		{
+			for(GAIA::NUM x = 1; sizeofarray(GAIA::RELATION_TYPE_STRING); ++x)
+			{
+				if(GAIA::ALGO::gstrcmp(psz, GAIA::RELATION_TYPE_STRING[x]) == 0)
+					return (RELATION_TYPE)x;
+			}
+		}
+		else
+		{
+			for(GAIA::NUM x = 0; x < sizeofarray(GAIA::RELATION_TYPE_STRING); ++x)
+			{
+				if(GAIA::ALGO::gstrcmp(psz, GAIA::RELATION_TYPE_STRING[x], sLen) == 0)
+					return (RELATION_TYPE)x;
+			}
+		}
+		return RELATION_TYPE_INVALID;
+	}
+	
+	GINL const CH* GetRelationTypeByEnum(GAIA::RELATION_TYPE rt)
+	{
+		if(rt >= sizeofarray(RELATION_TYPE_STRING))
+			return GNIL;
+		return RELATION_TYPE_STRING[(NUM)rt];
+	}
 }
 
 #endif

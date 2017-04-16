@@ -522,31 +522,29 @@ namespace GAIA
 
 	GINL TYPEID nametotype(const GAIA::CH* psz);
 	GINL TYPEID nametotype(const GAIA::WCH* psz);
-	TYPEID nametotype(const char* psz);
-	TYPEID nametotype(const wchar_t* psz);
-	template<typename _DataType> inline TYPEID datatotype(_DataType t){return TYPEID_INVALID;}
-	template<typename _DataType> inline TYPEID datatotype(_DataType* t){return TYPEID_INVALID;}
-	template<typename _DataType> inline TYPEID datatotype(const _DataType* t){return TYPEID_INVALID;}
-	template<> inline TYPEID datatotype(GAIA::NM t){return TYPEID_NM;}
-	template<> inline TYPEID datatotype(GAIA::UM t){return TYPEID_UM;}
-	template<> inline TYPEID datatotype(GAIA::BL t){return TYPEID_BL;}
-	template<> inline TYPEID datatotype(GAIA::N8 t){return TYPEID_N8;}
-	template<> inline TYPEID datatotype(GAIA::U8 t){return TYPEID_U8;}
-	template<> inline TYPEID datatotype(GAIA::N16 t){return TYPEID_N16;}
-	template<> inline TYPEID datatotype(GAIA::U16 t){return TYPEID_U16;}
-	template<> inline TYPEID datatotype(GAIA::N32 t){return TYPEID_N32;}
-	template<> inline TYPEID datatotype(GAIA::U32 t){return TYPEID_U32;}
-	template<> inline TYPEID datatotype(GAIA::N64 t){return TYPEID_N64;}
-	template<> inline TYPEID datatotype(GAIA::U64 t){return TYPEID_U64;}
-	template<> inline TYPEID datatotype(X128 t){return TYPEID_X128;}
-	template<> inline TYPEID datatotype(GAIA::F32 t){return TYPEID_F32;}
-	template<> inline TYPEID datatotype(GAIA::F64 t){return TYPEID_F64;}
-	template<> inline TYPEID datatotype(GAIA::N8* t){return TYPEID_CHARPOINTER;}
-	template<> inline TYPEID datatotype(const GAIA::N8* t){return TYPEID_CONSTCHARPOINTER;}
-	template<> inline TYPEID datatotype(GAIA::WCH* t){return TYPEID_WCHARPOINTER;}
-	template<> inline TYPEID datatotype(const GAIA::WCH* t){return TYPEID_CONSTWCHARPOINTER;}
-	template<> inline TYPEID datatotype(GAIA::GVOID* t){return TYPEID_POINTER;}
-	template<> inline TYPEID datatotype(const GAIA::GVOID* t){return TYPEID_CONSTPOINTER;}
+	template<typename _DataType> GINL TYPEID datatotype(_DataType t){return TYPEID_INVALID;}
+	template<typename _DataType> GINL TYPEID datatotype(_DataType* t){return TYPEID_INVALID;}
+	template<typename _DataType> GINL TYPEID datatotype(const _DataType* t){return TYPEID_INVALID;}
+	template<> GINL TYPEID datatotype(GAIA::NM t){return TYPEID_NM;}
+	template<> GINL TYPEID datatotype(GAIA::UM t){return TYPEID_UM;}
+	template<> GINL TYPEID datatotype(GAIA::BL t){return TYPEID_BL;}
+	template<> GINL TYPEID datatotype(GAIA::N8 t){return TYPEID_N8;}
+	template<> GINL TYPEID datatotype(GAIA::U8 t){return TYPEID_U8;}
+	template<> GINL TYPEID datatotype(GAIA::N16 t){return TYPEID_N16;}
+	template<> GINL TYPEID datatotype(GAIA::U16 t){return TYPEID_U16;}
+	template<> GINL TYPEID datatotype(GAIA::N32 t){return TYPEID_N32;}
+	template<> GINL TYPEID datatotype(GAIA::U32 t){return TYPEID_U32;}
+	template<> GINL TYPEID datatotype(GAIA::N64 t){return TYPEID_N64;}
+	template<> GINL TYPEID datatotype(GAIA::U64 t){return TYPEID_U64;}
+	template<> GINL TYPEID datatotype(X128 t){return TYPEID_X128;}
+	template<> GINL TYPEID datatotype(GAIA::F32 t){return TYPEID_F32;}
+	template<> GINL TYPEID datatotype(GAIA::F64 t){return TYPEID_F64;}
+	template<> GINL TYPEID datatotype(GAIA::N8* t){return TYPEID_CHARPOINTER;}
+	template<> GINL TYPEID datatotype(const GAIA::N8* t){return TYPEID_CONSTCHARPOINTER;}
+	template<> GINL TYPEID datatotype(GAIA::WCH* t){return TYPEID_WCHARPOINTER;}
+	template<> GINL TYPEID datatotype(const GAIA::WCH* t){return TYPEID_CONSTWCHARPOINTER;}
+	template<> GINL TYPEID datatotype(GAIA::GVOID* t){return TYPEID_POINTER;}
+	template<> GINL TYPEID datatotype(const GAIA::GVOID* t){return TYPEID_CONSTPOINTER;}
 
 	/* Common type. */
 	GAIA_ENUM_BEGIN(SEEK_TYPE)
@@ -566,6 +564,20 @@ namespace GAIA
 		RELATION_TYPE_TRUE,
 		RELATION_TYPE_FALSE,
 	GAIA_ENUM_END(RELATION_TYPE)
+	static const GAIA::CH* RELATION_TYPE_STRING[] = 
+	{
+		"invalid",
+		"equal",
+		"notequal",
+		"above",
+		"below",
+		"aboveequal",
+		"belowequal",
+		"true",
+		"false",
+	};
+	GINL GAIA::RELATION_TYPE GetRelationTypeByString(const GAIA::CH* psz, GAIA::NUM sLen = GINVALID);
+	GINL const CH* GetRelationTypeByEnum(GAIA::RELATION_TYPE rt);
 
 	GAIA_ENUM_BEGIN(STRING_TYPE)
 		STRING_TYPE_STRING	= 1 << 0,
