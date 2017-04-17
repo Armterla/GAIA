@@ -166,11 +166,10 @@ namespace GAIA
 			this->SetPeerAddress(addr);
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			if(!this->IsBinded()) // TODO:
+			if(!this->IsBinded())
 			{
 				GAIA::NETWORK::Addr addrSelf;
 				addrSelf.reset();
-				addrSelf.ip = "127.0.0.1";
 				this->Bind(addrSelf);
 			}
 			m_pDispatcher->attach_socket_iocp(*this);

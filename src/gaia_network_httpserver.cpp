@@ -1411,7 +1411,7 @@ namespace GAIA
 		GAIA::BL HttpServer::OpenAddr(const GAIA::NETWORK::Addr& addr)
 		{
 			GPCHR_FALSE_RET(this->IsCreated(), GAIA::False);
-			GPCHR_FALSE_RET(addr.check(), GAIA::False);
+			GPCHR_FALSE_RET(addr.uPort != 0, GAIA::False);
 
 			if(!m_disp->AddListenSocket(addr))
 				return GAIA::False;
@@ -1422,7 +1422,7 @@ namespace GAIA
 		GAIA::BL HttpServer::CloseAddr(const GAIA::NETWORK::Addr& addr)
 		{
 			GPCHR_FALSE_RET(this->IsCreated(), GAIA::False);
-			GPCHR_FALSE_RET(addr.check(), GAIA::False);
+			GPCHR_FALSE_RET(addr.uPort != 0, GAIA::False);
 
 			if(!m_disp->RemoveListenSocket(addr))
 				return GAIA::False;
