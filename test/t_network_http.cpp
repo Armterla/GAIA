@@ -1,4 +1,4 @@
-﻿#include "preheader.h"
+#include "preheader.h"
 #include "t_common.h"
 
 namespace TEST
@@ -156,7 +156,35 @@ namespace TEST
 		}
 		GINL GAIA::GVOID CheckBigGet(GAIA::LOG::Log& logobj)
 		{
-
+			TAST(aBegin == 1);
+			TAST(aEnd == 1);
+			TAST(aEndWithCancel == 0);
+			TAST(aState > 0);
+			TAST(aPause == 0);
+			TAST(aResume == 0);
+			TAST(aSent > 0);
+			TAST(aRecved > 0);
+			TAST(aSentHead > 0);
+			TAST(aRecvedHead > 0);
+			TAST(aRecvedBody > 0);
+			TAST(aRequestBodyData == 0);
+			TAST(aOldStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID] == 0);
+			TAST(aNewStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID] == 0);
+			TAST(aOldStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_READY] == 1);
+			TAST(aNewStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_READY] == 0);
+			TAST(aOldStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING] == 1);
+			TAST(aNewStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_PENDING] == 1);
+			TAST(aOldStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING] == 1);
+			TAST(aNewStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_CONNECTING] == 1);
+			TAST(aOldStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_COMPLETE] == 0);
+			TAST(aNewStateList[GAIA::NETWORK::HTTP_REQUEST_STATE_COMPLETE] == 1);
+			TAST(aSentSize > 0);
+			TAST(aRecvedSize > 0);
+			TAST(aSentHeadSize > 0);
+			TAST(aSentBodySize == GAIA::ALGO::gstrlen("Hello world! and hello kitty!"));
+			TAST(aRecvedHeadSize > 0);
+			TAST(aRecvedBodySize > 0);
+			TAST(aRequestBodyDataSize == 0);
 		}
 		GINL GAIA::GVOID CheckBigPut(GAIA::LOG::Log& logobj)
 		{
@@ -266,8 +294,6 @@ namespace TEST
 
 				TAST(svr.OpenAddr(addrService1));
 				{
-					GAIA::CTN::Vector<MyHttpRequest*> listRequest;
-
 					GAIA::NETWORK::HttpHead head;
 					head.Set(GAIA::NETWORK::HTTP_HEADNAME_HOST, szMyAddress);
 					head.Set(GAIA::NETWORK::HTTP_HEADNAME_USERAGENT, "Gaia/0.0.2");
@@ -320,6 +346,14 @@ namespace TEST
 							pRequest->drop_ref();
 						}
 						TAST(http.End());
+						
+						// Add Content-Length to head.
+						GAIA::CH szBody[32] = "Hello World! And hello kitty!";
+						GAIA::CTN::AChars chsTemp;
+						head.Reset();
+						chsTemp = GAIA::ALGO::gstrlen(szBody);
+						head.Set(GAIA::NETWORK::HTTP_HEADNAME_CONTENTLENGTH, chsTemp.fptr());
+						head.Optimize();
 
 						// Serial request test.
 						TAST(http.Begin());
@@ -330,15 +364,17 @@ namespace TEST
 								pRequest->SetMethod(GAIA::NETWORK::HTTP_METHOD_GET);
 								pRequest->SetURL(szMyUrl);
 								pRequest->SetHead(head);
+								pRequest->BindRequestBuffer(szBody, GAIA::ALGO::gstrlen(szBody));
 								pRequest->Request();
 								pRequest->Wait();
-								pRequest->CheckSmallGet(logobj);
+								pRequest->CheckBigGet(logobj);
 								pRequest->drop_ref();
 							}
 						}
 						TAST(http.End());
 
 						// Parallel request test.
+						GAIA::CTN::Vector<MyHttpRequest*> listRequest;
 						TAST(http.Begin());
 						{
 							listRequest.clear();
@@ -348,6 +384,7 @@ namespace TEST
 								pRequest->SetMethod(GAIA::NETWORK::HTTP_METHOD_GET);
 								pRequest->SetURL(szMyUrl);
 								pRequest->SetHead(head);
+								pRequest->BindRequestBuffer(szBody, GAIA::ALGO::gstrlen(szBody));
 								pRequest->Request();
 								listRequest.push_back(pRequest);
 							}
@@ -357,7 +394,7 @@ namespace TEST
 								MyHttpRequest* pRequest = listRequest[x];
 								GAST(pRequest != GNIL);
 								pRequest->Wait();
-								pRequest->CheckSmallGet(logobj);
+								pRequest->CheckBigGet(logobj);
 								pRequest->drop_ref();
 							}
 						}

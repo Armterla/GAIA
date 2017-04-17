@@ -610,7 +610,8 @@ namespace GAIA
 					else
 						m_reqbuf.proxy(GNIL, GNIL);
 					m_bReqBufOwner = GAIA::False;
-					m_reqbuf.proxy((GAIA::U8*)p, (GAIA::U8*)p + sSize - 1);
+					m_reqbuf.proxy((GAIA::U8*)p, (GAIA::U8*)p + sSize);
+					m_reqbuf.seek_write(sSize);
 				}
 				else
 				{

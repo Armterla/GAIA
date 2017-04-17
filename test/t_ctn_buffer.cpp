@@ -157,5 +157,12 @@ namespace TEST
 			TERROR;
 		if(b.endwith("Hello", GAIA::ALGO::gstrlen("World")))
 			TERROR;
+		b.reserve(123);
+		if(b.capacity() != 123)
+			TERROR;
+		GAIA::CH szTemp[32];
+		b.proxy((GAIA::U8*)szTemp, (GAIA::U8*)szTemp + 32);
+		TAST(b.capacity() == 32);
+		b.proxy(GNIL, GNIL);
 	}
 }
