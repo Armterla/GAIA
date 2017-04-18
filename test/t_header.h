@@ -411,6 +411,8 @@ namespace TEST
 
 	GAIA::GVOID test(GAIA::LOG::Log::CallBack* pLogCallBack = GNIL)
 	{
+		g_gaia_objwatcher.EnableLog(GAIA::True);
+		
 		{
 			/* Set log callback. */
 			TestLogCallBack test_log_cb;
