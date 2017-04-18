@@ -399,7 +399,7 @@ namespace GAIA
 			*/
 			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen)
 			{
-				sock.drop_ref();
+				sock.drop_ref("AsyncDispatcher::OnAcceptSocket:drop ref by base class");
 				return GAIA::False;
 			}
 

@@ -1,4 +1,4 @@
-﻿#ifndef		__GAIA_NETWORK_ASYNC_SOCKET_H__
+#ifndef		__GAIA_NETWORK_ASYNC_SOCKET_H__
 #define		__GAIA_NETWORK_ASYNC_SOCKET_H__
 
 #include "gaia_type.h"
@@ -255,7 +255,7 @@ namespace GAIA
 			/*!
 				@brief On async socket disconnected callback.
 			*/
-			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult){}
+			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult, GAIA::BL bByRemote){}
 
 			/*!
 				@brief On async socket started listen.
@@ -317,6 +317,7 @@ namespace GAIA
 			AsyncContext* m_pWriteAsyncCtx;
 			GAIA::U64 m_uRecycleTime;
 			GAIA::N32 m_nBackupSocket;
+			GAIA::BL m_bPushForRecycleAble;
 		#endif
 		};
 	}

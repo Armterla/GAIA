@@ -141,7 +141,7 @@ namespace GAIA
 					}
 				}
 			}
-			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult)
+			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult, GAIA::BL bByRemote)
 			{
 				// Check state and parameter.
 				if(!bResult)

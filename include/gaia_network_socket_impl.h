@@ -564,8 +564,11 @@ namespace GAIA
 
 		GINL GAIA::BL Socket::IsConnected() const
 		{
-			if(!this->IsCreated())
-				GTHROW(Illegal);
+			if(m_bConnected)
+			{
+				if(!this->IsCreated())
+					GTHROW(Illegal);
+			}
 			return m_bConnected;
 		}
 

@@ -96,17 +96,11 @@ namespace TEST
 			else if(uThreadID != m_uCallBackThreadID)
 				m_bExistDiffThreadCallBack = GAIA::True;
 		}
-		virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult)
+		virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult, GAIA::BL bByRemote)
 		{
 			m_nDisconnectedCount[bResult]++;
 			if(m_bNoMoreCallBack)
 				m_nDisconnectedCount[2]++;
-
-			GAIA::UM uThreadID = GAIA::THREAD::threadid();
-			if(m_uCallBackThreadID == GINVALID)
-				m_uCallBackThreadID = uThreadID;
-			else if(uThreadID != m_uCallBackThreadID)
-				m_bExistDiffThreadCallBack = GAIA::True;
 		}
 		virtual GAIA::GVOID OnListened(GAIA::BL bResult)
 		{
@@ -127,7 +121,7 @@ namespace TEST
 				if(nPracticeSize > 0)
 				{
 					GAIA::SYNC::Autolock al(m_lrSendBuf);
-					m_sendbuf.write(pData, nPracticeSize);
+					m_sendbuft.write(pData, nPracticeSize);
 				}
 			}
 			m_nSentCount[bResult]++;
@@ -148,7 +142,7 @@ namespace TEST
 				if(nSize > 0)
 				{
 					GAIA::SYNC::Autolock al(m_lrRecvBuf);
-					m_recvbuf.write(pData, nSize);
+					m_recvbuft.write(pData, nSize);
 				}
 			}
 			m_nRecvCount[bResult]++;
@@ -173,8 +167,8 @@ namespace TEST
 		AsyncCtx* m_ctx;
 		GAIA::SYNC::Lock m_lrSendBuf;
 		GAIA::SYNC::Lock m_lrRecvBuf;
-		GAIA::CTN::BufferRW m_sendbuf;
-		GAIA::CTN::BufferRW m_recvbuf;
+		GAIA::CTN::BufferRW m_sendbuft;
+		GAIA::CTN::BufferRW m_recvbuft;
 		GAIA::SYNC::Atomic m_nCreatedCount[3];
 		GAIA::SYNC::Atomic m_nClosedCount[3];
 		GAIA::SYNC::Atomic m_nBoundCount[3];
@@ -356,7 +350,7 @@ namespace TEST
 
 					// Wait connect complete.
 					{
-						GAIA::SYNC::gsleep(5000);
+						GAIA::SYNC::gsleep(400);
 					}
 
 					if(ctx.listAcceptedSockets.size() != ctx.listConnectedSockets.size())
@@ -375,7 +369,7 @@ namespace TEST
 
 					// Wait send complete.
 					{
-						GAIA::SYNC::gsleep(5000);
+						GAIA::SYNC::gsleep(400);
 					}
 
 					// Shutdown.
@@ -401,6 +395,11 @@ namespace TEST
 						AsyncSocketEx* pSocket = ctx.listAcceptedSockets[x];
 						pSocket->Close();
 					}
+					
+					// Wait full complete.
+					{
+						GAIA::SYNC::gsleep(400);
+					}
 
 					// Sign no more back.
 					{
@@ -421,21 +420,21 @@ namespace TEST
 
 					// Wait no more callback.
 					{
-						GAIA::SYNC::gsleep(1000);
+						GAIA::SYNC::gsleep(400);
 					}
 
 					// Check send.
 					for(GAIA::NUM x = 0; x < ctx.listConnectedSockets.size(); ++x)
 					{
 						AsyncSocketEx* pSock = ctx.listConnectedSockets[x];
-						if(pSock->m_sendbuf.size() != sizeof(GAIA::NUM) * DATA_TRANSFER_COUNT)
+						if(pSock->m_sendbuft.size() != sizeof(GAIA::NUM) * DATA_TRANSFER_COUNT)
 						{
 							TERROR;
 							break;
 						}
 						for(GAIA::NUM y = 0; y < DATA_TRANSFER_COUNT; ++y)
 						{
-							GAIA::NUM yy = pSock->m_sendbuf.readx<GAIA::NUM>();
+							GAIA::NUM yy = pSock->m_sendbuft.readx<GAIA::NUM>();
 							if(yy != y)
 							{
 								TERROR;
@@ -448,14 +447,14 @@ namespace TEST
 					for(GAIA::NUM x = 0; x < ctx.listAcceptedSockets.size(); ++x)
 					{
 						AsyncSocketEx* pSock = ctx.listAcceptedSockets[x];
-						if(pSock->m_recvbuf.size() != sizeof(GAIA::NUM) * DATA_TRANSFER_COUNT)
+						if(pSock->m_recvbuft.size() != sizeof(GAIA::NUM) * DATA_TRANSFER_COUNT)
 						{
 							TERROR;
 							break;
 						}
 						for(GAIA::NUM y = 0; y < DATA_TRANSFER_COUNT; ++y)
 						{
-							GAIA::NUM yy = pSock->m_recvbuf.readx<GAIA::NUM>();
+							GAIA::NUM yy = pSock->m_recvbuft.readx<GAIA::NUM>();
 							if(yy != y)
 							{
 								TERROR;

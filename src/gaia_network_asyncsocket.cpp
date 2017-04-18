@@ -125,6 +125,11 @@ namespace GAIA
 
 		GAIA::GVOID AsyncSocket::Close()
 		{
+			if(this->IsConnected())
+			{
+				this->SetConnected(GAIA::False);
+				this->OnDisconnected(GAIA::True, GAIA::False);
+			}
 		#if GAIA_OS != GAIA_OS_WINDOWS
 			m_pDispatcher->push_for_recycle(*this);
 		#endif
@@ -134,6 +139,11 @@ namespace GAIA
 
 		GAIA::GVOID AsyncSocket::Shutdown(GAIA::N32 nShutdownFlag)
 		{
+			if(this->IsConnected())
+			{
+				this->SetConnected(GAIA::False);
+				this->OnDisconnected(GAIA::True, GAIA::False);
+			}
 		#if GAIA_OS != GAIA_OS_WINDOWS
 			m_pDispatcher->push_for_recycle(*this);
 		#endif
@@ -238,7 +248,7 @@ namespace GAIA
 				if(err != ERROR_IO_PENDING)
 				{
 					m_pDispatcher->release_async_ctx(pCtx);
-					this->OnDisconnected(GAIA::False);
+					this->OnDisconnected(GAIA::False, GAIA::False);
 					this->drop_ref();
 					GERR << "GAIA AsyncSocket IOCP error, cannot DisconnectEx, ErrorCode = " << ::WSAGetLastError() << GEND;
 					return;
@@ -334,6 +344,7 @@ namespace GAIA
 			m_pWriteAsyncCtx = GNIL;
 			m_uRecycleTime = 0;
 			m_nBackupSocket = GINVALID;
+			m_bPushForRecycleAble = GAIA::True;
 		#endif
 		}
 	}

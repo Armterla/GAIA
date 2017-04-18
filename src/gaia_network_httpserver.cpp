@@ -108,7 +108,7 @@ namespace GAIA
 					}
 				}
 			}
-			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult)
+			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult, GAIA::BL bByRemote)
 			{
 				//
 				{
@@ -124,11 +124,14 @@ namespace GAIA
 				}
 
 				//
-				m_bClosed = GAIA::True;
-				m_pLink->rise_ref();
-				GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
-				m_pSvr->m_rclinks.push_back(m_pLink);
-				m_pLink = GNIL;
+				if(!m_bLinkDtor)
+				{
+					m_bClosed = GAIA::True;
+					m_pLink->rise_ref();
+					GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
+					m_pSvr->m_rclinks.push_back(m_pLink);
+					m_pLink = GNIL;
+				}
 			}
 			virtual GAIA::GVOID OnListened(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnAccepted(GAIA::BL bResult, const GAIA::NETWORK::Addr& addrListen){}
@@ -362,6 +365,7 @@ namespace GAIA
 				m_bClosed = GAIA::False;
 				m_lContentLength = GINVALID;
 				m_lRecvedBodyLength = 0;
+				m_bLinkDtor = GAIA::False;
 			}
 
 		private:
@@ -379,6 +383,7 @@ namespace GAIA
 			GAIA::BL m_bClosed;
 			GAIA::N64 m_lContentLength;
 			GAIA::N64 m_lRecvedBodyLength;
+			GAIA::BL m_bLinkDtor;
 		};
 
 		class HttpServerAsyncDispatcher : public GAIA::NETWORK::AsyncDispatcher
@@ -507,6 +512,7 @@ namespace GAIA
 		{
 			if(m_pSock != GNIL)
 			{
+				m_pSock->m_bLinkDtor = GAIA::True;
 				if(m_pSock->IsCreated())
 				{
 					GTRY
