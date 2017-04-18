@@ -15,8 +15,11 @@
 #include <gaia_global_impl.h>
 #include "../test/t_header.h"
 
+GAIA::SYNC::Atomic g_error_cnt;
+
 int main()
 {
+	g_error_cnt = 0;
 	TEST::test();
 	return 0;
 }
