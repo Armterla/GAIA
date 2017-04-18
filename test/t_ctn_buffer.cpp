@@ -160,6 +160,7 @@ namespace TEST
 		b.reserve(123);
 		if(b.capacity() != 123)
 			TERROR;
+		b.destroy();
 		GAIA::CH szTemp[32];
 		b.proxy((GAIA::U8*)szTemp, (GAIA::U8*)szTemp + 32);
 		TAST(b.capacity() == 32);
