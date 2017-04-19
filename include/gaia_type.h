@@ -18,6 +18,10 @@
 #	endif
 #endif
 
+#if GAIA_OS != GAIA_OS_WINDOWS
+#	include <pthread.h>
+#endif
+
 namespace GAIA
 {
 #ifdef GRCAST
@@ -348,14 +352,40 @@ namespace GAIA
 			m_bDestructingByDropRef = GAIA::False;
 		#ifdef GAIA_DEBUG_SOLUTION
 			m_uuid.uuid();
+		#	if GAIA_OS == GAIA_OS_WINDOWS
+				::InitializeCriticalSection(&m_cs);
+		#	else
+				pthread_mutex_init(&m_mutex, GNIL);
+		#	endif
 			this->debug_constructor();
 		#endif
 		}
 	#if defined(GAIA_DEBUG_SELFCHECK) || defined(GAIA_DEBUG_SOLUTION)
 		virtual ~RefObject();
 	#endif
+	#ifdef GAIA_DEBUG_SOLUTION
+		GINL GAIA::GVOID _dbg_log_enter()
+		{
+		#if GAIA_OS == GAIA_OS_WINDOWS
+			::EnterCriticalSection(&m_cs);
+		#else
+			pthread_mutex_lock(&m_mutex);
+		#endif
+		}
+		GINL GAIA::GVOID _dbg_log_leave()
+		{
+		#if GAIA_OS == GAIA_OS_WINDOWS
+			::LeaveCriticalSection(&m_cs);
+		#else
+			pthread_mutex_unlock(&m_mutex);
+		#endif
+		}
+	#endif
 		GINL GAIA::N64 rise_ref(const GAIA::CH* pszReason = GNIL)
 		{
+		#ifdef GAIA_DEBUG_SOLUTION
+			this->_dbg_log_enter();
+		#endif
 		#if GAIA_OS == GAIA_OS_WINDOWS
 		#	if GAIA_MACHINE == GAIA_MACHINE64
 				GAIA::NM nNew = InterlockedIncrement64(&m_nRef);
@@ -377,11 +407,15 @@ namespace GAIA
 		#endif
 		#ifdef GAIA_DEBUG_SOLUTION
 			this->debug_change_ref(GAIA::True, nNew, pszReason, m_bDestructingByDropRef);
+			this->_dbg_log_leave();
 		#endif
 			return nNew;
 		}
 		GINL GAIA::N64 drop_ref(const GAIA::CH* pszReason = GNIL)
 		{
+		#ifdef GAIA_DEBUG_SOLUTION
+			this->_dbg_log_enter();
+		#endif
 		#if GAIA_OS == GAIA_OS_WINDOWS
 		#	if GAIA_MACHINE == GAIA_MACHINE64
 				GAIA::NM nNew = InterlockedDecrement64(&m_nRef);
@@ -403,6 +437,7 @@ namespace GAIA
 		#endif
 		#ifdef GAIA_DEBUG_SOLUTION
 			this->debug_change_ref(GAIA::False, nNew, pszReason, m_bDestructingByDropRef);
+			this->_dbg_log_leave();
 		#endif
 			if(nNew == 0 && !m_bDestructingByDropRef)
 			{
@@ -439,6 +474,11 @@ namespace GAIA
 	#endif
 	#ifdef GAIA_DEBUG_SOLUTION
 		X128 m_uuid;
+	#	if GAIA_OS == GAIA_OS_WINDOWS
+			CRITICAL_SECTION m_cs;
+	#	else
+			pthread_mutex_t m_mutex;
+	#	endif
 	#endif
 		GAIA::BL m_bDestructingByDropRef;
 	#ifdef __APPLE__

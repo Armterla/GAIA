@@ -116,6 +116,11 @@ namespace GAIA
 		GAST(!m_bDestructingByDropRef || (this->get_ref() >= 0 && this->get_ref() <= 1));
 	#ifdef GAIA_DEBUG_SOLUTION
 		GWATCH_END(this, &m_uuid, 4);
+	#	if GAIA_OS == GAIA_OS_WINDOWS
+			::DeleteCriticalSection(&m_cs);
+	#	else
+			pthread_mutex_destroy(&m_mutex);
+	#	endif
 	#endif
 	}
 #endif
