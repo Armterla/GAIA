@@ -637,7 +637,7 @@ namespace GAIA
 					m_pHttp->GetDesc().sHttpVerLen + 2 +
 					m_head.GetStringSize() + 2;
 
-			this->rise_ref();
+			this->rise_ref("HttpRequest::Request:request rise ref");
 
 			m_uRequestTime = GAIA::TIME::tick_time();
 
@@ -811,7 +811,7 @@ namespace GAIA
 					GAIA::NETWORK::HttpRequest* pRequest = *it;
 					GAST(pRequest != GNIL);
 					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
-					pRequest->drop_ref();
+					pRequest->drop_ref("Http::End:request drop ref for pending request");
 				}
 				m_pendinglist.clear();
 			}
@@ -824,7 +824,7 @@ namespace GAIA
 					GAIA::NETWORK::HttpRequest* pRequest = *it;
 					GAST(pRequest != GNIL);
 					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
-					pRequest->drop_ref();
+					pRequest->drop_ref("Http::End:request drop ref for connecting request");
 				}
 				m_connectinglist.clear();
 			}
@@ -837,7 +837,7 @@ namespace GAIA
 					GAIA::NETWORK::HttpRequest* pRequest = *it;
 					GAST(pRequest != GNIL);
 					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
-					pRequest->drop_ref();
+					pRequest->drop_ref("Http::End:request drop ref for requesting request");
 				}
 				m_requestinglist.clear();
 			}
@@ -850,7 +850,7 @@ namespace GAIA
 					GAIA::NETWORK::HttpRequest* pRequest = *it;
 					GAST(pRequest != GNIL);
 					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
-					pRequest->drop_ref();
+					pRequest->drop_ref("Http::End:request drop ref for waiting request");
 				}
 				m_waitinglist.clear();
 			}
@@ -863,7 +863,7 @@ namespace GAIA
 					GAIA::NETWORK::HttpRequest* pRequest = *it;
 					GAST(pRequest != GNIL);
 					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
-					pRequest->drop_ref();
+					pRequest->drop_ref("Http::End:request drop ref for responsing request");
 				}
 				m_responsinglist.clear();
 			}
@@ -876,7 +876,7 @@ namespace GAIA
 					GAIA::NETWORK::HttpRequest* pRequest = *it;
 					GAST(pRequest != GNIL);
 					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
-					pRequest->drop_ref();
+					pRequest->drop_ref("Http::End:request drop ref for complete request");
 				}
 				m_completelist.clear();
 			}
@@ -888,7 +888,7 @@ namespace GAIA
 				{
 					GAIA::NETWORK::HttpAsyncSocket* pSocket = *it;
 					GAST(pSocket != GNIL);
-					pSocket->drop_ref();
+					pSocket->drop_ref("Http::End:socket drop ref");
 				}
 				m_socks.clear();
 			}
@@ -972,7 +972,7 @@ namespace GAIA
 							HttpAsyncSocket* pSocket = gnew HttpAsyncSocket(*this, *m_disp);
 							pRequest->m_pSock = pSocket;
 							pSocket->m_pRequest = pRequest;
-							pSocket->rise_ref();
+							pSocket->rise_ref("Http::Execute:socket rise ref for connect");
 
 							// Insert to socket list.
 							{
@@ -1050,8 +1050,8 @@ namespace GAIA
 						if(pWorkThread == GNIL || pRequest->m_uThreadMagicIndex % m_listWorkThreads.size() == pWorkThread->uThreadIndex)
 						{
 							pTempList->push_back(pRequest);
-							pRequest->rise_ref();
-							pRequest->m_pSock->rise_ref();
+							pRequest->rise_ref("Http::Execute:request rise ref for request");
+							pRequest->m_pSock->rise_ref("Http::Execute:socket rise ref for request");
 						}
 					}
 				}
@@ -1240,8 +1240,8 @@ namespace GAIA
 					{
 						GAIA::NETWORK::HttpRequest* pRequest = (*pTempList)[x];
 						GAST(pRequest != GNIL);
-						pRequest->m_pSock->drop_ref();
-						pRequest->drop_ref();
+						pRequest->m_pSock->drop_ref("Http::Execute:recycle socket for request failed");
+						pRequest->drop_ref("Http::Execute:recycle request for request failed");
 					}
 				}
 			}
@@ -1355,7 +1355,7 @@ namespace GAIA
 					}
 
 					// Release.
-					pSocket->drop_ref();
+					pSocket->drop_ref("Http::InternalCloseRequest:socket drop ref front");
 				}
 			}
 
@@ -1456,11 +1456,11 @@ namespace GAIA
 						}
 						GCATCHALL{}
 					}
-					req.m_pSock->drop_ref();
+					req.m_pSock->drop_ref("Http::InternalCloseRequest:socket drop ref back");
 				}
 
 				// Release.
-				req.drop_ref();
+				req.drop_ref("Http::InternalCloseRequest:request drop ref");
 			}
 		}
 	}

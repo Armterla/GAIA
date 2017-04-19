@@ -127,7 +127,7 @@ namespace GAIA
 				if(!m_bLinkDtor)
 				{
 					m_bClosed = GAIA::True;
-					m_pLink->rise_ref();
+					m_pLink->rise_ref("HttpServerAsyncSocket::OnDisconnected:link rise ref");
 					GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
 					m_pSvr->m_rclinks.push_back(m_pLink);
 					m_pLink = GNIL;
@@ -158,7 +158,7 @@ namespace GAIA
 				if(bNeedCallBackToRecycle)
 				{
 					m_bClosed = GAIA::True;
-					m_pLink->rise_ref();
+					m_pLink->rise_ref("HttpServerAsyncSocket::OnSent:link rise ref");
 					GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
 					m_pSvr->m_rclinks.push_back(m_pLink);
 					m_pLink = GNIL;
@@ -169,7 +169,7 @@ namespace GAIA
 				if(!bResult)
 				{
 					m_bClosed = GAIA::True;
-					m_pLink->rise_ref();
+					m_pLink->rise_ref("HttpServerAsyncSocket::OnRecved:link rise ref for recv failed");
 					GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
 					m_pSvr->m_rclinks.push_back(m_pLink);
 					m_pLink = GNIL;
@@ -345,7 +345,7 @@ namespace GAIA
 					   m_lRecvedBodyLength >= m_lContentLength ||
 					   m_lContentLength > m_pSvr->GetDesc().lSingleCallbackLimitSize)
 					{
-						m_pLink->rise_ref();
+						m_pLink->rise_ref("HttpServerAsyncSocket::OnRecv:link rise ref");
 						GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
 						m_pSvr->m_rclinks.push_back(m_pLink);
 					}
@@ -422,7 +422,7 @@ namespace GAIA
 				{
 					GAIA::CH szAddressPeer[32];
 					addrPeer.tostring(szAddressPeer);
-					GDEV << "[HttpSvr] HttpServerAsyncSocket::OnAcceptSocket Accepted " << szAddressPeer << GEND;
+					GDEV << "[HttpSvr] HttpServerAsyncDispatcher::OnAcceptSocket Accepted " << szAddressPeer << GEND;
 				}
 
 				// If the IP address is in black list.
@@ -430,7 +430,7 @@ namespace GAIA
 				{
 					if(m_pSvr->IsInBlackList(addrPeer.ip))
 					{
-						sock.drop_ref();
+						sock.drop_ref("HttpServerAsyncDispatcher::OnAcceptSocket:drop ref for in black list");
 						m_pSvr->GetStatus().uRequestDenyByBWCount++;
 						return GAIA::False;
 					}
@@ -441,7 +441,7 @@ namespace GAIA
 				{
 					if(!m_pSvr->IsInWhiteList(addrPeer.ip))
 					{
-						sock.drop_ref();
+						sock.drop_ref("HttpServerAsyncDispatcher::OnAcceptSocket:drop ref for not in white list");
 						m_pSvr->GetStatus().uRequestDenyByBWCount++;
 						return GAIA::False;
 					}
@@ -450,7 +450,7 @@ namespace GAIA
 				// If connection count is too many, close it.
 				if(m_pSvr->m_links_bypeeraddr.size() >= m_pSvr->GetDesc().sMaxConnCount)
 				{
-					sock.drop_ref();
+					sock.drop_ref("HttpServerAsyncDispatcher::OnAcceptSocket:drop ref for too many connection count");
 					m_pSvr->GetStatus().uRequestDenyByMaxConnCount++;
 					return GAIA::False;
 				}
@@ -522,7 +522,7 @@ namespace GAIA
 					}
 					GCATCHALL{}
 				}
-				m_pSock->drop_ref();
+				m_pSock->drop_ref("HttpServerLink::~HttpServerLink:sock drop ref");
 				m_pSock = GNIL;
 			}
 		}
@@ -1253,7 +1253,7 @@ namespace GAIA
 					GAIA::NETWORK::HttpServerLink* pLink = t;
 					GAST(pLink != GNIL);
 					it.erase();
-					pLink->drop_ref();
+					pLink->drop_ref("HttpServer::End:drop ref for release link in m_links_bypeeraddr");
 				}
 				GAST(m_links_bypeeraddr.empty());
 			}
@@ -1266,7 +1266,7 @@ namespace GAIA
 					GAIA::NETWORK::HttpServerLink* pLink = m_rclinks.front();
 					m_rclinks.pop_front();
 					GAST(pLink != GNIL);
-					pLink->drop_ref();
+					pLink->drop_ref("HttpServer::End:drop ref for release request completed link");
 				}
 				GAST(m_rclinks.empty());
 			}
@@ -1409,7 +1409,7 @@ namespace GAIA
 			}
 
 			// Drop.
-			pLink->drop_ref();
+			pLink->drop_ref("HttpServer::Execute:link drop ref");
 
 			return GAIA::True;
 		}
@@ -1812,7 +1812,7 @@ namespace GAIA
 			m_status.uLinkLifeTime += GAIA::TIME::gmt_time() - l.GetAcceptTime();
 
 			// Drop.
-			l.drop_ref();
+			l.drop_ref("HttpServer::RecycleLink:recycle a link");
 
 			return GAIA::True;
 		}
