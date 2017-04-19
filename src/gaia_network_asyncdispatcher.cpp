@@ -715,7 +715,10 @@ namespace GAIA
 									}
 								}
 								else
-									GERR << "GAIA AsyncDispatcher IOCP error, cannot recv, ErrorCode = " << dwError << GEND;
+								{
+									if(this->IsEnableLog())
+										GERR << "[AsyncDispatcher] AsyncDispatcher::Execute IOCP error, cannot recv, ErrorCode = " << dwError << GEND;
+								}
 							}
 							else
 								GASTFALSE;
@@ -907,7 +910,14 @@ namespace GAIA
 										}
 									}
 									else
+									{
+										if(this->IsEnableLog())
+										{
+											GAIA::N32 nErr = errno;
+											GERR << "[AsyncDispatcher] AsyncDispatcher::Execute: accept socket failed, errno = " << nErr << GEND;
+										}
 										break;
+									}
 								}
 							}
 							break;
@@ -939,6 +949,8 @@ namespace GAIA
 											ctx.pSocket->drop_ref("AsyncDispatcher::Execute:drop ref for receive failed");
 										}
 									}
+									else
+										GASTFALSE;
 								}
 							}
 							break;
@@ -993,6 +1005,7 @@ namespace GAIA
 											if(sNeedSendSize > 0)
 											{
 												GAIA::NUM sSendedSize = (GAIA::NUM)send(nSocket, pThread->tempbuf.fptr(), sNeedSendSize, 0);
+												GAST(sSendedSize == sNeedSendSize);
 												ctx.pSocket->OnSent(GAIA::True, pThread->tempbuf.fptr(), sSendedSize, sSendedSize + pThread->tempbuf.remain());
 											}
 											if(!ctx.pSocket->m_sendbuf.empty())
@@ -1133,7 +1146,8 @@ namespace GAIA
 					pAcceptingSocket->drop_ref("AsyncDispatcher::request_accept:recycle accepting socket");
 					pAcceptingSocket->drop_ref("AsyncDispatcher::request_accept:recycle accepting socket twice");
 					this->release_async_ctx(pCtx);
-					GERR << "GAIA AsyncDispatcher IOCP error, cannot AcceptEx, ErrorCode = " << ::WSAGetLastError() << GEND;
+					if(this->IsEnableLog())
+						GERR << "[AsyncDispatcher] AsyncDispatcher::request_accept:IOCP error, cannot AcceptEx, ErrorCode = " << ::WSAGetLastError() << GEND;
 				}
 			}
 		}
@@ -1154,7 +1168,8 @@ namespace GAIA
 				{
 					this->release_async_ctx(pCtx);
 					datasock.drop_ref("AsyncDispatcher::request_recv:drop ref for WSARecv failed");
-					GERR << "GAIA AsyncDispatcher IOCP error, cannot WSARecv, ErrorCode = " << ::WSAGetLastError() << GEND;
+					if(this->IsEnableLog())
+						GERR << "[AsyncDispatcher] AsyncDispatcher::request_recv:IOCP error, cannot WSARecv, ErrorCode = " << ::WSAGetLastError() << GEND;
 				}
 			}
 		}

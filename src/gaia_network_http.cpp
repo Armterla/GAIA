@@ -1287,6 +1287,7 @@ namespace GAIA
 						   uCurrentTime - pSock->m_pRequest->m_uRequestTime > pSock->m_pRequest->m_uLogicTimeout)
 						{
 							pNeedCloseRequests->push_back(pSock->m_pRequest);
+							continue;
 						}
 
 						// Check network timeout.
@@ -1294,6 +1295,7 @@ namespace GAIA
 						   uCurrentTime - pSock->m_pRequest->m_uLastRecvedTime > pSock->m_pRequest->m_uNetworkResponseTimeout)
 						{
 							pNeedCloseRequests->push_back(pSock->m_pRequest);
+							continue;
 						}
 					}
 				}

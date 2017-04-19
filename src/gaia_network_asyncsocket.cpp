@@ -203,7 +203,8 @@ namespace GAIA
 					m_pDispatcher->release_async_ctx(pCtx);
 					this->OnConnected(GAIA::False, addr);
 					this->drop_ref();
-					GERR << "GAIA AsyncSocket IOCP error, cannot ConnectEx, ErrorCode = " << ::WSAGetLastError() << GEND;
+					if(m_pDispatcher->IsEnableLog())
+						GERR << "[AsyncSocket] AsyncSocket::Connect:IOCP error, cannot ConnectEx, ErrorCode = " << ::WSAGetLastError() << GEND;
 					return;
 				}
 			}
@@ -250,7 +251,8 @@ namespace GAIA
 					m_pDispatcher->release_async_ctx(pCtx);
 					this->OnDisconnected(GAIA::False, GAIA::False);
 					this->drop_ref();
-					GERR << "GAIA AsyncSocket IOCP error, cannot DisconnectEx, ErrorCode = " << ::WSAGetLastError() << GEND;
+					if(m_pDispatcher->IsEnableLog())
+						GERR << "[AsyncSocket] AsyncSocket::Disconnect:IOCP error, cannot DisconnectEx, ErrorCode = " << ::WSAGetLastError() << GEND;
 					return;
 				}
 			}
@@ -297,7 +299,8 @@ namespace GAIA
 						this->OnSent(GAIA::False, p, sOffset, nSize);
 						m_pDispatcher->release_async_ctx(pCtx);
 						this->drop_ref();
-						GERR << "GAIA AsyncSocket IOCP error, cannot WSASend, ErrorCode = " << ::WSAGetLastError() << GEND;
+						if(m_pDispatcher->IsEnableLog())
+							GERR << "[AsyncSocket] AsyncSocket::Send:IOCP error, cannot WSASend, ErrorCode = " << ::WSAGetLastError() << GEND;
 						return sOffset;
 					}
 				}
