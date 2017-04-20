@@ -160,7 +160,7 @@ namespace GAIA
 				m_atm = atm;
 				return GAIA::True;
 			}
-			GINL GAIA::BL bindfile(GAIA::FSYS::FileBase* pFile, GAIA::UM atm)
+			GINL GAIA::BL bindfile(GAIA::FSYS::FileBase* pFile, GAIA::UM atm, GAIA::TCH* pszNewFileName = GNIL, GAIA::NUM sNewFileNameMaxLen = GINVALID)
 			{
 				if(pFile == GNIL)
 				{
@@ -173,14 +173,18 @@ namespace GAIA
 					if(atm & ACCESS_TYPE_WRITE)
 						opentype |= GAIA::FSYS::File::OPEN_TYPE_WRITE;
 					opentype |= GAIA::FSYS::File::OPEN_TYPE_CREATEALWAYS;
-					GAIA::MATH::RID128 rid128;
-					rid128.uuid();
+					GAIA::X128 x128;
+					x128.uuid();
 					GAIA::TCH szTempFileName[GAIA::MAXPL];
 					GAIA::ALGO::gstrcpy(szTempFileName, g_gaia_appdocdir);
-					rid128.tostring(szTempFileName + GAIA::ALGO::gstrlen(g_gaia_appdocdir));
+					x128.tostring(szTempFileName + GAIA::ALGO::gstrlen(g_gaia_appdocdir));
 					GAIA::ALGO::gstrcat(szTempFileName, _T(".acc"));
+					if(pszNewFileName != GNIL && sNewFileNameMaxLen <= GAIA::ALGO::gstrlen(szTempFileName))
+						return GAIA::False;
 					if(!pFile->Open(szTempFileName, opentype))
 						return GAIA::False;
+					if(pszNewFileName != GNIL)
+						GAIA::ALGO::gstrcpy(pszNewFileName, szTempFileName);
 				}
 				this->destroy();
 				GAST(pFile->IsOpen());
