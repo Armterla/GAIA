@@ -359,7 +359,7 @@ namespace TEST
 				accfile.Resize(ACCESS_ELEMENT_COUNT);
 				typedef GAIA::CTN::Accesser<GAIA::TCH, GAIA::NUM, GAIA::ALGO::ExtendGold<GAIA::NUM> > __AccType;
 				__AccType acc;
-				acc.bindfile(&accfile, __AccType::ACCESS_TYPE_READ | __AccType::ACCESS_TYPE_WRITE);
+				TAST(acc.bindfile(&accfile, __AccType::ACCESS_TYPE_READ | __AccType::ACCESS_TYPE_WRITE));
 				GAIA::ALGO::gstrcpy(acc, "HelloWorld");
 				if(GAIA::ALGO::gstrcmp(acc, "HelloWorld") != 0)
 					TERROR;
@@ -370,7 +370,8 @@ namespace TEST
 				typedef GAIA::CTN::Accesser<GAIA::NUM, GAIA::NUM, GAIA::ALGO::ExtendGold<GAIA::NUM> > __AccType;
 				__AccType acc;
 				acc.expandable(GAIA::True);
-				acc.bindfile(GNIL, __AccType::ACCESS_TYPE_READ | __AccType::ACCESS_TYPE_WRITE);
+				GAIA::TCH szNewFileName[GAIA::MAXPL];
+				TAST(acc.bindfile(GNIL, __AccType::ACCESS_TYPE_READ | __AccType::ACCESS_TYPE_WRITE, szNewFileName, sizeof(szNewFileName)));
 				for(GAIA::NUM x = 0; x < ACCESS_ELEMENT_COUNT; ++x)
 					acc[x] = x;
 				for(GAIA::NUM x = 0; x < ACCESS_ELEMENT_COUNT; ++x)
@@ -382,6 +383,8 @@ namespace TEST
 					}
 				}
 				gdel acc.bindfile();
+				GAIA::FSYS::Dir dir;
+				dir.RemoveFile(szNewFileName);
 			}
 
 			/* Expandable accesser bubble sort test. */
@@ -389,16 +392,16 @@ namespace TEST
 			//	typedef GAIA::CTN::Accesser<GAIA::NUM, GAIA::NUM, GAIA::ALGO::ExtendGold<GAIA::NUM> > __AccType;
 			//	__AccType acc;
 			//	acc.expandable(GAIA::True);
-			//	acc.bindfile(GNIL, __AccType::ACCESS_TYPE_READ | __AccType::ACCESS_TYPE_WRITE);
+			//	GAIA::TCH szNewFileName[GAIA::MAXPL];
+			//	TAST(acc.bindfile(GNIL, __AccType::ACCESS_TYPE_READ | __AccType::ACCESS_TYPE_WRITE, szNewFileName, sizeof(szNewFileName)));
 			//	for(GAIA::NUM x = 0; x < 100; ++x)
 			//		acc[x] = GAIA::MATH::xrandom();
 			//	GAIA::ALGO::bsort(acc, acc + 99);
 			//	if(!GAIA::ALGO::issorted(acc, acc + 99))
-			//	{
 			//		TERROR;
-			//
-			//	}
 			//	gdel acc.bindfile();
+			//	GAIA::FSYS::Dir dir;
+			//	dir.RemoveFile(szNewFileName);
 			//}
 
 			/* Accesser write test. */
@@ -495,13 +498,16 @@ namespace TEST
 						break;
 					}
 				}
+				GAIA::FSYS::Dir dir;
+				dir.RemoveFile(strFileName);
 			}
 
 			/* Expandable accesser read write test. */
 			{
 				typedef GAIA::CTN::Accesser<GAIA::NUM, GAIA::NUM, GAIA::ALGO::ExtendGold<GAIA::NUM> > __AccType;
 				__AccType acc;
-				acc.bindfile(GNIL, __AccType::ACCESS_TYPE_READ | __AccType::ACCESS_TYPE_WRITE);
+				GAIA::TCH szNewFileName[GAIA::MAXPL];
+				TAST(acc.bindfile(GNIL, __AccType::ACCESS_TYPE_READ | __AccType::ACCESS_TYPE_WRITE, szNewFileName, sizeof(szNewFileName)));
 				for(GAIA::NUM x = 0; x < ACCESS_ELEMENT_COUNT; ++x)
 				{
 					if(acc.write(&x, sizeof(x)) != sizeof(x))
@@ -547,6 +553,8 @@ namespace TEST
 					}
 				}
 				gdel acc.bindfile();
+				GAIA::FSYS::Dir dir;
+				dir.RemoveFile(szNewFileName);
 			}
 		}
 	}
