@@ -1307,7 +1307,7 @@ namespace GAIA
 			{
 				if(!GCCAST(HttpURL*)(this)->Analyze())
 					return GAIA::False;
-				if(sIndex < 0 || sIndex >= m_queries.size())
+				if(sIndex < 0 || sIndex * 2 + 1 >= m_queries.size())
 					return GAIA::False;
 				const Node& nname = m_queries[sIndex * 2];
 				GAIA::CH* pszResultName = this->get_analyzed_node(nname, pszName, sMaxNameSize, pNameResultSize);
