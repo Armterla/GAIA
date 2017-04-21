@@ -1,4 +1,4 @@
-﻿#ifndef		__GAIA_TYPE_H__
+#ifndef		__GAIA_TYPE_H__
 #define		__GAIA_TYPE_H__
 
 #include "gaia_version.h"
@@ -616,8 +616,7 @@ namespace GAIA
 		"true",
 		"false",
 	};
-	GINL GAIA::RELATION_TYPE GetRelationTypeByString(const GAIA::CH* psz, GAIA::NUM sLen = GINVALID);
-	GINL const CH* GetRelationTypeByEnum(GAIA::RELATION_TYPE rt);
+	template<typename _DataType> GAIA::RELATION_TYPE GetRelationTypeByString(const _DataType* psz, GAIA::NUM sLen = GINVALID);
 
 	GAIA_ENUM_BEGIN(STRING_TYPE)
 		STRING_TYPE_STRING	= 1 << 0,

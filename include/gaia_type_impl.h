@@ -105,7 +105,7 @@ namespace GAIA
 		return TYPEID_INVALID;
 	}
 	
-	GINL GAIA::RELATION_TYPE GetRelationTypeByString(const GAIA::CH* psz, GAIA::NUM sLen)
+	template<typename _DataType> GAIA::RELATION_TYPE GetRelationTypeByString(const _DataType* psz, GAIA::NUM sLen)
 	{
 		GAST(psz != GNIL && *psz != '\0');
 		GAST(sLen == GINVALID || sLen > 0);
@@ -126,13 +126,6 @@ namespace GAIA
 			}
 		}
 		return RELATION_TYPE_INVALID;
-	}
-	
-	GINL const CH* GetRelationTypeByEnum(GAIA::RELATION_TYPE rt)
-	{
-		if(rt >= sizeofarray(RELATION_TYPE_STRING))
-			return GNIL;
-		return RELATION_TYPE_STRING[(NUM)rt];
 	}
 }
 
