@@ -1283,19 +1283,31 @@ namespace GAIA
 						GAST(pSock->m_pRequest != GNIL);
 
 						// Check logic timeout.
-						if(pSock->m_pRequest->m_uRequestTime != 0 && uCurrentTime > pSock->m_pRequest->m_uRequestTime &&
-						   uCurrentTime - pSock->m_pRequest->m_uRequestTime > pSock->m_pRequest->m_uLogicTimeout)
+						if(pSock->m_pRequest->m_uRequestTime != 0)
 						{
-							pNeedCloseRequests->push_back(pSock->m_pRequest);
-							continue;
+							if(uCurrentTime > pSock->m_pRequest->m_uRequestTime)
+							{
+								GAIA::U64 uDeltaTime = uCurrentTime - pSock->m_pRequest->m_uRequestTime;
+								if(uDeltaTime > pSock->m_pRequest->m_uLogicTimeout)
+								{
+									pNeedCloseRequests->push_back(pSock->m_pRequest);
+									continue;
+								}
+							}
 						}
 
 						// Check network timeout.
-						if(pSock->m_pRequest->m_uLastRecvedTime != 0 && uCurrentTime > pSock->m_pRequest->m_uLastRecvedTime &&
-						   uCurrentTime - pSock->m_pRequest->m_uLastRecvedTime > pSock->m_pRequest->m_uNetworkResponseTimeout)
+						if(pSock->m_pRequest->m_uLastRecvedTime != 0)
 						{
-							pNeedCloseRequests->push_back(pSock->m_pRequest);
-							continue;
+							if(uCurrentTime > pSock->m_pRequest->m_uLastRecvedTime)
+							{
+								GAIA::U64 uDeltaTime = uCurrentTime - pSock->m_pRequest->m_uLastRecvedTime;
+								if(uDeltaTime > pSock->m_pRequest->m_uNetworkResponseTimeout)
+								{
+									pNeedCloseRequests->push_back(pSock->m_pRequest);
+									continue;
+								}
+							}
 						}
 					}
 				}
