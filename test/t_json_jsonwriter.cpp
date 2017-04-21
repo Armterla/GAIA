@@ -184,5 +184,27 @@ namespace TEST
 					TERROR;
 			}
 		}
+		
+		// Empty value test.
+		{
+			jw.SetBuffer(buf.fptr(), buf.write_size());
+			jw.Begin(GAIA::JSON::JSON_NODE_CONTAINER);
+			{
+				jw.Write(GAIA::JSON::JSON_NODE_NAME, "name1");
+				jw.Write(GAIA::JSON::JSON_NODE_VALUE, "");
+				
+				jw.Write(GAIA::JSON::JSON_NODE_NAME, "name2");
+				jw.Write(GAIA::JSON::JSON_NODE_VALUE, (const GAIA::CH*)GNIL);
+			}
+			jw.End();
+			
+			GAIA::NUM sWriteSize = jw.GetWriteSize();
+			
+			strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
+			if(ENABLE_DEBUG_OUTPUT)
+				TLOG(strResult.fptr());
+			if(strResult != "{\"name1\":\"\",\"name2\":\"\"}")
+				TERROR;
+		}
 	}
 }

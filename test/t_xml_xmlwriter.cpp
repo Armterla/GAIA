@@ -195,6 +195,28 @@ namespace TEST
 				if(strResult != "<RootNode><MNode0 Prop0=\"0\" Prop1=\"1\" Prop2=\"2\"><Node0 Prop0=\"0\" Prop1=\"1\" Prop2=\"2\"/><Node1 Prop0=\"0\" Prop1=\"1\" Prop2=\"2\"/><Node2 Prop0=\"0\" Prop1=\"1\" Prop2=\"2\"/></MNode0><MNode1 Prop0=\"0\" Prop1=\"1\" Prop2=\"2\"><Node0 Prop0=\"0\" Prop1=\"1\" Prop2=\"2\"/><Node1 Prop0=\"0\" Prop1=\"1\" Prop2=\"2\"/><Node2 Prop0=\"0\" Prop1=\"1\" Prop2=\"2\"/></MNode1><MNode2 Prop0=\"0\" Prop1=\"1\" Prop2=\"2\"><Node0 Prop0=\"0\" Prop1=\"1\" Prop2=\"2\"/><Node1 Prop0=\"0\" Prop1=\"1\" Prop2=\"2\"/><Node2 Prop0=\"0\" Prop1=\"1\" Prop2=\"2\"/></MNode2></RootNode>")
 					TERROR;
 			}
+			
+			// Empty value test.
+			{
+				xw.SetBuffer(buf.fptr(), buf.write_size());
+				xw.Begin(GAIA::XML::XML_NODE_CONTAINER, "RootNode");
+				{
+					xw.Write(GAIA::XML::XML_NODE_NAME, "name1");
+					xw.Write(GAIA::XML::XML_NODE_VALUE, "");
+					
+					xw.Write(GAIA::XML::XML_NODE_NAME, "name2");
+					xw.Write(GAIA::XML::XML_NODE_VALUE, (const GAIA::CH*)GNIL);
+				}
+				xw.End();
+				
+				GAIA::NUM sWriteSize = xw.GetWriteSize();
+				
+				strResult.assign((const GAIA::CH*)buf.fptr(), sWriteSize);
+				if(ENABLE_DEBUG_OUTPUT)
+					TLOG(strResult.fptr());
+				if(strResult != "<RootNode name1=\"\" name2=\"\"/>")
+					TERROR;
+			}
 		}
 	}
 }

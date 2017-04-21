@@ -351,7 +351,7 @@ namespace GAIA
 			0	, //			DEL(delete)
 		};
 
-		template<typename _DataType> GAIA::BL XmlCheckNodeName(GAIA::XML::XML_NODE nt, const _DataType* pszNodeName)
+		template<typename _DataType> GAIA::BL XmlCheckNodeName(GAIA::XML::XML_NODE nt, const _DataType* pszNodeName, GAIA::NUM sLen = GINVALID)
 		{
 			switch(nt)
 			{
@@ -359,24 +359,54 @@ namespace GAIA
 			case GAIA::XML::XML_NODE_MULTICONTAINER:
 			case GAIA::XML::XML_NODE_NAME:
 				{
-					const _DataType* p = pszNodeName;
-					while(*p != '\0')
+					if(GAIA::ALGO::gstremp(pszNodeName))
+						return GAIA::False;
+					if(sLen == GINVALID)
 					{
-						if(*p >= sizeof(ascii_xml_validnamechar) || !ascii_xml_validnamechar[*p])
-							return GAIA::False;
-						++p;
+						const _DataType* p = pszNodeName;
+						while(*p != '\0')
+						{
+							if(*p >= sizeof(ascii_xml_validnamechar) || !ascii_xml_validnamechar[*p])
+								return GAIA::False;
+							++p;
+						}
+					}
+					else
+					{
+						for(GAIA::NUM x = 0; x < sLen; ++x)
+						{
+							if(pszNodeName[x] >= sizeof(ascii_xml_validnamechar) || !ascii_xml_validnamechar[pszNodeName[x]])
+								return GAIA::False;
+						}
 					}
 				}
 				break;
 			case GAIA::XML::XML_NODE_VALUE:
 				{
-					const _DataType* p = pszNodeName;
-					while(*p != '\0')
+					if(!GAIA::ALGO::gstremp(pszNodeName))
 					{
-						if(*p == '<' || *p == '>' || *p == '\"')
-							return GAIA::False;
-						++p;
+						if(sLen == GINVALID)
+						{
+							const _DataType* p = pszNodeName;
+							while(*p != '\0')
+							{
+								if(*p == '<' || *p == '>' || *p == '\"')
+									return GAIA::False;
+								++p;
+							}
+						}
+						else
+						{
+							GAST(sLen > 0);
+							for(GAIA::NUM x = 0; x < sLen; ++x)
+							{
+								if(pszNodeName[x] == '<' || pszNodeName[x] == '>' || pszNodeName[x] == '\"')
+									return GAIA::False;
+							}
+						}
 					}
+					else
+						GAST(sLen == GINVALID || sLen == 0);
 				}
 				break;
 			default:

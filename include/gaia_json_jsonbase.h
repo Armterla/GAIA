@@ -185,7 +185,7 @@ namespace GAIA
 			0	, //			DEL(delete)
 		};
 
-		template<typename _DataType> GAIA::BL JsonCheckNodeName(GAIA::JSON::JSON_NODE nt, const _DataType* pszNodeName)
+		template<typename _DataType> GAIA::BL JsonCheckNodeName(GAIA::JSON::JSON_NODE nt, const _DataType* pszNodeName, GAIA::NUM sLen = GINVALID)
 		{
 			switch(nt)
 			{
@@ -193,24 +193,74 @@ namespace GAIA
 			case GAIA::JSON::JSON_NODE_MULTICONTAINER:
 			case GAIA::JSON::JSON_NODE_NAME:
 				{
-					const _DataType* p = pszNodeName;
-					while(*p != '\0')
+					if(GAIA::ALGO::gstremp(pszNodeName))
+						return GAIA::False;
+					if(sLen == GINVALID)
 					{
-						if(*p == '\"' && p != pszNodeName && p[-1] != '\\')
-							return GAIA::False;
-						++p;
+						const _DataType* p = pszNodeName;
+						while(*p != '\0')
+						{
+							if(*p == '\"')
+							{
+								if(p == pszNodeName)
+									return GAIA::False;
+								else if(p[-1] != '\\')
+									return GAIA::False;
+							}
+							++p;
+						}
+					}
+					else
+					{
+						for(GAIA::NUM x = 0; x < sLen; ++x)
+						{
+							if(pszNodeName[x] == '\"')
+							{
+								if(x == 0)
+									return GAIA::False;
+								else if(pszNodeName[x - 1] != '\\')
+									return GAIA::False;
+							}
+						}
 					}
 				}
 				break;
 			case GAIA::JSON::JSON_NODE_VALUE:
 				{
-					const _DataType* p = pszNodeName;
-					while(*p != '\0')
+					if(!GAIA::ALGO::gstremp(pszNodeName))
 					{
-						if(*p == '\"' && p != pszNodeName && p[-1] != '\\')
-							return GAIA::False;
-						++p;
+						if(sLen == GINVALID)
+						{
+							const _DataType* p = pszNodeName;
+							while(*p != '\0')
+							{
+								if(*p == '\"')
+								{
+									if(p == pszNodeName)
+										return GAIA::False;
+									else if(p[-1] != '\\')
+										return GAIA::False;
+								}
+								++p;
+							}
+						}
+						else
+						{
+							GAST(sLen > 0);
+							for(GAIA::NUM x = 0; x < sLen; ++x)
+							{
+								if(pszNodeName[x] == '\"')
+								{
+									if(x == 0)
+										return GAIA::False;
+									else if(pszNodeName[x - 1] != '\\')
+										return GAIA::False;
+								}
+							}
+						}
 					}
+					else
+						GAST(sLen == GINVALID || sLen == 0);
 				}
 				break;
 			default:
