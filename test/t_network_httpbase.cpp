@@ -24,6 +24,8 @@ namespace TEST
 			static const GAIA::CH* TEST_URL6 = "127.0.0.1/";
 			static const GAIA::CH* TEST_URL7 = "http://www.abc.com:4567/path1/path2/path3;param1;param2;param3?a=1&b=2&c=3#frag";
 			static const GAIA::CH* TEST_URL8 = "https://www.abc.com:4567/path1/path2/path3;param1;param2;param3?a=1&b=2&c=3#frag";
+			static const GAIA::CH* TEST_URL9 = "127.0.0.1/getpostreplys?postid=56&breadths=10,2&depth=2&&sortby=[{\"s\":\"1,2\"},{\"s\":\"1,2\"}]&startindex=0";
+			static const GAIA::CH* TEST_URL10 = "/getpostreplys?postid=56&breadths=10,2&depth=2&&sortby=[{\"s\":\"1,2\"},{\"s\":\"1,2\"}]&startindex=0";
 
 			GAIA::NETWORK::HttpURL hu;
 
@@ -282,6 +284,58 @@ namespace TEST
 
 			const GAIA::CH* pszURL = hu;
 			if(!GAIA::ALGO::gstrequal(pszURL, TEST_URL7))
+				TERROR;
+			
+			hu = TEST_URL9;
+			if(hu.GetProtocal(szProtocal, sizeof(szProtocal), &sPracSize) != GNIL)
+				TERROR;
+			if(hu.GetHostName(szHostName, sizeof(szHostName), &sPracSize) != szHostName)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szHostName, "127.0.0.1"))
+				TERROR;
+			if(sPracSize != sizeof("127.0.0.1") - 1)
+				TERROR;
+			if(hu.GetPort(szPort, sizeof(szPort), &sPracSize) != GNIL)
+				TERROR;
+			if(hu.GetPath(szPath, sizeof(szPath), &sPracSize) != szPath)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szPath, "/getpostreplys"))
+				TERROR;
+			if(sPracSize != sizeof("/getpostreplys") - 1)
+				TERROR;
+			if(hu.GetFullParam(szFullParam, sizeof(szFullParam), &sPracSize) != GNIL)
+				TERROR;
+			if(hu.GetFullQuery(szFullQuery, sizeof(szFullQuery), &sPracSize) != szFullQuery)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szFullQuery, "postid=56&breadths=10,2&depth=2&&sortby=[{\"s\":\"1,2\"},{\"s\":\"1,2\"}]&startindex=0"))
+				TERROR;
+			if(sPracSize != sizeof("postid=56&breadths=10,2&depth=2&&sortby=[{\"s\":\"1,2\"},{\"s\":\"1,2\"}]&startindex=0") - 1)
+				TERROR;
+			if(hu.GetFragment(szFragment, sizeof(szFragment), &sPracSize) != GNIL)
+				TERROR;
+			
+			hu = TEST_URL10;
+			if(hu.GetProtocal(szProtocal, sizeof(szProtocal), &sPracSize) != GNIL)
+				TERROR;
+			if(hu.GetHostName(szHostName, sizeof(szHostName), &sPracSize) != GNIL)
+				TERROR;
+			if(hu.GetPort(szPort, sizeof(szPort), &sPracSize) != GNIL)
+				TERROR;
+			if(hu.GetPath(szPath, sizeof(szPath), &sPracSize) != szPath)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szPath, "/getpostreplys"))
+				TERROR;
+			if(sPracSize != sizeof("/getpostreplys") - 1)
+				TERROR;
+			if(hu.GetFullParam(szFullParam, sizeof(szFullParam), &sPracSize) != GNIL)
+				TERROR;
+			if(hu.GetFullQuery(szFullQuery, sizeof(szFullQuery), &sPracSize) != szFullQuery)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szFullQuery, "postid=56&breadths=10,2&depth=2&&sortby=[{\"s\":\"1,2\"},{\"s\":\"1,2\"}]&startindex=0"))
+				TERROR;
+			if(sPracSize != sizeof("postid=56&breadths=10,2&depth=2&&sortby=[{\"s\":\"1,2\"},{\"s\":\"1,2\"}]&startindex=0") - 1)
+				TERROR;
+			if(hu.GetFragment(szFragment, sizeof(szFragment), &sPracSize) != GNIL)
 				TERROR;
 
 			hu.Reset();

@@ -717,9 +717,10 @@ namespace GAIA
 
 				// Partition analyze.
 				{
+					GAIA::NUM sFirstSlashIndex = GINVALID;
 					for(GAIA::NUM x = 0; x < sUrlSize; ++x)
 					{
-						if(pszUrl[x] == ':')
+						if(pszUrl[x] == ':' && sFirstSlashIndex == GINVALID)
 						{
 							if(sHostNameBegin == GINVALID)
 							{
@@ -752,6 +753,8 @@ namespace GAIA
 						}
 						else if(pszUrl[x] == '/')
 						{
+							if(sFirstSlashIndex == GINVALID)
+								sFirstSlashIndex = x;
 							if(sHostNameEnd == GINVALID)
 								sHostNameEnd = x;
 							else
