@@ -226,7 +226,9 @@ namespace GAIA
 		}
 		GAST(nNewRef >= 0);
 		GAST(!bDestructingByDropRef);
+	#if GAIA_OS != GAIA_OS_WINDOWS
 		GAST(nNewRef <= 0xFF);
+	#endif
 	}
 #endif
 }
