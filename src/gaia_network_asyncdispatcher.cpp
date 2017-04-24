@@ -771,7 +771,7 @@ namespace GAIA
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 			struct timespec timeout;
 			timeout.tv_sec = 0;
-			timeout.tv_nsec = 10 * 1000 * 1000; // 10 MilliSeconds.
+			timeout.tv_nsec = 100L * 1000L * 1000L; // 10 MilliSeconds.
 			struct kevent elist[128];
 			GAIA::NUM sEventCount = kevent(pThread->kqep, GNIL, 0, elist, sizeofarray(elist), &timeout);
 			if(sEventCount == GINVALID)
@@ -1005,6 +1005,11 @@ namespace GAIA
 											if(sNeedSendSize > 0)
 											{
 												GAIA::NUM sSendedSize = (GAIA::NUM)send(nSocket, pThread->tempbuf.fptr(), sNeedSendSize, 0);
+												if(sSendedSize != sNeedSendSize && this->IsEnableLog())
+												{
+													GAIA::N32 nErr = errno;
+													GERR << "[AsyncDispatcher] AsyncDispatcher::Execute: socket send failed, errno = " << nErr << GEND;
+												}
 												GAST(sSendedSize == sNeedSendSize);
 												ctx.pSocket->OnSent(GAIA::True, pThread->tempbuf.fptr(), sSendedSize, sSendedSize + pThread->tempbuf.remain());
 											}
