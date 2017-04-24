@@ -47,6 +47,7 @@ namespace GAIA
 		GAIA_ENUM_END(GERROR)
 		static const GAIA::CH* GERROR_TEXTA[] =
 		{
+			"InvalidError",
 			"NoError",
 			"Unknown",
 			"NetDown",
@@ -84,6 +85,7 @@ namespace GAIA
 		};
 		static const GAIA::WCH* GERROR_TEXTW[] =
 		{
+			L"InvalidError",
 			L"NoError",
 			L"Unknown",
 			L"NetDown",

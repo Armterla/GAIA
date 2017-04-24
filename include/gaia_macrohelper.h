@@ -389,12 +389,20 @@
 			: Ect##basename(pszFile, nCodeLine, pszMsg, nError, nOSError){}\
 	}
 
+#ifdef GAIA_DEBUG_PRINTEXCEPTION
+#	define GPRINTEXCEPTION(name) do{GAIA::STREAM::STDStream stm; stm << "GAIA Exception " << #name << "! File=" << __FILE__ << "(" << __LINE__ << ")\n";}while(0)
+#	define GPRINTEXCEPTION_PURE(name) do{GAIA::STREAM::STDStream stm; stm << "GAIA Exception! ErrorText\"" << name.GetErrorTextA() << "\" File=" << __FILE__ << "(" << __LINE__ << ")\n";}while(0)
+#else
+#	define GPRINTEXCEPTION(name) do{}while(0)
+#	define GPRINTEXCEPTION_PURE(name) do{}while(0)
+#endif
+
 #ifdef GAIA_DEBUG_THROWEXCEPTION
-#	define GTHROW(name) do{throw GAIA::ECT::Ect##name(__FILE__, __LINE__, "");}while(0)
-#	define GTHROWM(name, message) do{throw GAIA::ECT::Ect##name(__FILE__, __LINE__, message);}while(0)
+#	define GTHROW(name) do{GPRINTEXCEPTION(name); throw GAIA::ECT::Ect##name(__FILE__, __LINE__, "");}while(0)
+#	define GTHROWM(name, message) do{GPRINTEXCEPTION(name); throw GAIA::ECT::Ect##name(__FILE__, __LINE__, message);}while(0)
 #	define GTHROW_RET(name, ret) GTHROW(name)
 #	define GTHROWM_RET(name, message, ret) GTHROWM(name, message)
-#	define GTHROW_PURE(name) throw name;
+#	define GTHROW_PURE(name) do{GPRINTEXCEPTION_PURE(name); throw name;}while(0)
 #else
 #	define GTHROW(name) do{}while(0)
 #	define GTHROWM(name, message) do{}while(0)
