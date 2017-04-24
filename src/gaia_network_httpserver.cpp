@@ -770,10 +770,11 @@ namespace GAIA
 
 			if(GAIA::ALGO::gstrequal(szPath, "/httpinfo"))
 			{
-				strResp += "[GAIA HTTP SERVER STATUS]\n\n";
 				const GAIA::NETWORK::HttpServerStatus& s = this->GetServer().GetStatus();
+				
+				strResp += "[GAIA HTTP SERVER STATUS]\n\n";
 
-				GAIA::U64 uWorkTime = GAIA::TIME::gmt_time() - this->GetServer().GetStatus().uServerStartupTime;
+				GAIA::U64 uWorkTime = GAIA::TIME::gmt_time() - s.uServerStartupTime;
 				GAIA::CH szWorkTime[64];
 				GAIA::TIME::deltatime2string(uWorkTime, szWorkTime);
 				strResp += "\tServerWorkTime = "; strResp += szWorkTime; strResp += "\n\n";

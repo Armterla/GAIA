@@ -1346,7 +1346,7 @@ namespace GAIA
 
 				@return Return the AsyncDispatcher.
 			*/
-			GAIA::NETWORK::HttpServerAsyncDispatcher* GetAsyncDispatcher() const{return m_disp;}
+			GAIA::NETWORK::AsyncDispatcher* GetAsyncDispatcher() const{return (GAIA::NETWORK::AsyncDispatcher*)m_disp;}
 
 			/*!
 				@brief Enable output log.
