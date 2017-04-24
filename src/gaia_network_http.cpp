@@ -9,6 +9,10 @@
 #include <gaia_network_base_impl.h>
 #include <gaia_network_socket_impl.h>
 
+// DEBUG START.
+static GAIA::NETWORK::HttpRequest* s_pRequest = GNIL;
+// DEBUG END.
+
 namespace GAIA
 {
 	namespace NETWORK
@@ -109,13 +113,15 @@ namespace GAIA
 				}
 				GAST(m_pRequest != GNIL);
 
+				m_pRequest->m_uConnectedTime = GAIA::TIME::tick_time();
+				
 				if(m_pHttp->m_bLog)
 				{
 					GAIA::CH szTemp[32];
 					addr.tostring(szTemp);
 					GDEV << "[Http] HttpAsyncSocket::OnConnected: Connected to " << szTemp << GEND;
 				}
-
+				
 				// Change state.
 				{
 					GAIA::SYNC::Autolock al(m_pRequest->m_lrState);
@@ -900,7 +906,7 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		GAIA::BL Http::Execute(GAIA::NETWORK::HttpWorkThread* pWorkThread, GAIA::BL bConnect, GAIA::BL bRequest, GAIA::BL bClose, GAIA::BL bRecycleCache)
+		GAIA::BL Http::Execute(GAIA::NETWORK::HttpWorkThread* pWorkThread)
 		{
 			GAIA::BL bRet = GAIA::False;
 			GAIA::U64 uCurrentTime = GAIA::TIME::tick_time();
@@ -915,7 +921,6 @@ namespace GAIA
 			}
 
 			// Connect.
-			if(bConnect)
 			{
 				GAIA::BL bConnectionIsFull = GAIA::False;
 				{
@@ -968,6 +973,9 @@ namespace GAIA
 						//
 						if(bHostAddressIsValid)
 						{
+							//
+							pRequest->m_uConnectingTime = uCurrentTime;
+							
 							// Allocate socket.
 							HttpAsyncSocket* pSocket = gnew HttpAsyncSocket(*this, *m_disp);
 							pRequest->m_pSock = pSocket;
@@ -1013,10 +1021,23 @@ namespace GAIA
 								}
 								bRet = GAIA::True;
 							}
-							GCATCHALL
+							GCATCHBASE
 							{
+								// DEBUG START.
+								{
+									s_pRequest = pRequest;
+								}
+								// DEBUG END.
 								pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_CONNECT_FAILED;
 								pNeedCloseRequests->push_back(pRequest);
+								
+								// Erase from connection list.
+								{
+									GAIA::SYNC::Autolock al(m_lrConnectingList);
+									GAIA::BL bEraseResult = m_connectinglist.erase(pRequest);
+									if(!bEraseResult && m_bLog)
+										GERR << "[Http] Http::Execute: Erase from connecting list failed when connect failed!" << GEND;
+								}
 							}
 						}
 						else
@@ -1029,7 +1050,6 @@ namespace GAIA
 			}
 
 			// Request.
-			if(bRequest)
 			{
 				GAIA::SYNC::AutolockRW al(m_rwExecuteRequest, pWorkThread != GNIL);
 
@@ -1234,19 +1254,19 @@ namespace GAIA
 					}
 				}
 
-				// Recycle request list.
+				// Drop request ref and socket ref.
 				{
 					for(GAIA::NUM x = 0; x < pTempList->size(); ++x)
 					{
 						GAIA::NETWORK::HttpRequest* pRequest = (*pTempList)[x];
 						GAST(pRequest != GNIL);
-						pRequest->m_pSock->drop_ref("Http::Execute:recycle socket for request failed");
-						pRequest->drop_ref("Http::Execute:recycle request for request failed");
+						pRequest->m_pSock->drop_ref("Http::Execute:socket drop ref for request complete");
+						pRequest->drop_ref("Http::Execute:request drop ref for request complete");
 					}
 				}
 			}
 
-			// Close the request.
+			// Close the failed request.
 			{
 				for(GAIA::NUM x = 0; x < pNeedCloseRequests->size(); ++x)
 				{
@@ -1258,7 +1278,6 @@ namespace GAIA
 			}
 
 			// Close dispatch.
-			if(bClose)
 			{
 				GAIA::SYNC::Autolock al(m_lrExecuteClose);
 
@@ -1269,7 +1288,8 @@ namespace GAIA
 					{
 						GAIA::NETWORK::HttpRequest* pRequest = *it;
 						GAST(pRequest != GNIL);
-						pNeedCloseRequests->push_back(pRequest);
+						if(pWorkThread == GNIL || pRequest->m_uThreadMagicIndex % m_listWorkThreads.size() == pWorkThread->uThreadIndex)
+							pNeedCloseRequests->push_back(pRequest);
 					}
 				}
 
@@ -1281,31 +1301,82 @@ namespace GAIA
 						HttpAsyncSocket* pSock = *it;
 						GAST(pSock != GNIL);
 						GAST(pSock->m_pRequest != GNIL);
-
-						// Check logic timeout.
-						if(pSock->m_pRequest->m_uRequestTime != 0)
+						HttpRequest* pRequest = pSock->m_pRequest;
+						if(pWorkThread == GNIL || pRequest->m_uThreadMagicIndex % m_listWorkThreads.size() == pWorkThread->uThreadIndex)
 						{
-							if(uCurrentTime > pSock->m_pRequest->m_uRequestTime)
+							// Check logic timeout.
+							if(pSock->m_pRequest->m_uRequestTime != 0)
 							{
-								GAIA::U64 uDeltaTime = uCurrentTime - pSock->m_pRequest->m_uRequestTime;
-								if(uDeltaTime > pSock->m_pRequest->m_uLogicTimeout)
+								if(uCurrentTime > pSock->m_pRequest->m_uRequestTime)
 								{
-									pNeedCloseRequests->push_back(pSock->m_pRequest);
-									continue;
+									GAIA::U64 uDeltaTime = uCurrentTime - pSock->m_pRequest->m_uRequestTime;
+									if(uDeltaTime > pSock->m_pRequest->m_uLogicTimeout)
+									{
+										pNeedCloseRequests->push_back(pSock->m_pRequest);
+										continue;
+									}
 								}
 							}
-						}
-
-						// Check network timeout.
-						if(pSock->m_pRequest->m_uLastRecvedTime != 0)
-						{
-							if(uCurrentTime > pSock->m_pRequest->m_uLastRecvedTime)
+							
+							// Check network timeout.
+							if(pSock->m_pRequest->m_uLastRecvedTime != 0)
 							{
-								GAIA::U64 uDeltaTime = uCurrentTime - pSock->m_pRequest->m_uLastRecvedTime;
-								if(uDeltaTime > pSock->m_pRequest->m_uNetworkResponseTimeout)
+								if(uCurrentTime > pSock->m_pRequest->m_uLastRecvedTime)
 								{
-									pNeedCloseRequests->push_back(pSock->m_pRequest);
-									continue;
+									GAIA::U64 uDeltaTime = uCurrentTime - pSock->m_pRequest->m_uLastRecvedTime;
+									if(uDeltaTime > pSock->m_pRequest->m_uNetworkResponseTimeout)
+									{
+										pNeedCloseRequests->push_back(pSock->m_pRequest);
+										continue;
+									}
+								}
+							}
+							else if(pSock->m_pRequest->m_uLastSentTime != 0)
+							{
+								if(uCurrentTime > pSock->m_pRequest->m_uLastSentTime)
+								{
+									GAIA::U64 uDeltaTime = uCurrentTime - pSock->m_pRequest->m_uLastSentTime;
+									if(uDeltaTime > pSock->m_pRequest->m_uNetworkResponseTimeout)
+									{
+										pNeedCloseRequests->push_back(pSock->m_pRequest);
+										continue;
+									}
+								}
+							}
+							else if(pSock->m_pRequest->m_uLastSendingTime != 0)
+							{
+								if(uCurrentTime > pSock->m_pRequest->m_uLastSendingTime)
+								{
+									GAIA::U64 uDeltaTime = uCurrentTime - pSock->m_pRequest->m_uLastSendingTime;
+									if(uDeltaTime > pSock->m_pRequest->m_uNetworkResponseTimeout)
+									{
+										pNeedCloseRequests->push_back(pSock->m_pRequest);
+										continue;
+									}
+								}
+							}
+							else if(pSock->m_pRequest->m_uConnectedTime != 0)
+							{
+								if(uCurrentTime > pSock->m_pRequest->m_uConnectedTime)
+								{
+									GAIA::U64 uDeltaTime = uCurrentTime - pSock->m_pRequest->m_uConnectedTime;
+									if(uDeltaTime > pSock->m_pRequest->m_uNetworkResponseTimeout)
+									{
+										pNeedCloseRequests->push_back(pSock->m_pRequest);
+										continue;
+									}
+								}
+							}
+							else if(pSock->m_pRequest->m_uConnectingTime != 0)
+							{
+								if(uCurrentTime > pSock->m_pRequest->m_uConnectingTime)
+								{
+									GAIA::U64 uDeltaTime = uCurrentTime - pSock->m_pRequest->m_uConnectingTime;
+									if(uDeltaTime > pSock->m_pRequest->m_uNetworkResponseTimeout)
+									{
+										pNeedCloseRequests->push_back(pSock->m_pRequest);
+										continue;
+									}
 								}
 							}
 						}
@@ -1315,7 +1386,7 @@ namespace GAIA
 				// Make element in request list is unique.
 				pNeedCloseRequests->sort();
 				pNeedCloseRequests->unique();
-
+				
 				// Close the request.
 				{
 					for(GAIA::NUM x = 0; x < pNeedCloseRequests->size(); ++x)
@@ -1329,7 +1400,6 @@ namespace GAIA
 			}
 
 			// Recycle cache.
-			if(bRecycleCache)
 			{
 				GAIA::SYNC::Autolock al(m_lrExecuteRecycleCache);
 			}
@@ -1344,32 +1414,41 @@ namespace GAIA
 
 		GVOID Http::InternalCloseRequest(HttpRequest& req)
 		{
+			// DEBUG START.
+			{
+				if(&req == s_pRequest)
+				{
+					GAIA::NUM s = 0;
+					s = 1;
+				}
+			}
+			// DEBUG END.
+			
 			// Socket object.
 			{
-				GAIA::NETWORK::HttpAsyncSocket* pSocket = req.m_pSock;
-				if(pSocket != GNIL)
+				if(req.m_pSock != GNIL)
 				{
 					// Remove from list.
 					{
 						GAIA::SYNC::Autolock al(m_lrSocks);
-						GAIA::BL bEraseResult = m_socks.erase(pSocket);
+						GAIA::BL bEraseResult = m_socks.erase(req.m_pSock);
 						if(!bEraseResult && m_bLog)
 							GERR << "[Http] Http::InternalCloseSocket: Erase socket from socket list failed!" << GEND;
 					}
 
 					// Close socket.
-					if(pSocket->IsCreated())
+					if(req.m_pSock->IsCreated())
 					{
 						GTRY
 						{
-							pSocket->Shutdown();
-							pSocket->Close();
+							req.m_pSock->Shutdown();
+							req.m_pSock->Close();
 						}
 						GCATCHALL{}
 					}
 
 					// Release.
-					pSocket->drop_ref("Http::InternalCloseRequest:socket drop ref front");
+					req.m_pSock->drop_ref("Http::InternalCloseRequest:socket drop ref front");
 				}
 			}
 
@@ -1471,6 +1550,7 @@ namespace GAIA
 						GCATCHALL{}
 					}
 					req.m_pSock->drop_ref("Http::InternalCloseRequest:socket drop ref back");
+					req.m_pSock = GNIL;
 				}
 
 				// Release.

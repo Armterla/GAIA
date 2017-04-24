@@ -687,12 +687,14 @@ namespace GAIA
 
 				m_uLogicTimeout = 60 * 1000 * 1000;
 				m_uNetworkResponseTimeout = 16 * 1000 * 1000;
-				m_uRequestTime = 0;
 				m_uWriteCookicTime = 0;
 				m_uReadCookicTime = 0;
+				m_uRequestTime = 0;
+				m_uConnectingTime = 0;
+				m_uConnectedTime = 0;
+				m_uLastSendingTime = 0;
 				m_uLastSentTime = 0;
 				m_uLastRecvedTime = 0;
-				m_uLastSendingTime = 0;
 
 				m_sTotalReqHeadSize = 0;
 				m_sTotalRespHeadSize = 0;
@@ -731,12 +733,14 @@ namespace GAIA
 
 			GAIA::U64 m_uLogicTimeout;
 			GAIA::U64 m_uNetworkResponseTimeout;
-			GAIA::U64 m_uRequestTime;
 			GAIA::U64 m_uWriteCookicTime;
 			GAIA::U64 m_uReadCookicTime;
+			GAIA::U64 m_uRequestTime;
+			GAIA::U64 m_uConnectingTime;
+			GAIA::U64 m_uConnectedTime;
+			GAIA::U64 m_uLastSendingTime;
 			GAIA::U64 m_uLastSentTime;
 			GAIA::U64 m_uLastRecvedTime;
-			GAIA::U64 m_uLastSendingTime;
 
 			GAIA::NUM m_sTotalReqHeadSize;
 			GAIA::NUM m_sTotalRespHeadSize;
@@ -1248,21 +1252,13 @@ namespace GAIA
 					It used for internal, current class's user must set this parameter to GNIL.\n
 					Default value is GNIL.
 
-				@param bConnect [in] Specify execute connect operation or not. Default value is GAIA::True.
-
-				@param bRequest [in] Specify execute request operation or not. Default value is GAIA::True.
-
-				@param bClose [in] Specify execute close operation or not. Default value is GAIA::True.
-
-				@param bRecycleCache [in] Specify execute reccyle cache operation or not. Default value is GAIA::True.
-
 				@return If there exist a task to execute, pop and executed, return GAIA::True, or return GAIA::False.
 
 				@remarks Call this method only pop a unit task in task queue and execute it, so if user need execute all waiting task,
 					call this method many times until GAIA::False be returnned.\n
 					This method is thread safe.\n
 			*/
-			GAIA::BL Execute(GAIA::NETWORK::HttpWorkThread* pWorkThread = GNIL, GAIA::BL bConnect = GAIA::True, GAIA::BL bRequest = GAIA::True, GAIA::BL bClose = GAIA::True, GAIA::BL bRecycleCache = GAIA::True);
+			GAIA::BL Execute(GAIA::NETWORK::HttpWorkThread* pWorkThread = GNIL);
 
 			/*!
 				@brief Enable or disable write cookic to RAM.
