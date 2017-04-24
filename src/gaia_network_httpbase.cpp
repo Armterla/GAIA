@@ -3,6 +3,7 @@
 #include <gaia_algo_search.h>
 #include <gaia_network_httpbase.h>
 #include <gaia_global_decl.h>
+#include <gaia_type_impl.h>
 #include <gaia_assert_impl.h>
 #include <gaia_thread_base_impl.h>
 

@@ -55,6 +55,29 @@ namespace GAIA
 			"TRACE",	// HTTP_METHOD_TRACE
 			"CONNECT",	// HTTP_METHOD_CONNECT
 		};
+		
+		template<typename _DataType> GAIA::NETWORK::HTTP_METHOD GetHttpMethodByName(const _DataType* psz, GAIA::NUM sLen = GINVALID)
+		{
+			GAST(psz != GNIL && *psz != '\0');
+			GAST(sLen == GINVALID || sLen > 0);
+			if(sLen == GINVALID)
+			{
+				for(GAIA::NUM x = 0; x < sizeofarray(GAIA::NETWORK::HTTP_METHOD_STRING); ++x)
+				{
+					if(GAIA::ALGO::gstrcmp(psz, GAIA::NETWORK::HTTP_METHOD_STRING[x]) == 0)
+						return (GAIA::NETWORK::HTTP_METHOD)x;
+				}
+			}
+			else
+			{
+				for(GAIA::NUM x = 0; x < sizeofarray(GAIA::NETWORK::HTTP_METHOD_STRING); ++x)
+				{
+					if(GAIA::ALGO::gstrcmp(psz, GAIA::NETWORK::HTTP_METHOD_STRING[x], sLen) == 0)
+						return (GAIA::NETWORK::HTTP_METHOD)x;
+				}
+			}
+			return GAIA::NETWORK::HTTP_METHOD_INVALID;
+		}
 
 		static const GAIA::NUM HTTP_METHOD_STRING_LEN[] =
 		{
@@ -694,9 +717,10 @@ namespace GAIA
 
 				// Partition analyze.
 				{
+					GAIA::NUM sFirstSlashIndex = GINVALID;
 					for(GAIA::NUM x = 0; x < sUrlSize; ++x)
 					{
-						if(pszUrl[x] == ':')
+						if(pszUrl[x] == ':' && sFirstSlashIndex == GINVALID)
 						{
 							if(sHostNameBegin == GINVALID)
 							{
@@ -729,6 +753,8 @@ namespace GAIA
 						}
 						else if(pszUrl[x] == '/')
 						{
+							if(sFirstSlashIndex == GINVALID)
+								sFirstSlashIndex = x;
 							if(sHostNameEnd == GINVALID)
 								sHostNameEnd = x;
 							else
@@ -1284,7 +1310,7 @@ namespace GAIA
 			{
 				if(!GCCAST(HttpURL*)(this)->Analyze())
 					return GAIA::False;
-				if(sIndex < 0 || sIndex >= m_queries.size())
+				if(sIndex < 0 || sIndex * 2 + 1 >= m_queries.size())
 					return GAIA::False;
 				const Node& nname = m_queries[sIndex * 2];
 				GAIA::CH* pszResultName = this->get_analyzed_node(nname, pszName, sMaxNameSize, pNameResultSize);

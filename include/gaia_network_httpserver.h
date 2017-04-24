@@ -626,7 +626,7 @@ namespace GAIA
 			/*!
 				@brief Compare two HttpServerLink.
 
-				@param Specify the second operator for compare.
+				@param src [in] Specify the second operator for compare.
 
 				@return 
 					If current HttpServerLink below paramter src, return -1.\n
@@ -1080,7 +1080,7 @@ namespace GAIA
 
 				@param ip [in] Speicify a IP to add to black list.
 
-				@return uEffectTime [in] Specify the take effect time in microseconds.
+				@param uEffectTime [in] Specify the take effect time in microseconds.
 
 				@remarks
 					If the node is not exist which specified by parameter ip, the node will be created to black lsit.
@@ -1095,7 +1095,7 @@ namespace GAIA
 				@return If the parameter ip is exist in black list, current function call will success and return GAIA::True,
 					or will return GAIA::False.
 			*/
-			GAIA::GVOID RemoveBlackList(const GAIA::NETWORK::IP& ip);
+			GAIA::BL RemoveBlackList(const GAIA::NETWORK::IP& ip);
 
 			/*!
 				@brief Remove all ip addresses from black list.
@@ -1149,7 +1149,7 @@ namespace GAIA
 				@return If the parameter ip is exist in white list, current function call will success and return GAIA::True,
 					or will return GAIA::False.
 			*/
-			GAIA::GVOID RemoveWhiteList(const GAIA::NETWORK::IP& ip);
+			GAIA::BL RemoveWhiteList(const GAIA::NETWORK::IP& ip);
 
 			/*!
 				@brief Remove all ip addresses from white list.
@@ -1198,7 +1198,7 @@ namespace GAIA
 				@param sKeyLen [in] Specify the key's length in characters(With out '\0').
 					This parameter could be GINVALID when the parameter pszKey ended with '\0'.
 
-				@param resqhead [out] Used for saving the response head.
+				@param resphead [out] Used for saving the response head.
 
 				@param p [out] Used for saving the body's pointer.
 					If the cache did not have a body, this parameter will be filled by GNIL.

@@ -23,7 +23,6 @@ namespace GAIA
 
 		public:
 			GAIA_ENUM_BEGIN(FIRE_REASON)
-				FIRE_REASON_NORMAL,
 				FIRE_REASON_REGIST,
 				FIRE_REASON_UNREGIST,
 				FIRE_REASON_PAUSE,
@@ -128,7 +127,7 @@ namespace GAIA
 			GINL const GAIA::TIME::Timer::FireDesc& GetFireDesc() const{return m_desc.descFire;}
 			GINL GAIA::BL SetFireDesc(const GAIA::TIME::Timer::FireDesc& descFire){m_desc.descFire = descFire; return GAIA::True;}
 
-			GINL GAIA::TIME::TimerMgr* GetTimerMgr() const;
+			GINL GAIA::TIME::TimerMgr* GetTimerMgr() const{return m_pTimerMgr;}
 			GINL GAIA::BL IsRegisted() const{return m_pTimerMgr != GNIL;}
 			GINL const __MicroSecType& GetRegistTime() const{return m_nRegistTime;}
 			GINL const __MicroSecType& GetLastUpdateTime() const{return m_nLastUpdateTime;}
@@ -137,7 +136,7 @@ namespace GAIA
 			GINL GAIA::BL Pause();
 			GINL GAIA::BL Resume();
 			GINL GAIA::BL IsPaused() const{return m_bPaused;}
-			GINL GAIA::GVOID Update(GAIA::TIME::Timer::FIRE_REASON reason);
+			GINL GAIA::BL Update(GAIA::TIME::Timer::FIRE_REASON reason);
 
 		private:
 			GINL GAIA::GVOID init()
@@ -152,7 +151,7 @@ namespace GAIA
 				m_bPaused = GAIA::False;
 				m_bUnregisting = GAIA::False;
 			}
-			GINL GAIA::GVOID SetTimerMgr(GAIA::TIME::TimerMgr* pTimerMgr);
+			GINL GAIA::GVOID SetTimerMgr(GAIA::TIME::TimerMgr* pTimerMgr){m_pTimerMgr = pTimerMgr;}
 			GINL GAIA::GVOID SetRegistTime(const __MicroSecType& t){m_nRegistTime = t;}
 			GINL GAIA::GVOID SetLastUpdateTime(const __MicroSecType& t){m_nLastUpdateTime = t;}
 			GINL GAIA::GVOID SetUpdateTimes(const __UpdateTimesType& t){m_nUpdateTimes = t;}
@@ -175,7 +174,7 @@ namespace GAIA
 			GAIA::U8 m_bUnregisting : 1;
 		};
 
-		class TimerMgr : public GAIA::RefObject
+		class TimerMgr : public GAIA::Base
 		{
 		public:
 			typedef GAIA::CTN::Vector<Timer*> __TimerList;
@@ -199,7 +198,7 @@ namespace GAIA
 
 		public:
 			GINL TimerMgr(){this->init();}
-			GINL virtual ~TimerMgr(){this->Destroy();}
+			GINL ~TimerMgr(){this->Destroy();}
 
 			GINL GAIA::BL Create(const GAIA::TIME::TimerMgr::Desc& desc)
 			{
@@ -210,20 +209,20 @@ namespace GAIA
 			}
 			GINL GAIA::GVOID Destroy()
 			{
+				__TimerList listTimer;
 				for(GAIA::NUM x = 0; x < m_groups.size(); ++x)
 				{
 					Group& g = m_groups[x];
-					GAIA::TIME::Timer::__TimerBook::it it = g.timers.frontit();
-					for(; !it.empty(); ++it)
+					for(GAIA::TIME::Timer::__TimerBook::it it = g.timers.frontit(); !it.empty(); ++it)
 					{
 						GAIA::TIME::Timer* pTimer = *it;
-						if(pTimer->GetDesc().bAutoRelease)
-						{
-							if(pTimer->get_ref() > 1)
-								pTimer->drop_ref();
-						}
-						GAIA_RELEASE_SAFE(pTimer);
+						listTimer.push_back(pTimer);
 					}
+				}
+				for(GAIA::NUM x = 0; x < listTimer.size(); ++x)
+				{
+					GAIA::TIME::Timer* pTimer = listTimer[x];
+					this->Unregist(*pTimer);
 				}
 				m_groups.destroy();
 				m_nLastUpdateTime = 0;
@@ -265,11 +264,14 @@ namespace GAIA
 
 				if(timer.GetUnregisting())
 					return GAIA::True;
+
 				timer.SetUnregisting(GAIA::True);
 				{
 					/* Unregist fire. */
 					if(timer.GetDesc().descFire.bUnregistFire)
 						timer.Update(GAIA::TIME::Timer::FIRE_REASON_UNREGIST);
+					if(timer.GetDesc().bAutoRelease)
+						timer.drop_ref();
 
 					/* Unregist. */
 					GAIA::NUM sGroupIndex = timer.GetGroupIndex();
@@ -299,10 +301,9 @@ namespace GAIA
 				GAIA::TIME::TimerMgr* pTimerMgr = timer.GetTimerMgr();
 				if(pTimerMgr == GNIL)
 					return GAIA::False;
-				pTimerMgr->drop_ref();
 				if(pTimerMgr != this)
 					return GAIA::False;
-			#ifdef GAIA_DEBUG_SELFCHECKROUTINE
+			#ifdef GAIA_DEBUG_SELFCHECK
 				GAST(timer.GetGroupIndex() != GINVALID);
 				GAST(timer.GetGroupIndex() < m_groups.size());
 				const Group& g = m_groups[timer.GetGroupIndex()];
@@ -328,7 +329,8 @@ namespace GAIA
 								GAIA::TIME::Timer* pTimer = *it;
 								GAST(pTimer != GNIL);
 								pTimer->SetLastUpdateTime(this->GetLastUpdateTime());
-								pTimer->Update(GAIA::TIME::Timer::FIRE_REASON_UPDATE);
+								if(pTimer->Update(GAIA::TIME::Timer::FIRE_REASON_UPDATE))
+									this->Unregist(*pTimer);
 							}
 							g.nLastUpdate = this->GetLastUpdateTime();
 						}
@@ -352,7 +354,7 @@ namespace GAIA
 									GAIA::TIME::Timer* pTimer = *it;
 									GAIA::TIME::Timer::__MicroSecType nOffsetTime = this->GetLastUpdateTime() - pTimer->GetLastUpdateTime();
 									const GAIA::TIME::Timer::Desc& descTimer = pTimer->GetDesc();
-									GAIA::BL bUnregistInCallBack = GAIA::False;
+									GAIA::BL bComplete = GAIA::False;
 									if(nOffsetTime > descTimer.nEscapeUSec)
 									{
 										if(pTimer->GetDesc().bMultiCallBack)
@@ -360,33 +362,26 @@ namespace GAIA
 											while(this->GetLastUpdateTime() - pTimer->GetLastUpdateTime() > descTimer.nEscapeUSec)
 											{
 												pTimer->SetLastUpdateTime(pTimer->GetLastUpdateTime() + pTimer->GetDesc().nEscapeUSec);
-												pTimer->rise_ref();
+												if(pTimer->Update(GAIA::TIME::Timer::FIRE_REASON_UPDATE))
 												{
-													pTimer->Update(GAIA::TIME::Timer::FIRE_REASON_UPDATE);
-													if(!pTimer->IsRegisted())
-													{
-														bUnregistInCallBack = GAIA::True;
-														pTimer->drop_ref();
-														break;
-													}
+													this->Unregist(*pTimer);
+													bComplete = GAIA::True;
+													break;
 												}
-												pTimer->drop_ref();
 											}
 										}
 										else
 										{
 											GAIA::TIME::Timer::__MicroSecType nFireTimes = nOffsetTime / descTimer.nEscapeUSec;
 											pTimer->SetLastUpdateTime(pTimer->GetLastUpdateTime() + nFireTimes * pTimer->GetDesc().nEscapeUSec);
-											pTimer->rise_ref();
+											if(pTimer->Update(GAIA::TIME::Timer::FIRE_REASON_UPDATE))
 											{
-												pTimer->Update(GAIA::TIME::Timer::FIRE_REASON_UPDATE);
-												if(!pTimer->IsRegisted())
-													bUnregistInCallBack = GAIA::True;
+												this->Unregist(*pTimer);
+												bComplete = GAIA::True;
 											}
-											pTimer->drop_ref();
 										}
 									}
-									if(!bUnregistInCallBack)
+									if(!bComplete)
 										this->SwitchTimerToNewGroup(*pTimer);
 								}
 							}

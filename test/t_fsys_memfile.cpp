@@ -11,13 +11,13 @@ namespace TEST
             TERROR;
         if(f.GetOpenType() != GAIA::FSYS::FileBase::OPEN_TYPE_INVALID)
             TERROR;
-        if(!GAIA::ALGO::gstremp(f.GetFileKey()))
+        if(!GAIA::ALGO::gstremp(f.GetFileUrl()))
             TERROR;
         if(!f.Open(_T("MemFile"), GAIA::FSYS::FileBase::OPEN_TYPE_WRITE | GAIA::FSYS::FileBase::OPEN_TYPE_READ))
             TERROR;
         if(f.GetOpenType() != (GAIA::FSYS::FileBase::OPEN_TYPE_WRITE | GAIA::FSYS::FileBase::OPEN_TYPE_READ))
             TERROR;
-        if(GAIA::ALGO::gstremp(f.GetFileKey()))
+        if(GAIA::ALGO::gstremp(f.GetFileUrl()))
             TERROR;
         if(!f.IsOpen())
            TERROR;
@@ -78,7 +78,7 @@ namespace TEST
             TERROR;
         if(f.GetOpenType() != GAIA::FSYS::FileBase::OPEN_TYPE_INVALID)
             TERROR;
-        if(!GAIA::ALGO::gstremp(f.GetFileKey()))
+        if(!GAIA::ALGO::gstremp(f.GetFileUrl()))
             TERROR;
     }
 }

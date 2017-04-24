@@ -98,7 +98,7 @@ namespace GAIA
 
 				@return Return the buffer's size in bytes.
 			*/
-			GINL _SizeType GetWriteSize() const{return (m_pCursor - m_pFront) * sizeof(_DataType);}
+			GINL _SizeType GetWriteSize() const{return (_SizeType)((m_pCursor - m_pFront) * sizeof(_DataType));}
 
 			/*!
 				@brief Get the buffer's remain size(not be writen) in bytes.
@@ -143,7 +143,7 @@ namespace GAIA
 					GTHROW(InvalidParam);
 				if(pszNodeName != GNIL)
 				{
-					if(!GAIA::JSON::JsonCheckNodeName(nt, pszNodeName))
+					if(!GAIA::JSON::JsonCheckNodeName(nt, pszNodeName, nodenamelen))
 						GTHROW(InvalidParam);
 				}
 				if(nodenamelen == GINVALID && pszNodeName != GNIL)
@@ -311,9 +311,7 @@ namespace GAIA
 			{
 				if(nt != GAIA::JSON::JSON_NODE_NAME && nt != GAIA::JSON::JSON_NODE_VALUE)
 					GTHROW(InvalidParam);
-				if(GAIA::ALGO::gstremp(pszNodeName))
-					GTHROW(InvalidParam);
-				if(nt == GAIA::JSON::JSON_NODE_NAME && !GAIA::JSON::JsonCheckNodeName(nt, pszNodeName))
+				if(!GAIA::JSON::JsonCheckNodeName(nt, pszNodeName, nodenamelen))
 					GTHROW(InvalidParam);
 				if(m_CNTCursor == GINVALID)
 					GTHROW(Illegal);
@@ -353,11 +351,15 @@ namespace GAIA
 						if(bQuotes)
 						{
 							this->write("\"", sizeof("\"") - 1);
-							this->write(pszNodeName, nodenamelen);
+							if(nodenamelen > 0)
+								this->write(pszNodeName, nodenamelen);
 							this->write("\"", sizeof("\"") - 1);
 						}
 						else
-							this->write(pszNodeName, nodenamelen);
+						{
+							if(nodenamelen > 0)
+								this->write(pszNodeName, nodenamelen);
+						}
 						m_LastNNVT = GAIA::JSON::JSON_NODE_VALUE;
 					}
 					break;

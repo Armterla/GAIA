@@ -275,6 +275,18 @@ namespace GAIA
 					m_vec.destroy();
 				}
 			}
+			GINL GAIA::BL keep(const _SizeType& size)
+			{
+				if(size > this->size())
+					return GAIA::False;
+				if(size == this->size())
+					return GAIA::True;
+				_SizeType srcbegin = this->size() - size;
+				for(_SizeType x = 0; x < size; ++x)
+					(*this)[x] = (*this)[srcbegin + x];
+				this->resize(size);
+				return GAIA::True;
+			}
 			GINL GAIA::GVOID clear(){m_arr.clear(); m_vec.clear();}
 			GINL GAIA::GVOID destroy(){m_arr.clear(); m_vec.destroy();}
 			GINL GAIA::GVOID push_back(const _DataType& t)
@@ -440,6 +452,50 @@ namespace GAIA
 					++ret;
 				}
 				return ret;
+			}
+			template<typename _ParamDataType> _SizeType extract(_SizeType index_start, _SizeType index_end, _ParamDataType* pResult, const _SizeType& nResultSize) const
+			{
+				if(m_vec.capacity() != 0)
+					return m_vec.extract(index_start, index_end, pResult, nResultSize);
+				else
+					return m_arr.extract(index_start, index_end, pResult, nResultSize);
+			}
+			template<typename _ParamDataType> _SizeType extract_left(_SizeType index, _ParamDataType* pResult, const _SizeType& nResultSize) const
+			{
+				return this->extract(0, index - 1, pResult, nResultSize);
+			}
+			template<typename _ParamDataType> _SizeType extract_right(_SizeType index, _ParamDataType* pResult, const _SizeType& nResultSize) const
+			{
+				return this->extract(index + 1, GINVALID, pResult, nResultSize);
+			}
+			template<typename _ParamDataType> _SizeType extract_mid(_SizeType index_start, _SizeType index_end, _ParamDataType* pResult, const _SizeType& nResultSize) const
+			{
+				return this->extract(index_start, index_end, pResult, nResultSize);
+			}
+			GINL _SizeType extract(_SizeType index_start, _SizeType index_end, __MyType& res) const
+			{
+				if(index_start == GINVALID)
+					index_start = 0;
+				if(index_end == GINVALID)
+					index_end = this->size() - 1;
+				_SizeType oldsize = res.size();
+				res.resize_keep(oldsize + index_end - index_start + 1);
+				if(m_vec.capacity() != 0)
+					return m_vec.extract(index_start, index_end, res.fptr() + oldsize, res.size() - oldsize);
+				else
+					return m_arr.extract(index_start, index_end, res.fptr() + oldsize, res.size() - oldsize);
+			}
+			GINL _SizeType extract_left(_SizeType index, __MyType& res) const
+			{
+				return this->extract(0, index - 1, res);
+			}
+			GINL _SizeType extract_right(_SizeType index, __MyType& res) const
+			{
+				return this->extract(index + 1, GINVALID, res);
+			}
+			GINL _SizeType extract_mid(_SizeType index_start, _SizeType index_end, __MyType& res) const
+			{
+				return this->extract(index_start, index_end, res);
 			}
 			GINL _SizeType find(const _DataType& t, const _SizeType& index = 0) const
 			{

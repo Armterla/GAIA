@@ -1,4 +1,4 @@
-﻿#ifndef		__GAIA_TYPE_H__
+#ifndef		__GAIA_TYPE_H__
 #define		__GAIA_TYPE_H__
 
 #include "gaia_version.h"
@@ -16,6 +16,10 @@
 #	if GAIA_COMPILER != GAIA_COMPILER_GCC || GAIA_COMPILER_GCCVER < GAIA_COMPILER_GCCVER_USESYNCXX
 #		include <asm/atomic.h>
 #	endif
+#endif
+
+#if GAIA_OS != GAIA_OS_WINDOWS
+#	include <pthread.h>
 #endif
 
 namespace GAIA
@@ -153,6 +157,7 @@ namespace GAIA
 		GINL X128(GAIA::U32 u){(*this) = u;}
 		GINL GAIA::BL empty() const{return u64_0 == 0 && u64_1 == 0;}
 		GINL GAIA::GVOID clear(){u64_0 = u64_1 = 0;}
+		GINL GAIA::GVOID uuid();
 		template<typename _ParamDataType> GAIA::BL check(const _ParamDataType* psz) const;
 		template<typename _ParamDataType> GAIA::GVOID fromstring(const _ParamDataType* psz);
 		template<typename _ParamDataType> _ParamDataType* tostring(_ParamDataType* psz) const;
@@ -341,31 +346,76 @@ namespace GAIA
 	#	pragma clang diagnostic ignored"-Wdeprecated-declarations"
 	#endif
 	public:
-		GINL RefObject(){m_nRef = 1; m_bDestructing = GAIA::False;}
-		GINL GAIA::N64 rise_ref()
+		GINL RefObject()
+		{
+			m_nRef = 1;
+			m_bDestructingByDropRef = GAIA::False;
+		#ifdef GAIA_DEBUG_SOLUTION
+			m_uuid.uuid();
+		#	if GAIA_OS == GAIA_OS_WINDOWS
+				::InitializeCriticalSection(&m_cs);
+		#	else
+				pthread_mutex_init(&m_mutex, GNIL);
+		#	endif
+			this->debug_constructor();
+		#endif
+		}
+	#if defined(GAIA_DEBUG_SELFCHECK) || defined(GAIA_DEBUG_SOLUTION)
+		virtual ~RefObject();
+	#endif
+	#ifdef GAIA_DEBUG_SOLUTION
+		GINL GAIA::GVOID _dbg_log_enter()
 		{
 		#if GAIA_OS == GAIA_OS_WINDOWS
+			::EnterCriticalSection(&m_cs);
+		#else
+			pthread_mutex_lock(&m_mutex);
+		#endif
+		}
+		GINL GAIA::GVOID _dbg_log_leave()
+		{
+		#if GAIA_OS == GAIA_OS_WINDOWS
+			::LeaveCriticalSection(&m_cs);
+		#else
+			pthread_mutex_unlock(&m_mutex);
+		#endif
+		}
+	#endif
+		GINL GAIA::N64 rise_ref(const GAIA::CH* pszReason = GNIL)
+		{
+		#ifdef GAIA_DEBUG_SOLUTION
+			this->_dbg_log_enter();
+		#endif
+		#if GAIA_OS == GAIA_OS_WINDOWS
 		#	if GAIA_MACHINE == GAIA_MACHINE64
-				return InterlockedIncrement64(&m_nRef);
+				GAIA::NM nNew = InterlockedIncrement64(&m_nRef);
 		#	else
-				return InterlockedIncrement(&m_nRef);
+				GAIA::NM nNew = InterlockedIncrement(&m_nRef);
 		#	endif
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 		#	if GAIA_MACHINE == GAIA_MACHINE64
-				return OSAtomicIncrement64(&m_nRef);
+				GAIA::NM nNew = OSAtomicIncrement64(&m_nRef);
 		#	else
-				return OSAtomicIncrement32(&m_nRef);
+				GAIA::NM nNew = OSAtomicIncrement32(&m_nRef);
 		#	endif
 		#else
 		#	if GAIA_COMPILER == GAIA_COMPILER_GCC && GAIA_COMPILER_GCCVER >= GAIA_COMPILER_GCCVER_USESYNCXX
-				return __sync_add_and_fetch(&m_nRef, 1);
+				GAIA::NM nNew = __sync_add_and_fetch(&m_nRef, 1);
 		#	else
-				return atomic_inc_return(&m_nRef);
+				GAIA::NM nNew = atomic_inc_return(&m_nRef);
 		#	endif
 		#endif
+		#ifdef GAIA_DEBUG_SOLUTION
+			this->debug_change_ref(GAIA::True, nNew, pszReason, m_bDestructingByDropRef);
+			this->_dbg_log_leave();
+		#endif
+			return nNew;
 		}
-		GINL GAIA::N64 drop_ref()
+		GINL GAIA::N64 drop_ref(const GAIA::CH* pszReason = GNIL)
 		{
+		#ifdef GAIA_DEBUG_SOLUTION
+			this->_dbg_log_enter();
+		#endif
 		#if GAIA_OS == GAIA_OS_WINDOWS
 		#	if GAIA_MACHINE == GAIA_MACHINE64
 				GAIA::NM nNew = InterlockedDecrement64(&m_nRef);
@@ -385,9 +435,13 @@ namespace GAIA
 				GAIA::NM nNew = atomic_dec_return(&m_nRef);
 		#	endif
 		#endif
-			if(nNew == 0 && !m_bDestructing)
+		#ifdef GAIA_DEBUG_SOLUTION
+			this->debug_change_ref(GAIA::False, nNew, pszReason, m_bDestructingByDropRef);
+			this->_dbg_log_leave();
+		#endif
+			if(nNew == 0 && !m_bDestructingByDropRef)
 			{
-				m_bDestructing = GAIA::True;
+				m_bDestructingByDropRef = GAIA::True;
 				this->RefObjectDestruct();
 				gdel this;
 			}
@@ -398,6 +452,10 @@ namespace GAIA
 		virtual GAIA::GVOID RefObjectDestruct(){}
 	private:
 		GINL RefObject& operator = (const RefObject& src){return *this;}
+	#ifdef GAIA_DEBUG_SOLUTION
+		GAIA::GVOID debug_constructor();
+		virtual GAIA::GVOID debug_change_ref(GAIA::BL bRise, GAIA::NM nNewRef, const GAIA::CH* pszReason, GAIA::BL bDestructingByDropRef);
+	#endif
 	private:
 	#if GAIA_OS == GAIA_OS_WINDOWS
 	#	if GAIA_MACHINE == GAIA_MACHINE64
@@ -414,7 +472,15 @@ namespace GAIA
 	#else
 		volatile GAIA::N32 m_nRef;
 	#endif
-		GAIA::U8 m_bDestructing : 1;
+	#ifdef GAIA_DEBUG_SOLUTION
+		X128 m_uuid;
+	#	if GAIA_OS == GAIA_OS_WINDOWS
+			CRITICAL_SECTION m_cs;
+	#	else
+			pthread_mutex_t m_mutex;
+	#	endif
+	#endif
+		GAIA::BL m_bDestructingByDropRef;
 	#ifdef __APPLE__
 	#	pragma clang diagnostic pop
 	#endif
@@ -496,31 +562,29 @@ namespace GAIA
 
 	GINL TYPEID nametotype(const GAIA::CH* psz);
 	GINL TYPEID nametotype(const GAIA::WCH* psz);
-	TYPEID nametotype(const char* psz);
-	TYPEID nametotype(const wchar_t* psz);
-	template<typename _DataType> inline TYPEID datatotype(_DataType t){return TYPEID_INVALID;}
-	template<typename _DataType> inline TYPEID datatotype(_DataType* t){return TYPEID_INVALID;}
-	template<typename _DataType> inline TYPEID datatotype(const _DataType* t){return TYPEID_INVALID;}
-	template<> inline TYPEID datatotype(GAIA::NM t){return TYPEID_NM;}
-	template<> inline TYPEID datatotype(GAIA::UM t){return TYPEID_UM;}
-	template<> inline TYPEID datatotype(GAIA::BL t){return TYPEID_BL;}
-	template<> inline TYPEID datatotype(GAIA::N8 t){return TYPEID_N8;}
-	template<> inline TYPEID datatotype(GAIA::U8 t){return TYPEID_U8;}
-	template<> inline TYPEID datatotype(GAIA::N16 t){return TYPEID_N16;}
-	template<> inline TYPEID datatotype(GAIA::U16 t){return TYPEID_U16;}
-	template<> inline TYPEID datatotype(GAIA::N32 t){return TYPEID_N32;}
-	template<> inline TYPEID datatotype(GAIA::U32 t){return TYPEID_U32;}
-	template<> inline TYPEID datatotype(GAIA::N64 t){return TYPEID_N64;}
-	template<> inline TYPEID datatotype(GAIA::U64 t){return TYPEID_U64;}
-	template<> inline TYPEID datatotype(X128 t){return TYPEID_X128;}
-	template<> inline TYPEID datatotype(GAIA::F32 t){return TYPEID_F32;}
-	template<> inline TYPEID datatotype(GAIA::F64 t){return TYPEID_F64;}
-	template<> inline TYPEID datatotype(GAIA::N8* t){return TYPEID_CHARPOINTER;}
-	template<> inline TYPEID datatotype(const GAIA::N8* t){return TYPEID_CONSTCHARPOINTER;}
-	template<> inline TYPEID datatotype(GAIA::WCH* t){return TYPEID_WCHARPOINTER;}
-	template<> inline TYPEID datatotype(const GAIA::WCH* t){return TYPEID_CONSTWCHARPOINTER;}
-	template<> inline TYPEID datatotype(GAIA::GVOID* t){return TYPEID_POINTER;}
-	template<> inline TYPEID datatotype(const GAIA::GVOID* t){return TYPEID_CONSTPOINTER;}
+	template<typename _DataType> GINL TYPEID datatotype(_DataType t){return TYPEID_INVALID;}
+	template<typename _DataType> GINL TYPEID datatotype(_DataType* t){return TYPEID_INVALID;}
+	template<typename _DataType> GINL TYPEID datatotype(const _DataType* t){return TYPEID_INVALID;}
+	template<> GINL TYPEID datatotype(GAIA::NM t){return TYPEID_NM;}
+	template<> GINL TYPEID datatotype(GAIA::UM t){return TYPEID_UM;}
+	template<> GINL TYPEID datatotype(GAIA::BL t){return TYPEID_BL;}
+	template<> GINL TYPEID datatotype(GAIA::N8 t){return TYPEID_N8;}
+	template<> GINL TYPEID datatotype(GAIA::U8 t){return TYPEID_U8;}
+	template<> GINL TYPEID datatotype(GAIA::N16 t){return TYPEID_N16;}
+	template<> GINL TYPEID datatotype(GAIA::U16 t){return TYPEID_U16;}
+	template<> GINL TYPEID datatotype(GAIA::N32 t){return TYPEID_N32;}
+	template<> GINL TYPEID datatotype(GAIA::U32 t){return TYPEID_U32;}
+	template<> GINL TYPEID datatotype(GAIA::N64 t){return TYPEID_N64;}
+	template<> GINL TYPEID datatotype(GAIA::U64 t){return TYPEID_U64;}
+	template<> GINL TYPEID datatotype(X128 t){return TYPEID_X128;}
+	template<> GINL TYPEID datatotype(GAIA::F32 t){return TYPEID_F32;}
+	template<> GINL TYPEID datatotype(GAIA::F64 t){return TYPEID_F64;}
+	template<> GINL TYPEID datatotype(GAIA::N8* t){return TYPEID_CHARPOINTER;}
+	template<> GINL TYPEID datatotype(const GAIA::N8* t){return TYPEID_CONSTCHARPOINTER;}
+	template<> GINL TYPEID datatotype(GAIA::WCH* t){return TYPEID_WCHARPOINTER;}
+	template<> GINL TYPEID datatotype(const GAIA::WCH* t){return TYPEID_CONSTWCHARPOINTER;}
+	template<> GINL TYPEID datatotype(GAIA::GVOID* t){return TYPEID_POINTER;}
+	template<> GINL TYPEID datatotype(const GAIA::GVOID* t){return TYPEID_CONSTPOINTER;}
 
 	/* Common type. */
 	GAIA_ENUM_BEGIN(SEEK_TYPE)
@@ -540,6 +604,19 @@ namespace GAIA
 		RELATION_TYPE_TRUE,
 		RELATION_TYPE_FALSE,
 	GAIA_ENUM_END(RELATION_TYPE)
+	static const GAIA::CH* RELATION_TYPE_STRING[] = 
+	{
+		"invalid",
+		"equal",
+		"notequal",
+		"above",
+		"below",
+		"aboveequal",
+		"belowequal",
+		"true",
+		"false",
+	};
+	template<typename _DataType> GAIA::RELATION_TYPE GetRelationTypeByString(const _DataType* psz, GAIA::NUM sLen = GINVALID);
 
 	GAIA_ENUM_BEGIN(STRING_TYPE)
 		STRING_TYPE_STRING	= 1 << 0,

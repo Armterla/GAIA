@@ -838,7 +838,7 @@ namespace GAIA
 			Node* m_pRoot;
 			__PoolType m_pool;
 		public:
-		#ifdef GAIA_DEBUG_INTERNALROUTINE
+		#ifdef GAIA_DEBUG_ROUTINE
 			GINL GAIA::BL dbg_check_balance()
 			{
 				if(m_pRoot == GNIL)

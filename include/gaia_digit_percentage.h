@@ -235,7 +235,7 @@ namespace GAIA
 			}
 		}
 
-		GINL GAIA::BL percentage_decode(GAIA::CH* pszPercentage, GAIA::NUM sPercentageLen, GAIA::CH& ch)
+		GINL GAIA::BL percentage_decode(const GAIA::CH* pszPercentage, GAIA::NUM sPercentageLen, GAIA::CH& ch)
 		{
 			GAST(pszPercentage != GNIL);
 			if(pszPercentage == GNIL)
@@ -437,8 +437,8 @@ namespace GAIA
 					{
 						GAIA::CH ch1 = pszPercentage[x + 1];
 						GAIA::CH ch2 = pszPercentage[x + 2];
-						GAIA::BL b1 = ch1 >= '0' && ch1 <= '9' || ch1 >= 'a' && ch1 <= 'f' || ch1 >= 'A' && ch1 <= 'F';
-						GAIA::BL b2 = ch2 >= '0' && ch2 <= '9' || ch2 >= 'a' && ch2 <= 'f' || ch2 >= 'A' && ch2 <= 'F';
+						GAIA::BL b1 = (ch1 >= '0' && ch1 <= '9') || (ch1 >= 'a' && ch1 <= 'f') || (ch1 >= 'A' && ch1 <= 'F');
+						GAIA::BL b2 = (ch2 >= '0' && ch2 <= '9') || (ch2 >= 'a' && ch2 <= 'f') || (ch2 >= 'A' && ch2 <= 'F');
 						if(b1 && b2)
 							x += 2;
 					}
@@ -453,8 +453,8 @@ namespace GAIA
 				if(pszPercentage[x] == '%' && x + 2 < sPercentageLen)
 				{
 					const GAIA::U8* p = (const GAIA::U8*)&pszPercentage[x + 1];
-					GAIA::BL b1 = p[0] >= '0' && p[0] <= '9' || p[0] >= 'a' && p[0] <= 'f' || p[0] >= 'A' && p[0] <= 'F';
-					GAIA::BL b2 = p[1] >= '0' && p[1] <= '9' || p[1] >= 'a' && p[1] <= 'f' || p[1] >= 'A' && p[1] <= 'F';
+					GAIA::BL b1 = (p[0] >= '0' && p[0] <= '9') || (p[0] >= 'a' && p[0] <= 'f') || (p[0] >= 'A' && p[0] <= 'F');
+					GAIA::BL b2 = (p[1] >= '0' && p[1] <= '9') || (p[1] >= 'a' && p[1] <= 'f') || (p[1] >= 'A' && p[1] <= 'F');
 					if(b1 && b2)
 					{
 						if(sRet >= sMaxLocalLen)

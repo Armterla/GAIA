@@ -178,6 +178,7 @@
 #include	"gaia_log.h"
 
 #include	"gaia_dbg_perf.h"
+#include	"gaia_dbg_objwatcher.h"
 
 #include	"gaia_ctn_accesser.h"
 

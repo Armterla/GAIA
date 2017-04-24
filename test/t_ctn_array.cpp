@@ -390,5 +390,59 @@ namespace TEST
 			TERROR;
 		if(!arr.empty())
 			TERROR;
+
+		arr.resize(10);
+		arr.reset(-1);
+		for(__ArrayType::_sizetype x = 0; x < 10; ++x)
+			arr[x] = x;
+		arr.resize_keep(20);
+		for(__ArrayType::_sizetype x = 0; x < 10; ++x)
+		{
+			if(arr[x] != x)
+			{
+				TERROR;
+				break;
+			}
+		}
+
+		arr.clear();
+		for(__ArrayType::_datatype x = 0; x < 10; ++x)
+			arr.push_back(x);
+		TAST(arr.keep(5));
+		TAST(arr.size() == 5);
+		for(__ArrayType::_datatype x = 0; x < 5; ++x)
+		{
+			if(arr[x] != x + 5)
+			{
+				TERROR;
+				break;
+			}
+		}
+
+		arr.clear();
+		for(__ArrayType::_datatype x = 0; x < 10; ++x)
+			arr.push_back(x);
+		arr1.resize(100);
+		TAST(arr.extract_left(5, arr1.fptr(), 100) == 5);
+		TAST(arr1[0] == 0 && arr1[1] == 1 && arr1[2] == 2 && arr1[3] == 3 && arr1[4] == 4);
+		TAST(arr.extract_right(5, arr1.fptr(), 100) == 4);
+		TAST(arr1[0] == 6 && arr1[1] == 7 && arr1[2] == 8 && arr1[3] == 9);
+		TAST(arr.extract_mid(3, 7, arr1.fptr(), 100) == 5);
+		TAST(arr1[0] == 3 && arr1[1] == 4 && arr1[2] == 5 && arr1[3] == 6 && arr1[4] == 7);
+		TAST(arr.extract(3, 7, arr1.fptr(), 100) == 5);
+		TAST(arr1[0] == 3 && arr1[1] == 4 && arr1[2] == 5 && arr1[3] == 6 && arr1[4] == 7);
+		arr1.clear();
+		TAST(arr.extract_left(5, arr1) == 5);
+		TAST(arr1.size() == 5);
+		TAST(arr1[0] == 0 && arr1[1] == 1 && arr1[2] == 2 && arr1[3] == 3 && arr1[4] == 4);
+		TAST(arr.extract_right(5, arr1) == 4);
+		TAST(arr1.size() == 9);
+		TAST(arr1[5] == 6 && arr1[6] == 7 && arr1[7] == 8 && arr1[8] == 9);
+		TAST(arr.extract_mid(3, 7, arr1) == 5);
+		TAST(arr1.size() == 14);
+		TAST(arr1[9] == 3 && arr1[10] == 4 && arr1[11] == 5 && arr1[12] == 6 && arr1[13] == 7);
+		TAST(arr.extract(3, 7, arr1) == 5);
+		TAST(arr1.size() == 19);
+		TAST(arr1[14] == 3 && arr1[15] == 4 && arr1[16] == 5 && arr1[17] == 6 && arr1[18] == 7);
 	}
 }

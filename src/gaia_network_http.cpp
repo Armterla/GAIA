@@ -3,9 +3,11 @@
 #include <gaia_sync_base.h>
 #include <gaia_time.h>
 #include <gaia_network_http.h>
+#include <gaia_type_impl.h>
 #include <gaia_assert_impl.h>
 #include <gaia_thread_base_impl.h>
 #include <gaia_network_base_impl.h>
+#include <gaia_network_socket_impl.h>
 
 namespace GAIA
 {
@@ -139,7 +141,7 @@ namespace GAIA
 					}
 				}
 			}
-			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult)
+			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult, GAIA::BL bByRemote)
 			{
 				// Check state and parameter.
 				if(!bResult)
@@ -608,7 +610,8 @@ namespace GAIA
 					else
 						m_reqbuf.proxy(GNIL, GNIL);
 					m_bReqBufOwner = GAIA::False;
-					m_reqbuf.proxy((GAIA::U8*)p, (GAIA::U8*)p + sSize - 1);
+					m_reqbuf.proxy((GAIA::U8*)p, (GAIA::U8*)p + sSize);
+					m_reqbuf.seek_write(sSize);
 				}
 				else
 				{
@@ -634,7 +637,7 @@ namespace GAIA
 					m_pHttp->GetDesc().sHttpVerLen + 2 +
 					m_head.GetStringSize() + 2;
 
-			this->rise_ref();
+			this->rise_ref("HttpRequest::Request:request rise ref");
 
 			m_uRequestTime = GAIA::TIME::tick_time();
 
@@ -808,7 +811,7 @@ namespace GAIA
 					GAIA::NETWORK::HttpRequest* pRequest = *it;
 					GAST(pRequest != GNIL);
 					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
-					pRequest->drop_ref();
+					pRequest->drop_ref("Http::End:request drop ref for pending request");
 				}
 				m_pendinglist.clear();
 			}
@@ -821,7 +824,7 @@ namespace GAIA
 					GAIA::NETWORK::HttpRequest* pRequest = *it;
 					GAST(pRequest != GNIL);
 					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
-					pRequest->drop_ref();
+					pRequest->drop_ref("Http::End:request drop ref for connecting request");
 				}
 				m_connectinglist.clear();
 			}
@@ -834,7 +837,7 @@ namespace GAIA
 					GAIA::NETWORK::HttpRequest* pRequest = *it;
 					GAST(pRequest != GNIL);
 					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
-					pRequest->drop_ref();
+					pRequest->drop_ref("Http::End:request drop ref for requesting request");
 				}
 				m_requestinglist.clear();
 			}
@@ -847,7 +850,7 @@ namespace GAIA
 					GAIA::NETWORK::HttpRequest* pRequest = *it;
 					GAST(pRequest != GNIL);
 					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
-					pRequest->drop_ref();
+					pRequest->drop_ref("Http::End:request drop ref for waiting request");
 				}
 				m_waitinglist.clear();
 			}
@@ -860,7 +863,7 @@ namespace GAIA
 					GAIA::NETWORK::HttpRequest* pRequest = *it;
 					GAST(pRequest != GNIL);
 					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
-					pRequest->drop_ref();
+					pRequest->drop_ref("Http::End:request drop ref for responsing request");
 				}
 				m_responsinglist.clear();
 			}
@@ -873,7 +876,7 @@ namespace GAIA
 					GAIA::NETWORK::HttpRequest* pRequest = *it;
 					GAST(pRequest != GNIL);
 					pRequest->m_state = GAIA::NETWORK::HTTP_REQUEST_STATE_INVALID;
-					pRequest->drop_ref();
+					pRequest->drop_ref("Http::End:request drop ref for complete request");
 				}
 				m_completelist.clear();
 			}
@@ -885,7 +888,7 @@ namespace GAIA
 				{
 					GAIA::NETWORK::HttpAsyncSocket* pSocket = *it;
 					GAST(pSocket != GNIL);
-					pSocket->drop_ref();
+					pSocket->drop_ref("Http::End:socket drop ref");
 				}
 				m_socks.clear();
 			}
@@ -969,7 +972,7 @@ namespace GAIA
 							HttpAsyncSocket* pSocket = gnew HttpAsyncSocket(*this, *m_disp);
 							pRequest->m_pSock = pSocket;
 							pSocket->m_pRequest = pRequest;
-							pSocket->rise_ref();
+							pSocket->rise_ref("Http::Execute:socket rise ref for connect");
 
 							// Insert to socket list.
 							{
@@ -1047,8 +1050,8 @@ namespace GAIA
 						if(pWorkThread == GNIL || pRequest->m_uThreadMagicIndex % m_listWorkThreads.size() == pWorkThread->uThreadIndex)
 						{
 							pTempList->push_back(pRequest);
-							pRequest->rise_ref();
-							pRequest->m_pSock->rise_ref();
+							pRequest->rise_ref("Http::Execute:request rise ref for request");
+							pRequest->m_pSock->rise_ref("Http::Execute:socket rise ref for request");
 						}
 					}
 				}
@@ -1174,7 +1177,7 @@ namespace GAIA
 								{
 									pReqBuf->resize(1024 * 100);
 									GAIA::N64 lPracticeSize = pRequest->OnRequestBodyData(pRequest->m_lSendingSize - pRequest->m_sTotalReqHeadSize, pReqBuf->fptr(), pReqBuf->write_size());
-									pReqBuf->resize(lPracticeSize);
+									pReqBuf->resize((GAIA::NUM)lPracticeSize);
 									if(lPracticeSize == 0)
 										bBodySendingComplete = GAIA::True;
 									else if(lPracticeSize == GINVALID)
@@ -1237,8 +1240,8 @@ namespace GAIA
 					{
 						GAIA::NETWORK::HttpRequest* pRequest = (*pTempList)[x];
 						GAST(pRequest != GNIL);
-						pRequest->m_pSock->drop_ref();
-						pRequest->drop_ref();
+						pRequest->m_pSock->drop_ref("Http::Execute:recycle socket for request failed");
+						pRequest->drop_ref("Http::Execute:recycle request for request failed");
 					}
 				}
 			}
@@ -1280,17 +1283,31 @@ namespace GAIA
 						GAST(pSock->m_pRequest != GNIL);
 
 						// Check logic timeout.
-						if(pSock->m_pRequest->m_uRequestTime != 0 && uCurrentTime > pSock->m_pRequest->m_uRequestTime &&
-						   uCurrentTime - pSock->m_pRequest->m_uRequestTime > pSock->m_pRequest->m_uLogicTimeout)
+						if(pSock->m_pRequest->m_uRequestTime != 0)
 						{
-							pNeedCloseRequests->push_back(pSock->m_pRequest);
+							if(uCurrentTime > pSock->m_pRequest->m_uRequestTime)
+							{
+								GAIA::U64 uDeltaTime = uCurrentTime - pSock->m_pRequest->m_uRequestTime;
+								if(uDeltaTime > pSock->m_pRequest->m_uLogicTimeout)
+								{
+									pNeedCloseRequests->push_back(pSock->m_pRequest);
+									continue;
+								}
+							}
 						}
 
 						// Check network timeout.
-						if(pSock->m_pRequest->m_uLastRecvedTime != 0 && uCurrentTime > pSock->m_pRequest->m_uLastRecvedTime &&
-						   uCurrentTime - pSock->m_pRequest->m_uLastRecvedTime > pSock->m_pRequest->m_uNetworkResponseTimeout)
+						if(pSock->m_pRequest->m_uLastRecvedTime != 0)
 						{
-							pNeedCloseRequests->push_back(pSock->m_pRequest);
+							if(uCurrentTime > pSock->m_pRequest->m_uLastRecvedTime)
+							{
+								GAIA::U64 uDeltaTime = uCurrentTime - pSock->m_pRequest->m_uLastRecvedTime;
+								if(uDeltaTime > pSock->m_pRequest->m_uNetworkResponseTimeout)
+								{
+									pNeedCloseRequests->push_back(pSock->m_pRequest);
+									continue;
+								}
+							}
 						}
 					}
 				}
@@ -1317,7 +1334,7 @@ namespace GAIA
 				GAIA::SYNC::Autolock al(m_lrExecuteRecycleCache);
 			}
 
-			return GAIA::True;
+			return bRet;
 		}
 
 		GAIA::BL Http::CleanupCookic(GAIA::BL bRAM, GAIA::BL bFile, const GAIA::U64& uBeyondTime)
@@ -1352,7 +1369,7 @@ namespace GAIA
 					}
 
 					// Release.
-					pSocket->drop_ref();
+					pSocket->drop_ref("Http::InternalCloseRequest:socket drop ref front");
 				}
 			}
 
@@ -1453,11 +1470,11 @@ namespace GAIA
 						}
 						GCATCHALL{}
 					}
-					req.m_pSock->drop_ref();
+					req.m_pSock->drop_ref("Http::InternalCloseRequest:socket drop ref back");
 				}
 
 				// Release.
-				req.drop_ref();
+				req.drop_ref("Http::InternalCloseRequest:request drop ref");
 			}
 		}
 	}

@@ -9,6 +9,7 @@
 #include <gaia_ctn_charsstring.h>
 #include <gaia_ctn_map.h>
 #include <gaia_doc_pdf.h>
+#include <gaia_type_impl.h>
 #include <gaia_assert_impl.h>
 #include <gaia_thread_base_impl.h>
 #include <hpdf.h>
@@ -948,6 +949,8 @@ namespace GAIA
 						pszImageType = PDF_SUPPORT_IMAGE_PNG;
 					else if(GAIA::ALGO::gstricmp(pszExt, PDF_SUPPORT_IMAGE_JPEG) == 0)
 						pszImageType = PDF_SUPPORT_IMAGE_JPEG;
+					else if(GAIA::ALGO::gstricmp(pszExt, PDF_SUPPORT_IMAGE_RAW) == 0)
+						pszImageType = PDF_SUPPORT_IMAGE_RAW;
 					else
 						GTHROW(InvalidParam);
 				}
@@ -955,6 +958,8 @@ namespace GAIA
 					img = HPDF_LoadPngImageFromFile(m_ctx->doc, pszFileName);
 				else if(GAIA::ALGO::gstricmp(pszImageType, PDF_SUPPORT_IMAGE_JPEG) == 0)
 					img = HPDF_LoadJpegImageFromFile(m_ctx->doc, pszFileName);
+				else if(GAIA::ALGO::gstricmp(pszImageType, PDF_SUPPORT_IMAGE_RAW) == 0)
+					GASTFALSE;
 				else
 					GASTFALSE;
 			}
@@ -979,6 +984,8 @@ namespace GAIA
 				img = HPDF_LoadPngImageFromMem(m_ctx->doc, (const HPDF_BYTE*)pBuf, sLen);
 			else if(GAIA::ALGO::gstricmp(pszImageType, PDF_SUPPORT_IMAGE_JPEG) == 0)
 				img = HPDF_LoadJpegImageFromMem(m_ctx->doc, (const HPDF_BYTE*)pBuf, sLen);
+			else if(GAIA::ALGO::gstricmp(pszImageType, PDF_SUPPORT_IMAGE_RAW) == 0)
+				GTHROW(InvalidParam);
 			else
 				GTHROW(InvalidParam);
 			if(img == GNIL)

@@ -40,7 +40,7 @@ namespace GAIA
 			GAIA::TIME::RealTimer::RealTimerDesc m_desc;
 		};
 
-		class RealTimerMgr : public GAIA::RefObject
+		class RealTimerMgr : public GAIA::Base
 		{
 		public:
 			class RealTimerMgrDesc : public GAIA::Base
@@ -57,7 +57,7 @@ namespace GAIA
 
 		public:
 			GINL RealTimerMgr(){this->init();}
-			GINL virtual ~RealTimerMgr(){this->Destroy();}
+			GINL ~RealTimerMgr(){this->Destroy();}
 
 			GINL GAIA::BL Create(const GAIA::TIME::RealTimerMgr::RealTimerMgrDesc& desc);
 			GINL GAIA::GVOID Destroy(){}

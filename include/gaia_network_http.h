@@ -368,7 +368,7 @@ namespace GAIA
 
 				@return Return the logic timeout time in milliseconds. Default is 60 seconds.
 			*/
-			const GAIA::U64& GetLogicTimeout() const{return m_uLogicTimeout / 1000;}
+			GAIA::U64 GetLogicTimeout() const{return m_uLogicTimeout / 1000;}
 
 			/*!
 				@brief Set http request network response timeout time in milliseconds.\n
@@ -387,7 +387,7 @@ namespace GAIA
 
 				@return Return the network response timeout time in milliseconds. Default is 16 seconds.
 			*/
-			const GAIA::U64& GetNetworkResponseTimeout() const{return m_uNetworkResponseTimeout / 1000;}
+			GAIA::U64 GetNetworkResponseTimeout() const{return m_uNetworkResponseTimeout / 1000;}
 
 			/*!
 				@brief Enable or disable write cookic to RAM.
@@ -447,7 +447,7 @@ namespace GAIA
 
 				@remarks Default value after a HttpRequest construct is 0.
 			*/
-			const GAIA::U64& GetWriteCookicTime() const{return m_uWriteCookicTime / 1000;}
+			GAIA::U64 GetWriteCookicTime() const{return m_uWriteCookicTime / 1000;}
 
 			/*!
 				@brief Enable or disable read cookic from RAM.
@@ -507,7 +507,7 @@ namespace GAIA
 
 				@remarks Default value after a HttpRequest construct is 0.
 			*/
-			const GAIA::U64& GetReadCookicTime() const{return m_uReadCookicTime / 1000;}
+			GAIA::U64 GetReadCookicTime() const{return m_uReadCookicTime / 1000;}
 
 		protected:
 
@@ -662,7 +662,7 @@ namespace GAIA
 
 				@param pData [out] Used for saving the data.
 
-				@param sDataSize [in] Specify parameter pData's max size in bytes.
+				@param sMaxDataSize [in] Specify parameter pData's max size in bytes.
 
 				@return Return the practice data size in bytes.\n
 					If not exist any data to send or send to the end, return 0.\n

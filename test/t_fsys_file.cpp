@@ -19,12 +19,12 @@ namespace TEST
 
 		__DirType dir;
 		__FileType tfile;
-		if(!GAIA::ALGO::gstremp(tfile.GetFileKey()))
+		if(!GAIA::ALGO::gstremp(tfile.GetFileUrl()))
 			TERROR;
 		if(tfile.GetOpenType() != GAIA::FSYS::FileBase::OPEN_TYPE_INVALID)
 			TERROR;
 		TAST(tfile.Open(TEST_FILE_NAME, __FileType::OPEN_TYPE_WRITE | __FileType::OPEN_TYPE_CREATEALWAYS));
-		if(GAIA::ALGO::gstrcmp(tfile.GetFileKey(), TEST_FILE_NAME) != 0)
+		if(GAIA::ALGO::gstrcmp(tfile.GetFileUrl(), TEST_FILE_NAME) != 0)
 			TERROR;
 		if(tfile.GetOpenType() != (GAIA::FSYS::FileBase::OPEN_TYPE_WRITE | GAIA::FSYS::FileBase::OPEN_TYPE_CREATEALWAYS))
 			TERROR;
@@ -73,7 +73,7 @@ namespace TEST
 		if(GAIA::ALGO::gstrcmp(szText, "Hello Kitty", GAIA::ALGO::gstrlen("Hello Kitty")) != 0)
 			TERROR;
 		TAST(tfile.Close());
-		if(!GAIA::ALGO::gstremp(tfile.GetFileKey()))
+		if(!GAIA::ALGO::gstremp(tfile.GetFileUrl()))
 			TERROR;
 		if(tfile.GetOpenType() != GAIA::FSYS::FileBase::OPEN_TYPE_INVALID)
 			TERROR;

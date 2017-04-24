@@ -15,6 +15,8 @@
 #include "gaia_ctn_stringptrpool.h"
 #include "gaia_ctn_staticbufferpool.h"
 #include "gaia_ctn_bufferpool.h"
+#include "gaia_ctn_hashmap.h"
+#include "gaia_time.h"
 #include "gaia_log.h"
 #include "gaia_global_decl.h"
 
@@ -36,6 +38,25 @@
 #include "gaia_test_unit_impl.h"
 #include "gaia_test_case_impl.h"
 #include "gaia_math_rid_impl.h"
+
+namespace GAIA
+{
+	namespace GAIA_INTERNAL_NAMESPACE
+	{
+		class GlobalCtor : public GAIA::Base
+		{
+		public:
+			GlobalCtor()
+			{
+				g_gaia_processlaunchtime = GAIA::TIME::tick_time();
+			}
+		};
+	}
+}
+GAIA::GAIA_INTERNAL_NAMESPACE::GlobalCtor g_gaia_globalctor;
+
+/* Process time. */
+GAIA::U64 g_gaia_processlaunchtime;
 
 /* Global std stream. */
 GAIA::STREAM::STDStream g_gaia_stdstream;
@@ -145,11 +166,16 @@ GAIA::BL gaia_release_buffer(const GAIA::GVOID* p, GAIA::NUM sSize)
 /* PerfCollector. */
 GAIA::DBG::PerfCollector g_gaia_perf;
 
+/* ObjWatcher. */
+GAIA::DBG::ObjWatcher g_gaia_objwatcher;
+
+/* Global variable management. */
 GAIA::GVOID gaia_reset_global_variables()
 {
 	g_gaia_log.Destroy();
 	g_gaia_log_callback.reset();
 	g_gaia_perf.Reset();
+	g_gaia_objwatcher.Reset();
 
 	// Release global pool.
 	{

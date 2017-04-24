@@ -356,6 +356,12 @@ namespace TEST
 								break;
 							}
 							SUDPSocketUnserialMsg& msg = *(SUDPSocketUnserialMsg*)msgbuf;
+							if(msg.uData >= SUDPSOCKET_MSGCOUNT)
+							{
+								TERROR;
+								bExistError = GAIA::True;
+								break;
+							}
 							sockrecv.sUnserialMsgCount++;
 						}
 						else if(uMsgID == SUDPSOCKET_SERIAL_MSGID)
@@ -367,6 +373,12 @@ namespace TEST
 								break;
 							}
 							SUDPSocketSerialMsg& msg = *(SUDPSocketSerialMsg*)msgbuf;
+							if(msg.uData >= SUDPSOCKET_MSGCOUNT)
+							{
+								TERROR;
+								bExistError = GAIA::True;
+								break;
+							}
 							sockrecv.sSerialMsgCount++;
 							for(GAIA::NUM y = 0; y < sockrecv.listLastSerial.size(); ++y)
 							{

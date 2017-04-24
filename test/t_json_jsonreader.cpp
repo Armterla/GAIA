@@ -23,6 +23,7 @@ namespace TEST
 					const GAIA::CH* psz;
 
 					psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+					GAST(psz != GNIL);
 
 					psz = jr.Begin(nt, sNodeNameLen);
 					TAST(psz != GNIL);
@@ -31,6 +32,7 @@ namespace TEST
 					TAST(sNodeNameLen == 0);
 					{
 						psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 
 						psz = jr.Read(nt, sNodeNameLen);
 						TAST(psz != GNIL);
@@ -39,6 +41,7 @@ namespace TEST
 						TAST(*psz == 'a');
 
 						psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 
 						psz = jr.Read(nt, sNodeNameLen);
 						TAST(psz != GNIL);
@@ -47,6 +50,7 @@ namespace TEST
 						TAST(*psz == '1');
 
 						psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 
 						psz = jr.Read(nt, sNodeNameLen);
 						TAST(psz != GNIL);
@@ -73,6 +77,7 @@ namespace TEST
 						TAST(*psz == '3');
 
 						psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 					}
 					psz = jr.End(&nt);
 					TAST(nt == GAIA::JSON::JSON_NODE_CONTAINER);
@@ -93,6 +98,7 @@ namespace TEST
 					const GAIA::CH* psz;
 
 					psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+					GAST(psz != GNIL);
 
 					psz = jr.Begin(nt, sNodeNameLen);
 					TAST(psz != GNIL);
@@ -101,6 +107,7 @@ namespace TEST
 					TAST(sNodeNameLen == 0);
 					{
 						psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 
 						psz = jr.Read(nt, sNodeNameLen);
 						TAST(psz != GNIL);
@@ -109,6 +116,7 @@ namespace TEST
 						TAST(*psz == 'a');
 
 						psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 
 						psz = jr.Read(nt, sNodeNameLen);
 						TAST(psz != GNIL);
@@ -117,6 +125,7 @@ namespace TEST
 						TAST(*psz == '1');
 
 						psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 
 						psz = jr.Read(nt, sNodeNameLen);
 						TAST(psz != GNIL);
@@ -125,6 +134,7 @@ namespace TEST
 						TAST(*psz == 'b');
 
 						psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 
 						psz = jr.Read(nt, sNodeNameLen);
 						TAST(psz != GNIL);
@@ -133,6 +143,7 @@ namespace TEST
 						TAST(*psz == '2');
 
 						psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 
 						psz = jr.Read(nt, sNodeNameLen);
 						TAST(psz != GNIL);
@@ -141,6 +152,7 @@ namespace TEST
 						TAST(*psz == 'c');
 
 						psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 
 						psz = jr.Read(nt, sNodeNameLen);
 						TAST(psz != GNIL);
@@ -149,6 +161,7 @@ namespace TEST
 						TAST(*psz == '3');
 
 						psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 					}
 					psz = jr.End(&nt);
 					TAST(nt == GAIA::JSON::JSON_NODE_CONTAINER);
@@ -172,6 +185,7 @@ namespace TEST
 					const GAIA::CH* psz;
 
 					psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+					GAST(psz != GNIL);
 
 					psz = jr.Begin(nt, sNodeNameLen);
 					TAST(psz != GNIL);
@@ -182,6 +196,7 @@ namespace TEST
 						for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 						{
 							psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+							GAST(psz != GNIL);
 
 							psz = jr.Begin(nt, sNodeNameLen);
 							TAST(psz != GNIL);
@@ -190,6 +205,7 @@ namespace TEST
 							TAST(sNodeNameLen == 0);
 							{
 								psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+								GAST(psz != GNIL);
 
 								for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
 								{
@@ -203,6 +219,7 @@ namespace TEST
 									GAIA::ALGO::gstrcat(szTempValue, szTempIndexY);
 
 									psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+									GAST(psz != GNIL);
 
 									psz = jr.Read(nt, sNodeNameLen);
 									TAST(psz != GNIL);
@@ -210,6 +227,7 @@ namespace TEST
 									TAST(GAIA::ALGO::gstrcmp(szTempName, psz, sNodeNameLen) == 0);
 
 									psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+									GAST(psz != GNIL);
 
 									psz = jr.Read(nt, sNodeNameLen);
 									TAST(psz != GNIL);
@@ -217,6 +235,7 @@ namespace TEST
 									TAST(GAIA::ALGO::gstrcmp(szTempValue, psz, sNodeNameLen) == 0);
 
 									psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+									GAST(psz != GNIL);
 								}
 
 								for(GAIA::NUM y = 0; y < SAMPLE_COUNT; ++y)
@@ -228,6 +247,7 @@ namespace TEST
 									GAIA::ALGO::gstrcat(szTempName, szTempIndexY);
 
 									psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+									GAST(psz != GNIL);
 
 									psz = jr.Begin(nt, sNodeNameLen);
 									TAST(psz != GNIL);
@@ -247,6 +267,7 @@ namespace TEST
 											GAIA::ALGO::gstrcat(szTempValue, szTempIndexZ);
 
 											psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+											GAST(psz != GNIL);
 
 											psz = jr.Read(nt, sNodeNameLen);
 											TAST(psz != GNIL);
@@ -254,6 +275,7 @@ namespace TEST
 											TAST(GAIA::ALGO::gstrcmp(szTempName, psz, sNodeNameLen) == 0);
 
 											psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+											GAST(psz != GNIL);
 
 											psz = jr.Read(nt, sNodeNameLen);
 											TAST(psz != GNIL);
@@ -261,6 +283,7 @@ namespace TEST
 											TAST(GAIA::ALGO::gstrcmp(szTempValue, psz, sNodeNameLen) == 0);
 
 											psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+											GAST(psz != GNIL);
 										}
 									}
 									psz = jr.End(&nt);
@@ -269,6 +292,7 @@ namespace TEST
 									TAST(*psz == '}');
 
 									psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+									GAST(psz != GNIL);
 								}
 							}
 							psz = jr.End(&nt);
@@ -277,6 +301,7 @@ namespace TEST
 							TAST(*psz == '}');
 
 							psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+							GAST(psz != GNIL);
 						}
 					}
 					psz = jr.End(&nt);
@@ -301,6 +326,7 @@ namespace TEST
 					const GAIA::CH* psz;
 
 					psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+					GAST(psz != GNIL);
 
 					psz = jr.Begin(nt, sNodeNameLen);
 					TAST(psz != GNIL);
@@ -311,6 +337,7 @@ namespace TEST
 						GAIA::CH szName[64];
 
 						psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 
 						jr.ReadName(szName);
 						TAST(GAIA::ALGO::gstrequal(szName, "aa"));
@@ -319,6 +346,7 @@ namespace TEST
 						TAST(n == 1);
 
 						psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 
 						jr.ReadName(szName, sizeof(szName));
 						TAST(GAIA::ALGO::gstrequal(szName, "bb"));
@@ -327,6 +355,7 @@ namespace TEST
 						TAST(b == GAIA::True);
 
 						psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 
 						jr.ReadName(szName, sizeof(szName));
 						TAST(GAIA::ALGO::gstrequal(szName, "cc"));
@@ -337,6 +366,7 @@ namespace TEST
 						TAST(x128 == x128Source);
 
 						psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
+						GAST(psz != GNIL);
 					}
 					psz = jr.End(&nt);
 					TAST(nt == GAIA::JSON::JSON_NODE_CONTAINER);

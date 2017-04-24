@@ -4,6 +4,7 @@
 #include <gaia_network_asyncsocket.h>
 #include <gaia_network_asyncdispatcher.h>
 
+#include <gaia_type_impl.h>
 #include <gaia_assert_impl.h>
 #include <gaia_thread_base_impl.h>
 #include <gaia_network_base_impl.h>
@@ -124,6 +125,11 @@ namespace GAIA
 
 		GAIA::GVOID AsyncSocket::Close()
 		{
+			if(this->IsConnected())
+			{
+				this->SetConnected(GAIA::False);
+				this->OnDisconnected(GAIA::True, GAIA::False);
+			}
 		#if GAIA_OS != GAIA_OS_WINDOWS
 			m_pDispatcher->push_for_recycle(*this);
 		#endif
@@ -133,6 +139,11 @@ namespace GAIA
 
 		GAIA::GVOID AsyncSocket::Shutdown(GAIA::N32 nShutdownFlag)
 		{
+			if(this->IsConnected())
+			{
+				this->SetConnected(GAIA::False);
+				this->OnDisconnected(GAIA::True, GAIA::False);
+			}
 		#if GAIA_OS != GAIA_OS_WINDOWS
 			m_pDispatcher->push_for_recycle(*this);
 		#endif
@@ -165,11 +176,10 @@ namespace GAIA
 			this->SetPeerAddress(addr);
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
-			if(!this->IsBinded()) // TODO:
+			if(!this->IsBinded())
 			{
 				GAIA::NETWORK::Addr addrSelf;
 				addrSelf.reset();
-				addrSelf.ip = "127.0.0.1";
 				this->Bind(addrSelf);
 			}
 			m_pDispatcher->attach_socket_iocp(*this);
@@ -193,7 +203,8 @@ namespace GAIA
 					m_pDispatcher->release_async_ctx(pCtx);
 					this->OnConnected(GAIA::False, addr);
 					this->drop_ref();
-					GERR << "GAIA AsyncSocket IOCP error, cannot ConnectEx, ErrorCode = " << ::WSAGetLastError() << GEND;
+					if(m_pDispatcher->IsEnableLog())
+						GERR << "[AsyncSocket] AsyncSocket::Connect:IOCP error, cannot ConnectEx, ErrorCode = " << ::WSAGetLastError() << GEND;
 					return;
 				}
 			}
@@ -238,9 +249,10 @@ namespace GAIA
 				if(err != ERROR_IO_PENDING)
 				{
 					m_pDispatcher->release_async_ctx(pCtx);
-					this->OnDisconnected(GAIA::False);
+					this->OnDisconnected(GAIA::False, GAIA::False);
 					this->drop_ref();
-					GERR << "GAIA AsyncSocket IOCP error, cannot DisconnectEx, ErrorCode = " << ::WSAGetLastError() << GEND;
+					if(m_pDispatcher->IsEnableLog())
+						GERR << "[AsyncSocket] AsyncSocket::Disconnect:IOCP error, cannot DisconnectEx, ErrorCode = " << ::WSAGetLastError() << GEND;
 					return;
 				}
 			}
@@ -287,7 +299,8 @@ namespace GAIA
 						this->OnSent(GAIA::False, p, sOffset, nSize);
 						m_pDispatcher->release_async_ctx(pCtx);
 						this->drop_ref();
-						GERR << "GAIA AsyncSocket IOCP error, cannot WSASend, ErrorCode = " << ::WSAGetLastError() << GEND;
+						if(m_pDispatcher->IsEnableLog())
+							GERR << "[AsyncSocket] AsyncSocket::Send:IOCP error, cannot WSASend, ErrorCode = " << ::WSAGetLastError() << GEND;
 						return sOffset;
 					}
 				}
@@ -334,6 +347,7 @@ namespace GAIA
 			m_pWriteAsyncCtx = GNIL;
 			m_uRecycleTime = 0;
 			m_nBackupSocket = GINVALID;
+			m_bPushForRecycleAble = GAIA::True;
 		#endif
 		}
 	}

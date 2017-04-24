@@ -47,8 +47,8 @@ namespace TEST
 			GAIA::FSYS::File f;
 			if(f.Open(_T("../testres/LOCALE/iamgaia.txt"), GAIA::FSYS::FileBase::OPEN_TYPE_READ))
 			{
-				strUtf8.resize(f.Size());
-				f.Read(strUtf8.fptr(), f.Size());
+				strUtf8.resize((GAIA::N32)f.Size());
+				f.Read(strUtf8.fptr(), (GAIA::N32)f.Size());
 				f.Close();
 			}
 

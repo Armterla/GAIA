@@ -4,6 +4,7 @@
 #include "gaia_type.h"
 #include "gaia_assert.h"
 #include "gaia_ctn_string.h"
+#include "gaia_thread_base.h"
 
 #if GAIA_OS == GAIA_OS_WINDOWS
 #	include <winsock2.h>
@@ -71,15 +72,18 @@ namespace GAIA
 			GINL GAIA::GVOID SetName(const GAIA::CH* pszName){m_strName = pszName;}
 			GINL const GAIA::CH* GetName(){return m_strName;}
 			GINL STATE GetState() const{return m_state;}
+			GINL GAIA::UM GetThreadID() const{return m_uThreadID;}
 			GINL GAIA::BL Start()
 			{
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				if(m_hThread != GNIL)
 					return GAIA::False;
 				m_state = STATE_RUNNING;
-				m_hThread = ::CreateThread(GNIL, m_stacksize, gaia_native_thread_procedure, GSCAST(GAIA::GVOID*)(this), 0, GNIL);
+				DWORD dwThreadID;
+				m_hThread = ::CreateThread(GNIL, m_stacksize, gaia_native_thread_procedure, GSCAST(GAIA::GVOID*)(this), 0, &dwThreadID);
 				if(m_hThread == GNIL)
 					return GAIA::False;
+				m_uThreadID = (GAIA::UM)dwThreadID;
 				if(!m_strName.empty())
 				{
 					const DWORD MS_VC_EXCEPTION = 0x406D1388;
@@ -103,6 +107,7 @@ namespace GAIA
 				m_state = STATE_RUNNING;
 				if(pthread_create(&m_thread, &attr, gaia_native_thread_procedure, GSCAST(GAIA::GVOID*)(this)) != 0)
 					return GAIA::False;
+				m_uThreadID = (GAIA::UM)m_thread;
 				pthread_attr_destroy(&attr);
 				m_bCreated = GAIA::True;
 				return GAIA::True;
@@ -118,6 +123,7 @@ namespace GAIA
 						::CloseHandle(m_hThread);
 						(const_cast<Thread*>(this))->m_hThread = GNIL;
 						(const_cast<Thread*>(this))->m_state = STATE_INVALID;
+						(const_cast<Thread*>(this))->m_uThreadID = GINVALID;
 						return GAIA::True;
 					}
 				}
@@ -127,6 +133,7 @@ namespace GAIA
 					pthread_join(m_thread, GNIL);
 					(const_cast<Thread*>(this))->m_bCreated = GAIA::False;
 					(const_cast<Thread*>(this))->m_state = STATE_INVALID;
+					(const_cast<Thread*>(this))->m_uThreadID = GINVALID;
 					return GAIA::True;
 				}
 			#endif
@@ -138,6 +145,7 @@ namespace GAIA
 			{
 				m_stacksize = THREAD_STACK_SIZE;
 				m_state = STATE_INVALID;
+				m_uThreadID = GINVALID;
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				m_hThread = GNIL;
 			#else
@@ -147,6 +155,7 @@ namespace GAIA
 		private:
 			GAIA::NUM m_stacksize;
 			STATE m_state;
+			GAIA::UM m_uThreadID;
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			HANDLE m_hThread;
 		#else
@@ -156,9 +165,31 @@ namespace GAIA
 			GAIA::CTN::AString m_strName;
 		};
 	#if GAIA_OS == GAIA_OS_WINDOWS
-		GINL static DWORD WINAPI gaia_native_thread_procedure(GAIA::GVOID* p){Thread* pThread = GSCAST(Thread*)(p); pThread->Run(); return 0;}
+		GINL static DWORD WINAPI gaia_native_thread_procedure(GAIA::GVOID* p)
+		{
+			Thread* pThread = GSCAST(Thread*)(p);
+		#ifdef GAIA_DEBUG_AST
+			GAIA::UM uThreadIDByOS = GAIA::THREAD::threadid();
+			GAIA::UM uThreadIDByThread = pThread->GetThreadID();
+			GAST(uThreadIDByOS == uThreadIDByThread);
+		#endif
+			pThread->Run();
+			return 0;
+		}
 	#else
-		GINL static GAIA::GVOID* gaia_native_thread_procedure(GAIA::GVOID* p){signal(SIGPIPE, SIG_IGN); Thread* pThread = GSCAST(Thread*)(p); pThread->Run(); pthread_exit(0);}
+		GINL static GAIA::GVOID* gaia_native_thread_procedure(GAIA::GVOID* p)
+		{
+			signal(SIGPIPE, SIG_IGN);
+			Thread* pThread = GSCAST(Thread*)(p);
+		#ifdef GAIA_DEBUG_AST
+			GAIA::UM uThreadIDByOS = GAIA::THREAD::threadid();
+			GAIA::UM uThreadIDByThread = pThread->GetThreadID();
+			if(uThreadIDByThread != GINVALID)
+				GAST(uThreadIDByOS == uThreadIDByThread);
+		#endif
+			pThread->Run();
+			pthread_exit(0);
+		}
 	#endif
 	}
 }

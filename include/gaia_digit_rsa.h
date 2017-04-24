@@ -12,7 +12,7 @@ namespace GAIA
 {
 	namespace DIGIT
 	{
-		inline GAIA::N32 rsa_rand(GAIA::GVOID* p)
+		GINL GAIA::N32 rsa_rand(GAIA::GVOID* p)
 		{
 			GAIA::MATH::RandomLCG& lcg = *(GAIA::MATH::RandomLCG*)p;
 			return lcg.random();

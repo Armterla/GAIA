@@ -12,6 +12,16 @@
 #include "gaia_stream_stringstream.h"
 #include "gaia_time.h"
 
+/*
+	Filter predeclaration :
+
+		Assert				0x0001
+		ObjWatcher			0x0002
+		PerfCollector		0x0003
+		Log by macro		0x0004
+
+*/
+
 namespace GAIA
 {
 	namespace LOG
@@ -19,7 +29,7 @@ namespace GAIA
 		class Log : public GAIA::Base
 		{
 		public:
-			typedef GAIA::U32 __FilterType;
+			typedef GAIA::U16 __FilterType;
 			GAIA_ENUM_BEGIN(TYPE)
 				TYPE_LOG		= 1 << 0,
 				TYPE_WARNING	= 1 << 1,

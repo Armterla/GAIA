@@ -24,7 +24,7 @@ namespace GAIA
 				friend class it;
 				friend class const_it;
 			public:
-			#ifdef GAIA_DEBUG_INTERNALROUTINE
+			#ifdef GAIA_DEBUG_ROUTINE
 				Node(){m_pParent = GNIL;}
 				GINL _DataType& operator * (){return m_t;}
 				GINL const _DataType& operator * () const{return m_t;}

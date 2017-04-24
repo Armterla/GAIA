@@ -4,6 +4,7 @@
 #include <gaia_msys_heapcrt.h>
 #include <gaia_msys_heapesg.h>
 #include <gaia_digit_zip.h>
+#include <gaia_type_impl.h>
 #include <gaia_assert_impl.h>
 #include <gaia_thread_base_impl.h>
 #include <zlib.h>

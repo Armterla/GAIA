@@ -4,6 +4,7 @@
 #include "gaia_type.h"
 #include "gaia_assert.h"
 #include "gaia_iterator.h"
+#include "gaia_algo_compare.h"
 #include "gaia_algo_extend.h"
 #include "gaia_algo_search.h"
 #include "gaia_algo_sort.h"
@@ -233,6 +234,18 @@ namespace GAIA
 				else
 					this->destroy();
 			}
+			GINL GAIA::BL keep(const _SizeType& size)
+			{
+				if(size > this->size())
+					return GAIA::False;
+				if(size == this->size())
+					return GAIA::True;
+				_SizeType srcbegin = m_size - size;
+				for(_SizeType x = 0; x < size; ++x)
+					m_pFront[x] = m_pFront[srcbegin + x];
+				m_size = size;
+				return GAIA::True;
+			}
 			GINL GAIA::GVOID clear(){m_size = 0;}
 			GINL GAIA::GVOID destroy()
 			{
@@ -363,6 +376,72 @@ namespace GAIA
 					++ret;
 				}
 				return ret;
+			}
+			template<typename _ParamDataType> _SizeType extract(_SizeType index_start, _SizeType index_end, _ParamDataType* pResult, const _SizeType& nResultSize) const
+			{
+				if(index_start < GINVALID || index_start >= this->size())
+					return GINVALID;
+				if(index_end < GINVALID || index_end >= this->size())
+					return GINVALID;
+				if(index_start == GINVALID)
+					index_start = 0;
+				if(index_end == GINVALID)
+					index_end = this->size() - 1;
+				if(index_start > index_end)
+					return GINVALID;
+				if(pResult == GNIL)
+					return GINVALID;
+				if(this->empty())
+					return 0;
+				_SizeType nResult = GAIA::ALGO::gmin(index_end - index_start + 1, nResultSize);
+				GAIA::ALGO::copy(pResult, m_pFront + index_start, nResult);
+				return nResult;
+			}
+			template<typename _ParamDataType> _SizeType extract_left(_SizeType index, _ParamDataType* pResult, const _SizeType& nResultSize) const
+			{
+				return this->extract(0, index - 1, pResult, nResultSize);
+			}
+			template<typename _ParamDataType> _SizeType extract_right(_SizeType index, _ParamDataType* pResult, const _SizeType& nResultSize) const
+			{
+				return this->extract(index + 1, GINVALID, pResult, nResultSize);
+			}
+			template<typename _ParamDataType> _SizeType extract_mid(_SizeType index_start, _SizeType index_end, _ParamDataType* pResult, const _SizeType& nResultSize) const
+			{
+				return this->extract(index_start, index_end, pResult, nResultSize);
+			}
+			GINL _SizeType extract(_SizeType index_start, _SizeType index_end, __MyType& res) const
+			{
+				if(index_start < GINVALID || index_start >= this->size())
+					return GINVALID;
+				if(index_end < GINVALID || index_end >= this->size())
+					return GINVALID;
+				if(index_start == GINVALID)
+					index_start = 0;
+				if(index_end == GINVALID)
+					index_end = this->size() - 1;
+				if(index_start > index_end)
+					return GINVALID;
+				if(this->empty())
+				{
+					res.clear();
+					return 0;
+				}
+				_SizeType require = index_end - index_start + 1;
+				_SizeType old_length = res.size();
+				res.resize_keep(old_length + require);
+				return this->extract(index_start, index_end, res.m_pFront + old_length, require);
+			}
+			GINL _SizeType extract_left(_SizeType index, __MyType& res) const
+			{
+				return this->extract(0, index - 1, res);
+			}
+			GINL _SizeType extract_right(_SizeType index, __MyType& res) const
+			{
+				return this->extract(index + 1, GINVALID, res);
+			}
+			GINL _SizeType extract_mid(_SizeType index_start, _SizeType index_end, __MyType& res) const
+			{
+				return this->extract(index_start, index_end, res);
 			}
 			GINL _SizeType find(const _DataType& t, const _SizeType& index = 0) const
 			{

@@ -48,6 +48,28 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			__HashMapType::it it = hm.findit(x);
+			if(it.empty())
+			{
+				TERROR;
+				break;
+			}
+			if(*it != -x)
+			{
+				TERROR;
+				break;
+			}
+			__HashMapType::const_it cit = hm.const_findit(x);
+			if(cit.empty())
+			{
+				TERROR;
+				break;
+			}
+			if(*cit != -x)
+			{
+				TERROR;
+				break;
+			}
 		}
 		hm1 = hm;
 		TAST(hm1.size() == hm.size());
@@ -120,6 +142,28 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			GAIA::CTN::HashMap<CustomKey, CustomKey>::it it = hm_userdecl.findit(cd);
+			if(it.empty())
+			{
+				TERROR;
+				break;
+			}
+			if((*it).m_v != x)
+			{
+				TERROR;
+				break;
+			}
+			GAIA::CTN::HashMap<CustomKey, CustomKey>::const_it cit = hm_userdecl.const_findit(cd);
+			if(cit.empty())
+			{
+				TERROR;
+				break;
+			}
+			if((*cit).m_v != x)
+			{
+				TERROR;
+				break;
+			}
 		}
 
 		static const GAIA::CH* K1 = "HelloWorld";
@@ -146,6 +190,36 @@ namespace TEST
 		if(pFinded == GNIL)
 			TERROR;
 		else if(*pFinded != 2)
+			TERROR;
+		GAIA::CTN::HashMap<const GAIA::CH*, GAIA::N32>::it it = hmbystr.findit(K1);
+		if(it.empty())
+			TERROR;
+		else if(*it != 0)
+			TERROR;
+		GAIA::CTN::HashMap<const GAIA::CH*, GAIA::N32>::const_it cit = hmbystr.const_findit(K1);
+		if(cit.empty())
+			TERROR;
+		else if(*cit != 0)
+			TERROR;
+		it = hmbystr.findit(K2);
+		if(it.empty())
+			TERROR;
+		else if(*it != 1)
+			TERROR;
+		cit = hmbystr.const_findit(K2);
+		if(cit.empty())
+			TERROR;
+		else if(*cit != 1)
+			TERROR;
+		it = hmbystr.findit(K3);
+		if(it.empty())
+			TERROR;
+		else if(*it != 2)
+			TERROR;
+		cit = hmbystr.const_findit(K3);
+		if(cit.empty())
+			TERROR;
+		else if(*cit != 2)
 			TERROR;
 	}
 }

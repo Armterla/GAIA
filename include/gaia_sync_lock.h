@@ -34,14 +34,14 @@ namespace GAIA
 				pthread_mutex_init(&m_mutex, &attr);
 				pthread_mutexattr_destroy(&attr);
 			#endif
-			#ifdef GAIA_DEBUG_SELFCHECKROUTINE
+			#ifdef GAIA_DEBUG_SELFCHECK
 				m_owner_tid = (GAIA::UM)GINVALID;
 				m_owner_entertimes = 0;
 			#endif
 			}
 			GINL ~Lock()
 			{
-			#ifdef GAIA_DEBUG_SELFCHECKROUTINE
+			#ifdef GAIA_DEBUG_SELFCHECK
 			#	if GAIA_OS == GAIA_OS_WINDOWS
 			#		pragma warning(push)
 			#		pragma warning(disable : 4297)
@@ -66,7 +66,7 @@ namespace GAIA
 			#else
 				pthread_mutex_lock(&m_mutex);
 			#endif
-			#ifdef GAIA_DEBUG_SELFCHECKROUTINE
+			#ifdef GAIA_DEBUG_SELFCHECK
 				if(m_owner_entertimes == 0)
 				{
 					GAST(m_owner_tid == (GAIA::UM)GINVALID);
@@ -79,7 +79,7 @@ namespace GAIA
 			}
 			GINL GAIA::GVOID Leave()
 			{
-			#ifdef GAIA_DEBUG_SELFCHECKROUTINE
+			#ifdef GAIA_DEBUG_SELFCHECK
 				GAST(m_owner_entertimes > 0);
 				if(m_owner_entertimes > 0)
 					GAST(m_owner_tid == GAIA::THREAD::threadid());
@@ -101,7 +101,7 @@ namespace GAIA
 		#else
 			pthread_mutex_t m_mutex;
 		#endif
-		#ifdef GAIA_DEBUG_SELFCHECKROUTINE
+		#ifdef GAIA_DEBUG_SELFCHECK
 			GAIA::UM m_owner_tid;
 			GAIA::NM m_owner_entertimes;
 		#endif

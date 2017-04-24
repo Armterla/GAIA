@@ -57,7 +57,7 @@ namespace GAIA
 			lcg.seed(uTickTime % lcg.random_max());
 			u2 = lcg.random() * 0xFFFF + lcg.random();
 
-			/* Calculate u3(clock time. */
+			/* Calculate u3(clock time). */
 			u3 = uClockTime / 1000 / 1000;
 		#else
 			uuid_generate(*GRCAST(uuid_t*)(u));

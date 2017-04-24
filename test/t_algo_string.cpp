@@ -119,7 +119,6 @@ namespace TEST
 			GAIA::ALGO::hex2ch(uch, szTemp, sizeof(szTemp));
 			if(GAIA::ALGO::gstrcmp(szTemp, "EC") != 0)
 				TERROR;
-			uch = 0;
 			uch = GAIA::ALGO::ch2hex(szTemp, sizeof(szTemp));
 			if(uch != 0xEC)
 				TERROR;

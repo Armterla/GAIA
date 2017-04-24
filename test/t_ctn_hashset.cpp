@@ -51,6 +51,28 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			__HashSetType::it it = hs.findit(x);
+			if(it.empty())
+			{
+				TERROR;
+				break;
+			}
+			if(*it != x)
+			{
+				TERROR;
+				break;
+			}
+			__HashSetType::const_it cit = hs.const_findit(x);
+			if(cit.empty())
+			{
+				TERROR;
+				break;
+			}
+			if(*cit != x)
+			{
+				TERROR;
+				break;
+			}
 		}
 		hs1 = hs;
 		TAST(hs1.size() == hs.size());
@@ -123,6 +145,28 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			GAIA::CTN::HashSet<CustomData>::it it = hs_userdecl.findit(cd);
+			if(it.empty())
+			{
+				TERROR;
+				break;
+			}
+			if((*it).m_v != x)
+			{
+				TERROR;
+				break;
+			}
+			GAIA::CTN::HashSet<CustomData>::const_it cit = hs_userdecl.const_findit(cd);
+			if(cit.empty())
+			{
+				TERROR;
+				break;
+			}
+			if((*cit).m_v != x)
+			{
+				TERROR;
+				break;
+			}
 		}
 
 		static const GAIA::CH* K1 = "HelloWorld";
@@ -149,6 +193,36 @@ namespace TEST
 		if(ppFinded == GNIL)
 			TERROR;
 		else if(!GAIA::ALGO::gstrequal(*ppFinded, K3))
+			TERROR;
+		GAIA::CTN::HashSet<const GAIA::CH*>::it it = hsbystr.findit(K1);
+		if(it.empty())
+			TERROR;
+		else if(!GAIA::ALGO::gstrequal(*it, K1))
+			TERROR;
+		GAIA::CTN::HashSet<const GAIA::CH*>::const_it cit = hsbystr.const_findit(K1);
+		if(cit.empty())
+			TERROR;
+		else if(!GAIA::ALGO::gstrequal(*cit, K1))
+			TERROR;
+		it = hsbystr.findit(K2);
+		if(it.empty())
+			TERROR;
+		else if(!GAIA::ALGO::gstrequal(*it, K2))
+			TERROR;
+		cit = hsbystr.const_findit(K2);
+		if(cit.empty())
+			TERROR;
+		else if(!GAIA::ALGO::gstrequal(*cit, K2))
+			TERROR;
+		it = hsbystr.findit(K3);
+		if(it.empty())
+			TERROR;
+		else if(!GAIA::ALGO::gstrequal(*it, K3))
+			TERROR;
+		cit = hsbystr.const_findit(K3);
+		if(cit.empty())
+			TERROR;
+		else if(!GAIA::ALGO::gstrequal(*cit, K3))
 			TERROR;
 	}
 }

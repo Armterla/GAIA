@@ -203,7 +203,7 @@ namespace GAIA
 							break;
 						default:
 							{
-								if(*pLocalNext >= '0' && *pLocalNext <= '9' ||
+								if((*pLocalNext >= '0' && *pLocalNext <= '9') ||
 								   *pLocalNext == 't' ||
 								   *pLocalNext == 'f')
 								{
@@ -383,11 +383,7 @@ namespace GAIA
 					GAST(nodenamelen >= 0);
 					break;
 				case GAIA::JSON::JSON_NODE_MULTICONTAINER:
-					{
-						GAST(nodenamelen == 0);
-						if(*pRet != '[')
-							GTHROW_RET(Illegal, GNIL);
-					}
+					GAST(nodenamelen >= 0);
 					break;
 				default:
 					GTHROW_RET(Illegal, GNIL);
@@ -476,13 +472,13 @@ namespace GAIA
 				switch(nt)
 				{
 				case GAIA::JSON::JSON_NODE_NAME:
+					GAST(nodenamelen != 0);
 					break;
 				case GAIA::JSON::JSON_NODE_VALUE:
 					break;
 				default:
 					GTHROW_RET(Illegal, GNIL);
 				}
-				GAST(nodenamelen != 0);
 				m_pCursor = pNext;
 				return pRet;
 			}

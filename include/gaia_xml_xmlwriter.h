@@ -98,7 +98,7 @@ namespace GAIA
 
 				@return Return the buffer's size in bytes.
 			*/
-			GINL _SizeType GetWriteSize() const{return (m_pCursor - m_pFront) * sizeof(_DataType);}
+			GINL _SizeType GetWriteSize() const{return (_SizeType)((m_pCursor - m_pFront) * sizeof(_DataType));}
 
 			/*!
 				@brief Get the buffer's remain size in bytes.
@@ -136,7 +136,7 @@ namespace GAIA
 					GTHROW(InvalidParam);
 				if(GAIA::ALGO::gstremp(pszNodeName))
 					GTHROW(InvalidParam);
-				if(!GAIA::XML::XmlCheckNodeName(nt, pszNodeName))
+				if(!GAIA::XML::XmlCheckNodeName(nt, pszNodeName, nodenamelen))
 					GTHROW(InvalidParam);
 				if(nodenamelen == GINVALID && pszNodeName != GNIL)
 					nodenamelen = GAIA::ALGO::gstrlen(pszNodeName);
@@ -295,9 +295,7 @@ namespace GAIA
 			{
 				if(nt != GAIA::XML::XML_NODE_NAME && nt != GAIA::XML::XML_NODE_VALUE)
 					GTHROW(InvalidParam);
-				if(GAIA::ALGO::gstremp(pszNodeName))
-					GTHROW(InvalidParam);
-				if(nt == GAIA::XML::XML_NODE_NAME && !GAIA::XML::XmlCheckNodeName(nt, pszNodeName))
+				if(!GAIA::XML::XmlCheckNodeName(nt, pszNodeName, nodenamelen))
 					GTHROW(InvalidParam);
 				if(m_CNTCursor == GINVALID)
 					GTHROW(Illegal);
@@ -322,7 +320,8 @@ namespace GAIA
 						   m_LastNNVT != GAIA::XML::XML_NODE_VALUE)
 							GTHROW(Illegal);
 						this->write(" ", sizeof(" ") - 1);
-						this->write(pszNodeName, nodenamelen);
+						if(nodenamelen > 0)
+							this->write(pszNodeName, nodenamelen);
 						this->write("=\"", sizeof("=\"") - 1);
 						m_LastNNVT = GAIA::XML::XML_NODE_NAME;
 					}
@@ -331,7 +330,8 @@ namespace GAIA
 					{
 						if(m_LastNNVT != GAIA::XML::XML_NODE_NAME)
 							GTHROW(Illegal);
-						this->write(pszNodeName, nodenamelen);
+						if(nodenamelen > 0)
+							this->write(pszNodeName, nodenamelen);
 						this->write("\"", sizeof("\"") - 1);
 						m_LastNNVT = GAIA::XML::XML_NODE_VALUE;
 					}

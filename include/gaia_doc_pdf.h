@@ -10,7 +10,7 @@ namespace GAIA
 	namespace DOC
 	{
 		/*!
-			@brief
+			@brief PDF text align type.
 		*/
 		GAIA_ENUM_BEGIN(PDF_TEXT_ALIGN)
 			PDF_TEXT_ALIGN_LEFT,
@@ -20,7 +20,7 @@ namespace GAIA
 		GAIA_ENUM_END(PDF_TEXT_ALIGN)
 
 		/*!
-			@brief
+			@brief PDF line cap type.
 		*/
 		GAIA_ENUM_BEGIN(PDF_LINE_CAP)
 			PDF_LINE_CAP_HARD,
@@ -29,7 +29,7 @@ namespace GAIA
 		GAIA_ENUM_END(PDF_LINE_CAP)
 
 		/*!
-			@brief
+			@brief PDF link join type.
 		*/
 		GAIA_ENUM_BEGIN(PDF_LINE_JOIN)
 			PDF_LINE_JOIN_MITER,
@@ -38,7 +38,7 @@ namespace GAIA
 		GAIA_ENUM_END(PDF_LINE_JOIN)
 
 		/*!
-			@brief
+			@brief PDF text render mode.
 		*/
 		GAIA_ENUM_BEGIN(PDF_TEXT_RENDER_MODE)
 			PDF_TEXT_RENDER_MODE_FILL,
@@ -52,7 +52,7 @@ namespace GAIA
 		GAIA_ENUM_END(PDF_TEXT_RENDER_MODE)
 
 		/*!
-			@brief
+			@brief PDF primitive blend mode.
 		*/
 		GAIA_ENUM_BEGIN(PDF_BLEND_MODE)
 			PDF_BLEND_MODE_NORMAL,
@@ -84,23 +84,27 @@ namespace GAIA
 		{
 		public:
 			/*!
-				@brief
+				@brief PDF writer's callback.
 			*/
 			class CallBack : public GAIA::Base
 			{
 			public:
 				/*!
-					@brief
+					@brief If error occurred when write a PDF, this method will be callbacked.
 				*/
 				virtual GAIA::GVOID OnError(GAIA::U64 uError, GAIA::U64 uDetail, const GAIA::CH* pszError){}
 
 			public:
+				
 				/*!
-					@brief
+					@brief Constructor.
 				*/
 				CallBack(){this->init();}
+				
 				/*!
-					@brief
+					@brief Get current callback's owner PDFWriter.
+				 
+					@return Return the owner PDFWriter.
 				*/
 				PDFWriter& GetPDFWriter(){return *m_pPDFWriter;}
 
@@ -114,222 +118,242 @@ namespace GAIA
 
 		public:
 			/*!
-				@brief
+				@brief Constructor.
 			*/
 			PDFWriter();
 
 			/*!
-				@brief
+				@brief Destructor.
 			*/
 			~PDFWriter();
 
 			// CallBack management.
 			/*!
-				@brief
+				@brief Regist a callback.
 			*/
 			GAIA::GVOID RegistCallBack(GAIA::DOC::PDFWriter::CallBack& cb);
 
 			/*!
-				@brief
+				@brief Unregist a callback.
 			*/
 			GAIA::GVOID UnregistCallBack(GAIA::DOC::PDFWriter::CallBack& cb);
 
 			/*!
-				@brief
+				@brief Check the callback is registed or not.
 			*/
 			GAIA::BL IsRegistedCallBack(GAIA::DOC::PDFWriter::CallBack& cb) const;
 
 			/*!
-				@brief
+				@brief Unregist all callback.
 			*/
 			GAIA::GVOID UnregistCallBackAll();
 
 			// Document info management.
 			/*!
-				@brief
+				@brief Set PDF's creator information.
+			 
+				@param pszCreator [in] Specify the creator's name.
 			*/
 			GAIA::GVOID SetCreator(const GAIA::CH* pszCreator);
 
 			/*!
-				@brief
+				@brief Get PDF's creator information.
+			 
+				@return Return the creator's name.
 			*/
 			const GAIA::CH* GetCreator() const;
 
 			/*!
-				@brief
+				@brief Set PDF's author information.
+			 
+				@param pszAuthor [in] Specify the author's name.
 			*/
 			GAIA::GVOID SetAuthor(const GAIA::CH* pszAuthor);
 
 			/*!
-				@brief
+				@brief Get PDF's author information.
+			 
+				@return Return the author's name.
 			*/
 			const GAIA::CH* GetAuthor() const;
 
 			/*!
-				@brief
+				@brief Set PDF's title.
+			 
+				@param pszTitle [in] Specify the title name.
 			*/
 			GAIA::GVOID SetTitle(const GAIA::CH* pszTitle);
 
 			/*!
-				@brief
+				@brief Get PDF's title.
+			 
+				@return Return the PDF's title name.
 			*/
 			const GAIA::CH* GetTitle() const;
 
 			/*!
-				@brief
+				@brief Set PDF's subject information.
+			 
+				@param pszSubject [in] Specify the subject name.
 			*/
 			GAIA::GVOID SetSubject(const GAIA::CH* pszSubject);
 
 			/*!
-				@brief
+				@brief Get PDF's subject information.
+			 
+				@return Return the PDF's subject name.
 			*/
 			const GAIA::CH* GetSubject() const;
 
 			/*!
-				@brief
+				@brief Set PDF's keywords information.
+			 
+				@param pszKeywords [in] Specify the keywords.
 			*/
 			GAIA::GVOID SetKeywords(const GAIA::CH* pszKeywords);
 
 			/*!
-				@brief
+				@brief Get PDF's keywords information.
+			 
+				@return Return PDF's keywords.
 			*/
 			const GAIA::CH* GetKeywords() const;
 
 			/*!
-				@brief
+				@brief Set PDF's create time.
 			*/
 			GAIA::GVOID SetCreateTime(const GAIA::TIME::Time& t);
 
 			/*!
-				@brief
+				@brief Get PDF's create time.
 			*/
 			const GAIA::TIME::Time& GetCreateTime() const;
 
 			/*!
-				@brief
+				@brief Set PDF's mod time.
 			*/
 			GAIA::GVOID SetModTime(const GAIA::TIME::Time& t);
 
 			/*!
-				@brief
+				@brief Get PDF's mod time.
 			*/
 			const GAIA::TIME::Time& GetModTime() const;
 
 			// Encoding management.
 			/*!
-				@brief
+				@brief Set PDF's encoding.
 			*/
 			GAIA::GVOID SetEncoding(const GAIA::CH* pszEncodingName);
 
 			/*!
-				@brief
+				@brief Get PDF's encoding.
 			*/
 			const GAIA::CH* GetEncoding() const;
 
 			// Page management.
 			/*!
-				@brief
+				@brief Insert a page at a specified page index.
 			*/
 			GAIA::GVOID InsertPage(GAIA::NUM sPageIndex = GINVALID);
 
 			/*!
-				@brief
+				@brief Get page count.
 			*/
 			GAIA::NUM GetPageCount() const;
 
 			/*!
-				@brief
+				@brief Select a page for current operation page.
 			*/
 			GAIA::GVOID SelectPage(GAIA::NUM sPageIndex = GINVALID);
 
 			/*!
-				@brief
+				@brief Set page's width.
 			*/
 			GAIA::GVOID SetPageWidth(GAIA::REAL rWidth);
 
 			/*!
-				@brief
+				@brief Get page's width.
 			*/
 			GAIA::REAL GetPageWidth() const;
 
 			/*!
-				@brief
+				@brief Set page's height.
 			*/
 			GAIA::GVOID SetPageHeight(GAIA::REAL rHeight);
 
 			/*!
-				@brief
+				@brief Get page's height.
 			*/
 			GAIA::REAL GetPageHeight() const;
 
 			// Color management.
 			/*!
-				@brief
+				@brief Set current pipeline's Fill-RGB color.
 			*/
 			GAIA::GVOID SetFillRGB(GAIA::REAL r, GAIA::REAL g, GAIA::REAL b);
 
 			/*!
-				@brief
+				@brief Get current pipeline's Fill-RGB color.
 			*/
 			GAIA::GVOID GetFillRGB(GAIA::REAL& r, GAIA::REAL& g, GAIA::REAL& b) const;
 
 			/*!
-				@brief
+				@brief Set current pipeline's Fill-CMYK color.
 			*/
 			GAIA::GVOID SetFillCMYK(GAIA::REAL c, GAIA::REAL m, GAIA::REAL y, GAIA::REAL k);
 
 			/*!
-				@brief
+				@brief Get current pipeline's Fill-CMYK color.
 			*/
 			GAIA::GVOID GetFillCMYK(GAIA::REAL& c, GAIA::REAL& m, GAIA::REAL& y, GAIA::REAL& k) const;
 
 			/*!
-				@brief
+				@brief Set current pipeline's Stroke-RGB color.
 			*/
 			GAIA::GVOID SetStrokeRGB(GAIA::REAL r, GAIA::REAL g, GAIA::REAL b);
 
 			/*!
-				@brief
+				@brief Get current pipeline's Stroke-RGB color.
 			*/
 			GAIA::GVOID GetStrokeRGB(GAIA::REAL& r, GAIA::REAL& g, GAIA::REAL& b) const;
 
 			/*!
-				@brief
+				@brief Set current pipeline's Stroke-CMYK color.
 			*/
 			GAIA::GVOID SetStrokeCMYK(GAIA::REAL c, GAIA::REAL m, GAIA::REAL y, GAIA::REAL k);
 
 			/*!
-				@brief
+				@brief Get current pipeline's Stroke-CMYK color.
 			*/
 			GAIA::GVOID GetStrokeCMYK(GAIA::REAL& c, GAIA::REAL& m, GAIA::REAL& y, GAIA::REAL& k) const;
 
 			/*!
-				@brief
+				@brief Set current pipeline's Fill-Alpha value.
 			*/
 			GAIA::GVOID SetFillAlpha(GAIA::REAL a);
 
 			/*!
-				@brief
+				@brief Get current pipeline's Fill-Alpha value.
 			*/
 			GAIA::REAL GetFillAlpha() const;
 
 			/*!
-				@brief
+				@brief Set current pipeline's Stroke-Alpha value.
 			*/
 			GAIA::GVOID SetStrokeAlpha(GAIA::REAL a);
 
 			/*!
-				@brief
+				@brief Get current pipeline's Stroke-Alpha value.
 			*/
 			GAIA::REAL GetStrokeAlpha() const;
 
 			/*!
-				@brief
+				@brief Set current pipeline's blend mode.
 			*/
 			GAIA::GVOID SetBlendMode(GAIA::DOC::PDF_BLEND_MODE m);
 
 			/*!
-				@brief
+				@brief Get current pipeline's blend mode.
 			*/
 			GAIA::DOC::PDF_BLEND_MODE GetBlendMode() const;
 
@@ -337,285 +361,285 @@ namespace GAIA
 
 			// State management.
 			/*!
-				@brief
+				@brief Save current pipeline's states.
 			*/
 			GAIA::GVOID StateSave();
 
 			/*!
-				@brief
+				@brief Restore current pipeline's states.
 			*/
 			GAIA::GVOID StateRestore();
 
 			// Graphics management.
 			/*!
-				@brief
+				@brief Set current pipeline's Line-Width.
 			*/
 			GAIA::GVOID SetLineWidth(GAIA::REAL rLineWidth);
 
 			/*!
-				@brief
+				@brief Get current pipeline's Line-Width.
 			*/
 			GAIA::REAL GetLineWidth() const;
 
 			/*!
-				@brief
+				@brief Set current pipeline's Line-Cap type.
 			*/
 			GAIA::GVOID SetLineCap(GAIA::DOC::PDF_LINE_CAP m);
 
 			/*!
-				@brief
+				@brief Get current pipeline's Line-Cap type.
 			*/
 			GAIA::DOC::PDF_LINE_CAP GetLineCap() const;
 
 			/*!
-				@brief
+				@brief Set current pipeline's Line-Join type.
 			*/
 			GAIA::GVOID SetLineJoin(GAIA::DOC::PDF_LINE_JOIN m);
 
 			/*!
-				@brief
+				@brief Get current pipeline's Line-Join type.
 			*/
 			GAIA::DOC::PDF_LINE_JOIN GetLineJoin() const;
 
 			/*!
-				@brief
+				@brief Set line or geometry's dash style which will be draw by stroke(PDFWriter::Stroke) mode or file-stroke(PDFWriter::FillStroke) mode.
 			*/
 			GAIA::GVOID SetDash(const GAIA::U16* pPattern, GAIA::U32 uCount, GAIA::U32 uPhase);
 
 			/*!
-				@brief
+				@brief Get line or geometry's dash style.
 			*/
 			GAIA::GVOID GetDash(GAIA::U16* pPattern, GAIA::U32& uCount, GAIA::U32& uPhase) const;
 
 			/*!
-				@brief
+				@brief Move current pipeline's geometry cursor position.
 			*/
 			GAIA::GVOID MoveTo(GAIA::REAL x, GAIA::REAL y);
 
 			/*!
-				@brief
+				@brief Retrieve current pipeline's geometry cursor position.
 			*/
 			GAIA::GVOID Pos(GAIA::REAL& x, GAIA::REAL& y) const;
 
 			/*!
-				@brief
+				@brief Fill the geometry.
 			*/
 			GAIA::GVOID Fill();
 
 			/*!
-				@brief
+				@brief Stroke the geometry.
 			*/
 			GAIA::GVOID Stroke();
 
 			/*!
-				@brief
+				@brief Fill and stroke the geometry.
 			*/
 			GAIA::GVOID FillStroke();
 
 			/*!
-				@brief
+				@brief Add a rectangle.
 			*/
 			GAIA::GVOID Rectangle(GAIA::REAL x, GAIA::REAL y, GAIA::REAL rWidth, GAIA::REAL rHeight);
 
 			/*!
-				@brief
+				@brief Add a circle.
 			*/
 			GAIA::GVOID Circle(GAIA::REAL x, GAIA::REAL y, GAIA::REAL rRadius);
 
 			/*!
-				@brief
+				@brief Add a ellipse.
 			*/
 			GAIA::GVOID Ellipse(GAIA::REAL x, GAIA::REAL y, GAIA::REAL xr, GAIA::REAL yr);
 
 			/*!
-				@brief
+				@brief Add a arc.
 			*/
 			GAIA::GVOID Arc(GAIA::REAL x, GAIA::REAL y, GAIA::REAL rRadius, GAIA::REAL rAngle1, GAIA::REAL rAngle2);
 
 			/*!
-				@brief
+				@brief Draw line from current geometry cursor position to a new position.
 			*/
 			GAIA::GVOID LineTo(GAIA::REAL x, GAIA::REAL y);
 
 			/*!
-				@brief
+				@brief Draw curve from current geometry cursor position to a new position with tangent parameters.
 			*/
 			GAIA::GVOID CurveTo(GAIA::REAL x, GAIA::REAL y, GAIA::REAL xtan, GAIA::REAL ytan);
 
 			/*!
-				@brief
+				@brief Draw curve from current geometry cursor position to a new position with tangent parameters.
 			*/
 			GAIA::GVOID CurveTo(GAIA::REAL x, GAIA::REAL y, GAIA::REAL xtan1, GAIA::REAL ytan1, GAIA::REAL xtan2, GAIA::REAL ytan2);
 
 			// Font management.
 			/*!
-				@brief
+				@brief Prepare the font.
 			*/
 			const GAIA::CH* PrepareFont(const GAIA::CH* pszFontFileName, GAIA::BL bEmbedToDoc = GAIA::True);
 
 			// Text management.
 			/*!
-				@brief
+				@brief Begin write text.
 			*/
 			GAIA::GVOID BeginText();
 
 			/*!
-				@brief
+				@brief End write text.
 			*/
 			GAIA::GVOID EndText();
 
 			/*!
-				@brief
+				@brief Check is begin or not begin to write text.
 			*/
 			GAIA::BL IsBeginText() const;
 
 			/*!
-				@brief
+				@brief Set current pipeline's text font.
 			*/
 			GAIA::GVOID SetFont(const GAIA::CH* pszFont);
 
 			/*!
-				@brief
+				@brief Get current pipeline's text font.
 			*/
 			const GAIA::CH* GetFont() const;
 
 			/*!
-				@brief
+				@brief Set current pipeline's font size.
 			*/
 			GAIA::GVOID SetFontSize(GAIA::REAL rFontSize);
 
 			/*!
-				@brief
+				@brief Get current pipeline's font size.
 			*/
 			GAIA::REAL GetFontSize() const;
 
 			/*!
-				@brief
+				@brief Set current pipeline's line space.
 			*/
 			GAIA::GVOID SetLineSpace(GAIA::REAL rSpace);
 
 			/*!
-				@brief
+				@brief Get current pipeline's line space.
 			*/
 			GAIA::REAL GetLineSpace() const;
 
 			/*!
-				@brief
+				@brief Set current pipeline's word space.
 			*/
 			GAIA::GVOID SetWordSpace(GAIA::REAL rSpace);
 
 			/*!
-				@brief
+				@brief Get current pipeline's word space.
 			*/
 			GAIA::REAL GetWordSpace() const;
 
 			/*!
-				@brief
+				@brief Set current pipeline's character space.
 			*/
 			GAIA::GVOID SetCharSpace(GAIA::REAL rSpace);
 
 			/*!
-				@brief
+				@brief Get current pipeline's character space.
 			*/
 			GAIA::REAL GetCharSpace() const;
 
 			/*!
-				@brief
+				@brief Set current pipeline's text offset in vertical.
 			*/
 			GAIA::GVOID SetTextVOffset(GAIA::REAL rOffset);
 
 			/*!
-				@brief
+				@brief Get current pipeline's text offset in vertical.
 			*/
 			GAIA::REAL GetTextVOffset() const;
 
 			/*!
-				@brief
+				@brief Set current pipeline's text transform matrix.
 			*/
 			GAIA::GVOID SetTextMatrix(GAIA::REAL x, GAIA::REAL y, GAIA::REAL a, GAIA::REAL b, GAIA::REAL c, GAIA::REAL d);
 
 			/*!
-				@brief
+				@brief Set current pipeline's text render mode.
 			*/
 			GAIA::GVOID SetTextRenderMode(GAIA::DOC::PDF_TEXT_RENDER_MODE m);
 
 			/*!
-				@brief
+				@brief Get current pipeline's text render mode.
 			*/
 			GAIA::DOC::PDF_TEXT_RENDER_MODE GetTextRenderMode() const;
 
 			/*!
-				@brief
+				@brief Move current pipeline's text position.
 			*/
 			GAIA::GVOID MoveTextTo(GAIA::REAL x, GAIA::REAL y);
 
 			/*!
-				@brief
+				@brief Retrive current pipeline's text position.
 			*/
 			GAIA::GVOID TextPos(GAIA::REAL& x, GAIA::REAL& y) const;
 
 			/*!
-				@brief
+				@brief Print text a pipeline's text posision.
 			*/
 			GAIA::GVOID Text(const GAIA::CH* pszText, GAIA::BL bNewLine = GAIA::False);
 
 			/*!
-				@brief
+				@brief Print text at a specified position.
 			*/
 			GAIA::GVOID Text(GAIA::REAL x, GAIA::REAL y, const GAIA::CH* pszText);
 
 			/*!
-				@brief
+				@brief Print text at a rectangle.
 			*/
 			GAIA::GVOID Text(GAIA::REAL rLeft, GAIA::REAL rTop, GAIA::REAL rRight, GAIA::REAL rBottom, const GAIA::CH* pszText, GAIA::DOC::PDF_TEXT_ALIGN align = GAIA::DOC::PDF_TEXT_ALIGN_LEFT);
 
 			// Text measure.
 			/*!
-				@brief
+				@brief Get text width.
 			*/
 			GAIA::REAL GetTextWidth(const GAIA::CH* pszText);
 
 			/*!
-				@brief
+				@brief Meature the text.
 			*/
 			GAIA::NUM MeatureText(const GAIA::CH* pszText, GAIA::REAL rWidth, GAIA::BL bWordWrap = GAIA::True, GAIA::REAL* pRealWidth = GNIL);
 
 			// Image management.
 			/*!
-				@brief
+				@brief Draw image by a image file.
 			*/
 			GAIA::GVOID DrawImage(GAIA::REAL x, GAIA::REAL y, GAIA::REAL w, GAIA::REAL h, const GAIA::CH* pszFileName, const GAIA::CH* pszImageType = GNIL);
 
 			/*!
-				@brief
+				@brief Draw image by a image buffer.
 			*/
 			GAIA::GVOID DrawImage(GAIA::REAL x, GAIA::REAL y, GAIA::REAL w, GAIA::REAL h, const GAIA::GVOID* pBuf, GAIA::NUM sLen, const GAIA::CH* pszImageType);
 
 			/*!
-				@brief
+				@brief Draw image by a pixel buffer.
 			*/
 			GAIA::GVOID DrawImage(GAIA::REAL x, GAIA::REAL y, GAIA::REAL w, GAIA::REAL h, const GAIA::GVOID* pBuf, GAIA::NUM sBufWidth, GAIA::NUM sBufHeight, GAIA::NUM sBitCountPerPixel);
 
 			// Catalog management.
 			/*!
-				@brief
+				@brief Make catalog to current PDF.
 			*/
 			GAIA::GVOID* MakeCatalog(GAIA::GVOID* pParent, const GAIA::CH* pszName, GAIA::NUM sPageIndex, GAIA::GVOID* pEncoder = GNIL);
 
 			// Link management.
 			/*!
-				@brief
+				@brief Make link to current PDF.
 			*/
 			GAIA::GVOID MakeLink(GAIA::NUM sSrcPageIndex, GAIA::REAL x, GAIA::REAL y, GAIA::REAL w, GAIA::REAL h, GAIA::NUM sDstPageIndex);
 
 			/*!
-				@brief
+				@brief Make URL link to current PDF.
 			*/
 			GAIA::GVOID MakeURLLink(GAIA::NUM sPageIndex, GAIA::REAL x, GAIA::REAL y, GAIA::REAL w, GAIA::REAL h, const GAIA::CH* pszURL);
 
 			// Comment management.
 			/*!
-				@brief
+				@brief Make comment to current PDF.
 			*/
 			GAIA::GVOID MakeComment(GAIA::NUM sPageIndex, GAIA::REAL x, GAIA::REAL y, GAIA::REAL w, GAIA::REAL h, const GAIA::CH* pszText);
 
@@ -623,56 +647,53 @@ namespace GAIA
 
 			// Compress management.
 			/*!
-				@brief
+				@brief Set PDF's compress mode.
 			*/
 			GAIA::GVOID SetCompressMode(GAIA::U32 uFlag);
 
 			/*!
-				@brief
+				@brief Get PDF's compress mode.
 			*/
 			GAIA::U32 GetCompressMode() const;
 
 			// Right management.
 			/*!
-				@brief
+				@brief Set PDF's permission.
 			*/
 			GAIA::GVOID SetPermission(GAIA::U32 uFlag);
 
 			/*!
-				@brief
+				@brief Get PDF's permission.
 			*/
 			GAIA::U32 GetPermission() const;
 
 			/*!
-				@brief
+				@brief Set PDF's creator's password.
 			*/
 			GAIA::GVOID SetCreatorPassword(const GAIA::CH* pszCreatorPassword);
 
 			/*!
-				@brief
+				@brief Get PDF's creator's password.
 			*/
 			const GAIA::CH* GetCreatorPassword() const;
 
 			/*!
-				@brief
+				@brief Set PDF's reader password.
 			*/
 			GAIA::GVOID SetReaderPassword(const GAIA::CH* pszReaderPassword);
 
 			/*!
-				@brief
+				@brief Get PDF's reader password.
 			*/
 			const GAIA::CH* GetReaderPassword() const;
 
 			// Save management.
 			/*!
-				@brief
+				@brief Save PDF to file.
 			*/
 			GAIA::BL Save(const GAIA::CH* pszFileName = GNIL);
 
 			// CallBack entries.
-			/*!
-				@brief
-			*/
 			GAIA::GVOID OnError(GAIA::U64 uError, GAIA::U64 uDetail);
 
 		private:

@@ -12,6 +12,8 @@
 #	include <sys/time.h>
 #endif
 
+extern GAIA::U64 g_gaia_processlaunchtime;
+
 namespace GAIA
 {
 	namespace TIME
@@ -98,8 +100,12 @@ namespace GAIA
 		#else
 			timeval now;
 			::gettimeofday(&now, GNIL);
-			return (GAIA::U64)now.tv_sec * 1000 * 1000 + (GAIA::U64)now.tv_usec;
+			return ((GAIA::U64)now.tv_sec * 1000 * 1000 + (GAIA::U64)now.tv_usec);
 		#endif
+		}
+		GINL GAIA::U64 process_time()
+		{
+			return GAIA::TIME::tick_time() - g_gaia_processlaunchtime;
 		}
 		/*
 		 *	64-bit time compressed object as follow:
@@ -490,6 +496,10 @@ namespace GAIA
 			GINL GAIA::GVOID ticktime()
 			{
 				this->usecond(GAIA::TIME::tick_time());
+			}
+			GINL GAIA::GVOID processtime()
+			{
+				this->usecond(GAIA::TIME::process_time());
 			}
 			GINL operator GAIA::N64() const{return this->usecond();}
 			GINL GAIA::N64 year() const{return y;}

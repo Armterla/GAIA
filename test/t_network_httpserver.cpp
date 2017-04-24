@@ -101,11 +101,8 @@ namespace TEST
 			{
 				TAST(svr.IsBegin());
 
-				GAIA::NETWORK::Addr addrLocal;
-				GAIA::CH szHostName[128];
-				GAIA::NETWORK::GetHostName(szHostName, sizeof(szHostName));
 				GAIA::CTN::Vector<GAIA::NETWORK::IP> listHostIP;
-				GAIA::NETWORK::GetHostIPList(szHostName, listHostIP);
+				GAIA::NETWORK::GetHostIPList(GAIA::NETWORK::GAIA_LOCAL_HOST, listHostIP);
 
 				GAIA::NETWORK::Addr addrService1, addrService2;
 				if(listHostIP.empty())

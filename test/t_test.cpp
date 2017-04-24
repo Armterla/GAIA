@@ -379,6 +379,8 @@ namespace TEST
 					break;
 				}
 			}
+
+			ctl.Erase(tcRoot);
 		}
 	}
 }

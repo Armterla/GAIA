@@ -396,5 +396,45 @@ namespace TEST
 			TERROR;
 		if(!av.empty())
 			TERROR;
+
+		av.destroy();
+		for(__ArrayVectorType::_datatype x = 0; x < 10; ++x)
+			av.push_back(x);
+		TAST(av.keep(5));
+		TAST(av.size() == 5);
+		for(__ArrayVectorType::_datatype x = 0; x < 5; ++x)
+		{
+			if(av[x] != x + 5)
+			{
+				TERROR;
+				break;
+			}
+		}
+
+		av.clear();
+		for(__ArrayVectorType::_datatype x = 0; x < 10; ++x)
+			av.push_back(x);
+		av1.resize(100);
+		TAST(av.extract_left(5, av1.fptr(), 100) == 5);
+		TAST(av1[0] == 0 && av1[1] == 1 && av1[2] == 2 && av1[3] == 3 && av1[4] == 4);
+		TAST(av.extract_right(5, av1.fptr(), 100) == 4);
+		TAST(av1[0] == 6 && av1[1] == 7 && av1[2] == 8 && av1[3] == 9);
+		TAST(av.extract_mid(3, 7, av1.fptr(), 100) == 5);
+		TAST(av1[0] == 3 && av1[1] == 4 && av1[2] == 5 && av1[3] == 6 && av1[4] == 7);
+		TAST(av.extract(3, 7, av1.fptr(), 100) == 5);
+		TAST(av1[0] == 3 && av1[1] == 4 && av1[2] == 5 && av1[3] == 6 && av1[4] == 7);
+		av1.clear();
+		TAST(av.extract_left(5, av1) == 5);
+		TAST(av1.size() == 5);
+		TAST(av1[0] == 0 && av1[1] == 1 && av1[2] == 2 && av1[3] == 3 && av1[4] == 4);
+		TAST(av.extract_right(5, av1) == 4);
+		TAST(av1.size() == 9);
+		TAST(av1[5] == 6 && av1[6] == 7 && av1[7] == 8 && av1[8] == 9);
+		TAST(av.extract_mid(3, 7, av1) == 5);
+		TAST(av1.size() == 14);
+		TAST(av1[9] == 3 && av1[10] == 4 && av1[11] == 5 && av1[12] == 6 && av1[13] == 7);
+		TAST(av.extract(3, 7, av1) == 5);
+		TAST(av1.size() == 19);
+		TAST(av1[14] == 3 && av1[15] == 4 && av1[16] == 5 && av1[17] == 6 && av1[18] == 7);
 	}
 }

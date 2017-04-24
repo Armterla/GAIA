@@ -20,11 +20,11 @@ namespace GAIA
 			GINL MemFile(){this->init();}
 			GINL ~MemFile(){if(this->IsOpen()) this->Close();}
 		public:
-			virtual GAIA::BL Open(const GAIA::TCH* filekey, const GAIA::UM& opentype)
+			virtual GAIA::BL Open(const GAIA::TCH* fileurl, const GAIA::UM& opentype)
 			{
 				if(this->IsOpen())
 					this->Close();
-				m_strFileKey = filekey;
+				m_strFileUrl = fileurl;
 				m_fileopentype = opentype;
 				return GAIA::True;
 			}
@@ -32,14 +32,14 @@ namespace GAIA
 			{
 				if(!this->IsOpen())
 					return GAIA::False;
-				m_strFileKey.clear();
+				m_strFileUrl.clear();
 				m_fileopentype = GAIA::FSYS::FileBase::OPEN_TYPE_INVALID;
 				m_buf.destroy();
 				m_filesize = 0;
 				return GAIA::True;
 			}
 			virtual GAIA::BL IsOpen() const{return m_fileopentype != GAIA::FSYS::FileBase::OPEN_TYPE_INVALID;}
-			GINL virtual const GAIA::TCH* GetFileKey() const{return m_strFileKey.fptr();}
+			GINL virtual const GAIA::TCH* GetFileUrl() const{return m_strFileUrl.fptr();}
 			GINL virtual GAIA::UM GetOpenType() const{return m_fileopentype;}
 			virtual GAIA::FSYS::FileBase::__FileSizeType Size() const{return m_filesize;}
 			virtual GAIA::BL Resize(const GAIA::FSYS::FileBase::__FileSizeType& size)
@@ -107,7 +107,7 @@ namespace GAIA
 				m_filesize = 0;
 			}
 		private:
-			GAIA::CTN::TCharsString m_strFileKey;
+			GAIA::CTN::TCharsString m_strFileUrl;
 			GAIA::UM m_fileopentype;
 			_BufferType m_buf;
 			GAIA::FSYS::FileBase::__FileSizeType m_filesize;
