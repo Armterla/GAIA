@@ -128,7 +128,7 @@ namespace GAIA
 				{
 					m_bClosed = GAIA::True;
 					m_pLink->rise_ref("HttpServerAsyncSocket::OnDisconnected:link rise ref");
-					GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
+					GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
 					m_pSvr->m_rclinks.push_back(m_pLink);
 					m_pLink = GNIL;
 				}
@@ -159,7 +159,7 @@ namespace GAIA
 				{
 					m_bClosed = GAIA::True;
 					m_pLink->rise_ref("HttpServerAsyncSocket::OnSent:link rise ref");
-					GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
+					GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
 					m_pSvr->m_rclinks.push_back(m_pLink);
 					m_pLink = GNIL;
 				}
@@ -170,7 +170,7 @@ namespace GAIA
 				{
 					m_bClosed = GAIA::True;
 					m_pLink->rise_ref("HttpServerAsyncSocket::OnRecved:link rise ref for recv failed");
-					GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
+					GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
 					m_pSvr->m_rclinks.push_back(m_pLink);
 					m_pLink = GNIL;
 					return;
@@ -346,7 +346,7 @@ namespace GAIA
 					   m_lContentLength > m_pSvr->GetDesc().lSingleCallbackLimitSize)
 					{
 						m_pLink->rise_ref("HttpServerAsyncSocket::OnRecv:link rise ref");
-						GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
+						GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
 						m_pSvr->m_rclinks.push_back(m_pLink);
 					}
 				}
@@ -462,7 +462,7 @@ namespace GAIA
 				pLink->SetListenAddr(addrListen);
 				pLink->SetAcceptTime(GAIA::TIME::gmt_time());
 				((HttpServerAsyncSocket*)&sock)->SetLink(pLink);
-				GAIA::SYNC::AutolockW al(m_pSvr->m_rwLinks);
+				GAIA::SYNC::Autolock al(m_pSvr->m_lrLinks);
 				m_pSvr->m_links_bypeeraddr.insert(GAIA::CTN::Ref<GAIA::NETWORK::HttpServerLink>(pLink));
 				return GAIA::True;
 			}
@@ -490,7 +490,7 @@ namespace GAIA
 						break;
 					GAIA::BL bExistExecutedTask = m_pSvr->Execute();
 					if(!bExistExecutedTask)
-						GAIA::SYNC::gsleep(1);
+						GAIA::SYNC::gsleep(100);
 				}
 			}
 
@@ -1246,7 +1246,7 @@ namespace GAIA
 
 			// Release all links.
 			{
-				GAIA::SYNC::AutolockW al(m_rwLinks);
+				GAIA::SYNC::Autolock al(m_lrLinks);
 				for(__LinkSetType::it it = m_links_bypeeraddr.frontit(); !it.empty(); )
 				{
 					__LinkSetType::_datatype& t = *it;
@@ -1260,7 +1260,7 @@ namespace GAIA
 
 			// Release all request completed links.
 			{
-				GAIA::SYNC::AutolockW al(m_rwRCLinks);
+				GAIA::SYNC::Autolock al(m_lrRCLinks);
 				while(!m_rclinks.empty())
 				{
 					GAIA::NETWORK::HttpServerLink* pLink = m_rclinks.front();
@@ -1284,7 +1284,7 @@ namespace GAIA
 
 			// Get a task.
 			{
-				GAIA::SYNC::AutolockW al(m_rwRCLinks);
+				GAIA::SYNC::Autolock al(m_lrRCLinks);
 				if(m_rclinks.empty())
 					return GAIA::False;
 				pLink = m_rclinks.front();
@@ -1802,7 +1802,7 @@ namespace GAIA
 		{
 			// Remove from link list.
 			{
-				GAIA::SYNC::AutolockW al(m_rwLinks);
+				GAIA::SYNC::Autolock al(m_lrLinks);
 				if(!m_links_bypeeraddr.erase(GAIA::CTN::Ref<GAIA::NETWORK::HttpServerLink>(&l)))
 					return GAIA::False;
 			}

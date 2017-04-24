@@ -1409,10 +1409,10 @@ namespace GAIA
 			GAIA::BL m_bCreated;
 			GAIA::BL m_bBegin;
 
-			GAIA::SYNC::LockRW m_rwLinks;
+			GAIA::SYNC::Lock m_lrLinks;
 			__LinkSetType m_links_bypeeraddr;
 
-			GAIA::SYNC::LockRW m_rwRCLinks; // RC means request complete.
+			GAIA::SYNC::Lock m_lrRCLinks; // RC means request complete.
 			__LinkQueueType m_rclinks; // RC means request complete.
 
 			GAIA::BL m_bEnableResponseCache;
