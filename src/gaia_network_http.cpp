@@ -38,7 +38,7 @@ namespace GAIA
 						break;
 					GAIA::BL bExistExecutedTask = m_pHttp->Execute(this);
 					if(!bExistExecutedTask)
-						GAIA::SYNC::gsleep(1);
+						GAIA::SYNC::gsleep(10);
 				}
 			}
 
