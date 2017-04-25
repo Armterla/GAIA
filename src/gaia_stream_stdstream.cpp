@@ -17,10 +17,32 @@ namespace GAIA
 {
 	namespace STREAM
 	{
-		GAIA::SYNC::Lock s_lrSTDStream;
+		GAIA::SYNC::Lock s_lrSTDStreamRead;
+		GAIA::SYNC::Lock s_lrSTDStreamWrite;
+		
+		GAIA::GVOID STDStream::lock_read()
+		{
+			s_lrSTDStreamRead.Enter();
+		}
+		
+		GAIA::GVOID STDStream::unlock_read()
+		{
+			s_lrSTDStreamRead.Leave();
+		}
+		
+		GAIA::GVOID STDStream::lock_write()
+		{
+			s_lrSTDStreamWrite.Enter();
+		}
+		
+		GAIA::GVOID STDStream::unlock_write()
+		{
+			s_lrSTDStreamWrite.Leave();
+		}
+		
 		STDStream& STDStream::operator << (GAIA::BL t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(!this->enable_write())
 				return *this;
 			std::cout << t;
@@ -28,7 +50,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator << (GAIA::NM t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(!this->enable_write())
 				return *this;
 			std::cout << t;
@@ -36,7 +58,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator << (GAIA::UM t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(!this->enable_write())
 				return *this;
 			std::cout << t;
@@ -44,7 +66,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator << (GAIA::N8 t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(!this->enable_write())
 				return *this;
 			std::cout << (GAIA::N32)t;
@@ -52,7 +74,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator << (GAIA::N16 t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(!this->enable_write())
 				return *this;
 			std::cout << (GAIA::N32)t;
@@ -60,7 +82,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator << (GAIA::N32 t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(!this->enable_write())
 				return *this;
 			std::cout << t;
@@ -68,7 +90,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator << (const GAIA::N64& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(!this->enable_write())
 				return *this;
 			std::cout << t;
@@ -76,7 +98,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator << (GAIA::U8 t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(!this->enable_write())
 				return *this;
 			std::cout << (GAIA::U32)t;
@@ -84,7 +106,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator << (GAIA::U16 t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(!this->enable_write())
 				return *this;
 			std::cout << (GAIA::U32)t;
@@ -92,7 +114,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator << (GAIA::U32 t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(!this->enable_write())
 				return *this;
 			std::cout << t;
@@ -100,7 +122,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator << (const GAIA::U64& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(!this->enable_write())
 				return *this;
 			std::cout << t;
@@ -108,7 +130,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator << (GAIA::F32 t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(!this->enable_write())
 				return *this;
 			std::cout << t;
@@ -116,7 +138,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator << (const GAIA::F64& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(!this->enable_write())
 				return *this;
 			std::cout << t;
@@ -124,7 +146,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator << (const GAIA::WCH& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(!this->enable_write())
 				return *this;
 			std::cout << (GAIA::N64)t;
@@ -132,7 +154,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator << (const GAIA::CH* p)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(p == GNIL)
 				return *this;
 			if(!this->enable_write())
@@ -142,7 +164,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator << (const GAIA::WCH* p)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(p == GNIL)
 				return *this;
 			if(!this->enable_write())
@@ -152,7 +174,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator << (const GAIA::X128& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(!this->enable_write())
 				return *this;
 			return *this;
@@ -188,7 +210,7 @@ namespace GAIA
 
 		STDStream& STDStream::operator >> (GAIA::BL& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(!this->enable_read())
 				return *this;
 			BEGIN_PREPARE_READ
@@ -203,7 +225,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (GAIA::NM& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(!this->enable_read())
 				return *this;
 			BEGIN_PREPARE_READ
@@ -215,7 +237,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (GAIA::UM& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(!this->enable_read())
 				return *this;
 			BEGIN_PREPARE_READ
@@ -227,7 +249,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (GAIA::N8& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(!this->enable_read())
 				return *this;
 			BEGIN_PREPARE_READ
@@ -241,7 +263,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (GAIA::N16& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(!this->enable_read())
 				return *this;
 			BEGIN_PREPARE_READ
@@ -255,7 +277,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (GAIA::N32& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(!this->enable_read())
 				return *this;
 			BEGIN_PREPARE_READ
@@ -267,7 +289,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (GAIA::N64& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(!this->enable_read())
 				return *this;
 			BEGIN_PREPARE_READ
@@ -279,7 +301,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (GAIA::U8& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(!this->enable_read())
 				return *this;
 			BEGIN_PREPARE_READ
@@ -293,7 +315,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (GAIA::U16& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(!this->enable_read())
 				return *this;
 			BEGIN_PREPARE_READ
@@ -307,7 +329,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (GAIA::U32& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(!this->enable_read())
 				return *this;
 			BEGIN_PREPARE_READ
@@ -319,7 +341,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (GAIA::U64& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(!this->enable_read())
 				return *this;
 			BEGIN_PREPARE_READ
@@ -331,7 +353,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (GAIA::F32& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(!this->enable_read())
 				return *this;
 			BEGIN_PREPARE_READ
@@ -343,7 +365,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (GAIA::F64& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(!this->enable_read())
 				return *this;
 			BEGIN_PREPARE_READ
@@ -355,7 +377,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (GAIA::WCH& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(!this->enable_read())
 				return *this;
 			BEGIN_PREPARE_READ
@@ -369,7 +391,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (GAIA::CH* p)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(p == GNIL)
 				return *this;
 			if(!this->enable_read())
@@ -383,7 +405,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (GAIA::WCH* p)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(p == GNIL)
 				return *this;
 			if(!this->enable_read())
@@ -397,7 +419,7 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (GAIA::X128& t)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			if(!this->enable_read())
 				return *this;
 			BEGIN_PREPARE_READ
@@ -411,13 +433,13 @@ namespace GAIA
 		}
 		STDStream& STDStream::operator >> (StreamFormat& pf)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamRead);
 			pf = m_pf;
 			return *this;
 		}
 		STDStream& STDStream::operator << (const StreamFormat& pf)
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(pf.align() != m_pf.align() || pf.align() != 0)
 			{
 				std::cout << std::setw(pf.align());
@@ -525,7 +547,7 @@ namespace GAIA
 		}
 		GAIA::GVOID STDStream::flush()
 		{
-			GAIA::SYNC::Autolock al(s_lrSTDStream);
+			GAIA::SYNC::Autolock al(s_lrSTDStreamWrite);
 			if(!this->enable_write())
 				return;
 			std::cout << std::flush;
