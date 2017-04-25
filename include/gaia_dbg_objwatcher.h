@@ -690,13 +690,7 @@ namespace GAIA
 			{
 				GAIA::LOG::Log* pLog;
 				if(m_pLog == GNIL)
-				{
-				#ifdef GAIA_DEBUG_LOG
 					pLog = &g_gaia_log;
-				#else
-					pLog = &g_gaia_invalidlog;
-				#endif
-				}
 				else
 					pLog = m_pLog;
 				return *pLog;
