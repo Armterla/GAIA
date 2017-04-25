@@ -14,7 +14,7 @@
 #	define GAIA_THREADSAFE GAIA_THREADSAFE_ON
 #endif
 
-/* APP Mode. */
+/* APP mode. */
 #define GAIA_APPMODE_CONSOLE 1
 #define GAIA_APPMODE_GUI 2
 #ifdef __GAIA_CONSOLE__

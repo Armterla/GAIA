@@ -1,4 +1,9 @@
-﻿#include <sqlite3.h>
+﻿#include <gaia_sysconfig.h>
+
+#ifdef GAIA_FEATURE_SQLITE
+#	include <sqlite3.h>
+#endif
+
 #include <gaia_type.h>
 #include <gaia_assert.h>
 #include <gaia_ctn_string.h>
@@ -32,14 +37,18 @@ namespace GAIA
 			DBLocalQueryContext()
 			{
 				pDB = GNIL;
+			#ifdef GAIA_FEATURE_SQLITE
 				pSqliteSTMT = GNIL;
+			#endif
 				sBindCursor = 0;
 				sFieldCursor = 0;
 				bSelectSQL = GAIA::False;
 			}
 		public:
 			DBLocal* pDB;
+		#ifdef GAIA_FEATURE_SQLITE
 			sqlite3_stmt* pSqliteSTMT;
+		#endif
 			GAIA::NUM sBindCursor;
 			GAIA::NUM sFieldCursor;
 			GAIA::CTN::AString strSQL;
@@ -50,14 +59,18 @@ namespace GAIA
 		public:
 			DBLocalContext()
 			{
+			#ifdef GAIA_FEATURE_SQLITE
 				pSqliteDB = GNIL;
+			#endif
 				syncmode = GAIA::DB::DB_SYNC_MODE_INVALID;
 				sCacheSize = GINVALID;
 				nTransactionRefCount = 0;
 				sTransactionMethod = 0; // 0 means not init, 1 means commit, 2 means rollback.
 			}
 		public:
+		#ifdef GAIA_FEATURE_SQLITE
 			sqlite3* pSqliteDB;
+		#endif
 			GAIA::CTN::AString strDBName;
 			GAIA::DB::DB_SYNC_MODE syncmode;
 			GAIA::NUM sCacheSize;
@@ -82,7 +95,11 @@ namespace GAIA
 		}
 		GAIA::BL DBLocalQuery::IsQueryed() const
 		{
+		#ifdef GAIA_FEATURE_SQLITE
 			return m_ctx->pSqliteSTMT != GNIL;
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 		}
 		const GAIA::CH* DBLocalQuery::GetSQL() const
 		{
@@ -92,9 +109,13 @@ namespace GAIA
 		{
 			if(!this->IsQueryed())
 				return GAIA::False;
+		#ifdef GAIA_FEATURE_SQLITE
 			if(sqlite3_finalize(m_ctx->pSqliteSTMT) != SQLITE_OK)
 				return GAIA::False;
 			m_ctx->pSqliteSTMT = GNIL;
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 			return GAIA::True;
 		}
 		GAIA::BL DBLocalQuery::Prepare(const GAIA::CH* pszSQL)
@@ -117,8 +138,12 @@ namespace GAIA
 			// Create.
 			if(pszSQL != GNIL)
 			{
+			#ifdef GAIA_FEATURE_SQLITE
 				if(sqlite3_prepare_v2(m_ctx->pDB->m_ctx->pSqliteDB, pszSQL, -1, &m_ctx->pSqliteSTMT, GNIL) != SQLITE_OK)
 					return GAIA::False;
+			#else
+				GTHROW_RET(NotSupport, GAIA::False);
+			#endif
 				m_ctx->strSQL = pszSQL;
 				const GAIA::CH* pszTemp = pszSQL;
 				while(GAIA::ALGO::isblank(*pszTemp) || GAIA::ALGO::isspecial(*pszTemp))
@@ -139,9 +164,12 @@ namespace GAIA
 			GPCHR_NULLSTR_RET(pszSQL, GAIA::False);
 			if(!DBLocalCheckSQL(pszSQL))
 				return GAIA::False;
-
+		#ifdef GAIA_FEATURE_SQLITE
 			if(sqlite3_exec(m_ctx->pDB->m_ctx->pSqliteDB, pszSQL, GNIL, GNIL, GNIL) != SQLITE_OK)
 				return GAIA::False;
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 			return GAIA::True;
 		}
 		GAIA::BL DBLocalQuery::BindNull(GAIA::NUM sIndex)
@@ -150,8 +178,12 @@ namespace GAIA
 				return GAIA::False;
 			if(sIndex != GINVALID)
 				m_ctx->sBindCursor = sIndex;
+		#ifdef GAIA_FEATURE_SQLITE
 			if(sqlite3_bind_null(m_ctx->pSqliteSTMT, m_ctx->sBindCursor + 1) != SQLITE_OK)
 				return GAIA::False;
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 			m_ctx->sBindCursor++;
 			return GAIA::True;
 		}
@@ -161,8 +193,12 @@ namespace GAIA
 				return GAIA::False;
 			if(sIndex != GINVALID)
 				m_ctx->sBindCursor = sIndex;
+		#ifdef GAIA_FEATURE_SQLITE
 			if(sqlite3_bind_int(m_ctx->pSqliteSTMT, m_ctx->sBindCursor + 1, n) != SQLITE_OK)
 				return GAIA::False;
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 			m_ctx->sBindCursor++;
 			return GAIA::True;
 		}
@@ -172,8 +208,12 @@ namespace GAIA
 				return GAIA::False;
 			if(sIndex != GINVALID)
 				m_ctx->sBindCursor = sIndex;
+		#ifdef GAIA_FEATURE_SQLITE
 			if(sqlite3_bind_int64(m_ctx->pSqliteSTMT, m_ctx->sBindCursor + 1, l) != SQLITE_OK)
 				return GAIA::False;
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 			m_ctx->sBindCursor++;
 			return GAIA::True;
 		}
@@ -183,8 +223,12 @@ namespace GAIA
 				return GAIA::False;
 			if(sIndex != GINVALID)
 				m_ctx->sBindCursor = sIndex;
+		#ifdef GAIA_FEATURE_SQLITE
 			if(sqlite3_bind_double(m_ctx->pSqliteSTMT, m_ctx->sBindCursor + 1, (GAIA::F64)f) != SQLITE_OK)
 				return GAIA::False;
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 			m_ctx->sBindCursor++;
 			return GAIA::True;
 		}
@@ -194,8 +238,12 @@ namespace GAIA
 				return GAIA::False;
 			if(sIndex != GINVALID)
 				m_ctx->sBindCursor = sIndex;
+		#ifdef GAIA_FEATURE_SQLITE
 			if(sqlite3_bind_double(m_ctx->pSqliteSTMT, m_ctx->sBindCursor + 1, d) != SQLITE_OK)
 				return GAIA::False;
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 			m_ctx->sBindCursor++;
 			return GAIA::True;
 		}
@@ -205,6 +253,7 @@ namespace GAIA
 				return GAIA::False;
 			if(sIndex != GINVALID)
 				m_ctx->sBindCursor = sIndex;
+		#ifdef GAIA_FEATURE_SQLITE
 			sqlite3_destructor_type destructor;
 			if(bStatic)
 				destructor = SQLITE_STATIC;
@@ -212,6 +261,9 @@ namespace GAIA
 				destructor = SQLITE_TRANSIENT;
 			if(sqlite3_bind_text(m_ctx->pSqliteSTMT, m_ctx->sBindCursor + 1, psz, -1, destructor) != SQLITE_OK)
 				return GAIA::False;
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 			m_ctx->sBindCursor++;
 			return GAIA::True;
 		}
@@ -229,6 +281,7 @@ namespace GAIA
 				return GAIA::False;
 			if(sIndex != GINVALID)
 				m_ctx->sBindCursor = sIndex;
+		#ifdef GAIA_FEATURE_SQLITE
 			sqlite3_destructor_type destructor;
 			if(bStatic)
 				destructor = SQLITE_STATIC;
@@ -236,6 +289,9 @@ namespace GAIA
 				destructor = SQLITE_TRANSIENT;
 			if(sqlite3_bind_blob(m_ctx->pSqliteSTMT, m_ctx->sBindCursor + 1, p, sSize, destructor) != SQLITE_OK)
 				return GAIA::False;
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 			m_ctx->sBindCursor++;
 			return GAIA::True;
 		}
@@ -243,18 +299,26 @@ namespace GAIA
 		{
 			m_ctx->sBindCursor = 0;
 			m_ctx->sFieldCursor = 0;
+		#ifdef GAIA_FEATURE_SQLITE
 			if(m_ctx->pSqliteSTMT != GNIL)
 			{
 				if(sqlite3_reset(m_ctx->pSqliteSTMT) != SQLITE_OK)
 					return GAIA::False;
 			}
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 			return GAIA::True;
 		}
 		GAIA::NUM DBLocalQuery::GetFieldCount()
 		{
 			if(!this->IsQueryed())
 				return GINVALID;
+		#ifdef GAIA_FEATURE_SQLITE
 			return sqlite3_column_count(m_ctx->pSqliteSTMT);
+		#else
+			GTHROW_RET(NotSupport, GINVALID);
+		#endif
 		}
 		GAIA::NUM DBLocalQuery::GetRecordCount()
 		{
@@ -268,9 +332,14 @@ namespace GAIA
 				return GNIL;
 			if(sColumn != GINVALID)
 				m_ctx->sFieldCursor = sColumn;
+		#ifdef GAIA_FEATURE_SQLITE
 			if(sColumn >= sqlite3_column_count(m_ctx->pSqliteSTMT))
 				return GNIL;
 			const GAIA::CH* pszRet = sqlite3_column_name(m_ctx->pSqliteSTMT, m_ctx->sFieldCursor);
+		#else
+			const GAIA::CH* pszRet = GNIL;
+			GTHROW_RET(NotSupport, GNIL);
+		#endif
 			m_ctx->sFieldCursor++;
 			return pszRet;
 		}
@@ -282,6 +351,7 @@ namespace GAIA
 				return GAIA::TYPEID_INVALID;
 			if(sColumn != GINVALID)
 				m_ctx->sFieldCursor = sColumn;
+		#ifdef GAIA_FEATURE_SQLITE
 			if(sColumn >= sqlite3_column_count(m_ctx->pSqliteSTMT))
 				return GAIA::TYPEID_INVALID;
 			GAIA::N32 sqlite_type = sqlite3_column_type(m_ctx->pSqliteSTMT, m_ctx->sFieldCursor);
@@ -313,6 +383,9 @@ namespace GAIA
 				return GAIA::TYPEID_CONSTPOINTER;
 			else if(sqlite_type == SQLITE_NULL)
 				return GAIA::TYPEID_INVALID;
+		#else
+			GTHROW_RET(NotSupport, GAIA::TYPEID_INVALID);
+		#endif
 			return GAIA::TYPEID_INVALID;
 		}
 		GAIA::BL DBLocalQuery::SeekBind(GAIA::NUM sOffset)
@@ -328,8 +401,12 @@ namespace GAIA
 		{
 			if(!this->IsQueryed())
 				return GAIA::False;
+		#ifdef GAIA_FEATURE_SQLITE
 			if(sOffset < 0 || sOffset >= sqlite3_column_count(m_ctx->pSqliteSTMT))
 				return GAIA::False;
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 			m_ctx->sFieldCursor = sOffset;
 			return GAIA::True;
 		}
@@ -339,6 +416,7 @@ namespace GAIA
 			m_ctx->sFieldCursor = 0;
 			if(!this->IsQueryed())
 				return GAIA::False;
+		#ifdef GAIA_FEATURE_SQLITE
 			GAIA::N32 nRes = sqlite3_step(m_ctx->pSqliteSTMT);
 			if(m_ctx->bSelectSQL)
 			{
@@ -350,70 +428,104 @@ namespace GAIA
 				if(nRes != SQLITE_DONE)
 					return GAIA::False;
 			}
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 			return GAIA::True;
 		}
 		GAIA::N32 DBLocalQuery::GetN32(GAIA::NUM sColumn)
 		{
 			if(!this->IsQueryed())
-				GTHROW(Illegal);
+				GTHROW_RET(Illegal, 0);
 			if(sColumn != GINVALID)
 				m_ctx->sFieldCursor = sColumn;
+		#ifdef GAIA_FEATURE_SQLITE
 			GAIA::N32 nRet = sqlite3_column_int(m_ctx->pSqliteSTMT, m_ctx->sFieldCursor);
+		#else
+			GAIA::N32 nRet = 0;
+			GTHROW_RET(NotSupport, 0);
+		#endif
 			m_ctx->sFieldCursor++;
 			return nRet;
 		}
 		GAIA::N64 DBLocalQuery::GetN64(GAIA::NUM sColumn)
 		{
 			if(!this->IsQueryed())
-				GTHROW(Illegal);
+				GTHROW_RET(Illegal, 0);
 			if(sColumn != GINVALID)
 				m_ctx->sFieldCursor = sColumn;
+		#ifdef GAIA_FEATURE_SQLITE
 			GAIA::N64 nRet = sqlite3_column_int64(m_ctx->pSqliteSTMT, m_ctx->sFieldCursor);
+		#else
+			GAIA::N32 nRet = 0;
+			GTHROW_RET(NotSupport, 0);
+		#endif
 			m_ctx->sFieldCursor++;
 			return nRet;
 		}
 		GAIA::F32 DBLocalQuery::GetF32(GAIA::NUM sColumn)
 		{
 			if(!this->IsQueryed())
-				GTHROW(Illegal);
+				GTHROW_RET(Illegal, 0.0F);
 			if(sColumn != GINVALID)
 				m_ctx->sFieldCursor = sColumn;
+		#ifdef GAIA_FEATURE_SQLITE
 			GAIA::F32 fRet = (GAIA::F32)sqlite3_column_double(m_ctx->pSqliteSTMT, m_ctx->sFieldCursor);
+		#else
+			GAIA::N32 fRet = 0.0F;
+			GTHROW_RET(NotSupport, 0.0F);
+		#endif
 			m_ctx->sFieldCursor++;
 			return fRet;
 		}
 		GAIA::F64 DBLocalQuery::GetF64(GAIA::NUM sColumn)
 		{
 			if(!this->IsQueryed())
-				GTHROW(Illegal);
+				GTHROW_RET(Illegal, 0.0);
 			if(sColumn != GINVALID)
 				m_ctx->sFieldCursor = sColumn;
+		#ifdef GAIA_FEATURE_SQLITE
 			GAIA::F64 fRet = sqlite3_column_double(m_ctx->pSqliteSTMT, m_ctx->sFieldCursor);
+		#else
+			GAIA::N32 fRet = 0.0;
+			GTHROW_RET(NotSupport, 0.0);
+		#endif
 			m_ctx->sFieldCursor++;
 			return fRet;
 		}
 		const GAIA::CH* DBLocalQuery::GetStringA(GAIA::NUM sColumn)
 		{
 			if(!this->IsQueryed())
-				GTHROW(Illegal);
+				GTHROW_RET(Illegal, GNIL);
 			if(sColumn != GINVALID)
 				m_ctx->sFieldCursor = sColumn;
+		#ifdef GAIA_FEATURE_SQLITE
 			const GAIA::CH* pszRet = (const GAIA::CH*)sqlite3_column_text(m_ctx->pSqliteSTMT, m_ctx->sFieldCursor);
+		#else
+			const GAIA::CH* pszRet = GNIL;
+			GTHROW_RET(NotSupport, GNIL);
+		#endif
 			m_ctx->sFieldCursor++;
 			return pszRet;
 		}
 		const GAIA::WCH* DBLocalQuery::GetStringW(GAIA::NUM sColumn)
 		{
 			if(!this->IsQueryed())
-				GTHROW(Illegal);
+				GTHROW_RET(Illegal, GNIL);
 			return GNIL;
 		}
 		const GAIA::GVOID* DBLocalQuery::GetBlob(GAIA::NUM& sSize, GAIA::NUM sColumn)
 		{
 			if(!this->IsQueryed())
-				GTHROW(Illegal);
+				GTHROW_RET(Illegal, GNIL);
+		#ifdef GAIA_FEATURE_SQLITE
 			sSize = sqlite3_column_bytes(m_ctx->pSqliteSTMT, m_ctx->sFieldCursor);
 			const GAIA::GVOID* pRet = sqlite3_column_blob(m_ctx->pSqliteSTMT, m_ctx->sFieldCursor);
+		#else
+			sSize = 0;
+			const GAIA::GVOID* pRet = GNIL;
+			GTHROW_RET(NotSupport, GNIL);
+		#endif
 			m_ctx->sFieldCursor++;
 			return pRet;
 		}
@@ -433,16 +545,24 @@ namespace GAIA
 		}
 		GAIA::BL DBLocal::Open(const GAIA::CH* pszDBName)
 		{
+		#ifdef GAIA_FEATURE_SQLITE
 			GAIA::N32 nThreadSafeFlag = sqlite3_threadsafe();
 			if(nThreadSafeFlag != 1)
 			{
 				GASTFALSE;
 				return GAIA::False;
 			}
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 			if(this->IsOpen())
 				this->Close();
+		#ifdef GAIA_FEATURE_SQLITE
 			if(sqlite3_open(pszDBName, &m_ctx->pSqliteDB) != SQLITE_OK)
 				return GAIA::False;
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 			m_ctx->strDBName = pszDBName;
 			return GAIA::True;
 		}
@@ -450,8 +570,12 @@ namespace GAIA
 		{
 			if(!this->IsOpen())
 				return GAIA::False;
+		#ifdef GAIA_FEATURE_SQLITE
 			if(sqlite3_close(m_ctx->pSqliteDB) != SQLITE_OK)
 				return GAIA::False;
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 			m_ctx->strDBName.clear();
 			m_ctx->syncmode = GAIA::DB::DB_SYNC_MODE_INVALID;
 			m_ctx->sCacheSize = GINVALID;
@@ -459,7 +583,11 @@ namespace GAIA
 		}
 		GAIA::BL DBLocal::IsOpen() const
 		{
+		#ifdef GAIA_FEATURE_SQLITE
 			return m_ctx->pSqliteDB != GNIL;
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 		}
 		const GAIA::CH* DBLocal::GetDBName() const
 		{
@@ -545,11 +673,15 @@ namespace GAIA
 			if(m_ctx->nTransactionRefCount == 0)
 			{
 				m_ctx->sTransactionMethod = 0; // 0 means not init, 1 means commit, 2 means rollback.
+			#ifdef GAIA_FEATURE_SQLITE
 				if(sqlite3_exec(m_ctx->pSqliteDB, "BEGIN IMMEDIATE TRANSACTION", GNIL, GNIL, GNIL) != SQLITE_OK)
 				{
 					m_ctx->lrTransaction.Leave();
 					return GAIA::False;
 				}
+			#else
+				GTHROW_RET(NotSupport, GAIA::False);
+			#endif
 			}
 			m_ctx->nTransactionRefCount++;
 			return GAIA::True;
@@ -577,19 +709,27 @@ namespace GAIA
 			{
 				if(bRollBack)
 				{
+				#ifdef GAIA_FEATURE_SQLITE
 					if(sqlite3_exec(m_ctx->pSqliteDB, "ROLLBACK TRANSACTION", GNIL, GNIL, GNIL) != SQLITE_OK)
 					{
 						m_ctx->lrTransaction.Leave();
 						return GAIA::False;
 					}
+				#else
+					GTHROW_RET(NotSupport, GAIA::False);
+				#endif
 				}
 				else
 				{
+				#ifdef GAIA_FEATURE_SQLITE
 					if(sqlite3_exec(m_ctx->pSqliteDB, "COMMIT TRANSACTION", GNIL, GNIL, GNIL) != SQLITE_OK)
 					{
 						m_ctx->lrTransaction.Leave();
 						return GAIA::False;
 					}
+				#else
+					GTHROW_RET(NotSupport, GAIA::False);
+				#endif
 				}
 			}
 			m_ctx->sTransactionMethod = 0;
@@ -598,8 +738,12 @@ namespace GAIA
 		}
 		GAIA::BL DBLocal::Optimize()
 		{
+		#ifdef GAIA_FEATURE_SQLITE
 			if(sqlite3_exec(m_ctx->pSqliteDB, "VACUUM;", GNIL, GNIL, GNIL) != SQLITE_OK)
 				return GAIA::False;
+		#else
+			GTHROW_RET(NotSupport, GAIA::False);
+		#endif
 			return GAIA::True;
 		}
 		GAIA::BL DBLocal::Checkup()
@@ -620,7 +764,11 @@ namespace GAIA
 		{
 			if(!this->IsOpen())
 				return GNIL;
+		#ifdef GAIA_FEATURE_SQLITE
 			return sqlite3_errmsg(m_ctx->pSqliteDB);
+		#else
+			GTHROW_RET(NotSupport, GNIL);
+		#endif
 		}
 	}
 }
