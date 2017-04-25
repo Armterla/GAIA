@@ -390,8 +390,24 @@
 	}
 
 #ifdef GAIA_DEBUG_PRINTEXCEPTION
-#	define GPRINTEXCEPTION(name) do{GAIA::STREAM::STDStream stm; stm << "GAIA Exception " << #name << "! File=" << __FILE__ << "(" << __LINE__ << ")\n";}while(0)
-#	define GPRINTEXCEPTION_PURE(name) do{GAIA::STREAM::STDStream stm; stm << "GAIA Exception! ErrorText\"" << name.GetErrorTextA() << "\" File=" << __FILE__ << "(" << __LINE__ << ")\n";}while(0)
+#	define GPRINTEXCEPTION(name) \
+		do\
+		{\
+			GAIA::STREAM::StreamBase& stm = GAIA::DBG::debugstream();\
+			stm.lock_write();\
+			stm << "GAIA Exception " << #name << "! File=" << __FILE__ << "(" << __LINE__ << ")\n";\
+			stm.unlock_write();\
+		}\
+		while(0)
+#	define GPRINTEXCEPTION_PURE(name) \
+		do\
+		{\
+			GAIA::STREAM::StreamBase& stm = GAIA::DBG::debugstream();\
+			stm.lock_write();\
+			stm << "GAIA Exception! ErrorText\"" << name.GetErrorTextA() << "\" File=" << __FILE__ << "(" << __LINE__ << ")\n";\
+			stm.unlock_write();\
+		}\
+		while(0)
 #else
 #	define GPRINTEXCEPTION(name) do{}while(0)
 #	define GPRINTEXCEPTION_PURE(name) do{}while(0)

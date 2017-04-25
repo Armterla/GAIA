@@ -13,47 +13,53 @@ namespace GAIA
 {
 	namespace DBG
 	{
+		GINL GAIA::STREAM::StreamBase& debugstream();
 		GINL GAIA::GVOID debuglog(const GAIA::CH* pszHead, const GAIA::CH* pszFileName, GAIA::NUM sCodeLine);
+		
 #ifdef GAIA_DEBUG_AST
 #	if GAIA_APPMODE == GAIA_APPMODE_CONSOLE
 #		define GAST(e)	do\
+						{\
+							if(!(e))\
 							{\
-								if(!(e))\
+								GAIA::CH szTempDebugLogHead[1024] = "GAST Failed:";\
+								const GAIA::CH* pszE = #e;\
+								GAIA::CH* pszTempDebugLogHeadDst = szTempDebugLogHead + sizeof("GAST Failed:") - 1;\
+								while(*pszE != '\0')\
+									*pszTempDebugLogHeadDst++ = *pszE++;\
+								*pszTempDebugLogHeadDst = ' ';\
+								*pszTempDebugLogHeadDst++ = '\0';\
+								GAIA::DBG::debuglog(szTempDebugLogHead, __FILE__, __LINE__);\
+								if(g_gaia_assertconfirm)\
 								{\
-									GAIA::CH szTempDebugLogHead[1024] = "GAST Failed:";\
-									const GAIA::CH* pszE = #e;\
-									GAIA::CH* pszTempDebugLogHeadDst = szTempDebugLogHead + sizeof("GAST Failed:") - 1;\
-									while(*pszE != '\0')\
-										*pszTempDebugLogHeadDst++ = *pszE++;\
-									*pszTempDebugLogHeadDst = ' ';\
-									*pszTempDebugLogHeadDst++ = '\0';\
-									GAIA::DBG::debuglog(szTempDebugLogHead, __FILE__, __LINE__);\
-									if(g_gaia_assertconfirm)\
-									{\
-										GAIA::STREAM::STDStream stm;\
-										stm << "GAST Failed:\n\t" << #e << "\n\t" << __FILE__ << "(" << __LINE__ << ")\n\tInput 1 to break and other to continue:";\
-										GAIA::CH ch[32];\
-										stm >> ch;\
-										if(ch[0] == '1' && ch[1] == '\0')\
-											GTHROW(Ast);\
-									}\
-									else\
-									{\
-										GAIA::STREAM::STDStream stm;\
-										stm << "GAST Failed:\n\t" << #e << "\n\t" << __FILE__ << "(" << __LINE__ << ")\n";\
+									GAIA::STREAM::StreamBase& stm = GAIA::DBG::debugstream();\
+									stm.lock_write();\
+									stm << "GAST Failed:\n\t" << #e << "\n\t" << __FILE__ << "(" << __LINE__ << ")\n\tInput 1 to break and other to continue:";\
+									stm.unlock_write();\
+									GAIA::CH ch[32];\
+									stm >> ch;\
+									if(ch[0] == '1' && ch[1] == '\0')\
 										GTHROW(Ast);\
-									}\
 								}\
-							}while(0)
-#	elif GAIA_APPMODE == GAIA_APPMODE_GUI
-#		define GAST(e)	do\
-							{\
-								if(!(e))\
+								else\
 								{\
-									GAIA::DBG::debuglog("GAST Failed:", __FILE__, __LINE__);\
+									GAIA::STREAM::StreamBase& stm = GAIA::DBG::debugstream();\
+									stm.lock_write();\
+									stm << "GAST Failed:\n\t" << #e << "\n\t" << __FILE__ << "(" << __LINE__ << ")\n";\
+									stm.unlock_write();\
 									GTHROW(Ast);\
 								}\
-							}while(0)
+							}\
+						}while(0)
+#	elif GAIA_APPMODE == GAIA_APPMODE_GUI
+#		define GAST(e)	do\
+						{\
+							if(!(e))\
+							{\
+								GAIA::DBG::debuglog("GAST Failed:", __FILE__, __LINE__);\
+								GTHROW(Ast);\
+							}\
+						}while(0)
 #	endif
 #else
 #	define GAST(e) do{}while(0)
@@ -76,8 +82,10 @@ namespace GAIA
 									GAIA::DBG::debuglog(szTempDebugLogHead, __FILE__, __LINE__);\
 									if(g_gaia_assertconfirm)\
 									{\
-										GAIA::STREAM::STDStream stm;\
+										GAIA::STREAM::StreamBase& stm = GAIA::DBG::debugstream();\
+										stm.lock_write();\
 										stm << "GASTDBG Failed:\n\t" << #e << "\n\t"  << __FILE__ << "(" << __LINE__ << ")\n\tInput 1 to break and other to continue(Debug):";\
+										stm.unlock_write();\
 										GAIA::CH ch;\
 										stm >> ch;\
 										if(ch == '1')\
@@ -85,8 +93,10 @@ namespace GAIA
 									}\
 									else\
 									{\
-										GAIA::STREAM::STDStream stm;\
+										GAIA::STREAM::StreamBase& stm = GAIA::DBG::debugstream();\
+										stm.lock_write();\
 										stm << "GAST Failed:\n\t" << #e << "\n\t" << __FILE__ << "(" << __LINE__ << ")\n";\
+										stm.unlock_write();\
 										GTHROW(AstDebug);\
 									}\
 								}\
