@@ -420,8 +420,12 @@ namespace GAIA
 			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen)
 			{
 				GAIA::NETWORK::Addr addrPeer;
+			#ifdef GAIA_DEBUG_AST
 				GAIA::BL bGetPeerAddrResult = sock.GetPeerAddress(addrPeer);
 				GAST(bGetPeerAddrResult && addrPeer.check());
+			#else
+				sock.GetPeerAddress(addrPeer);
+			#endif
 
 				if(m_pSvr->m_bLog)
 				{

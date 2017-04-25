@@ -1018,8 +1018,12 @@ namespace GAIA
 												GAST(ctx.pSocket->m_pWriteAsyncCtx != GNIL);
 												struct kevent ke;
 												EV_SET(&ke, nSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, ctx.pSocket->m_pWriteAsyncCtx);
+											#ifdef GAIA_DEBUG_AST
 												GAIA::NUM sResult = kevent(pThread->kqep, &ke, 1, GNIL, 0, GNIL);
 												GAST(sResult != GINVALID);
+											#else
+												kevent(pThread->kqep, &ke, 1, GNIL, 0, GNIL);
+											#endif
 											}
 										}
 										ctx.pSocket->drop_ref("AsyncDispatcher::Execute:EndSend");

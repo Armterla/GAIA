@@ -168,7 +168,10 @@ namespace GAIA
 						else if(GAIA::ALGO::gstrequal(pszLocale, "SYS"))
 							ct = GAIA::CHARSET_TYPE_SYS;
 						else
+						{
+							ct = GAIA::CHARSET_TYPE_INVALID;
 							GTHROW(Constructor);
+						}
 						GAIA::NUM sSrcLen = GAIA::ALGO::gstrlen(p);
 						this->resize(sSrcLen * 6 + 1);
 						GAIA::NUM sLen = GAIA::LOCALE::w2m((const GAIA::WCH*)p, sSrcLen, this->fptr(), this->size(), ct);
@@ -194,7 +197,10 @@ namespace GAIA
 						else if(GAIA::ALGO::gstrequal(pszLocale, "SYS"))
 							ct = GAIA::CHARSET_TYPE_SYS;
 						else
+						{
+							ct = GAIA::CHARSET_TYPE_INVALID;
 							GTHROW(Constructor);
+						}
 						GAIA::NUM sSrcLen = GAIA::ALGO::gstrlen(p);
 						this->resize(sSrcLen + 1);
 						GAIA::NUM sLen = GAIA::LOCALE::m2w(p, sSrcLen, (GAIA::WCH*)this->fptr(), sSrcLen, ct);
