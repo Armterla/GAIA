@@ -979,6 +979,8 @@ namespace GAIA
 				strResp += "\tMaxAllocSize = "; strResp += memstatus.nMaxAllocSize; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, memstatus.nMaxAllocSize); strResp += "\n";
 				strResp += "\tNotReleaseSize = "; strResp += memstatus.nAllocSizeSum - memstatus.nReleaseSizeSum; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, memstatus.nAllocSizeSum - memstatus.nReleaseSizeSum); strResp += "\n";
 				strResp += "\tNotReleaseCount = "; strResp += memstatus.nAllocTimesSum - memstatus.nReleaseTimesSum; strResp += "\n";
+				strResp += "\tMinLoc = "; strResp += memstatus.pszMinAllocFileName; strResp += "("; strResp += memstatus.sMinAllocCodeLine; strResp += ")\n";
+				strResp += "\tMaxLoc = "; strResp += memstatus.pszMaxAllocFileName; strResp += "("; strResp += memstatus.sMaxAllocCodeLine; strResp += ")\n";
 			#else
 				strResp += "GAIA_DEBUG_MEMORYLEAK is not define, so can't collect memory infomation.\n";
 			#endif

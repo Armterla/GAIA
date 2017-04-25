@@ -1,4 +1,4 @@
-﻿#ifndef		__GAIA_ALLOCATOR_LEAKDETECTOR_H__
+#ifndef		__GAIA_ALLOCATOR_LEAKDETECTOR_H__
 #define		__GAIA_ALLOCATOR_LEAKDETECTOR_H__
 
 #include "gaia_type.h"
@@ -51,6 +51,10 @@ namespace GAIA
 					nReleaseTimesSum = 0;
 					nMinAllocSize = +(GAIA::N64)0x4000000000000000;
 					nMaxAllocSize = -(GAIA::N64)0x4000000000000000;
+					pszMinAllocFileName = GNIL;
+					pszMaxAllocFileName = GNIL;
+					sMinAllocCodeLine = GINVALID;
+					sMaxAllocCodeLine = GINVALID;
 				}
 				GINL GAIA::BL isreset() const
 				{
@@ -66,6 +70,14 @@ namespace GAIA
 						return GAIA::False;
 					if(nMaxAllocSize != -(GAIA::N64)0x4000000000000000)
 						return GAIA::False;
+					if(pszMinAllocFileName != GNIL)
+						return GAIA::False;
+					if(pszMaxAllocFileName != GNIL)
+						return GAIA::False;
+					if(sMinAllocCodeLine != GINVALID)
+						return GAIA::False;
+					if(sMaxAllocCodeLine != GINVALID)
+						return GAIA::False;
 					return GAIA::True;
 				}
 				GINL GAIA::GVOID diff(const GAIA::MSYS::LeakDetector::Status& older)
@@ -76,6 +88,10 @@ namespace GAIA
 					nReleaseTimesSum -= older.nReleaseTimesSum;
 					nMinAllocSize = 0;
 					nMaxAllocSize = 0;
+					pszMinAllocFileName = GNIL;
+					pszMaxAllocFileName = GNIL;
+					sMinAllocCodeLine = GINVALID;
+					sMaxAllocCodeLine = GINVALID;
 				}
 			public:
 				GAIA::N64 nAllocSizeSum;
@@ -84,6 +100,10 @@ namespace GAIA
 				GAIA::N64 nReleaseTimesSum;
 				GAIA::N64 nMinAllocSize;
 				GAIA::N64 nMaxAllocSize;
+				const GAIA::CH* pszMinAllocFileName;
+				const GAIA::CH* pszMaxAllocFileName;
+				GAIA::NUM sMinAllocCodeLine;
+				GAIA::NUM sMaxAllocCodeLine;
 			};
 			class NodeBase
 			{
@@ -127,11 +147,28 @@ namespace GAIA
 				{
 					if(m_bGlobalStatus)
 						m_stm << "Global Memory Status:\n";
-					m_stm << "\t" << "Leak count and size = " << s.nAllocTimesSum - s.nReleaseTimesSum << "/" << s.nAllocSizeSum - s.nReleaseSizeSum << "\n";
-					m_stm << "\t" << "Alloc count and size = " << s.nAllocTimesSum << "/" << s.nAllocSizeSum << "\n";
-					m_stm << "\t" << "Release count and size = " << s.nReleaseTimesSum << "/" << s.nReleaseSizeSum << "\n";
+					
+					GAIA::CH szLeakSize[64];
+					GAIA::CH szAllocSize[64];
+					GAIA::CH szReleaseSize[64];
+					GAIA::CH szMinAllocSize[64];
+					GAIA::CH szMaxAllocSize[64];
+					GAIA_INTERNAL_NAMESPACE::gstrbycapacity(szLeakSize, s.nAllocSizeSum - s.nReleaseSizeSum);
+					GAIA_INTERNAL_NAMESPACE::gstrbycapacity(szAllocSize, s.nAllocSizeSum);
+					GAIA_INTERNAL_NAMESPACE::gstrbycapacity(szReleaseSize, s.nReleaseSizeSum);
+					GAIA_INTERNAL_NAMESPACE::gstrbycapacity(szMinAllocSize, s.nMinAllocSize);
+					GAIA_INTERNAL_NAMESPACE::gstrbycapacity(szMaxAllocSize, s.nMaxAllocSize);
+					
+					m_stm << "\t" << "Leak count and size = " << s.nAllocTimesSum - s.nReleaseTimesSum << "/" << s.nAllocSizeSum - s.nReleaseSizeSum << " as " << szLeakSize << "\n";
+					m_stm << "\t" << "Alloc count and size = " << s.nAllocTimesSum << "/" << s.nAllocSizeSum << " as " << szAllocSize  << "\n";
+					m_stm << "\t" << "Release count and size = " << s.nReleaseTimesSum << "/" << s.nReleaseSizeSum << " as " << szReleaseSize  << "\n";
 					if(s.nMinAllocSize <= s.nMaxAllocSize)
-						m_stm << "\t" << "Min = " << s.nMinAllocSize << " Max = " << s.nMaxAllocSize << "\n";
+					{
+						m_stm << "\t" << "Min = " << s.nMinAllocSize << " as " << szMinAllocSize 
+									<< ", Max = " << s.nMaxAllocSize << " as " << szMaxAllocSize << "\n";
+						m_stm << "\t" << "MinLoc = " << s.pszMinAllocFileName << "(" << s.sMinAllocCodeLine << ")" << "\n";
+						m_stm << "\t" << "MaxLoc = " << s.pszMaxAllocFileName << "(" << s.sMaxAllocCodeLine << ")" << "\n";
+					}
 					else
 						m_stm << "\t" << "No min and max info" << "\n";
 					m_stm << "\n";
@@ -261,17 +298,33 @@ namespace GAIA
 				n.status.nAllocSizeSum += uSize;
 				n.status.nAllocTimesSum++;
 				if((GAIA::N64)uSize < n.status.nMinAllocSize)
+				{
 					n.status.nMinAllocSize = uSize;
+					n.status.pszMinAllocFileName = pszFileName;
+					n.status.sMinAllocCodeLine = nCodeLine;
+				}
 				if((GAIA::N64)uSize > n.status.nMaxAllocSize)
+				{
 					n.status.nMaxAllocSize = uSize;
+					n.status.pszMaxAllocFileName = pszFileName;
+					n.status.sMaxAllocCodeLine = nCodeLine;
+				}
 
 				// Update global status.
 				m_snapshot.gstatus.nAllocSizeSum += uSize;
 				m_snapshot.gstatus.nAllocTimesSum++;
 				if((GAIA::N64)uSize < m_snapshot.gstatus.nMinAllocSize)
+				{
 					m_snapshot.gstatus.nMinAllocSize = uSize;
+					m_snapshot.gstatus.pszMinAllocFileName = pszFileName;
+					m_snapshot.gstatus.sMinAllocCodeLine = nCodeLine;
+				}
 				if((GAIA::N64)uSize > m_snapshot.gstatus.nMaxAllocSize)
+				{
 					m_snapshot.gstatus.nMaxAllocSize = uSize;
+					m_snapshot.gstatus.pszMaxAllocFileName = pszFileName;
+					m_snapshot.gstatus.sMaxAllocCodeLine = nCodeLine;
+				}
 			}
 			GINL GAIA::GVOID release(const GAIA::GVOID* p)
 			{
@@ -296,17 +349,17 @@ namespace GAIA
 				n.status.nReleaseSizeSum += anref.size;
 				n.status.nReleaseTimesSum++;
 				if((GAIA::N64)anref.size < n.status.nMinAllocSize)
-					n.status.nMinAllocSize = anref.size;
+					GASTFALSE;
 				if((GAIA::N64)anref.size > n.status.nMaxAllocSize)
-					n.status.nMaxAllocSize = anref.size;
+					GASTFALSE;
 
 				// Update global status.
 				m_snapshot.gstatus.nReleaseSizeSum += anref.size;
 				m_snapshot.gstatus.nReleaseTimesSum++;
 				if((GAIA::N64)anref.size < m_snapshot.gstatus.nMinAllocSize)
-					m_snapshot.gstatus.nMinAllocSize = anref.size;
+					GASTFALSE;
 				if((GAIA::N64)anref.size > m_snapshot.gstatus.nMaxAllocSize)
-					m_snapshot.gstatus.nMaxAllocSize = anref.size;
+					GASTFALSE;
 
 				//
 				m_snapshot.allocnodes.erase(it);

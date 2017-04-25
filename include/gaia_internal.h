@@ -125,6 +125,123 @@ namespace GAIA_INTERNAL_NAMESPACE
 		}
 		return pDst;
 	}
+	template<typename _DataType1, typename _DataType2, typename _SizeType>
+	GAIA::GVOID move_right(_DataType1 dst, _DataType2 src, const _SizeType& size)
+	{
+		_SizeType sizetemp = size;
+		while(sizetemp > 0)
+		{
+			*dst = *src;
+			--dst;
+			--src;
+			--sizetemp;
+		}
+	}
+	template<typename _DataType1, typename _DataType2, typename _DataType3, typename _DataType4>
+	_DataType1 insert(_DataType1 dst, _DataType2 size, _DataType3 src, _DataType4 index)
+	{
+		if(index != size)
+			GAIA_INTERNAL_NAMESPACE::move_right(dst + size, dst + size - 1, size - index);
+		dst[index] = src;
+		return dst;
+	}
+	template<typename _DataType> GAIA::GVOID swap(_DataType& t1, _DataType& t2)
+	{
+		_DataType t = t2;
+		t2 = t1;
+		t1 = t;
+	}
+	template<typename _DataType> GAIA::GVOID inverse(_DataType pBegin, _DataType pEnd)
+	{
+		GAST(!!pBegin);
+		GAST(!!pEnd);
+		while(pBegin != pEnd)
+		{
+			GAIA_INTERNAL_NAMESPACE::swap(*pBegin, *pEnd);
+			++pBegin;
+			if(pBegin == pEnd)
+				break;
+			--pEnd;
+		}
+	}
+	template<typename _SrcDataType, typename _DstDataType>
+	_DstDataType int2str(const _SrcDataType& src, _DstDataType pDst)
+	{
+		_SrcDataType tsrc = src;
+		_DstDataType p = pDst;
+		if(src < (_SrcDataType)0)
+		{
+		#ifdef GAIA_DEBUG_WARNING
+		#	if GAIA_COMPILER == GAIA_COMPILER_VC
+		#		pragma warning(disable : 4146)
+		#	endif
+		#endif
+			tsrc = -tsrc;
+		#ifdef GAIA_DEBUG_WARNING
+		#	if GAIA_COMPILER == GAIA_COMPILER_VC
+		#		pragma warning(default : 4146)
+		#	endif
+		#endif
+			*p = '-';
+			++p;
+		}
+		while(tsrc > 0)
+		{
+			*p = (tsrc % 10 + '0');
+			tsrc /= 10;
+			++p;
+		}
+		if(p == pDst)
+		{
+			*p = '0';
+			++p;
+		}
+		else
+			GAIA_INTERNAL_NAMESPACE::inverse(*pDst == '-' ? pDst + 1 : pDst, p - 1);
+		*p = '\0';
+		return p + 1;
+	}
+	template<typename _DataType1, typename _DataType2>
+	_DataType1 gstrbycapacity(_DataType1 dst, _DataType2 storagesize)
+	{
+		GAIA::CH szUnit[32];
+		if(storagesize >= 1024 * 1024 * 1024)
+		{
+			storagesize = storagesize / 1024 / 1024 * 1000 / 1024;
+			GAIA_INTERNAL_NAMESPACE::gstrcpy(szUnit, "(GB)");
+		}
+		else if(storagesize >= 1024 * 1024)
+		{
+			storagesize = storagesize / 1024 * 100 / 1024;
+			GAIA_INTERNAL_NAMESPACE::gstrcpy(szUnit, "(MB)");
+		}
+		else if(storagesize >= 1024)
+		{
+			storagesize = storagesize * 10 / 1024;
+			GAIA_INTERNAL_NAMESPACE::gstrcpy(szUnit, "(KB)");
+		}
+		else
+			GAIA_INTERNAL_NAMESPACE::gstrcpy(szUnit, "(Bytes)");
+		GAIA_INTERNAL_NAMESPACE::int2str(storagesize, dst);
+		GAIA::NUM sLen = GAIA_INTERNAL_NAMESPACE::gstrlen(dst);
+		if(szUnit[1] == 'G')
+		{
+			insert(dst, sLen, '.', sLen - 3);
+			++sLen;
+		}
+		else if(szUnit[1] == 'M')
+		{
+			insert(dst, sLen, '.', sLen - 2);
+			++sLen;
+		}
+		else if(szUnit[1] == 'K')
+		{
+			insert(dst, sLen, '.', sLen - 1);
+			++sLen;
+		}
+		GAIA_INTERNAL_NAMESPACE::gstrcpy(dst + sLen, szUnit);
+		return dst;
+	}
 }
 
 #endif
