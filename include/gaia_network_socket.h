@@ -38,6 +38,8 @@ namespace GAIA
 				SOCKET_OPTION_REUSEPORT,
 				SOCKET_OPTION_TCPNODELAY,
 				SOCKET_OPTION_KEEPALIVE,
+				SOCKET_OPTION_SENDTIMEOUT,
+				SOCKET_OPTION_RECVTIMEOUT,
 			GAIA_ENUM_END(SOCKET_OPTION)
 
 			/*!
@@ -306,6 +308,8 @@ namespace GAIA
 			GAIA::NETWORK::Socket::SOCKET_TYPE m_SockType;
 			GAIA::N32 m_nSendBufferSize;
 			GAIA::N32 m_nRecvBufferSize;
+			GAIA::N32 m_nSendTimeout;
+			GAIA::N32 m_nRecvTimeout;
 			GAIA::NETWORK::Addr m_addrBinded;
 			GAIA::NETWORK::Addr m_addrPeer;
 			GAIA::BL m_bBinded : 1;
