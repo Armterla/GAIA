@@ -73,6 +73,11 @@ namespace GAIA
 					if(descSvr.nAcceptedSocketRecvBufferSize != GINVALID)
 						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, descSvr.nAcceptedSocketRecvBufferSize);
 				}
+				
+				if(descSvr.nSocketSendTimeout != GINVALID)
+					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDTIMEOUT, descSvr.nSocketSendTimeout);
+				if(descSvr.nSocketRecvTimeout != GINVALID)
+					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVTIMEOUT, descSvr.nSocketRecvTimeout);
 			}
 
 			virtual GAIA::N32 Send(const GAIA::GVOID* p, GAIA::N32 nSize)
@@ -937,6 +942,8 @@ namespace GAIA
 				strResp += "\tEnableSocketTCPNoDelay = "; strResp += descSvr.bEnableSocketTCPNoDelay; strResp += "\n";
 				strResp += "\tEnableSocketNoBlock = "; strResp += descSvr.bEnableSocketNoBlock; strResp += "\n";
 				strResp += "\tEnableSocketReuseAddr = "; strResp += descSvr.bEnableSocketReuseAddr; strResp += "\n";
+				strResp += "\tSocketSendTimeout = "; strResp += descSvr.nSocketSendTimeout; strResp += "\n";
+				strResp += "\tSocketRecvTimeout = "; strResp += descSvr.nSocketRecvTimeout; strResp += "\n";
 				strResp += "\tListenSocketSendBufferSize = "; strResp += descSvr.nListenSocketSendBufferSize; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, descSvr.nListenSocketSendBufferSize); strResp += "\n";
 				strResp += "\tListenSocketRecvBufferSize = "; strResp += descSvr.nListenSocketRecvBufferSize; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, descSvr.nListenSocketRecvBufferSize); strResp += "\n";
 				strResp += "\tAcceptedSocketSendBufferSize = "; strResp += descSvr.nAcceptedSocketSendBufferSize; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, descSvr.nAcceptedSocketSendBufferSize); strResp += "\n";

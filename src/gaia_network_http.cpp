@@ -92,6 +92,11 @@ namespace GAIA
 					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, descHttp.nSocketSendBufferSize);
 				if(descHttp.nSocketRecvBufferSize != GINVALID)
 					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, descHttp.nSocketRecvBufferSize);
+				
+				if(descHttp.nSocketSendTimeout != GINVALID)
+					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDTIMEOUT, descHttp.nSocketSendTimeout);
+				if(descHttp.nSocketRecvTimeout != GINVALID)
+					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVTIMEOUT, descHttp.nSocketRecvTimeout);
 			}
 
 		protected:

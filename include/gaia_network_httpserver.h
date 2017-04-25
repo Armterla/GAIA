@@ -106,6 +106,8 @@ namespace GAIA
 				bEnableSocketTCPNoDelay = GAIA::True;
 				bEnableSocketNoBlock = GAIA::False;
 				bEnableSocketReuseAddr = GAIA::True;
+				nSocketSendTimeout = GINVALID;
+				nSocketRecvTimeout = GINVALID;
 				nListenSocketSendBufferSize = GINVALID;
 				nListenSocketRecvBufferSize = GINVALID;
 				nAcceptedSocketSendBufferSize = GINVALID;
@@ -141,6 +143,10 @@ namespace GAIA
 				if(sHttpVerLen <= 0)
 					return GAIA::False;
 				if(GAIA::ALGO::gstrlen(szHttpVer) != sHttpVerLen)
+					return GAIA::False;
+				if(nSocketSendTimeout != GINVALID && nSocketSendTimeout <= 0)
+					return GAIA::False;
+				if(nSocketRecvTimeout != GINVALID && nSocketRecvTimeout <= 0)
 					return GAIA::False;
 				if(nListenSocketSendBufferSize != GINVALID && nListenSocketSendBufferSize <= 0)
 					return GAIA::False;
@@ -257,6 +263,16 @@ namespace GAIA
 				@brief Specify the socket RE-USE-ADDRESS mode, default is GAIA::False.
 			*/
 			GAIA::BL bEnableSocketReuseAddr;
+			
+			/*!
+			 	@brief Specify the socket's send timeout in milliseconds, default is GINVALID means use system default setting.
+			*/
+			GAIA::N32 nSocketSendTimeout;
+			
+			/*!
+			 	@brief Specify the socket's recv timeout in milliseconds, default is GINVALID means use system default setting.
+			*/
+			GAIA::N32 nSocketRecvTimeout;
 
 			/*!
 				@brief Specify the listen socket's send buffer size in bytes, default is GINVALID means use system default setting.

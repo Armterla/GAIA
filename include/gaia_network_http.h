@@ -792,6 +792,8 @@ namespace GAIA
 				bEnableSocketReuseAddr = GAIA::True;
 				nSocketSendBufferSize = GINVALID;
 				nSocketRecvBufferSize = GINVALID;
+				nSocketSendTimeout = GINVALID;
+				nSocketRecvTimeout = GINVALID;
 				sMaxCookicCount = DEFAULT_MAX_COOKIC_COUNT;
 				sMaxCookicSize = DEFAULT_MAX_COOKIC_SIZE;
 			}
@@ -822,6 +824,10 @@ namespace GAIA
 				if(nSocketSendBufferSize != GINVALID && nSocketSendBufferSize <= 0)
 					return GAIA::False;
 				if(nSocketRecvBufferSize != GINVALID && nSocketRecvBufferSize <= 0)
+					return GAIA::False;
+				if(nSocketSendTimeout != GINVALID && nSocketSendTimeout <= 0)
+					return GAIA::False;
+				if(nSocketRecvTimeout != GINVALID && nSocketRecvTimeout <= 0)
 					return GAIA::False;
 				if(sMaxCookicCount < 0)
 					return GAIA::False;
@@ -899,6 +905,16 @@ namespace GAIA
 				@brief Specify the socket's receive buffer size in bytes, default is GINVALID means use system default setting.
 			*/
 			GAIA::N32 nSocketRecvBufferSize;
+			
+			/*!
+			 	@brief Specify the socket's send timeout in milliseconds, default is GINVALID means use system default setting.
+			*/
+			GAIA::N32 nSocketSendTimeout;
+			
+			/*!
+			 	@brief Specify the socket's recv timeout in milliseconds, default is GINVALID means use system default setting.
+			*/
+			GAIA::N32 nSocketRecvTimeout;
 
 			/*!
 				@brief Specify the max cookic count, default value is DEFAULT_MAX_COOKIC_COUNT.
