@@ -547,7 +547,7 @@ namespace GAIA
 				return PDF_LINE_CAP_ROUND;
 			else if(cap == HPDF_PROJECTING_SCUARE_END)
 				return PDF_LINE_CAP_SCUARE;
-			GTHROW(Illegal);
+			GTHROW_RET(Illegal, GAIA::DOC::PDF_LINE_CAP_INVALID);
 		}
 		GAIA::GVOID PDFWriter::SetLineJoin(GAIA::DOC::PDF_LINE_JOIN m)
 		{
@@ -573,13 +573,12 @@ namespace GAIA
 			else if(join == HPDF_BEVEL_JOIN)
 				return PDF_LINE_JOIN_BEVEL;
 			else
-				GTHROW(InvalidParam);
+				GTHROW_RET(InvalidParam, GAIA::DOC::PDF_LINE_JOIN_INVALID);
 		}
 		GAIA::GVOID PDFWriter::SetDash(const GAIA::U16* pPattern, GAIA::U32 uCount, GAIA::U32 uPhase)
 		{
 			if(HPDF_Page_SetDash(m_ctx->page, pPattern, uCount, uPhase) != HPDF_OK)
 				GTHROW(Illegal);
-
 		}
 		GAIA::GVOID PDFWriter::GetDash(GAIA::U16* pPattern, GAIA::U32& uCount, GAIA::U32& uPhase) const
 		{
@@ -833,7 +832,7 @@ namespace GAIA
 			else if(pracmode == HPDF_CLIPPING)
 				return GAIA::DOC::PDF_TEXT_RENDER_MODE_CLIP;
 			else
-				GTHROW(Illegal);
+				GTHROW_RET(Illegal, GAIA::DOC::PDF_TEXT_RENDER_MODE_INVALID);
 		}
 		GAIA::GVOID PDFWriter::MoveTextTo(GAIA::REAL x, GAIA::REAL y)
 		{
@@ -1025,7 +1024,11 @@ namespace GAIA
 				bpc = 8;
 			}
 			else
+			{
+				cs = HPDF_CS_EOF;
+				bpc = 0;
 				GTHROW(InvalidParam);
+			}
 			HPDF_Image img = HPDF_LoadRawImageFromMem(m_ctx->doc, (const HPDF_BYTE*)pBuf, sBufWidth, sBufHeight, cs, bpc);
 			if(img == GNIL)
 				GTHROW(Illegal);
