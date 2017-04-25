@@ -404,8 +404,14 @@ namespace GAIA
 					if(m_nSendTimeout == (GAIA::N32)v)
 						return;
 					m_nSendTimeout = v;
+				#if GAIA_OS == GAIA_OS_WINDOWS
 					if(setsockopt(m_nSocket, SOL_SOCKET, SO_SNDTIMEO, (GAIA::CH*)&m_nSendTimeout, sizeof(m_nSendTimeout)) != 0)
 						THROW_LASTERROR;
+				#else
+					struct timeval tv = {m_nSendTimeout / 1000, (m_nSendTimeout % 1000) * 1000};
+					if(setsockopt(m_nSocket, SOL_SOCKET, SO_SNDTIMEO, (GAIA::CH*)&tv, sizeof(tv)) != 0)
+						THROW_LASTERROR;
+				#endif
 				}
 				break;
 			case GAIA::NETWORK::Socket::SOCKET_OPTION_RECVTIMEOUT:
@@ -413,8 +419,14 @@ namespace GAIA
 					if(m_nRecvTimeout == (GAIA::N32)v)
 						return;
 					m_nRecvTimeout = v;
+				#if GAIA_OS == GAIA_OS_WINDOWS
 					if(setsockopt(m_nSocket, SOL_SOCKET, SO_RCVTIMEO, (GAIA::CH*)&m_nRecvTimeout, sizeof(m_nRecvTimeout)) != 0)
 						THROW_LASTERROR;
+				#else
+					struct timeval tv = {m_nSendTimeout / 1000, (m_nSendTimeout % 1000) * 1000};
+					if(setsockopt(m_nSocket, SOL_SOCKET, SO_RCVTIMEO, (GAIA::CH*)&tv, sizeof(tv)) != 0)
+						THROW_LASTERROR;
+				#endif
 				}
 				break;
 			default:
