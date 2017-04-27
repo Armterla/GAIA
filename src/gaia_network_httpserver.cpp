@@ -1549,7 +1549,7 @@ namespace GAIA
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(HttpServer*)(this)->m_rwBlackList);
 			GAIA::BL bExist = GAIA::False;
-			for(GAIA::CTN::Set<GAIA::NETWORK::HttpServerBlackWhiteNode>::const_it it = m_WhiteList.const_frontit(); !it.empty(); ++it)
+			for(GAIA::CTN::Set<GAIA::NETWORK::HttpServerBlackWhiteNode>::const_it it = m_BlackList.const_frontit(); !it.empty(); ++it)
 			{
 				listResult.push_back(*it);
 				bExist = GAIA::True;
@@ -1604,7 +1604,7 @@ namespace GAIA
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(HttpServer*)(this)->m_rwWhiteList);
 			GAIA::BL bExist = GAIA::False;
-			for(GAIA::CTN::Set<GAIA::NETWORK::HttpServerBlackWhiteNode>::const_it it = m_BlackList.const_frontit(); !it.empty(); ++it)
+			for(GAIA::CTN::Set<GAIA::NETWORK::HttpServerBlackWhiteNode>::const_it it = m_WhiteList.const_frontit(); !it.empty(); ++it)
 			{
 				listResult.push_back(*it);
 				bExist = GAIA::True;
