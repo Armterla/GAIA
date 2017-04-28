@@ -3,6 +3,7 @@
 
 #include "gaia_type.h"
 #include "gaia_assert.h"
+#include "gaia_algo_string.h"
 
 namespace GAIA
 {

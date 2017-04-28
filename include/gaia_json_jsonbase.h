@@ -1,8 +1,10 @@
-﻿#ifndef		__GAIA_JSON_JSONBASE_H__
+#ifndef		__GAIA_JSON_JSONBASE_H__
 #define		__GAIA_JSON_JSONBASE_H__
 
 #include "gaia_type.h"
 #include "gaia_assert.h"
+#include "gaia_algo_string.h"
+#include "gaia_ctn_arrayvector.h"
 
 namespace GAIA
 {
@@ -268,6 +270,359 @@ namespace GAIA
 				return GAIA::False;
 			}
 			return GAIA::True;
+		}
+		
+		template<typename _DataType> GAIA::NUM JsonChangeFormat(const _DataType* pSrc, GAIA::NUM sSrcLen, _DataType* pDst, GAIA::NUM sDstLen, GAIA::JSON::JSON_SAVE savetype)
+		{
+		#define JSONCHANGEFORMAT_CHECKSIZE do{if(sRet >= sDstLen)return GINVALID;}while(0)
+			
+			// Parameter checkup.
+			GPCHR_FALSE_RET(pSrc != GNIL, GINVALID);
+			GPCHR_FALSE_RET(sSrcLen > 0, GINVALID);
+			GPCHR_FALSE_RET(savetype > GAIA::JSON::JSON_SAVE_INVALID && savetype < GAIA::JSON::JSON_SAVE_MAXENUMCOUNT, GINVALID);
+			if(pDst == GNIL)
+				GPCHR_FALSE_RET(sDstLen == 0, GINVALID);
+			else
+				GPCHR_FALSE_RET(sDstLen != 0, GINVALID);
+			GPCHR_FALSE_RET(sDstLen >= 0, GINVALID);
+			
+			// Local variables.
+			GAIA::NUM sRet = 0;
+			
+			// 
+			if(savetype == GAIA::JSON::JSON_SAVE_BESTSIZE)
+			{
+				if(pDst == GNIL) // Calculate size mode.
+				{
+					GAIA::BL bInString = GAIA::False;
+					for(GAIA::NUM x = 0; x < sSrcLen; ++x)
+					{
+						if(pSrc[x] == '\"')
+						{
+							if(x == 0 || pSrc[x - 1] != '\\')
+								bInString = !bInString;
+							sRet++;
+						}
+						else
+						{
+							if(bInString)
+								sRet++;
+							else
+							{
+								if(pSrc[x] > ' ')
+									sRet++;
+							}
+						}
+					}
+				}
+				else // Fill mode.
+				{
+					GAIA::BL bInString = GAIA::False;
+					for(GAIA::NUM x = 0; x < sSrcLen; ++x)
+					{
+						if(pSrc[x] == '\"')
+						{
+							if(x == 0 || pSrc[x - 1] != '\\')
+								bInString = !bInString;
+							JSONCHANGEFORMAT_CHECKSIZE;
+							pDst[sRet++] = pSrc[x];
+						}
+						else
+						{
+							if(bInString)
+							{
+								JSONCHANGEFORMAT_CHECKSIZE;
+								pDst[sRet++] = pSrc[x];
+							}
+							else
+							{
+								if(pSrc[x] > ' ')
+								{
+									JSONCHANGEFORMAT_CHECKSIZE;
+									pDst[sRet++] = pSrc[x];
+								}
+							}
+						}
+					}
+				}
+			}
+			else if(savetype == GAIA::JSON::JSON_SAVE_BESTREAD)
+			{
+				// Structure information collect.
+				static const GAIA::U8 LEFT = 0x01;
+				static const GAIA::U8 RIGHT = 0x02;
+				GAIA::CTN::ArrayVector<GAIA::U8, 1024> listStructure;
+				{
+					GAIA::BL bInString = GAIA::False;
+					for(GAIA::NUM x = 0; x < sSrcLen; ++x)
+					{
+						if(pSrc[x] == '\"')
+						{
+							if(x == 0 || pSrc[x - 1] != '\\')
+								bInString = !bInString;
+						}
+						else
+						{
+							if(pSrc[x] == '{' || pSrc[x] == '[')
+							{
+								GAIA::U8 uFlag = LEFT;
+								if(!bInString)
+									listStructure.push_back(uFlag);
+							}
+							else if(pSrc[x] == '}' || pSrc[x] == ']')
+							{
+								GAIA::U8 uFlag = RIGHT;
+								if(!bInString)
+									listStructure.push_back(uFlag);
+							}
+						}
+					}
+				}
+				
+				// Generate destination.
+				const GAIA::CH szLineBreak[] = GAIA_FILELINEBREAK;
+				GAIA::NUM sDepth = 0;
+				GAIA::NUM sCursor = 0;
+				GAIA::BL bInString = GAIA::False;
+				GAIA::BL bSingleLine = GAIA::False;
+				if(pDst == GNIL) // Calculate size mode.
+				{
+					for(GAIA::NUM x = 0; x < sSrcLen; ++x)
+					{
+						GAIA::BL bNeedWriteSrc = GAIA::True;
+						if(pSrc[x] == '\"')
+						{
+							if(x == 0 || pSrc[x - 1] != '\\')
+								bInString = !bInString;
+						}
+						else
+						{
+							if(!bInString)
+							{
+								if(pSrc[x] == '{' || pSrc[x] == '[')
+								{
+									//
+									GAST(listStructure[sCursor] == LEFT);
+									sCursor++;
+									sDepth++;
+									
+									if(sCursor > 1)
+									{
+										for(GAIA::NUM x = 0; x < sizeof(szLineBreak) - 1; ++x)
+											sRet++;
+									}
+									for(GAIA::NUM x = 1; x < sDepth; ++x)
+										sRet++;
+									
+									if(sCursor < listStructure.size())
+									{
+										GAIA::U8 uNextFlag = listStructure[sCursor];
+										if(uNextFlag == RIGHT)
+											bSingleLine = GAIA::True;
+										else
+										{
+											sRet++;
+											bNeedWriteSrc = GAIA::False;
+											
+											bSingleLine = GAIA::False;
+											
+											for(GAIA::NUM x = 0; x < sizeof(szLineBreak) - 1; ++x)
+												sRet++;
+											for(GAIA::NUM x = 0; x < sDepth; ++x)
+												sRet++;
+										}
+									}
+								}
+								else if(pSrc[x] == '}' || pSrc[x] == ']')
+								{
+									if(sCursor > 0)
+									{
+										GAIA::U8 uPrevFlag = listStructure[sCursor - 1];
+										if(uPrevFlag == LEFT)
+											bSingleLine = GAIA::True;
+										else
+										{
+											bSingleLine = GAIA::False;
+											
+											for(GAIA::NUM x = 0; x < sizeof(szLineBreak) - 1; ++x)
+												sRet++;
+											for(GAIA::NUM x = 1; x < sDepth; ++x)
+												sRet++;
+										}
+									}
+									
+									GAST(listStructure[sCursor] == RIGHT);
+									sCursor++;
+									sDepth--;
+								}
+								else if(pSrc[x] == ',')
+								{
+									if(!bSingleLine)
+									{
+										bNeedWriteSrc = GAIA::False;
+										
+										sRet++;
+										
+										for(GAIA::NUM x = 0; x < sizeof(szLineBreak) - 1; ++x)
+											sRet++;
+										for(GAIA::NUM x = 0; x < sDepth; ++x)
+											sRet++;
+									}
+								}
+							}
+						}
+						
+						if(bNeedWriteSrc)
+							sRet++;
+					}
+				}
+				else // Fill mode.
+				{
+					for(GAIA::NUM x = 0; x < sSrcLen; ++x)
+					{
+						GAIA::BL bNeedWriteSrc = GAIA::True;
+						if(pSrc[x] == '\"')
+						{
+							if(x == 0 || pSrc[x - 1] != '\\')
+								bInString = !bInString;
+						}
+						else
+						{
+							if(!bInString)
+							{
+								if(pSrc[x] == '{' || pSrc[x] == '[')
+								{
+									GAST(listStructure[sCursor] == LEFT);
+									sCursor++;
+									sDepth++;
+									
+									if(sCursor > 1)
+									{
+										for(GAIA::NUM x = 0; x < sizeof(szLineBreak) - 1; ++x)
+										{
+											JSONCHANGEFORMAT_CHECKSIZE;
+											pDst[sRet++] = szLineBreak[x];
+										}
+									}
+									for(GAIA::NUM x = 1; x < sDepth; ++x)
+									{
+										JSONCHANGEFORMAT_CHECKSIZE;
+										pDst[sRet++] = '\t';
+									}
+									
+									if(sCursor < listStructure.size())
+									{
+										GAIA::U8 uNextFlag = listStructure[sCursor];
+										if(uNextFlag == RIGHT)
+											bSingleLine = GAIA::True;
+										else
+										{
+											JSONCHANGEFORMAT_CHECKSIZE;
+											pDst[sRet++] = pSrc[x];
+											bNeedWriteSrc = GAIA::False;
+											
+											bSingleLine = GAIA::False;
+											
+											for(GAIA::NUM x = 0; x < sizeof(szLineBreak) - 1; ++x)
+											{
+												JSONCHANGEFORMAT_CHECKSIZE;
+												pDst[sRet++] = szLineBreak[x];
+											}
+											for(GAIA::NUM x = 0; x < sDepth; ++x)
+											{
+												JSONCHANGEFORMAT_CHECKSIZE;
+												pDst[sRet++] = '\t';
+											}
+										}
+									}
+								}
+								else if(pSrc[x] == '}' || pSrc[x] == ']')
+								{
+									if(sCursor > 0)
+									{
+										GAIA::U8 uPrevFlag = listStructure[sCursor - 1];
+										if(uPrevFlag == LEFT)
+											bSingleLine = GAIA::True;
+										else
+										{
+											bSingleLine = GAIA::False;
+											for(GAIA::NUM x = 0; x < sizeof(szLineBreak) - 1; ++x)
+											{
+												JSONCHANGEFORMAT_CHECKSIZE;
+												pDst[sRet++] = szLineBreak[x];
+											}
+											for(GAIA::NUM x = 1; x < sDepth; ++x)
+											{
+												JSONCHANGEFORMAT_CHECKSIZE;
+												pDst[sRet++] = '\t';
+											}
+										}
+									}
+									
+									GAST(listStructure[sCursor] == RIGHT);
+									sCursor++;
+									sDepth--;
+								}
+								else if(pSrc[x] == ',')
+								{
+									if(!bSingleLine)
+									{
+										bNeedWriteSrc = GAIA::False;
+										
+										JSONCHANGEFORMAT_CHECKSIZE;
+										pDst[sRet++] = pSrc[x];
+										
+										for(GAIA::NUM x = 0; x < sizeof(szLineBreak) - 1; ++x)
+										{
+											JSONCHANGEFORMAT_CHECKSIZE;
+											pDst[sRet++] = szLineBreak[x];
+										}
+										for(GAIA::NUM x = 0; x < sDepth; ++x)
+										{
+											JSONCHANGEFORMAT_CHECKSIZE;
+											pDst[sRet++] = '\t';
+										}
+									}
+								}
+							}
+						}
+						
+						if(bNeedWriteSrc)
+						{
+							JSONCHANGEFORMAT_CHECKSIZE;
+							pDst[sRet++] = pSrc[x];
+						}
+					}
+				}
+			}
+			else
+				GASTFALSE;
+			
+			// Return.
+			return sRet;
+		}
+		
+		GINL GAIA::NUM JsonChangeFormat(const GAIA::TCH* pszSrcFileName, const GAIA::TCH* pszDstFileName, GAIA::JSON::JSON_SAVE savetype)
+		{
+			// Parameter checkup.
+			GPCHR_FALSE_RET(!GAIA::ALGO::gstremp(pszSrcFileName), GINVALID);
+			GPCHR_FALSE_RET(savetype > GAIA::JSON::JSON_SAVE_INVALID && savetype < GAIA::JSON::JSON_SAVE_MAXENUMCOUNT, GINVALID);
+
+			// Local variables.
+			GAIA::NUM sRet = 0;
+			
+			// 
+			if(savetype == GAIA::JSON::JSON_SAVE_BESTSIZE)
+			{
+			}
+			else if(savetype == GAIA::JSON::JSON_SAVE_BESTREAD)
+			{
+			}
+			else
+				GASTFALSE;
+			
+			// Return.
+			return sRet;
 		}
 
 		class JsonFactoryHolder : public GAIA::Base

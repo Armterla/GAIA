@@ -112,6 +112,47 @@ namespace TEST
 	}
 	extern GAIA::GVOID t_json_json(GAIA::LOG::Log& logobj)
 	{
+		// Json format test.
+		{
+			const GAIA::CH SINGLELINE[] = "{\"aa\":true,\"bb\":false,\"cc\":[{\"a\":123,\"b\":456,\"c\":[]}]}";
+			
+			GAIA::CH szDst[1024];
+			GAIA::CH szDst1[1024];
+			GAIA::NUM sResult0 = GAIA::JSON::JsonChangeFormat(SINGLELINE, sizeof(SINGLELINE) - 1, (GAIA::CH*)GNIL, 0, GAIA::JSON::JSON_SAVE_BESTSIZE);
+			GAST(sResult0 != GINVALID);
+			GAIA::NUM sResult1 = GAIA::JSON::JsonChangeFormat(SINGLELINE, sizeof(SINGLELINE) - 1, szDst, sizeof(szDst), GAIA::JSON::JSON_SAVE_BESTSIZE);
+			GAST(sResult1 != GINVALID);
+			GAST(sResult0 == sResult1);
+			GAST(sResult0 == sizeof(SINGLELINE) - 1);
+			
+			sResult0 = GAIA::JSON::JsonChangeFormat(SINGLELINE, sizeof(SINGLELINE) - 1, (GAIA::CH*)GNIL, 0, GAIA::JSON::JSON_SAVE_BESTREAD);
+			GAST(sResult0 != GINVALID);
+			sResult1 = GAIA::JSON::JsonChangeFormat(SINGLELINE, sizeof(SINGLELINE) - 1, szDst, sizeof(szDst), GAIA::JSON::JSON_SAVE_BESTREAD);
+			GAST(sResult1 != GINVALID);
+			GAST(sResult0 == sResult1);
+			GAST(sResult0 > sizeof(SINGLELINE) - 1);
+			
+			GAIA::NUM sDstLen = sResult0;
+			
+			sResult0 = GAIA::JSON::JsonChangeFormat(szDst, sDstLen, (GAIA::CH*)GNIL, 0, GAIA::JSON::JSON_SAVE_BESTSIZE);
+			GAST(sResult0 != GINVALID);
+			sResult1 = GAIA::JSON::JsonChangeFormat(szDst, sDstLen, szDst1, sizeof(szDst1), GAIA::JSON::JSON_SAVE_BESTSIZE);
+			GAST(sResult1 != GINVALID);
+			GAST(sResult0 == sResult1);
+			GAST(sResult0 == sizeof(SINGLELINE) - 1);
+			
+			GAIA::NUM sDst1Len = sResult0;
+			
+			szDst[sDstLen] = '\0';
+			szDst1[sDst1Len] = '\0';
+			
+			GAST(GAIA::ALGO::gstrcmp(szDst1, SINGLELINE) == 0);
+			
+			g_gaia_stdstream << szDst << "\n";
+			g_gaia_stdstream << szDst1 << "\n";
+		}
+		
+		//
 		GAIA::JSON::JsonFactory fac;
 		GAIA::JSON::JsonFactoryDesc desc;
 		desc.reset();
