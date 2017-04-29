@@ -63,6 +63,18 @@ namespace GAIA
 			}
 			return GAIA::True;
 		}
+		
+		template<typename _DataType> GAIA::NUM HtmlChangeFormat(const _DataType* pSrc, GAIA::NUM sSrcLen, _DataType* pDst, GAIA::NUM sDstLen, GAIA::HTML::HTML_SAVE savetype)
+		{
+			GAIA::NUM sRet = 0;
+			return sRet;
+		}
+		
+		GINL GAIA::NUM HtmlChangeFormat(const GAIA::TCH* pszSrcFileName, const GAIA::TCH* pszDstFileName, GAIA::HTML::HTML_SAVE savetype)
+		{
+			GAIA::NUM sRet = 0;
+			return sRet;
+		}
 
 		class HtmlFactoryHolder : public GAIA::Base
 		{

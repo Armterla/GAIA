@@ -1,4 +1,4 @@
-﻿#ifndef		__GAIA_XML_XMLBASE_H__
+#ifndef		__GAIA_XML_XMLBASE_H__
 #define		__GAIA_XML_XMLBASE_H__
 
 #include "gaia_type.h"
@@ -414,6 +414,18 @@ namespace GAIA
 				return GAIA::False;
 			}
 			return GAIA::True;
+		}
+		
+		template<typename _DataType> GAIA::NUM XmlChangeFormat(const _DataType* pSrc, GAIA::NUM sSrcLen, _DataType* pDst, GAIA::NUM sDstLen, GAIA::XML::XML_SAVE savetype)
+		{
+			GAIA::NUM sRet = 0;
+			return sRet;
+		}
+		
+		GINL GAIA::NUM XmlChangeFormat(const GAIA::TCH* pszSrcFileName, const GAIA::TCH* pszDstFileName, GAIA::XML::XML_SAVE savetype)
+		{
+			GAIA::NUM sRet = 0;
+			return sRet;
 		}
 
 		class XmlFactoryHolder : public GAIA::Base
