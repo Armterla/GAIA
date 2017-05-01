@@ -3,31 +3,32 @@
 
 namespace GAIA
 {
-	namespace STREAM{};
-	namespace DBG{};
-	namespace ECT{};
-	namespace SYSTEM{};
-	namespace SYNC{};
-	namespace MATH{};
-	namespace MSYS{};
-	namespace ITERATOR{};
-	namespace ALGO{};
-	namespace CTN{};
-	namespace TIME{};
-	namespace THREAD{};
-	namespace PROCESS{};
-	namespace FSYS{};
-	namespace DIGIT{};
-	namespace NETWORK{};
-	namespace LOCALE{};
-	namespace LOG{};
-	namespace PHYS{};
-	namespace STATE{};
-	namespace TEST{};
-	namespace XML{};
-	namespace JSON{};
-	namespace DB{};
-	namespace MISC{};
+	namespace STREAM{}
+	namespace DBG{}
+	namespace ECT{}
+	namespace SYSTEM{}
+	namespace SYNC{}
+	namespace MATH{}
+	namespace MSYS{}
+	namespace ITERATOR{}
+	namespace ALGO{}
+	namespace CTN{}
+	namespace TIME{}
+	namespace THREAD{}
+	namespace PROCESS{}
+	namespace FSYS{}
+	namespace DIGIT{}
+	namespace NETWORK{}
+	namespace LOCALE{}
+	namespace LOG{}
+	namespace PHYS{}
+	namespace STATE{}
+	namespace TEST{}
+	namespace XML{}
+	namespace JSON{}
+	namespace DB{}
+	namespace MISC{}
+	namespace PATTERN{}
 }
 
 using namespace GAIA;
@@ -56,5 +57,6 @@ using namespace GAIA::XML;
 using namespace GAIA::JSON;
 using namespace GAIA::DB;
 using namespace GAIA::MISC;
+using namespace GAIA::PATTERN;
 
 #endif
