@@ -28,12 +28,14 @@ namespace GAIA
 		public:
 			typedef _SizeType _sizetype;
 		public:
-			typedef Extend1<_SizeType> __MyType;
+			typedef Extend2<_SizeType> __MyType;
 		public:
 			GINL _SizeType Increase(const _SizeType& size) const
 			{
 				GAST(size >= 0);
-				return GSCAST(_SizeType)(GAIA::ALGO::gmin(GSCAST(GAIA::NMAXTYPE)(size * 2 + 1), GSCAST(GAIA::NMAXTYPE)(1024 * 1024 * 10)));
+				_SizeType s = GSCAST(GAIA::NMAXTYPE)(size + 1);
+				s = GSCAST(_SizeType)(GAIA::ALGO::gmin(GSCAST(GAIA::NMAXTYPE)(s), GSCAST(GAIA::NMAXTYPE)(1024L * 1024L * 10L)));
+				return GSCAST(_SizeType)(size + s);
 			}
 		};
 		template<typename _SizeType> class ExtendGold
@@ -41,13 +43,14 @@ namespace GAIA
 		public:
 			typedef _SizeType _sizetype;
 		public:
-			typedef Extend1<_SizeType> __MyType;
+			typedef ExtendGold<_SizeType> __MyType;
 		public:
 			GINL _SizeType Increase(const _SizeType& size) const
 			{
 				GAST(size >= 0);
-				_SizeType ret = (_SizeType)((GAIA::MATH::GOLD + R(1.0)) * (GAIA::REAL)size) + 1;
-				return GSCAST(_SizeType)(GAIA::ALGO::gmin(GSCAST(GAIA::NMAXTYPE)(ret), GSCAST(GAIA::NMAXTYPE)(1024 * 1024 * 10)));
+				_SizeType s = GSCAST(_SizeType)(GAIA::MATH::GOLD * (GAIA::REAL)size) + 1;
+				s = GSCAST(_SizeType)(GAIA::ALGO::gmin(GSCAST(GAIA::NMAXTYPE)(s), GSCAST(GAIA::NMAXTYPE)(1024L * 1024L * 10L)));
+				return GSCAST(_SizeType)(size + s);
 			}
 		};
 	}
