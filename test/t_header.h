@@ -149,7 +149,6 @@ namespace TEST
 	extern GAIA::GVOID t_network_http(GAIA::LOG::Log& logobj);
 
 	extern GAIA::GVOID t_locale(GAIA::LOG::Log& logobj);
-	extern GAIA::GVOID t_locale_languagechinese(GAIA::LOG::Log& logobj);
 	
 	extern GAIA::GVOID t_pattern_stringindex(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_pattern_textindex(GAIA::LOG::Log& logobj);
@@ -319,7 +318,7 @@ namespace TEST
 			TITEM("Network: Network http test begin!"); t_network_http(logobj); TITEM("End"); TTEXT("\t");
 
 			TITEM("Locale: test begin!"); t_locale(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("Locale: LanguageChinese test begin!"); t_locale_languagechinese(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Locale: Language test begin!"); t_locale_language(logobj); TITEM("End"); TTEXT("\t");
 			
 			TITEM("Pattern: StringIndex test begin!"); t_pattern_stringindex(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Pattern: TextIndex test begin!"); t_pattern_textindex(logobj); TITEM("End"); TTEXT("\t");

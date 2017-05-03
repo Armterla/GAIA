@@ -318,7 +318,6 @@
 		1A4CE2A71EB7810B007AFD08 /* tperf_msys_heapesg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A4CE1721EB7810A007AFD08 /* tperf_msys_heapesg.cpp */; };
 		1A4CE2A91EB7829A007AFD08 /* t_pattern_stringindex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A4CE2A81EB7829A007AFD08 /* t_pattern_stringindex.cpp */; };
 		1A4CE2AB1EB78331007AFD08 /* t_pattern_textindex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A4CE2AA1EB78331007AFD08 /* t_pattern_textindex.cpp */; };
-		1A4CE2AD1EB78355007AFD08 /* t_locale_languagechinese.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A4CE2AC1EB78355007AFD08 /* t_locale_languagechinese.cpp */; };
 		3B3119D81E6D36CD009462C1 /* libiconv.2.4.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B3119D71E6D36CD009462C1 /* libiconv.2.4.0.tbd */; };
 		3B6B9C991E9FBA6E008CF1A0 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B6B9C981E9FBA6E008CF1A0 /* main.cpp */; };
 /* End PBXBuildFile section */
@@ -658,7 +657,6 @@
 		1A4CE1721EB7810A007AFD08 /* tperf_msys_heapesg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tperf_msys_heapesg.cpp; sourceTree = "<group>"; };
 		1A4CE2A81EB7829A007AFD08 /* t_pattern_stringindex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_pattern_stringindex.cpp; path = ../test/t_pattern_stringindex.cpp; sourceTree = SOURCE_ROOT; };
 		1A4CE2AA1EB78331007AFD08 /* t_pattern_textindex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_pattern_textindex.cpp; path = ../test/t_pattern_textindex.cpp; sourceTree = SOURCE_ROOT; };
-		1A4CE2AC1EB78355007AFD08 /* t_locale_languagechinese.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_locale_languagechinese.cpp; path = ../test/t_locale_languagechinese.cpp; sourceTree = SOURCE_ROOT; };
 		3B31161E1E6D3538009462C1 /* gaia_osx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gaia_osx; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3119D71E6D36CD009462C1 /* libiconv.2.4.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.4.0.tbd; path = usr/lib/libiconv.2.4.0.tbd; sourceTree = SDKROOT; };
 		3B6B9C981E9FBA6E008CF1A0 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = SOURCE_ROOT; };
@@ -1008,7 +1006,6 @@
 				1A4CE1721EB7810A007AFD08 /* tperf_msys_heapesg.cpp */,
 				1A4CE2A81EB7829A007AFD08 /* t_pattern_stringindex.cpp */,
 				1A4CE2AA1EB78331007AFD08 /* t_pattern_textindex.cpp */,
-				1A4CE2AC1EB78355007AFD08 /* t_locale_languagechinese.cpp */,
 			);
 			name = test;
 			path = ../test;
@@ -1284,7 +1281,6 @@
 				1A4CE1731EB7810A007AFD08 /* adler32.c in Sources */,
 				1A4CE2741EB7810A007AFD08 /* t_json_json.cpp in Sources */,
 				1A4CE2251EB7810A007AFD08 /* t_algo_base.cpp in Sources */,
-				1A4CE2AD1EB78355007AFD08 /* t_locale_languagechinese.cpp in Sources */,
 				1A4CE1BD1EB7810A007AFD08 /* hpdf_outline.c in Sources */,
 				1A4CE2191EB7810A007AFD08 /* pngset.c in Sources */,
 				1A4CE2711EB7810A007AFD08 /* t_img_jpeg.cpp in Sources */,

@@ -232,7 +232,6 @@
 #include	"gaia_network_http.h"
 
 #include 	"gaia_locale_language.h"
-#include 	"gaia_locale_languagechinese.h"
 
 #include 	"gaia_pattern_stringindex.h"
 #include 	"gaia_pattern_textindex.h"
