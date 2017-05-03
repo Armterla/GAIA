@@ -320,6 +320,7 @@
 		1A4CE2AB1EB78331007AFD08 /* t_pattern_textindex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A4CE2AA1EB78331007AFD08 /* t_pattern_textindex.cpp */; };
 		3B3119D81E6D36CD009462C1 /* libiconv.2.4.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B3119D71E6D36CD009462C1 /* libiconv.2.4.0.tbd */; };
 		3B6B9C991E9FBA6E008CF1A0 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B6B9C981E9FBA6E008CF1A0 /* main.cpp */; };
+		3BA2A7BD1EB99E0600B734EC /* t_locale_language.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BA2A7BC1EB99E0600B734EC /* t_locale_language.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -660,6 +661,7 @@
 		3B31161E1E6D3538009462C1 /* gaia_osx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gaia_osx; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3119D71E6D36CD009462C1 /* libiconv.2.4.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.4.0.tbd; path = usr/lib/libiconv.2.4.0.tbd; sourceTree = SDKROOT; };
 		3B6B9C981E9FBA6E008CF1A0 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = SOURCE_ROOT; };
+		3BA2A7BC1EB99E0600B734EC /* t_locale_language.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_locale_language.cpp; path = ../test/t_locale_language.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -955,6 +957,7 @@
 				1A4CE13F1EB7810A007AFD08 /* t_json_json.cpp */,
 				1A4CE1401EB7810A007AFD08 /* t_json_jsonreader.cpp */,
 				1A4CE1411EB7810A007AFD08 /* t_json_jsonwriter.cpp */,
+				3BA2A7BC1EB99E0600B734EC /* t_locale_language.cpp */,
 				1A4CE1421EB7810A007AFD08 /* t_locale.cpp */,
 				1A4CE1431EB7810A007AFD08 /* t_log_log.cpp */,
 				1A4CE1441EB7810A007AFD08 /* t_math_aabb.cpp */,
@@ -984,6 +987,8 @@
 				1A4CE15C1EB7810A007AFD08 /* t_network_httpserver.cpp */,
 				1A4CE15D1EB7810A007AFD08 /* t_network_socket.cpp */,
 				1A4CE15E1EB7810A007AFD08 /* t_network_sudpsocket.cpp */,
+				1A4CE2A81EB7829A007AFD08 /* t_pattern_stringindex.cpp */,
+				1A4CE2AA1EB78331007AFD08 /* t_pattern_textindex.cpp */,
 				1A4CE15F1EB7810A007AFD08 /* t_stream_stringstream.cpp */,
 				1A4CE1601EB7810A007AFD08 /* t_sync_atomic.cpp */,
 				1A4CE1611EB7810A007AFD08 /* t_sync_event.cpp */,
@@ -1000,12 +1005,10 @@
 				1A4CE16C1EB7810A007AFD08 /* t_xml_xmlwriter.cpp */,
 				1A4CE16D1EB7810A007AFD08 /* tp_compiler.cpp */,
 				1A4CE16E1EB7810A007AFD08 /* tp_objstatus.cpp */,
-				1A4CE16F1EB7810A007AFD08 /* tperf_ctn.cpp */,
 				1A4CE1701EB7810A007AFD08 /* tperf_ctn_avltree.cpp */,
 				1A4CE1711EB7810A007AFD08 /* tperf_ctn_dmpgraph.cpp */,
+				1A4CE16F1EB7810A007AFD08 /* tperf_ctn.cpp */,
 				1A4CE1721EB7810A007AFD08 /* tperf_msys_heapesg.cpp */,
-				1A4CE2A81EB7829A007AFD08 /* t_pattern_stringindex.cpp */,
-				1A4CE2AA1EB78331007AFD08 /* t_pattern_textindex.cpp */,
 			);
 			name = test;
 			path = ../test;
@@ -1187,6 +1190,7 @@
 				1A4CE2041EB7810A007AFD08 /* pcre_maketables.c in Sources */,
 				1A4CE2551EB7810A007AFD08 /* t_ctn_string.cpp in Sources */,
 				1A4CE1AF1EB7810A007AFD08 /* hpdf_fontdef_tt.c in Sources */,
+				3BA2A7BD1EB99E0600B734EC /* t_locale_language.cpp in Sources */,
 				1A4CE28E1EB7810A007AFD08 /* t_network_base.cpp in Sources */,
 				1A4CE1B41EB7810A007AFD08 /* hpdf_image_png.c in Sources */,
 				1A4CE2721EB7810A007AFD08 /* t_img_png.cpp in Sources */,

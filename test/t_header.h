@@ -149,6 +149,7 @@ namespace TEST
 	extern GAIA::GVOID t_network_http(GAIA::LOG::Log& logobj);
 
 	extern GAIA::GVOID t_locale(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_locale_language(GAIA::LOG::Log& logobj);
 	
 	extern GAIA::GVOID t_pattern_stringindex(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_pattern_textindex(GAIA::LOG::Log& logobj);
