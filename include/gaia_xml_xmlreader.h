@@ -187,7 +187,8 @@ namespace GAIA
 								GTHROW_RET(DataError, GNIL);
 							nt = GAIA::XML::XML_NODE_MULTICONTAINER;
 							nodenamelen = (_SizeType)(p - m_pCursor - 2);
-							pRet = m_pCursor + 2;
+							pRet = m_pCursor + 1;
+							GAST(*pRet == '/');
 
 							p = this->move_to_next(p);
 							if(*p != '>')
