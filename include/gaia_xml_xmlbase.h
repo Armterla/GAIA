@@ -9,6 +9,9 @@ namespace GAIA
 {
 	namespace XML
 	{
+		/*!
+		 	@brief Specify the xml node type.
+		*/
 		GAIA_ENUM_BEGIN(XML_NODE)
 			XML_NODE_CONTAINER,		// Like <NODE1/>
 			XML_NODE_MULTICONTAINER,// Like <NODE1></NODE1>
@@ -18,9 +21,12 @@ namespace GAIA
 			XML_NODE_COMMENT,		// Like <!--comment content-->
 		GAIA_ENUM_END(XML_NODE)
 
+		/*!
+		 	@brief Specify the xml save text mode.
+		*/
 		GAIA_ENUM_BEGIN(XML_SAVE)
-			XML_SAVE_BESTSIZE,
-			XML_SAVE_BESTREAD,
+			XML_SAVE_BESTSIZE, /*!< Remove all invalid characters(' ', '\t', '\r', '\n' and etc) */
+			XML_SAVE_BESTREAD, /*!< Add line break and indent. */
 		GAIA_ENUM_END(XML_SAVE)
 
 		static const GAIA::TCH XML_DEFAULT_ROOT_NODE_NAME[] = _T("XML_ROOT");
@@ -351,6 +357,18 @@ namespace GAIA
 			0	, //			DEL(delete)
 		};
 
+		/*!
+		 	@brief Check string is a valid xml node name or not.
+		 
+		 	@param nt [in] Specify the xml node type.
+		 
+		 	@param pszNodeName [in] Specify the xml node name.
+		 
+		 	@param sLen [in] Specify the length of parameter pszNode in characters.
+		 		This parameter could be GINVALID, then all the characters in parameter pszNodeName will be checked until to '\0'.
+		 
+		 	@return If characters of parameter pszNodeName are all valid, return GAIA::True, or will return GAIA::False.
+		*/
 		template<typename _DataType> GAIA::BL XmlCheckNodeName(GAIA::XML::XML_NODE nt, const _DataType* pszNodeName, GAIA::NUM sLen = GINVALID)
 		{
 			switch(nt)
@@ -416,6 +434,31 @@ namespace GAIA
 			return GAIA::True;
 		}
 		
+		/*!
+		 	@brief Change xml text format.
+		 
+		 	@param pSrc [in] Specify the source xml text string.
+		 		This parameter can't be NULL.
+		 
+		 	@param sSrcLen [in] Specify the source xml text string length in characters.
+		 		This parameter must above 0.
+		 
+		 	@param pDst [out] Used for saving the converted result.
+		 		This parameter could be GNIL when current function used for calculate length of the result only, then the parameter sDstLen must be GINVALID.
+		 		
+		 
+		 	@param sDstLen [in] Specify the max length of parameter pDst in characters.
+				This parameter could be GINVALID when current function used for calculate length of the result only, then the parameter pDst must be GNIL.
+		 		If parameter pDst is not GNIL, this parameter must above 0.
+		 
+		 	@param savetype [in] Specify the target xml save type.
+		 
+		 	@return If success, return the practice count of result characters.\n
+		 		If failed, return GINVALID.
+		 
+		 	@remarks This function not clean invalid characters when parameter savetype is XML_SAVE_BESTREAD,
+		 		In this situation, you could call this function with parameter savetype filled by XML_SAVE_BESTSIZE first to cleanup invalid characters. 
+		*/
 		template<typename _DataType> GAIA::NUM XmlChangeFormat(const _DataType* pSrc, GAIA::NUM sSrcLen, _DataType* pDst, GAIA::NUM sDstLen, GAIA::XML::XML_SAVE savetype)
 		{
 		#define XMLCHANGEFORMAT_STEPRESULT(v) \

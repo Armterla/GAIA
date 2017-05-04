@@ -10,6 +10,9 @@ namespace GAIA
 {
 	namespace JSON
 	{
+		/*!
+		 	@brief Specify the json node type.
+		*/
 		GAIA_ENUM_BEGIN(JSON_NODE)
 			JSON_NODE_CONTAINER,		// Like {}
 			JSON_NODE_MULTICONTAINER,	// Like []
@@ -17,9 +20,12 @@ namespace GAIA
 			JSON_NODE_VALUE,			// Like "c":1 's 1 part
 		GAIA_ENUM_END(JSON_NODE)
 
+		/*!
+		 	@brief Specify the json save text mode.
+		*/
 		GAIA_ENUM_BEGIN(JSON_SAVE)
-			JSON_SAVE_BESTSIZE,
-			JSON_SAVE_BESTREAD,
+			JSON_SAVE_BESTSIZE, /*!< Remove all invalid characters(' ', '\t', '\r', '\n' and etc) */
+			JSON_SAVE_BESTREAD, /*!< Add line break and indent. */
 		GAIA_ENUM_END(JSON_SAVE)
 
 		static const GAIA::TCH JSON_DEFAULT_ROOT_NODE_NAME[] = _T("JSON_ROOT");
@@ -187,6 +193,18 @@ namespace GAIA
 			0	, //			DEL(delete)
 		};
 
+		/*!
+		 	@brief Check string is a valid json node name or not.
+		 
+		 	@param nt [in] Specify the json node type.
+		 
+		 	@param pszNodeName [in] Specify the json node name.
+		 
+		 	@param sLen [in] Specify the length of parameter pszNode in characters.
+		 		This parameter could be GINVALID, then all the characters in parameter pszNodeName will be checked until to '\0'.
+		 
+		 	@return If characters of parameter pszNodeName are all valid, return GAIA::True, or will return GAIA::False.
+		*/
 		template<typename _DataType> GAIA::BL JsonCheckNodeName(GAIA::JSON::JSON_NODE nt, const _DataType* pszNodeName, GAIA::NUM sLen = GINVALID)
 		{
 			switch(nt)
@@ -272,6 +290,31 @@ namespace GAIA
 			return GAIA::True;
 		}
 		
+		/*!
+		 	@brief Change json text format.
+		 
+		 	@param pSrc [in] Specify the source json text string.
+		 		This parameter can't be NULL.
+		 
+		 	@param sSrcLen [in] Specify the source json text string length in characters.
+		 		This parameter must above 0.
+		 
+		 	@param pDst [out] Used for saving the converted result.
+		 		This parameter could be GNIL when current function used for calculate length of the result only, then the parameter sDstLen must be GINVALID.
+		 		
+		 
+		 	@param sDstLen [in] Specify the max length of parameter pDst in characters.
+				This parameter could be GINVALID when current function used for calculate length of the result only, then the parameter pDst must be GNIL.
+		 		If parameter pDst is not GNIL, this parameter must above 0.
+		 
+		 	@param savetype [in] Specify the target json save type.
+		 
+		 	@return If success, return the practice count of result characters.\n
+		 		If failed, return GINVALID.
+		 
+		 	@remarks This function not clean invalid characters when parameter savetype is JSON_SAVE_BESTREAD,
+		 		In this situation, you could call this function with parameter savetype filled by JSON_SAVE_BESTSIZE first to cleanup invalid characters. 
+		*/
 		template<typename _DataType> GAIA::NUM JsonChangeFormat(const _DataType* pSrc, GAIA::NUM sSrcLen, _DataType* pDst, GAIA::NUM sDstLen, GAIA::JSON::JSON_SAVE savetype)
 		{
 		#define JSONCHANGEFORMAT_STEPRESULT(v) \
