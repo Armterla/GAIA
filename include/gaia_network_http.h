@@ -198,6 +198,13 @@ namespace GAIA
 				@return If the buffer exist, return a valid pointer, or will return GNIL.
 			*/
 			const GAIA::GVOID* GetRequestBuffer() const{return m_reqbuf.fptr();}
+			
+			/*!
+			 	@brief Get the buffer for request.
+			 
+			 	@return If the buffer exist, return a valid pointer, or will return GNIL.
+			*/
+			GAIA::GVOID* GetRequestBuffer(){return m_reqbuf.fptr();}
 
 			/*!
 				@brief Get the buffer size in bytes for request.
