@@ -18,15 +18,21 @@ namespace GAIA
 			return lcg.random();
 		}
 
+		/*!
+		 	@brief RSA crypt algorithm.
+		*/
 		class RSA
 		{
+		public:
+			static const GAIA::NUM DEFAULT_BIT_COUNT = 1024;
+			
 		public:
 			/*!
 				@brief Constructor.
 			*/
 			RSA()
 			{
-				m_sBitCount = 1024;
+				m_sBitCount = 0;
 				rsa_init(&m_rsa, RSA_PKCS_V15, 0);
 			}
 
@@ -40,15 +46,22 @@ namespace GAIA
 
 			/*!
 				@brief Reset context to default.
+			 
+			 	@remarks After this function call, all RSA context is reset.
+			 		The object status is samed to a new allocated RSA object.
 			*/
 			GINL GAIA::GVOID reset()
 			{
+				m_sBitCount = 0;
 				rsa_free(&m_rsa);
 				rsa_init(&m_rsa, RSA_PKCS_V15, 0);
 			}
 
 			/*!
 				@brief Get RSA crypt bit count.
+			 		Default value is DEFAULT_BIT_COUNT.
+			 
+			 	@Return Return the bit count of current RSA object.
 			*/
 			GINL GAIA::NUM bit_count()
 			{
@@ -57,8 +70,16 @@ namespace GAIA
 
 			/*!
 				@brief Build a key.
+			 
+			 	@param sBitCount [in] 
+			 
+			 	@param sExp [in]
+			 
+			 	@param uRandomSeed [in]
+			 
+			 	@remarks Current function will cost a lot of CPU time.
 			*/
-			GINL GAIA::BL build_key(GAIA::NUM sBitCount = 1024, GAIA::NUM sExp = 65537, GAIA::U32 uRandomSeed = (GAIA::U32)(GAIA::TIME::tick_time() % 10000))
+			GINL GAIA::BL build_key(GAIA::NUM sBitCount = DEFAULT_BIT_COUNT, GAIA::NUM sExp = 65537, GAIA::U32 uRandomSeed = (GAIA::U32)(GAIA::TIME::tick_time() % 10000))
 			{
 				m_sBitCount = sBitCount;
 				return rsa_gen_key(&m_rsa, rsa_rand, &m_lcg, sBitCount, sExp) == 0;
@@ -66,12 +87,20 @@ namespace GAIA
 
 			/*!
 				@brief Set public key.
+			 
+			 	@param n [in] Specify RSA-N digit of public key.
+			 
+			 	@param e [in] Specify RSA-E digit of public key.
+			 
+			 	@param sBitCount [in] Specify RSA-BitCount.
+			 
+			 	@return If set public key successfully, return GAIA::True, or will return GAIA::False.
 			*/
-			GINL GAIA::BL set_public_key(const GAIA::CH* m, const GAIA::CH* e, GAIA::NUM sBitCount = 1024)
+			GINL GAIA::BL set_public_key(const GAIA::CH* n, const GAIA::CH* e, GAIA::NUM sBitCount = DEFAULT_BIT_COUNT)
 			{
-				GAST(!GAIA::ALGO::gstremp(m));
+				GAST(!GAIA::ALGO::gstremp(n));
 				GAST(!GAIA::ALGO::gstremp(e));
-				if(mpi_read_string(&m_rsa.N, 10, m) != 0)
+				if(mpi_read_string(&m_rsa.N, 10, n) != 0)
 					return GAIA::False;
 				if(mpi_read_string(&m_rsa.E, 10, e) != 0)
 					return GAIA::False;
@@ -82,14 +111,26 @@ namespace GAIA
 
 			/*!
 				@brief Get public key.
+			 
+			 	@param n [in] Used for saving RSA-N digit of public key.
+			 
+			 	@param e [in] Used for saving RSA-E digit of public key.
+			 
+			 	@param nMaxNSize [in] Specify the max size of parameter n in bytes.
+			 
+			 	@param nMaxESize [in] Specify the max size of parameter e in bytes.
+			 
+			 	@return If get public key successfully, return GAIA::True, or will return GAIA::False.
 			*/
-			GINL GAIA::BL get_public_key(GAIA::CH* m, GAIA::CH* e, GAIA::N32 nMaxMSize = 1024, GAIA::N32 nMaxESize = 1024)
+			GINL GAIA::BL get_public_key(GAIA::CH* n, GAIA::CH* e, GAIA::N32 nMaxNSize = 1024, GAIA::N32 nMaxESize = 1024)
 			{
-				GAST(m != GNIL);
+				GAST(n != GNIL);
 				GAST(e != GNIL);
-				GAST(nMaxMSize > 0);
+				GAST(nMaxNSize > 0);
 				GAST(nMaxESize > 0);
-				if(mpi_write_string(&m_rsa.N, 10, m, &nMaxMSize) != 0)
+				if(m_sBitCount == 0)
+					return GAIA::False;
+				if(mpi_write_string(&m_rsa.N, 10, n, &nMaxNSize) != 0)
 					return GAIA::False;
 				if(mpi_write_string(&m_rsa.E, 10, e, &nMaxESize) != 0)
 					return GAIA::False;
@@ -98,14 +139,22 @@ namespace GAIA
 
 			/*!
 				@brief Set private key.
+			 
+			 	@param n [in] Specify RSA-N digit of private key.
+			 
+			 	@param d [in] Specify RSA-D digit of private key.
+			 
+			 	@param sBitCount [in] Specify RSA-BitCount.
+			 
+			 	@return If set private key successfully, return GAIA::True, or will return GAIA::False.
 			*/
-			GINL GAIA::BL set_private_key(const GAIA::CH* m, const GAIA::CH* e, GAIA::NUM sBitCount = 1024)
+			GINL GAIA::BL set_private_key(const GAIA::CH* n, const GAIA::CH* d, GAIA::NUM sBitCount = DEFAULT_BIT_COUNT)
 			{
-				GAST(!GAIA::ALGO::gstremp(m));
-				GAST(!GAIA::ALGO::gstremp(e));
-				if(mpi_read_string(&m_rsa.N, 10, m) != 0)
+				GAST(!GAIA::ALGO::gstremp(n));
+				GAST(!GAIA::ALGO::gstremp(d));
+				if(mpi_read_string(&m_rsa.N, 10, n) != 0)
 					return GAIA::False;
-				if(mpi_read_string(&m_rsa.D, 10, e) != 0)
+				if(mpi_read_string(&m_rsa.D, 10, d) != 0)
 					return GAIA::False;
 				m_rsa.len = sBitCount / 8;
 				m_sBitCount = sBitCount;
@@ -114,22 +163,36 @@ namespace GAIA
 
 			/*!
 				@brief Get private key.
+			 
+			 	@param n [out] Used for saving RSA-N digit of private key.
+			 
+			 	@param d [out] Used for saving RSA-D digit of private key.
+			 
+			 	@param nMaxNSize [in] Specify the max size of parameter n in bytes.
+			 
+			 	@param nMaxDSize [in] Specify the max size of parameter d in bytes.
+			 
+			 	@return If get private key successfully, return GAIA::True, or will return GAIA::False.
 			*/
-			GINL GAIA::BL get_private_key(GAIA::CH* m, GAIA::CH* e, GAIA::N32 nMaxMSize = 1024, GAIA::N32 nMaxESize = 1024)
+			GINL GAIA::BL get_private_key(GAIA::CH* n, GAIA::CH* d, GAIA::N32 nMaxNSize = 1024, GAIA::N32 nMaxDSize = 1024)
 			{
-				GAST(m != GNIL);
-				GAST(e != GNIL);
-				GAST(nMaxMSize > 0);
-				GAST(nMaxESize > 0);
-				if(mpi_write_string(&m_rsa.N, 10, m, &nMaxMSize) != 0)
+				GAST(n != GNIL);
+				GAST(d != GNIL);
+				GAST(nMaxNSize > 0);
+				GAST(nMaxDSize > 0);
+				if(m_sBitCount == 0)
 					return GAIA::False;
-				if(mpi_write_string(&m_rsa.D, 10, e, &nMaxESize) != 0)
+				if(mpi_write_string(&m_rsa.N, 10, n, &nMaxNSize) != 0)
+					return GAIA::False;
+				if(mpi_write_string(&m_rsa.D, 10, d, &nMaxDSize) != 0)
 					return GAIA::False;
 				return GAIA::True;
 			}
 
 			/*!
 				@brief Check public key.
+			 
+			 	@return If public key is available, return GAIA::True, or will return GAIA::False.
 			*/
 			GINL GAIA::BL check_public_key()
 			{
@@ -138,6 +201,8 @@ namespace GAIA
 
 			/*!
 				@brief Check private key.
+			 
+			 	@return If private key is available, return GAIA::True, or will return GAIA::False.
 			*/
 			GINL GAIA::BL check_private_key()
 			{
@@ -146,6 +211,8 @@ namespace GAIA
 
 			/*!
 				@brief Check public and private key.
+			 
+			 	@return If the public key and private key is all available, return GAIA::True, or will return GAIA::False.
 			*/
 			GINL GAIA::BL check_key()
 			{
@@ -158,6 +225,18 @@ namespace GAIA
 
 			/*!
 				@brief Crypt data.
+			 
+			 	@param pData [in] Specify the source data which will be crypted.
+			 
+			 	@param sDataLen [in] Specify the length of parameter pData in bytes.
+			 
+			 	@param pResult [out] Used for saving the crypted data.
+			 
+			 	@param nMaxResultSize [in] Specify the length of parameter pResult in bytes. Default is 128.
+			 
+			 	@param bPKCS1 [in] Specify enable or disable PKCS1 mode. Default is GAIA::True.
+			 
+			 	@return Return the length of the result in chars.
 			*/
 			GINL GAIA::NUM encrypt(const GAIA::GVOID* pData, GAIA::NUM sDataLen, GAIA::GVOID* pResult, GAIA::N32 nMaxResultSize = 128, GAIA::BL bPKCS1 = GAIA::True)
 			{
@@ -184,6 +263,16 @@ namespace GAIA
 
 			/*!
 				@brief Decrypt data.
+			 
+			 	@param pData [in] Specify the source data which will be decrypted.
+			 
+			 	@param pResult [out] Used for saving the decrypted data.
+			 
+			 	@param nMaxResultSize [in] Specify the length of parameter pResult in bytes. Default is 128.
+			 
+			 	@param bPKCS1 [in] Specify enable or disable PKCS1 mode. Default is GAIA::True.
+			 
+			 	@return Return the length of the result in chars.
 			*/
 			GINL GAIA::NUM decrypt(const GAIA::GVOID* pData, GAIA::GVOID* pResult, GAIA::N32 nMaxResultSize = 128, GAIA::BL bPKCS1 = GAIA::True)
 			{
