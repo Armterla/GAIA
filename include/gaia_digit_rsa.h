@@ -226,11 +226,11 @@ namespace GAIA
 			/*!
 				@brief Crypt data.
 			 
-			 	@param pData [in] Specify the source data which will be crypted.
+			 	@param pData [in] Specify the source data which will be encrypted.
 			 
 			 	@param sDataLen [in] Specify the length of parameter pData in bytes.
 			 
-			 	@param pResult [out] Used for saving the crypted data.
+			 	@param pResult [out] Used for saving the encrypted data.
 			 
 			 	@param nMaxResultSize [in] Specify the length of parameter pResult in bytes. Default is 128.
 			 
