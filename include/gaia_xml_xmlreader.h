@@ -364,7 +364,7 @@ namespace GAIA
 				@exception GAIA::ECT::EctDataError
 					If the source xml's format exist error, and can't read, throw it.
 			*/
-			GINL const _DataType* End(GAIA::XML::XML_NODE* nt = GNIL)
+			GINL const _DataType* End(GAIA::XML::XML_NODE* nt = GNIL, _SizeType* pNodeNameLen = GNIL)
 			{
 				GAIA::XML::XML_NODE nodetype;
 				_SizeType nodenamelen;
@@ -385,6 +385,8 @@ namespace GAIA
 				default:
 					GTHROW_RET(Illegal, GNIL);
 				}
+				if(pNodeNameLen != GNIL)
+					*pNodeNameLen = nodenamelen;
 				m_pCursor = pNext;
 				return pRet;
 			}

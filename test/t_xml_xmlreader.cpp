@@ -65,10 +65,11 @@ namespace TEST
 							GAST(psz != GNIL);
 						}
 					}
-					psz = xr.End(&nt);
+					psz = xr.End(&nt, &sNodeNameLen);
 					TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 					TAST(psz != GNIL);
 					TAST(*psz == '/');
+					TAST(sNodeNameLen == 0);
 				}
 				GCATCHALL
 				{
@@ -126,10 +127,11 @@ namespace TEST
 							GAST(psz != GNIL);
 						}
 					}
-					psz = xr.End(&nt);
+					psz = xr.End(&nt, &sNodeNameLen);
 					TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 					TAST(psz != GNIL);
 					TAST(*psz == '/');
+					TAST(sNodeNameLen == 0);
 				}
 				GCATCHALL
 				{
@@ -258,28 +260,31 @@ namespace TEST
 											GAST(psz != GNIL);
 										}
 									}
-									psz = xr.End(&nt);
+									psz = xr.End(&nt, &sNodeNameLen);
 									TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 									TAST(psz != GNIL);
 									TAST(*psz == '/');
+									TAST(sNodeNameLen == 0);
 
 									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
 									GAST(psz != GNIL);
 								}
 							}
-							psz = xr.End(&nt);
+							psz = xr.End(&nt, &sNodeNameLen);
 							TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 							TAST(psz != GNIL);
-							TAST(*psz != '/');
+							TAST(*psz == '/');
+							TAST(sNodeNameLen == 6);
 
 							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
 							GAST(psz != GNIL);
 						}
 					}
-					psz = xr.End(&nt);
+					psz = xr.End(&nt, &sNodeNameLen);
 					TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 					TAST(psz != GNIL);
-					TAST(*psz != '/');
+					TAST(*psz == '/');
+					TAST(sNodeNameLen == 8);
 				}
 				GCATCHALL
 				{
@@ -400,28 +405,31 @@ namespace TEST
 											GAST(psz != GNIL);
 										}
 									}
-									psz = xr.End(&nt);
+									psz = xr.End(&nt, &sNodeNameLen);
 									TAST(nt == GAIA::XML::XML_NODE_CONTAINER);
 									TAST(psz != GNIL);
 									TAST(*psz == '/');
+									TAST(sNodeNameLen == 0);
 
 									psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
 									GAST(psz != GNIL);
 								}
 							}
-							psz = xr.End(&nt);
+							psz = xr.End(&nt, &sNodeNameLen);
 							TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 							TAST(psz != GNIL);
-							TAST(*psz != '/');
+							TAST(*psz == '/');
+							TAST(sNodeNameLen == 6);
 
 							psz = xr.Peek(nt, sNodeNameLen); // Mix operation.
 							GAST(psz != GNIL);
 						}
 					}
-					psz = xr.End(&nt);
+					psz = xr.End(&nt, &sNodeNameLen);
 					TAST(nt == GAIA::XML::XML_NODE_MULTICONTAINER);
 					TAST(psz != GNIL);
-					TAST(*psz != '/');
+					TAST(*psz == '/');
+					TAST(sNodeNameLen == 8);
 				}
 				GCATCHALL
 				{
