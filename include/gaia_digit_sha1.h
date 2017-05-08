@@ -8,14 +8,32 @@ namespace GAIA
 {
 	namespace DIGIT
 	{
+		/*!
+		 	@brief Stream based SHA1 algorithme class.
+		*/
 		class SHA1 : public GAIA::Base
 		{
 		public:
+			
+			/*!
+			 	@brief SHA1 context class.
+			*/
 			class Context : public GAIA::Base
 			{
 			public:
+				/*!
+				 	@brief Constructor.
+				*/
 				GINL Context(){}
+				
+				/*!
+				 	@brief Copy constructor.
+				*/
 				GINL Context(const Context& src){this->operator = (src);}
+				
+				/*!
+				 	@brief Reset current context to the default value.
+				*/
 				GINL GAIA::GVOID reset()
 				{
 					res[0] = 0x67452301;
@@ -31,6 +49,11 @@ namespace GAIA
 					msgbufsize = 0;
 				}
 
+				/*!
+				 	@brief Check the context is changed or not.
+				 
+				 	@return If changed, return GAIA::True, or will return GAIA::False.
+				*/
 				GINL GAIA::BL check() const
 				{
 					if(res[0] != 0x67452301)
@@ -63,6 +86,12 @@ namespace GAIA
 						return GAIA::True;
 					return GAIA::False;
 				}
+				
+				/*!
+				 	@brief Deep copy context from another one.
+				 
+				 	@return Return current object.
+				*/
 				GINL Context& operator = (const Context& src)
 				{
 					GAIA::ALGO::gmemcpy(res, src.res, sizeof(res));
@@ -84,11 +113,46 @@ namespace GAIA
 				GAIA::U32 msgbufsize;
 			};
 		public:
+			/*!
+			 	@brief Constructor.
+			*/
 			GINL SHA1(){this->reset();}
+			
+			/*!
+			 	@brief Reset SHA1 context.
+			 
+			 	@remarks After this function call, the object will be equal to a new allocated MD5 object.
+			*/
 			GINL GAIA::GVOID reset(){m_ctx.reset();}
+			
+			/*!
+			 	@brief Check SHA1 context is changed or not.
+			 
+			 	@return If SHA1 context changed(calculate any data SHA1), return GAIA::True, or will return GAIA::False.
+			*/
 			GINL GAIA::BL check() const{return m_ctx.check();}
+			
+			/*!
+			 	@brief Set SHA1 context.
+			 
+			 	@param ctx [in] Specify the new SHA1 context.
+			*/
 			GINL GAIA::GVOID context(const Context& ctx){m_ctx = ctx;}
+			
+			/*!
+			 	@brief Get SHA1 context.
+			 
+			 	@return Return SHA1 context of current object.
+			*/
 			GINL const Context& context() const{return m_ctx;}
+			
+			/*!
+			 	@brief Calculate binary data's SHA1.
+			 
+			 	@param p [in] Specify a binary data buffer.
+			 
+			 	@param size [in] Specify the size of parameter p in bytes.
+			*/
 			GINL GAIA::GVOID update(const GAIA::U8* p, GAIA::U32 size)
 			{
 				GAST(p != GNIL);
@@ -133,7 +197,20 @@ namespace GAIA
 					GAIA::ALGO::gmemcpy(m_ctx.msgbuf, p, size);
 				}
 			}
+			
+			/*!
+			 	@brief Calculate data type's SHA1.
+			 
+			 	@param t [in] Specify a data type to calculate.
+			*/
 			template<typename _DataType> GAIA::GVOID update(const _DataType& t){this->update((const GAIA::U8*)&t, sizeof(t));}
+			
+			/*!
+			 	@brief Get SHA1 result.
+			 
+			 	@param res [out] Used for saving the SHA1 result.
+			 		The length of this parameter must above equal 20 bytes.
+			*/
 			GINL GAIA::GVOID result(GAIA::U8 res[20])
 			{
 				if(m_ctx.msgbufsize == 0)
