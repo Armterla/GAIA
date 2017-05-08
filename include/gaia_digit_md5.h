@@ -21,14 +21,31 @@ namespace GAIA
 			0, 0, 0, 0, 0, 0, 0, 0
 		};
 
+		/*!
+		 	@brief Stream based MD5 algorithm class.
+		*/
 		class MD5 : public GAIA::Base
 		{
 		public:
+			/*!
+			 	@brief MD5 context class.
+			*/
 			class Context : public GAIA::Base
 			{
 			public:
+				/*!
+				 	@brief Constructor.
+				*/
 				GINL Context(){}
+				
+				/*!
+				 	@brief Copy constructor.
+				*/
 				GINL Context(const Context& src){this->operator = (src);}
+				
+				/*!
+				 	@brief Reset current context to the default value.
+				*/
 				GINL GAIA::GVOID reset()
 				{
 					count[0] = count[1] = 0;
@@ -37,6 +54,12 @@ namespace GAIA
 					state[2] = 0x98badcfe;
 					state[3] = 0x10325476;
 				}
+				
+				/*!
+				 	@brief Check current context is changed or not.
+				 
+				 	@return If changed, return GAIA::True, or will return GAIA::False.
+				*/
 				GINL GAIA::BL check() const
 				{
 					if(count[0] != 0)
@@ -53,6 +76,12 @@ namespace GAIA
 						return GAIA::True;
 					return GAIA::False;
 				}
+				
+				/*!
+				 	@brief Deep copy context from another one.
+				 
+				 	@return Return current object.
+				*/
 				GINL Context& operator = (const Context& src)
 				{
 					GAIA::ALGO::gmemcpy(state, src.state, sizeof(state));
@@ -67,11 +96,46 @@ namespace GAIA
 			};
 
 		public:
+			/*!
+			 	@brief Constructor.
+			*/
 			GINL MD5(){this->reset();}
+			
+			/*!
+			 	@brief Reset MD5 context.
+			 
+			 	@remarks After this function call, the object will be equal to a new allocated MD5 object.
+			*/
 			GINL GAIA::GVOID reset(){m_ctx.reset();}
+			
+			/*!
+			 	@brief Check MD5 context is changed or not.
+			 
+			 	@return If MD5 context changed(calculate any data MD5), return GAIA::True, or will return GAIA::False.
+			*/
 			GINL GAIA::BL check() const{return m_ctx.check();}
+			
+			/*!
+			 	@brief Set MD5 context.
+			 
+			 	@param ctx [in] Specify the new MD5 context.
+			*/
 			GINL GAIA::GVOID context(const Context& ctx){m_ctx = ctx;}
+			
+			/*!
+			 	@brief Get MD5 context.
+			 
+			 	@return Return MD5 context of current object.
+			*/
 			GINL const Context& context() const{return m_ctx;}
+			
+			/*!
+			 	@brief Calculate binary data's MD5.
+			 
+			 	@param p [in] Specify a binary data buffer.
+			 
+			 	@param size [in] Specify the size of parameter p in bytes.
+			*/
 			GINL GAIA::GVOID update(const GAIA::U8* p, GAIA::U32 size)
 			{
 				GAST(p != GNIL);
@@ -100,7 +164,20 @@ namespace GAIA
 				if(size - i > 0)
 					GAIA::ALGO::gmemcpy(&m_ctx.buffer[index], &p[i], size - i);
 			}
+			
+			/*!
+			 	@brief Calculate data type's MD5.
+			 
+			 	@param t [in] Specify a data type to calculate.
+			*/
 			template<typename _DataType> GAIA::GVOID update(const _DataType& t){this->update((const GAIA::U8*)&t, sizeof(t));}
+			
+			/*!
+			 	@brief Get MD5 result.
+			 
+			 	@param res [out] Used for saving the MD5 result.
+			 		The length of this parameter must above equal 16 bytes.
+			*/
 			GINL GAIA::GVOID result(GAIA::U8 res[16])
 			{
 				// Backup.
