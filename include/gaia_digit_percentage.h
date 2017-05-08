@@ -171,6 +171,18 @@ namespace GAIA
 			1	, //			DEL(delete)
 		};
 
+		/*!
+		 	@brief Percentage encode a byte.
+		 
+		 	@param ch [in] Specify a character which will be encoded.
+		 
+		 	@param pszPercentage [out] Used for saving encoded result.
+		 
+		 	@param sMaxPercentageLen [in] Specify the size of parameter pszPercentage.
+		 
+		 	@return Return the pratice length of encoded result characters in bytes.
+		 		If encode failed, return GINVALID.
+		*/
 		GINL GAIA::NUM percentage_encode(GAIA::CH ch, GAIA::CH* pszPercentage, GAIA::NUM sMaxPercentageLen)
 		{
 			if(((GAIA::U8)ch) < 128 && !ascii_need_percentage[ch])
@@ -235,6 +247,17 @@ namespace GAIA
 			}
 		}
 
+		/*!
+		 	@brief Percentage decode a string to a byte.
+		 
+		 	@param pszPercentage [in] Specify the source percentage encoded buffer.
+		 
+		 	@param sPercentageLen [in] Specify the length of parameter pszPercentage.
+		 
+		 	@param ch [out] Used for saving the decoded result.
+		 
+		 	@return If decoded success, return GAIA::True, or will return GAIA::False.
+		*/
 		GINL GAIA::BL percentage_decode(const GAIA::CH* pszPercentage, GAIA::NUM sPercentageLen, GAIA::CH& ch)
 		{
 			GAST(pszPercentage != GNIL);
@@ -278,6 +301,20 @@ namespace GAIA
 			return GAIA::True;
 		}
 
+		/*!
+		 	@brief Percentage encode a string.
+		 
+		 	@param pszLocal [in] Specify a string which will be encoded.
+		 
+		 	@param sLocalLen [in] Specify the length of parameter pszLocal in bytes.
+		 
+		 	@param pszPercentage [out] Used for saving the encoded string result. 
+		 
+		 	@param sMaxPercentageLen [in] Specify the max length of parameter pszPercentage in bytes.
+		 
+		 	@return Return the pratice length of encoded string result in bytes.
+		 		If encode failed, return GINVALID.
+		*/
 		GINL GAIA::NUM percentage_encode(const GAIA::CH* pszLocal, GAIA::NUM sLocalLen, GAIA::CH* pszPercentage, GAIA::NUM sMaxPercentageLen)
 		{
 			// Parameter checkup.
@@ -401,6 +438,20 @@ namespace GAIA
 			return sRet;
 		}
 
+		/*!
+		 	@brief Percentage decode a percentage-buffer to a string.
+		 
+		 	@param pszPercentage [in] Specify the percentage encoded source string.
+		 
+		 	@param sPercentageLen [in] Specify the length of parameter pszPercentage in bytes.
+		 
+		 	@param pszLocal [out] Used for saving decoded result.
+		 
+		 	@param sMaxLocalLen [in] Specify the max length of parameter pszLocal in bytes.
+		 
+		 	@return Return the practice length of of decoded string result in bytes.
+		 		If decode failed, return GINVALID.
+		*/
 		GINL GAIA::NUM percentage_decode(const GAIA::CH* pszPercentage, GAIA::NUM sPercentageLen, GAIA::CH* pszLocal, GAIA::NUM sMaxLocalLen)
 		{
 			// Parameter checkup.
