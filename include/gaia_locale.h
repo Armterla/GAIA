@@ -3,8 +3,8 @@
 
 #include "gaia_type.h"
 #include "gaia_assert.h"
-#include "gaia_internal.h"
 #include "gaia_algo_compare.h"
+#include "gaia_algo_string.h"
 
 #if GAIA_OS == GAIA_OS_WINDOWS
 #	include <xlocale>
@@ -39,7 +39,7 @@ namespace GAIA
 			if(charset_type <= GAIA::CHARSET_TYPE_INVALID || charset_type >= GAIA::CHARSET_TYPE_MAXENUMCOUNT)
 				return 0;
 			if(src_size_in_bytes < 0)
-				src_size_in_bytes = GAIA_INTERNAL_NAMESPACE::gstrlen((const GAIA::CH*)pszSrc);
+				src_size_in_bytes = GAIA::ALGO::gstrlen((const GAIA::CH*)pszSrc);
 			if(charset_type == GAIA::CHARSET_TYPE_ASCII)
 			{
 				GAIA::NUM ret = GAIA::ALGO::gmin(src_size_in_bytes, dst_size_in_wchar);
@@ -111,7 +111,7 @@ namespace GAIA
 			if(charset_type <= GAIA::CHARSET_TYPE_INVALID || charset_type >= GAIA::CHARSET_TYPE_MAXENUMCOUNT)
 				return 0;
 			if(src_size_in_wchar < 0)
-				src_size_in_wchar = GAIA_INTERNAL_NAMESPACE::gstrlen(pszSrc);
+				src_size_in_wchar = GAIA::ALGO::gstrlen(pszSrc);
 			if(charset_type == GAIA::CHARSET_TYPE_ASCII)
 			{
 				GAIA::NUM ret = GAIA::ALGO::gmin(src_size_in_wchar, dst_size_in_bytes);

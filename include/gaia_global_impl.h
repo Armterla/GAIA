@@ -41,19 +41,16 @@
 
 namespace GAIA
 {
-	namespace GAIA_INTERNAL_NAMESPACE
+	class GlobalCtor : public GAIA::Base
 	{
-		class GlobalCtor : public GAIA::Base
+	public:
+		GlobalCtor()
 		{
-		public:
-			GlobalCtor()
-			{
-				g_gaia_processlaunchtime = GAIA::TIME::tick_time();
-			}
-		};
-	}
+			g_gaia_processlaunchtime = GAIA::TIME::tick_time();
+		}
+	};
 }
-GAIA::GAIA_INTERNAL_NAMESPACE::GlobalCtor g_gaia_globalctor;
+GAIA::GlobalCtor g_gaia_globalctor;
 
 /* Process time. */
 GAIA::U64 g_gaia_processlaunchtime;

@@ -3,6 +3,7 @@
 
 #include "gaia_type.h"
 #include "gaia_assert.h"
+#include "gaia_algo_string.h"
 #include "gaia_global_decl.h"
 
 #if GAIA_OS == GAIA_OS_WINDOWS
@@ -64,7 +65,7 @@ namespace GAIA
 	{
 		if(psz == GNIL)
 			return GAIA::False;
-		if(GAIA_INTERNAL_NAMESPACE::gstrlen(psz) != 32)
+		if(GAIA::ALGO::gstrlen(psz) != 32)
 			return GAIA::False;
 		for(GAIA::NUM x = 0; x < 32; ++x)
 		{
@@ -78,11 +79,11 @@ namespace GAIA
 	}
 	template<typename _ParamDataType> GAIA::GVOID X128::fromstring(const _ParamDataType* psz)
 	{
-		GAIA_INTERNAL_NAMESPACE::str2hex(psz, sizeofarray(u8), u8);
+		GAIA::ALGO::str2hex(psz, sizeofarray(u8), u8);
 	}
 	template<typename _ParamDataType> _ParamDataType* X128::tostring(_ParamDataType* psz) const
 	{
-		GAIA_INTERNAL_NAMESPACE::hex2str(u8, sizeofarray(u8), psz);
+		GAIA::ALGO::hex2str(u8, sizeofarray(u8), psz);
 		return psz;
 	}
 
@@ -90,7 +91,7 @@ namespace GAIA
 	{
 		for(GAIA::N32 x = 0; x < sizeofarray(TYPEID_ANAME); ++x)
 		{
-			if(GAIA_INTERNAL_NAMESPACE::gstrcmp(TYPEID_ANAME[x], psz) == 0)
+			if(GAIA::ALGO::gstrcmp(TYPEID_ANAME[x], psz) == 0)
 				return GSCAST(TYPEID)(x);
 		}
 		return TYPEID_INVALID;
@@ -99,7 +100,7 @@ namespace GAIA
 	{
 		for(GAIA::N32 x = 0; x < sizeofarray(TYPEID_WNAME); ++x)
 		{
-			if(GAIA_INTERNAL_NAMESPACE::gstrcmp(TYPEID_WNAME[x], psz) == 0)
+			if(GAIA::ALGO::gstrcmp(TYPEID_WNAME[x], psz) == 0)
 				return GSCAST(TYPEID)(x);
 		}
 		return TYPEID_INVALID;

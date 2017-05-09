@@ -3,9 +3,9 @@
 
 #include "gaia_type.h"
 #include "gaia_assert.h"
+#include "gaia_algo_string.h"
 #include "gaia_sync_lock.h"
 #include "gaia_sync_autolock.h"
-#include "gaia_internal.h"
 
 #include <stdlib.h>
 
@@ -127,7 +127,7 @@ namespace GAIA
 						return -1;
 					else if(nCodeLine > src.nCodeLine)
 						return +1;
-					return GAIA_INTERNAL_NAMESPACE::gstrcmp(pszFileName, src.pszFileName);
+					return GAIA::ALGO::gstrcmp(pszFileName, src.pszFileName);
 				}
 				GCLASS_COMPARE_BYCOMPARE(Node)
 			public:
@@ -153,11 +153,11 @@ namespace GAIA
 					GAIA::CH szReleaseSize[64];
 					GAIA::CH szMinAllocSize[64];
 					GAIA::CH szMaxAllocSize[64];
-					GAIA_INTERNAL_NAMESPACE::gstrbycapacity(szLeakSize, s.nAllocSizeSum - s.nReleaseSizeSum);
-					GAIA_INTERNAL_NAMESPACE::gstrbycapacity(szAllocSize, s.nAllocSizeSum);
-					GAIA_INTERNAL_NAMESPACE::gstrbycapacity(szReleaseSize, s.nReleaseSizeSum);
-					GAIA_INTERNAL_NAMESPACE::gstrbycapacity(szMinAllocSize, s.nMinAllocSize);
-					GAIA_INTERNAL_NAMESPACE::gstrbycapacity(szMaxAllocSize, s.nMaxAllocSize);
+					GAIA::ALGO::gstrbycapacity(szLeakSize, s.nAllocSizeSum - s.nReleaseSizeSum);
+					GAIA::ALGO::gstrbycapacity(szAllocSize, s.nAllocSizeSum);
+					GAIA::ALGO::gstrbycapacity(szReleaseSize, s.nReleaseSizeSum);
+					GAIA::ALGO::gstrbycapacity(szMinAllocSize, s.nMinAllocSize);
+					GAIA::ALGO::gstrbycapacity(szMaxAllocSize, s.nMaxAllocSize);
 					
 					m_stm << "\t" << "Leak count and size = " << s.nAllocTimesSum - s.nReleaseTimesSum << "/" << s.nAllocSizeSum - s.nReleaseSizeSum << " as " << szLeakSize << "\n";
 					m_stm << "\t" << "Alloc count and size = " << s.nAllocTimesSum << "/" << s.nAllocSizeSum << " as " << szAllocSize  << "\n";
@@ -278,8 +278,8 @@ namespace GAIA
 				if(it == m_snapshot.nodes.end())
 				{
 					finder.reset();
-					finder.pszFileName = (GAIA::CH*)malloc(GAIA_INTERNAL_NAMESPACE::gstrlen(pszFileName) + sizeof(GAIA::CH));
-					GAIA_INTERNAL_NAMESPACE::gstrcpy(finder.pszFileName, pszFileName);
+					finder.pszFileName = (GAIA::CH*)malloc(GAIA::ALGO::gstrlen(pszFileName) + sizeof(GAIA::CH));
+					GAIA::ALGO::gstrcpy(finder.pszFileName, pszFileName);
 					finder.nCodeLine = nCodeLine;
 					std::pair<__NodeList::iterator, bool> pr = m_snapshot.nodes.insert(finder);
 					it = pr.first;

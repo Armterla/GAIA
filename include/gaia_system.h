@@ -3,6 +3,7 @@
 
 #include "gaia_type.h"
 #include "gaia_assert.h"
+#include "gaia_algo_string.h"
 
 #include <stdlib.h>
 
@@ -48,7 +49,7 @@ namespace GAIA
 		GINL GAIA::BL ShellExec(const GAIA::CH* pszCmd)
 		{
 			if(GAIA::ALWAYSFALSE){}
-			else if(GAIA_INTERNAL_NAMESPACE::gstrcmp(pszCmd, "clear") == 0)
+			else if(GAIA::ALGO::gstrcmp(pszCmd, "clear") == 0)
 			{
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				system("cls");
