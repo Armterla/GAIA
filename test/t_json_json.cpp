@@ -126,6 +126,7 @@ namespace TEST
 			TAST(sResult1 != GINVALID);
 			TAST(sResult0 == sResult1);
 			TAST(sResult0 == sizeof(DST) - 1);
+			szDst[sResult1] = '\0';
 			TAST(GAIA::ALGO::gstrcmp(szDst, DST) == 0);
 			
 			sResult0 = GAIA::JSON::JsonChangeFormat(DST, sizeof(DST) - 1, (GAIA::CH*)GNIL, 0, GAIA::JSON::JSON_SAVE_BESTREAD);
@@ -133,6 +134,7 @@ namespace TEST
 			sResult1 = GAIA::JSON::JsonChangeFormat(DST, sizeof(DST) - 1, szDst, sizeof(szDst), GAIA::JSON::JSON_SAVE_BESTREAD);
 			TAST(sResult1 != GINVALID);
 			TAST(sResult0 == sResult1);
+			szDst[sResult1] = '\0';
 			
 			GAIA::NUM sDstLen = sResult0;
 			
@@ -142,6 +144,7 @@ namespace TEST
 			TAST(sResult1 != GINVALID);
 			TAST(sResult0 == sResult1);
 			TAST(sResult0 == sizeof(DST) - 1);
+			szDst1[sResult1] = '\0';
 			
 			GAIA::NUM sDst1Len = sResult0;
 			
