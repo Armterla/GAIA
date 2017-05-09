@@ -946,6 +946,18 @@
     <ClCompile Include="..\test\t_digit_percentage.cpp">
       <Filter>GAIA\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\t_dbg_objwatcher.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_locale_language.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_pattern_stringindex.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_pattern_textindex.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\test\preheader.h">
