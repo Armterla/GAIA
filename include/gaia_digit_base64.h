@@ -8,18 +8,55 @@ namespace GAIA
 {
 	namespace DIGIT
 	{
+		/*!
+		 	@brief Get base64 encode result size.
+		 
+		 	@param srclen [in] Specify the source length in bytes.
+		 
+		 	@return Return the size of the result in characters.
+		*/
+		template<typename _SizeType> _SizeType base64encode_resultsize(_SizeType srclen)
+		{
+			return ((srclen + 2) / 3) * 4;
+		}
+		
+		/*!
+		 	@brief Get base64 decode max result size.
+		 
+		 	@param srclen [in] Specify the source length in characters.
+		 
+		 	@return Return the size of the result in bytes.
+		*/
+		template<typename _SizeType> _SizeType base64decode_maxresultsize(_SizeType srclen)
+		{
+			return (srclen >> 2) * 3 + 2;
+		}
+		
+		/*!
+		 	@brief Base64 encode.
+		 
+		 	@param pDst [out] Used for saving the encoded result.
+		
+		 	@param dstlen [in] Specify the length of parameter pDst in characters.
+		 
+		 	@param pSrc [in] Specify the source binary buffer.
+		 
+		 	@param srclen [in] Specify the size of parameter pSrc in bytes.
+		 
+		 	@return Return practice length of the result in characters. If failed, return GINVALID.
+		*/
 		template<typename _DataType, typename _DstSizeType, typename _SrcSizeType> _DstSizeType base64encode(_DataType* pDst, _DstSizeType dstlen, const GAIA::U8* pSrc, _SrcSizeType srclen)
 		{
 			static const GAIA::U8 BIN2ASCII[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 			GAST(pSrc != GNIL);
 			GAST(srclen > 0);
 			if(pSrc == GNIL || srclen <= 0)
-				return 0;
+				return GINVALID;
 			if(pDst != GNIL)
 			{
 				GAST(dstlen >= ((srclen + 2) / 3) * 4);
 				if(dstlen < ((srclen + 2) / 3) * 4)
-					return 0;
+					return GINVALID;
 				for(GAIA::N32 i = srclen; i > 0; i -= 3)
 				{
 					GAIA::U8 b0, b1, b2;
@@ -47,6 +84,19 @@ namespace GAIA
 			return ((srclen + 2) / 3) * 4;
 		}
 
+		/*!
+		 	@brief Base64 decode.
+		 
+		 	@param pDst [out] Used for saving decoded result.
+		 
+		 	@param dstlen [in] Specify the size of parameter pDst in bytes.
+		 
+		 	@param pSrc [in] Specify the source base64 string.
+		 
+		 	@param srclen [in] Specify the length of parameter pSrc in characters.
+		 
+		 	@return Return the practice size of the result in bytes. If failed, return GINVALID.
+		*/
 		template<typename _DataType, typename _DstSizeType, typename _SrcSizeType> _DstSizeType base64decode(GAIA::U8* pDst, _DstSizeType dstlen, const _DataType* pSrc, _SrcSizeType srclen)
 		{
 			static const GAIA::U8 ASCII2BIN[128] = {
@@ -62,7 +112,7 @@ namespace GAIA
 			GAST(pSrc != GNIL);
 			GAST(srclen > 0);
 			if(pSrc == GNIL || srclen <= 0)
-				return 0;
+				return GINVALID;
 			GAIA::U8 b[4];
 			_DataType t;
 			GAIA::U8* pDstOld = pDst;
@@ -70,7 +120,7 @@ namespace GAIA
 			{
 				t = *pSrc;
 				if((t < 0) || (t >= 0x80))
-					return 0;
+					return GINVALID;
 				else
 				{
 					if(ASCII2BIN[t] == 0xE0)
@@ -86,7 +136,7 @@ namespace GAIA
 			{
 				t = pSrc[srclen - 1];
 				if((t < 0) || (t >= 0x80))
-					return 0;
+					return GINVALID;
 				else
 				{
 					if((ASCII2BIN[t] | 0x13) == 0xF3)
@@ -96,7 +146,7 @@ namespace GAIA
 				}
 			}
 			if((srclen % 4) != 0)
-				return 0;
+				return GINVALID;
 			if(pDst != GNIL)
 			{
 				for(GAIA::N32 i = 0; i < srclen; i += 4)
@@ -106,7 +156,7 @@ namespace GAIA
 					{
 						t = *pSrc++;
 						if((t < 0) || (t >= 0x80))
-							return 0;
+							return GINVALID;
 						else
 						{
 							if(t == '=')
@@ -115,7 +165,7 @@ namespace GAIA
 							{
 								b[j] = ASCII2BIN[t];
 								if(b[j] & 0x80)
-									return 0;
+									return GINVALID;
 							}
 						}
 					}
@@ -123,7 +173,7 @@ namespace GAIA
 					{
 						GAST(dstlen - (pDst - pDstOld) >= 3);
 						if(dstlen - (pDst - pDstOld) < 3)
-							return 0;
+							return GINVALID;
 						*pDst++ = (b[0] << 2) | (b[1] >> 4);
 						*pDst++ = (b[1] << 4) | (b[2] >> 2);
 						*pDst++ = (b[2] << 6) | b[3];
@@ -132,7 +182,7 @@ namespace GAIA
 					{
 						GAST(dstlen - (pDst - pDstOld) >= 2);
 						if(dstlen - (pDst - pDstOld) < 2)
-							return 0;
+							return GINVALID;
 						*pDst++ = (b[0] << 2) | (b[1] >> 4);
 						*pDst++ = (b[1] << 4) | (b[2] >> 2);
 						return (i >> 2) * 3 + 2;
@@ -141,12 +191,12 @@ namespace GAIA
 					{
 						GAST(dstlen - (pDst - pDstOld) >= 1);
 						if(dstlen - (pDst - pDstOld) < 1)
-							return 0;
+							return GINVALID;
 						*pDst++ = (b[0] << 2) | (b[1] >> 4);
 						return (i >> 2) * 3 + 1;
 					}
 					else
-						return 0;
+						return GINVALID;
 				}
 			}
 			return (srclen >> 2) * 3;
