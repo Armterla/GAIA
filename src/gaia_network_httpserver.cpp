@@ -144,7 +144,12 @@ namespace GAIA
 			{
 				GAIA::BL bNeedCallBackToRecycle = GAIA::False;
 				if(!bResult)
+				{
+					GAIA::SYNC::Autolock al(m_lr);
+					if(m_pLink == GNIL)
+						return;
 					bNeedCallBackToRecycle = GAIA::True;
+				}
 				else
 				{
 					GAIA::SYNC::Autolock al(m_lr);
@@ -173,6 +178,9 @@ namespace GAIA
 			{
 				if(!bResult)
 				{
+					GAIA::SYNC::Autolock al1(m_lr);
+					if(m_pLink == GNIL)
+						return;
 					m_bClosed = GAIA::True;
 					m_pLink->rise_ref("HttpServerAsyncSocket::OnRecved:link rise ref for recv failed");
 					GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
