@@ -6,6 +6,8 @@
 #include "gaia_sync_atomic.h"
 #include "gaia_sync_lock.h"
 #include "gaia_sync_autolock.h"
+#include "gaia_sync_lockpure.h"
+#include "gaia_sync_autolockpure.h"
 #include "gaia_ctn_bufferrw.h"
 #include "gaia_network_ip.h"
 #include "gaia_network_addr.h"
@@ -305,6 +307,7 @@ namespace GAIA
 			GAIA::NETWORK::ASYNC_SOCKET_TYPE m_socktype;
 			GAIA::NETWORK::Socket m_sock;
 			GAIA::SYNC::Lock m_lrSend;
+			GAIA::SYNC::LockPure m_lrCB;
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			GAIA::SYNC::Atomic m_atomBrokenTimes;
