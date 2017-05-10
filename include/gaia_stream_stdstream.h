@@ -25,6 +25,11 @@ namespace GAIA
 				if(m_pszPrepareRead != GNIL)
 					gdel[] m_pszPrepareRead;
 			}
+			
+			virtual GAIA::GVOID lock_read();
+			virtual GAIA::GVOID unlock_read();
+			virtual GAIA::GVOID lock_write();
+			virtual GAIA::GVOID unlock_write();
 
 			virtual GAIA::GVOID enable_write(GAIA::BL bEnable){m_bEnableWrite = bEnable;}
 			virtual GAIA::BL enable_write() const{return m_bEnableWrite;}

@@ -112,6 +112,49 @@ namespace TEST
 	}
 	extern GAIA::GVOID t_json_json(GAIA::LOG::Log& logobj)
 	{
+		// Json format test.
+		{
+			const GAIA::CH SRC[] = "\t\t\n{\"aa\":true,\t\t\"bb\" : false,\"cc\": [ { \"a\":123,\"b\":456,\"c\":[],\"d\":{\"aaa\":\"aaavalue\"\t},\"e\":{\n\t}}]}";
+			const GAIA::CH DST[] = "{\"aa\":true,\"bb\":false,\"cc\":[{\"a\":123,\"b\":456,\"c\":[],\"d\":{\"aaa\":\"aaavalue\"},\"e\":{}}]}";
+			
+			GAIA::CH szDst[1024];
+			GAIA::CH szDst1[1024];
+			
+			GAIA::NUM sResult0 = GAIA::JSON::JsonChangeFormat(SRC, sizeof(SRC) - 1, (GAIA::CH*)GNIL, 0, GAIA::JSON::JSON_SAVE_BESTSIZE);
+			TAST(sResult0 != GINVALID);
+			GAIA::NUM sResult1 = GAIA::JSON::JsonChangeFormat(SRC, sizeof(SRC) - 1, szDst, sizeof(szDst), GAIA::JSON::JSON_SAVE_BESTSIZE);
+			TAST(sResult1 != GINVALID);
+			TAST(sResult0 == sResult1);
+			TAST(sResult0 == sizeof(DST) - 1);
+			szDst[sResult1] = '\0';
+			TAST(GAIA::ALGO::gstrcmp(szDst, DST) == 0);
+			
+			sResult0 = GAIA::JSON::JsonChangeFormat(DST, sizeof(DST) - 1, (GAIA::CH*)GNIL, 0, GAIA::JSON::JSON_SAVE_BESTREAD);
+			TAST(sResult0 != GINVALID);
+			sResult1 = GAIA::JSON::JsonChangeFormat(DST, sizeof(DST) - 1, szDst, sizeof(szDst), GAIA::JSON::JSON_SAVE_BESTREAD);
+			TAST(sResult1 != GINVALID);
+			TAST(sResult0 == sResult1);
+			szDst[sResult1] = '\0';
+			
+			GAIA::NUM sDstLen = sResult0;
+			
+			sResult0 = GAIA::JSON::JsonChangeFormat(szDst, sDstLen, (GAIA::CH*)GNIL, 0, GAIA::JSON::JSON_SAVE_BESTSIZE);
+			TAST(sResult0 != GINVALID);
+			sResult1 = GAIA::JSON::JsonChangeFormat(szDst, sDstLen, szDst1, sizeof(szDst1), GAIA::JSON::JSON_SAVE_BESTSIZE);
+			TAST(sResult1 != GINVALID);
+			TAST(sResult0 == sResult1);
+			TAST(sResult0 == sizeof(DST) - 1);
+			szDst1[sResult1] = '\0';
+			
+			GAIA::NUM sDst1Len = sResult0;
+			
+			szDst[sDstLen] = '\0';
+			szDst1[sDst1Len] = '\0';
+			
+			TAST(GAIA::ALGO::gstrcmp(szDst1, DST) == 0);
+		}
+		
+		//
 		GAIA::JSON::JsonFactory fac;
 		GAIA::JSON::JsonFactoryDesc desc;
 		desc.reset();

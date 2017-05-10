@@ -355,7 +355,10 @@ namespace GAIA
 			m_listen_sockets.insert(addrListen, pListenSocket);
 
 			pListenSocket->m_sock.Listen();
-			pListenSocket->OnListened(GAIA::True);
+			{
+				GAIA::SYNC::AutolockPure al(pListenSocket->m_lrCB);
+				pListenSocket->OnListened(GAIA::True);
+			}
 
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			for(GAIA::NUM x = 0; x < m_desc.sWinIOCPAcceptEventCount; ++x)
@@ -607,7 +610,10 @@ namespace GAIA
 							pCtx->pDataSocket->GetGlobalAddress(addrPeer);
 							pCtx->pDataSocket->SetPeerAddress(addrPeer);
 
-							pCtx->pDataSocket->OnAccepted(GAIA::True, addrListen);
+							{
+								GAIA::SYNC::AutolockPure al(pCtx->pDataSocket->m_lrCB);
+								pCtx->pDataSocket->OnAccepted(GAIA::True, addrListen);
+							}
 							if(this->OnAcceptSocket(*pCtx->pDataSocket, addrListen))
 							{
 								for(GAIA::NUM x = 0; x < m_desc.sWinIOCPRecvEventCount; ++x)
@@ -626,7 +632,10 @@ namespace GAIA
 					GAIA::NETWORK::Addr addrPeer;
 					pCtx->pDataSocket->GetPeerAddress(addrPeer);
 					pCtx->pDataSocket->SetConnected(GAIA::True);
-					pCtx->pDataSocket->OnConnected(GAIA::True, addrPeer);
+					{
+						GAIA::SYNC::AutolockPure al(pCtx->pDataSocket->m_lrCB);
+						pCtx->pDataSocket->OnConnected(GAIA::True, addrPeer);
+					}
 
 					// Begin receive.
 					for(GAIA::NUM x = 0; x < m_desc.sWinIOCPRecvEventCount; ++x)
@@ -637,13 +646,17 @@ namespace GAIA
 					if(pCtx->pDataSocket->IsConnected())
 					{
 						pCtx->pDataSocket->SetConnected(GAIA::False);
-						pCtx->pDataSocket->OnDisconnected(GAIA::True, GAIA::False);
+						{
+							GAIA::SYNC::AutolockPure al(pCtx->pDataSocket->m_lrCB);
+							pCtx->pDataSocket->OnDisconnected(GAIA::True, GAIA::False);
+						}
 					}
 					pCtx->pDataSocket->SwapBrokenState();
 				}
 				else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_SEND)
 				{
 					GAST(dwTrans == pCtx->_buf.len);
+					GAIA::SYNC::AutolockPure al(pCtx->pDataSocket->m_lrCB);
 					pCtx->pDataSocket->OnSent(GAIA::True, pCtx->data, dwTrans, pCtx->_buf.len);
 				}
 				else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_RECV)
@@ -651,7 +664,10 @@ namespace GAIA
 					// Dispatch.
 					if(dwTrans > 0)
 					{
-						pCtx->pDataSocket->OnRecved(GAIA::True, pCtx->data, dwTrans);
+						{
+							GAIA::SYNC::AutolockPure al(pCtx->pDataSocket->m_lrCB);
+							pCtx->pDataSocket->OnRecved(GAIA::True, pCtx->data, dwTrans);
+						}
 						this->request_recv(*pCtx->pDataSocket);
 					}
 					else if(dwTrans == 0)
@@ -666,7 +682,11 @@ namespace GAIA
 								if(pCtx->pDataSocket->IsConnected())
 								{
 									pCtx->pDataSocket->SetConnected(GAIA::False);
-									pCtx->pDataSocket->OnDisconnected(GAIA::True, GAIA::True);
+									
+									{
+										GAIA::SYNC::AutolockPure al(pCtx->pDataSocket->m_lrCB);
+										pCtx->pDataSocket->OnDisconnected(GAIA::True, GAIA::True);
+									}
 								}
 							}
 						}
@@ -710,7 +730,11 @@ namespace GAIA
 										if(pCtx->pDataSocket->IsConnected())
 										{
 											pCtx->pDataSocket->SetConnected(GAIA::False);
-											pCtx->pDataSocket->OnDisconnected(GAIA::True, GAIA::True);
+											
+											{
+												GAIA::SYNC::AutolockPure al(pCtx->pDataSocket->m_lrCB);
+												pCtx->pDataSocket->OnDisconnected(GAIA::True, GAIA::True);
+											}
 										}
 									}
 								}
@@ -725,32 +749,51 @@ namespace GAIA
 						}
 						else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_SEND)
 						{
-							pCtx->pDataSocket->OnSent(GAIA::False, pCtx->data, dwTrans, pCtx->_buf.len);
+							{
+								GAIA::SYNC::AutolockPure al(pCtx->pDataSocket->m_lrCB);
+								pCtx->pDataSocket->OnSent(GAIA::False, pCtx->data, dwTrans, pCtx->_buf.len);
+							}
+							
 							if(pCtx->pDataSocket->IsConnected())
 							{
 								pCtx->pDataSocket->SetConnected(GAIA::False);
-								pCtx->pDataSocket->OnDisconnected(GAIA::True, GAIA::True);
+								
+								{
+									GAIA::SYNC::AutolockPure al(pCtx->pDataSocket->m_lrCB);
+									pCtx->pDataSocket->OnDisconnected(GAIA::True, GAIA::True);
+								}
 							}
 						}
 						else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_CONNECT)
 						{
 							GAIA::NETWORK::Addr addrPeer;
 							pCtx->pDataSocket->GetPeerAddress(addrPeer);
-							pCtx->pDataSocket->OnConnected(GAIA::False, addrPeer);
+							{
+								GAIA::SYNC::AutolockPure al(pCtx->pDataSocket->m_lrCB);
+								pCtx->pDataSocket->OnConnected(GAIA::False, addrPeer);
+							}
 						}
 						else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_DISCONNECT)
 						{
 							if(pCtx->pDataSocket->IsConnected())
 							{
 								pCtx->pDataSocket->SetConnected(GAIA::False);
-								pCtx->pDataSocket->OnDisconnected(GAIA::False, GAIA::False);
+								
+								{
+									GAIA::SYNC::AutolockPure al(pCtx->pDataSocket->m_lrCB);
+									pCtx->pDataSocket->OnDisconnected(GAIA::False, GAIA::False);
+								}
 							}
 						}
 						else if(pCtx->type == GAIA::NETWORK::ASYNC_CONTEXT_TYPE_ACCEPT)
 						{
 							GAIA::NETWORK::Addr addrBinded;
 							pCtx->pListenSocket->GetBindedAddress(addrBinded);
-							pCtx->pDataSocket->OnAccepted(GAIA::False, addrBinded);
+							
+							{
+								GAIA::SYNC::AutolockPure al(pCtx->pDataSocket->m_lrCB);
+								pCtx->pDataSocket->OnAccepted(GAIA::False, addrBinded);
+							}
 						}
 						else
 							GASTFALSE;
@@ -771,7 +814,7 @@ namespace GAIA
 		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_UNIX
 			struct timespec timeout;
 			timeout.tv_sec = 0;
-			timeout.tv_nsec = 10 * 1000 * 1000; // 10 MilliSeconds.
+			timeout.tv_nsec = 100L * 1000L * 1000L; // 10 MilliSeconds.
 			struct kevent elist[128];
 			GAIA::NUM sEventCount = kevent(pThread->kqep, GNIL, 0, elist, sizeofarray(elist), &timeout);
 			if(sEventCount == GINVALID)
@@ -802,7 +845,10 @@ namespace GAIA
 								pThread->tempbuf.resize(sRecvAbleSize);
 								GAIA::NUM sRecved = (GAIA::NUM)recv(nSocket, pThread->tempbuf.fptr(), sRecvAbleSize, 0);
 								if(sRecved > 0)
+								{
+									GAIA::SYNC::AutolockPure al(ctx.pSocket->m_lrCB);
 									ctx.pSocket->OnRecved(GAIA::True, pThread->tempbuf.fptr(), sRecved);
+								}
 							}
 						}
 						bConnectBroken = GAIA::True;
@@ -818,7 +864,11 @@ namespace GAIA
 						if(ctx.pSocket->IsConnected())
 						{
 							ctx.pSocket->SetConnected(GAIA::False);
-							ctx.pSocket->OnDisconnected(GAIA::True, GAIA::True);
+							
+							{
+								GAIA::SYNC::AutolockPure al(ctx.pSocket->m_lrCB);
+								ctx.pSocket->OnDisconnected(GAIA::True, GAIA::True);
+							}
 						}
 						struct kevent ke;
 						EV_SET(&ke, nSocket, EVFILT_WRITE, EV_DELETE, 0, 0, GNIL);
@@ -893,8 +943,11 @@ namespace GAIA
 										GAST(pAcceptedSock->m_pWriteAsyncCtx == GNIL);
 										pAcceptedSock->m_pWriteAsyncCtx = pCtxSend;
 
-										pAcceptedSock->OnCreated(GAIA::True);
-										pAcceptedSock->OnAccepted(GAIA::True, addrListen);
+										{
+											GAIA::SYNC::AutolockPure al(pAcceptedSock->m_lrCB);
+											pAcceptedSock->OnCreated(GAIA::True);
+											pAcceptedSock->OnAccepted(GAIA::True, addrListen);
+										}
 										if(this->OnAcceptSocket(*pAcceptedSock, addrListen))
 										{
 											struct kevent ke[2];
@@ -929,7 +982,10 @@ namespace GAIA
 									pThread->tempbuf.resize(sRecvAbleSize);
 									GAIA::NUM sRecved = (GAIA::NUM)recv(nSocket, pThread->tempbuf.fptr(), sRecvAbleSize, 0);
 									if(sRecved > 0)
+									{
+										GAIA::SYNC::AutolockPure al(ctx.pSocket->m_lrCB);
 										ctx.pSocket->OnRecved(GAIA::True, pThread->tempbuf.fptr(), sRecved);
+									}
 									else if(sRecved < 0)
 									{
 										GAIA::N32 nErr = errno;
@@ -938,7 +994,11 @@ namespace GAIA
 											if(ctx.pSocket->IsConnected())
 											{
 												ctx.pSocket->SetConnected(GAIA::False);
-												ctx.pSocket->OnDisconnected(GAIA::True, GAIA::True);
+												
+												{
+													GAIA::SYNC::AutolockPure al(ctx.pSocket->m_lrCB);
+													ctx.pSocket->OnDisconnected(GAIA::True, GAIA::True);
+												}
 											}
 											struct kevent ke;
 											EV_SET(&ke, nSocket, EVFILT_WRITE, EV_DELETE, 0, 0, GNIL);
@@ -978,7 +1038,11 @@ namespace GAIA
 								GAIA::NETWORK::Addr addrPeer;
 								ctx.pSocket->GetPeerAddress(addrPeer);
 								ctx.pSocket->SetConnected(GAIA::True);
-								ctx.pSocket->OnConnected(GAIA::True, addrPeer);
+								
+								{
+									GAIA::SYNC::AutolockPure al(ctx.pSocket->m_lrCB);
+									ctx.pSocket->OnConnected(GAIA::True, addrPeer);
+								}
 
 								struct kevent ke[2];
 								EV_SET(&ke[0], nSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, &ctx);
@@ -1005,16 +1069,29 @@ namespace GAIA
 											if(sNeedSendSize > 0)
 											{
 												GAIA::NUM sSendedSize = (GAIA::NUM)send(nSocket, pThread->tempbuf.fptr(), sNeedSendSize, 0);
+												if(sSendedSize != sNeedSendSize && this->IsEnableLog())
+												{
+													GAIA::N32 nErr = errno;
+													GERR << "[AsyncDispatcher] AsyncDispatcher::Execute: socket send failed, errno = " << nErr << GEND;
+												}
 												GAST(sSendedSize == sNeedSendSize);
-												ctx.pSocket->OnSent(GAIA::True, pThread->tempbuf.fptr(), sSendedSize, sSendedSize + pThread->tempbuf.remain());
+												
+												{
+													GAIA::SYNC::AutolockPure al(ctx.pSocket->m_lrCB);
+													ctx.pSocket->OnSent(GAIA::True, pThread->tempbuf.fptr(), sSendedSize, sSendedSize + pThread->tempbuf.remain());
+												}
 											}
 											if(!ctx.pSocket->m_sendbuf.empty())
 											{
 												GAST(ctx.pSocket->m_pWriteAsyncCtx != GNIL);
 												struct kevent ke;
 												EV_SET(&ke, nSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, ctx.pSocket->m_pWriteAsyncCtx);
+											#ifdef GAIA_DEBUG_AST
 												GAIA::NUM sResult = kevent(pThread->kqep, &ke, 1, GNIL, 0, GNIL);
 												GAST(sResult != GINVALID);
+											#else
+												kevent(pThread->kqep, &ke, 1, GNIL, 0, GNIL);
+											#endif
 											}
 										}
 										ctx.pSocket->drop_ref("AsyncDispatcher::Execute:EndSend");

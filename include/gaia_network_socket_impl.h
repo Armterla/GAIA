@@ -1,4 +1,4 @@
-﻿#ifndef		__GAIA_NETWORK_SOCKET_IMPL_H__
+#ifndef		__GAIA_NETWORK_SOCKET_IMPL_H__
 #define		__GAIA_NETWORK_SOCKET_IMPL_H__
 
 #include "gaia_type.h"
@@ -399,6 +399,36 @@ namespace GAIA
 				#endif
 				}
 				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_SENDTIMEOUT:
+				{
+					if(m_nSendTimeout == (GAIA::N32)v)
+						return;
+					m_nSendTimeout = v;
+				#if GAIA_OS == GAIA_OS_WINDOWS
+					if(setsockopt(m_nSocket, SOL_SOCKET, SO_SNDTIMEO, (GAIA::CH*)&m_nSendTimeout, sizeof(m_nSendTimeout)) != 0)
+						THROW_LASTERROR;
+				#else
+					struct timeval tv = {m_nSendTimeout / 1000, (m_nSendTimeout % 1000) * 1000};
+					if(setsockopt(m_nSocket, SOL_SOCKET, SO_SNDTIMEO, (GAIA::CH*)&tv, sizeof(tv)) != 0)
+						THROW_LASTERROR;
+				#endif
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_RECVTIMEOUT:
+				{
+					if(m_nRecvTimeout == (GAIA::N32)v)
+						return;
+					m_nRecvTimeout = v;
+				#if GAIA_OS == GAIA_OS_WINDOWS
+					if(setsockopt(m_nSocket, SOL_SOCKET, SO_RCVTIMEO, (GAIA::CH*)&m_nRecvTimeout, sizeof(m_nRecvTimeout)) != 0)
+						THROW_LASTERROR;
+				#else
+					struct timeval tv = {m_nSendTimeout / 1000, (m_nSendTimeout % 1000) * 1000};
+					if(setsockopt(m_nSocket, SOL_SOCKET, SO_RCVTIMEO, (GAIA::CH*)&tv, sizeof(tv)) != 0)
+						THROW_LASTERROR;
+				#endif
+				}
+				break;
 			default:
 				GTHROW(InvalidParam);
 			}
@@ -444,6 +474,16 @@ namespace GAIA
 			case GAIA::NETWORK::Socket::SOCKET_OPTION_KEEPALIVE:
 				{
 					v = (GAIA::BL)m_bKeepAlive;
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_SENDTIMEOUT:
+				{
+					v = m_nSendTimeout;
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_RECVTIMEOUT:
+				{
+					v = m_nRecvTimeout;
 				}
 				break;
 			default:
@@ -797,8 +837,10 @@ namespace GAIA
 		{
 			m_nSocket = GINVALID;
 			m_SockType = SOCKET_TYPE_INVALID;
-			m_nSendBufferSize = 1024 * 2;
-			m_nRecvBufferSize = 1024 * 2;
+			m_nSendBufferSize = GINVALID;
+			m_nRecvBufferSize = GINVALID;
+			m_nSendTimeout = GINVALID;
+			m_nRecvTimeout = GINVALID;
 			m_bBinded = GAIA::False;
 			m_bConnected = GAIA::False;
 			m_bNotBlock = GAIA::False;

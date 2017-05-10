@@ -38,9 +38,11 @@ namespace GAIA
 			#else
 				pthread_mutex_destroy(&m_mutex);
 				pthread_cond_destroy(&m_cond);
-				GAST(m_reqcount == -1);
-				GAIA::UM origin_owner_tid = m_owner_tid;
-				GAST(origin_owner_tid == (GAIA::UM)GINVALID);
+			#	ifdef GAIA_DEBUG_AST
+					GAST(m_reqcount == -1);
+					GAIA::UM origin_owner_tid = m_owner_tid;
+					GAST(origin_owner_tid == (GAIA::UM)GINVALID);
+			#	endif
 			#endif
 			}
 			GINL GAIA::GVOID Enter()

@@ -16,6 +16,12 @@ namespace GAIA
 		class Dir;
 		class File;
 	}
+	
+	namespace LOCALE
+	{
+		class Language;
+		class LanguageChinese;
+	}
 
 	namespace NETWORK
 	{
@@ -95,6 +101,12 @@ namespace GAIA
 	namespace DOC
 	{
 		class PDFWriter;
+	}
+	
+	namespace PATTERN
+	{
+		class StringIndex;
+		class TextIndex;
 	}
 }
 

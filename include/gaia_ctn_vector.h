@@ -281,6 +281,8 @@ namespace GAIA
 				_SizeType newsize = this->size() + size;
 				if(newsize > this->capacity())
 				{
+					_ExtendType increaser;
+					newsize = GAIA::ALGO::gmax(increaser.Increase(this->capacity()), newsize);
 					_DataType* pTemp = gnew _datatype[newsize];
 					if(m_pFront != GNIL)
 					{

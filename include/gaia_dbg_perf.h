@@ -66,15 +66,19 @@ namespace GAIA
 				{
 					if(uThreadID == GINVALID)
 					{
-						GAIA::LOG::Log& gaialog = *m_pGAIALog;
-						gaialog << gaialog.Type(m_logtype) << gaialog.UserFilter(m_uLogFilter) <<
-									  pszItemName <<
-									  " Count=" << uTotalCount <<
-									  " Total=" << uTotalTime <<
-									  " Avg=" << uTotalTime / uTotalCount <<
-									  " Min=" << uMinTime <<
-									  " Max=" << uMaxTime <<
-									  gaialog.End();
+						if(m_pGAIALog != GNIL)
+						{
+							GAIA::LOG::Log& gaialog = *m_pGAIALog;
+							gaialog << gaialog.Type(m_logtype) 
+									<< gaialog.UserFilter(m_uLogFilter) 
+									<< pszItemName 
+									<< " Count=" << uTotalCount
+									<< " Total=" << uTotalTime 
+									<< " Avg=" << uTotalTime / uTotalCount 
+									<< " Min=" << uMinTime 
+									<< " Max=" << uMaxTime 
+									<< gaialog.End();
+						}
 					}
 					return GAIA::True;
 				}
@@ -296,8 +300,6 @@ namespace GAIA
 				{
 				#ifdef GAIA_DEBUG_LOG
 					pLog = &g_gaia_log;
-				#else
-					pLog = &g_gaia_invalidlog;
 				#endif
 				}
 				CallBackForLog cb(*pLog, logtype, uLogFilter);

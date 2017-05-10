@@ -187,7 +187,8 @@ namespace GAIA
 								GTHROW_RET(DataError, GNIL);
 							nt = GAIA::XML::XML_NODE_MULTICONTAINER;
 							nodenamelen = (_SizeType)(p - m_pCursor - 2);
-							pRet = m_pCursor + 2;
+							pRet = m_pCursor + 1;
+							GAST(*pRet == '/');
 
 							p = this->move_to_next(p);
 							if(*p != '>')
@@ -363,7 +364,7 @@ namespace GAIA
 				@exception GAIA::ECT::EctDataError
 					If the source xml's format exist error, and can't read, throw it.
 			*/
-			GINL const _DataType* End(GAIA::XML::XML_NODE* nt = GNIL)
+			GINL const _DataType* End(GAIA::XML::XML_NODE* nt = GNIL, _SizeType* pNodeNameLen = GNIL)
 			{
 				GAIA::XML::XML_NODE nodetype;
 				_SizeType nodenamelen;
@@ -384,6 +385,8 @@ namespace GAIA
 				default:
 					GTHROW_RET(Illegal, GNIL);
 				}
+				if(pNodeNameLen != GNIL)
+					*pNodeNameLen = nodenamelen;
 				m_pCursor = pNext;
 				return pRet;
 			}
@@ -548,11 +551,11 @@ namespace GAIA
 				const _DataType* pNext;
 				const _DataType* pRet = this->Peek(nt, nodenamelen, &pNext);
 				if(pRet == GNIL)
-					GTHROW_RET(Illegal, GNIL);
+					GTHROW_RET(Illegal, v);
 				switch(nt)
 				{
 				case GAIA::XML::XML_NODE_NAME:
-					GTHROW_RET(Illegal, GNIL);
+					GTHROW_RET(Illegal, v);
 				case GAIA::XML::XML_NODE_VALUE:
 					{
 						if(GAIA::ALGO::gstrcmp(pRet, "true", nodenamelen) == 0)
@@ -564,7 +567,7 @@ namespace GAIA
 					}
 					break;
 				default:
-					GTHROW_RET(Illegal, GNIL);
+					GTHROW_RET(Illegal, v);
 				}
 				GAST(nodenamelen != 0);
 				m_pCursor = pNext;
@@ -589,24 +592,24 @@ namespace GAIA
 				const _DataType* pNext;
 				const _DataType* pRet = this->Peek(nt, nodenamelen, &pNext);
 				if(pRet == GNIL)
-					GTHROW_RET(Illegal, GNIL);
+					GTHROW_RET(Illegal, v);
 				switch(nt)
 				{
 				case GAIA::XML::XML_NODE_NAME:
-					GTHROW_RET(Illegal, GNIL);
+					GTHROW_RET(Illegal, v);
 				case GAIA::XML::XML_NODE_VALUE:
 					{
 						if(nodenamelen != 32)
-							GTHROW_RET(Convert, GNIL);
+							GTHROW_RET(Convert, v);
 						GAIA::CH sz[33];
 						GAIA::ALGO::gstrcpy(sz, pRet, nodenamelen);
 						if(!v.check(sz))
-							GTHROW_RET(Convert, GNIL);
+							GTHROW_RET(Convert, v);
 						v.fromstring(sz);
 					}
 					break;
 				default:
-					GTHROW_RET(Illegal, GNIL);
+					GTHROW_RET(Illegal, v);
 				}
 				GAST(nodenamelen != 0);
 				m_pCursor = pNext;

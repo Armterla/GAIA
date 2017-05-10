@@ -117,6 +117,48 @@ namespace TEST
 	}
 	extern GAIA::GVOID t_xml_xml(GAIA::LOG::Log& logobj)
 	{
+		// Xml format test.
+		{
+			const GAIA::CH SRC[] = "<a>  <b c=\"1\" \t d = \"string\"/><bb cc=\"1.2\" dd=\"string value\"\t ><bbb ccc=\"123\"  ddd=\"a string value\"/>\n\n</bb></a>";
+			const GAIA::CH DST[] = "<a><b c=\"1\" d=\"string\"/><bb cc=\"1.2\" dd=\"string value\"><bbb ccc=\"123\" ddd=\"a string value\"/></bb></a>";
+			
+			GAIA::CH szDst[1024];
+			GAIA::CH szDst1[1024];
+			
+			GAIA::NUM sResult0 = GAIA::XML::XmlChangeFormat(SRC, sizeof(SRC) - 1, (GAIA::CH*)GNIL, 0, GAIA::XML::XML_SAVE_BESTSIZE);
+			TAST(sResult0 != GINVALID);
+			GAIA::NUM sResult1 = GAIA::XML::XmlChangeFormat(SRC, sizeof(SRC) - 1, szDst, sizeof(szDst), GAIA::XML::XML_SAVE_BESTSIZE);
+			TAST(sResult1 != GINVALID);
+			TAST(sResult0 == sResult1);
+			TAST(sResult0 == sizeof(DST) - 1);
+			szDst[sResult1] = '\0';
+			TAST(GAIA::ALGO::gstrcmp(szDst, DST) == 0);
+			
+			sResult0 = GAIA::XML::XmlChangeFormat(DST, sizeof(DST) - 1, (GAIA::CH*)GNIL, 0, GAIA::XML::XML_SAVE_BESTREAD);
+			TAST(sResult0 != GINVALID);
+			sResult1 = GAIA::XML::XmlChangeFormat(DST, sizeof(DST) - 1, szDst, sizeof(szDst), GAIA::XML::XML_SAVE_BESTREAD);
+			TAST(sResult1 != GINVALID);
+			TAST(sResult0 == sResult1);
+			szDst[sResult1] = '\0';
+			
+			GAIA::NUM sDstLen = sResult0;
+			
+			sResult0 = GAIA::XML::XmlChangeFormat(szDst, sDstLen, (GAIA::CH*)GNIL, 0, GAIA::XML::XML_SAVE_BESTSIZE);
+			TAST(sResult0 != GINVALID);
+			sResult1 = GAIA::XML::XmlChangeFormat(szDst, sDstLen, szDst1, sizeof(szDst1), GAIA::XML::XML_SAVE_BESTSIZE);
+			TAST(sResult1 != GINVALID);
+			TAST(sResult0 == sResult1);
+			TAST(sResult0 == sizeof(DST) - 1);
+			szDst1[sResult1] = '\0';
+			
+			GAIA::NUM sDst1Len = sResult0;
+			
+			szDst[sDstLen] = '\0';
+			szDst1[sDst1Len] = '\0';
+			
+			TAST(GAIA::ALGO::gstrcmp(szDst1, DST) == 0);
+		}
+		
 		GAIA::XML::XmlFactory fac;
 		GAIA::XML::XmlFactoryDesc desc;
 		desc.reset();

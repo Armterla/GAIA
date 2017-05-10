@@ -169,7 +169,10 @@ namespace GAIA
 						else if(GAIA::ALGO::gstrequal(pszLocale, "SYS"))
 							ct = GAIA::CHARSET_TYPE_SYS;
 						else
+						{
+							ct = GAIA::CHARSET_TYPE_INVALID;
 							GTHROW(Constructor);
+						}
 						GAIA::NUM sSrcLen = GAIA::ALGO::gstrlen(p);
 						if(!this->resize(sSrcLen * 6 + 1))
 							GTHROW(Constructor);
@@ -196,7 +199,10 @@ namespace GAIA
 						else if(GAIA::ALGO::gstrequal(pszLocale, "SYS"))
 							ct = GAIA::CHARSET_TYPE_SYS;
 						else
+						{
+							ct = GAIA::CHARSET_TYPE_INVALID;
 							GTHROW(Constructor);
+						}
 						GAIA::NUM sSrcLen = GAIA::ALGO::gstrlen(p);
 						if(!this->resize(sSrcLen + 1))
 							GTHROW(Constructor);

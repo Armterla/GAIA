@@ -4,6 +4,7 @@
 #include "gaia_type.h"
 #include "gaia_assert.h"
 #include "gaia_algo_extend.h"
+#include "gaia_algo_string.h"
 #include "gaia_ctn_vector.h"
 #include "gaia_ctn_set.h"
 

@@ -10,6 +10,11 @@ namespace GAIA
 		class StreamBase : public GAIA::Base
 		{
 		public:
+			virtual GAIA::GVOID lock_read() = 0;
+			virtual GAIA::GVOID unlock_read() = 0;
+			virtual GAIA::GVOID lock_write() = 0;
+			virtual GAIA::GVOID unlock_write() = 0;
+			
 			virtual GAIA::GVOID enable_write(GAIA::BL bEnable) = 0;
 			virtual GAIA::BL enable_write() const = 0;
 			virtual GAIA::GVOID enable_read(GAIA::BL bEnable) = 0;
@@ -60,6 +65,11 @@ namespace GAIA
 		class InvalidStream : public GAIA::STREAM::StreamBase
 		{
 		public:
+			virtual GAIA::GVOID lock_read(){}
+			virtual GAIA::GVOID unlock_read(){}
+			virtual GAIA::GVOID lock_write(){}
+			virtual GAIA::GVOID unlock_write(){}
+			
 			virtual GAIA::GVOID enable_write(GAIA::BL bEnable){}
 			virtual GAIA::BL enable_write() const{return GAIA::False;}
 			virtual GAIA::GVOID enable_read(GAIA::BL bEnable){}

@@ -5,6 +5,7 @@
 #include "gaia_assert.h"
 #include "gaia_log.h"
 
+extern GAIA::STREAM::STDStream g_gaia_stdstream;
 extern GAIA::LOG::Log g_gaia_log;
 extern GAIA::LOG::InvalidLog g_gaia_invalidlog;
 
@@ -12,6 +13,11 @@ namespace GAIA
 {
 	namespace DBG
 	{
+		GINL GAIA::STREAM::StreamBase& debugstream()
+		{
+			return g_gaia_stdstream;
+		}
+		
 		GINL GAIA::GVOID debuglog(const GAIA::CH* pszHead, const GAIA::CH* pszFileName, GAIA::NUM sCodeLine)
 		{
 			g_gaia_log << g_gaia_log.Type(GAIA::LOG::Log::TYPE_ERROR)

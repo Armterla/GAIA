@@ -608,11 +608,11 @@ namespace GAIA
 				const _DataType* pNext;
 				const _DataType* pRet = this->Peek(nt, nodenamelen, &pNext);
 				if(pRet == GNIL)
-					GTHROW_RET(Illegal, GNIL);
+					GTHROW_RET(Illegal, v);
 				switch(nt)
 				{
 				case GAIA::JSON::JSON_NODE_NAME:
-					GTHROW_RET(Illegal, GNIL);
+					GTHROW_RET(Illegal, v);
 				case GAIA::JSON::JSON_NODE_VALUE:
 					{
 						if(GAIA::ALGO::gstrcmp(pRet, "true", nodenamelen) == 0)
@@ -627,7 +627,7 @@ namespace GAIA
 					}
 					break;
 				default:
-					GTHROW_RET(Illegal, GNIL);
+					GTHROW_RET(Illegal, v);
 				}
 				GAST(nodenamelen != 0);
 				m_pCursor = pNext;
@@ -652,24 +652,24 @@ namespace GAIA
 				const _DataType* pNext;
 				const _DataType* pRet = this->Peek(nt, nodenamelen, &pNext);
 				if(pRet == GNIL)
-					GTHROW_RET(Illegal, GNIL);
+					GTHROW_RET(Illegal, v);
 				switch(nt)
 				{
 				case GAIA::JSON::JSON_NODE_NAME:
-					GTHROW_RET(Illegal, GNIL);
+					GTHROW_RET(Illegal, v);
 				case GAIA::JSON::JSON_NODE_VALUE:
 					{
 						if(nodenamelen != 32)
-							GTHROW_RET(Convert, GNIL);
+							GTHROW_RET(Convert, v);
 						GAIA::CH sz[33];
 						GAIA::ALGO::gstrcpy(sz, pRet, nodenamelen);
 						if(!v.check(sz))
-							GTHROW_RET(Convert, GNIL);
+							GTHROW_RET(Convert, v);
 						v.fromstring(sz);
 					}
 					break;
 				default:
-					GTHROW_RET(Illegal, GNIL);
+					GTHROW_RET(Illegal, v);
 				}
 				GAST(nodenamelen != 0);
 				m_pCursor = pNext;

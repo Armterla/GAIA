@@ -94,6 +94,7 @@ namespace GAIA
 			GAST(nSocket <= GAIA::N32MAX);
 			if(nSocket == INVALID_SOCKET)
 			{
+				GAIA::SYNC::AutolockPure al(this->m_lrCB);
 				this->OnCreated(GAIA::False);
 				return;
 			}
@@ -120,7 +121,10 @@ namespace GAIA
 			m_nBackupSocket = m_sock.GetFD();
 		#endif
 
-			this->OnCreated(GAIA::True);
+			{
+				GAIA::SYNC::AutolockPure al(this->m_lrCB);
+				this->OnCreated(GAIA::True);
+			}
 		}
 
 		GAIA::GVOID AsyncSocket::Close()
@@ -128,13 +132,21 @@ namespace GAIA
 			if(this->IsConnected())
 			{
 				this->SetConnected(GAIA::False);
-				this->OnDisconnected(GAIA::True, GAIA::False);
+				
+				{
+					GAIA::SYNC::AutolockPure al(this->m_lrCB);
+					this->OnDisconnected(GAIA::True, GAIA::False);
+				}
 			}
 		#if GAIA_OS != GAIA_OS_WINDOWS
 			m_pDispatcher->push_for_recycle(*this);
 		#endif
 			m_sock.Close();
-			this->OnClosed(GAIA::True);
+
+			{
+				GAIA::SYNC::AutolockPure al(this->m_lrCB);
+				this->OnClosed(GAIA::True);
+			}
 		}
 
 		GAIA::GVOID AsyncSocket::Shutdown(GAIA::N32 nShutdownFlag)
@@ -142,19 +154,31 @@ namespace GAIA
 			if(this->IsConnected())
 			{
 				this->SetConnected(GAIA::False);
-				this->OnDisconnected(GAIA::True, GAIA::False);
+				
+				{
+					GAIA::SYNC::AutolockPure al(this->m_lrCB);
+					this->OnDisconnected(GAIA::True, GAIA::False);
+				}
 			}
 		#if GAIA_OS != GAIA_OS_WINDOWS
 			m_pDispatcher->push_for_recycle(*this);
 		#endif
 			m_sock.Shutdown(nShutdownFlag);
-			this->OnShutdowned(GAIA::True, nShutdownFlag);
+			
+			{
+				GAIA::SYNC::AutolockPure al(this->m_lrCB);
+				this->OnShutdowned(GAIA::True, nShutdownFlag);
+			}
 		}
 
 		GAIA::GVOID AsyncSocket::Bind(const GAIA::NETWORK::Addr& addr)
 		{
 			m_sock.Bind(addr);
-			this->OnBound(GAIA::True, addr);
+			
+			{
+				GAIA::SYNC::AutolockPure al(this->m_lrCB);
+				this->OnBound(GAIA::True, addr);
+			}
 		}
 
 		GAIA::GVOID AsyncSocket::Connect(const GAIA::NETWORK::Addr& addr)
@@ -201,7 +225,10 @@ namespace GAIA
 				if(err != ERROR_IO_PENDING)
 				{
 					m_pDispatcher->release_async_ctx(pCtx);
-					this->OnConnected(GAIA::False, addr);
+					{
+						GAIA::SYNC::AutolockPure al(this->m_lrCB);
+						this->OnConnected(GAIA::False, addr);
+					}
 					this->drop_ref();
 					if(m_pDispatcher->IsEnableLog())
 						GERR << "[AsyncSocket] AsyncSocket::Connect:IOCP error, cannot ConnectEx, ErrorCode = " << ::WSAGetLastError() << GEND;
@@ -249,7 +276,10 @@ namespace GAIA
 				if(err != ERROR_IO_PENDING)
 				{
 					m_pDispatcher->release_async_ctx(pCtx);
-					this->OnDisconnected(GAIA::False, GAIA::False);
+					{
+						GAIA::SYNC::AutolockPure al(this->m_lrCB);
+						this->OnDisconnected(GAIA::False, GAIA::False);
+					}
 					this->drop_ref();
 					if(m_pDispatcher->IsEnableLog())
 						GERR << "[AsyncSocket] AsyncSocket::Disconnect:IOCP error, cannot DisconnectEx, ErrorCode = " << ::WSAGetLastError() << GEND;
@@ -296,7 +326,11 @@ namespace GAIA
 					DWORD err = WSAGetLastError();
 					if(err != ERROR_IO_PENDING)
 					{
-						this->OnSent(GAIA::False, p, sOffset, nSize);
+						{
+							GAIA::SYNC::AutolockPure al(this->m_lrCB);
+							this->OnSent(GAIA::False, p, sOffset, nSize);
+						}
+						
 						m_pDispatcher->release_async_ctx(pCtx);
 						this->drop_ref();
 						if(m_pDispatcher->IsEnableLog())

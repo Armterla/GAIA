@@ -3,10 +3,13 @@
 
 #include "gaia_type.h"
 #include "gaia_assert.h"
-#include "gaia_algo_string.h"
-#include "gaia_ctn_string.h"
 #include "gaia_stream_format.h"
 #include "gaia_stream_streambase.h"
+#include "gaia_sync_lock.h"
+#include "gaia_sync_autolock.h"
+#include "gaia_algo_string.h"
+#include "gaia_ctn_string.h"
+
 
 namespace GAIA
 {
@@ -25,6 +28,11 @@ namespace GAIA
 
 		public:
 			GINL StringStream(){this->init();}
+			
+			virtual GAIA::GVOID lock_read(){m_lrRead.Enter();}
+			virtual GAIA::GVOID unlock_read(){m_lrRead.Leave();}
+			virtual GAIA::GVOID lock_write(){m_lrWrite.Enter();}
+			virtual GAIA::GVOID unlock_write(){m_lrWrite.Leave();}
 
 			GINL virtual GAIA::GVOID enable_write(GAIA::BL bEnable){m_bEnableWrite = bEnable;}
 			GINL virtual GAIA::BL enable_write() const{return m_bEnableWrite;}
@@ -32,6 +40,7 @@ namespace GAIA
 			GINL virtual GAIA::BL enable_read() const{return m_bEnableRead;}
 			GINL virtual StringStream& operator << (GAIA::BL t)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				if(!this->enable_write())
 					return *this;
 				if(t)
@@ -42,6 +51,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (GAIA::NM t)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				if(!this->enable_write())
 					return *this;
 				__CharType szTemp[64];
@@ -51,6 +61,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (GAIA::UM t)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				if(!this->enable_write())
 					return *this;
 				__CharType szTemp[64];
@@ -60,6 +71,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (GAIA::N8 t)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				if(!this->enable_write())
 					return *this;
 				__CharType szTemp[64];
@@ -69,6 +81,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (GAIA::N16 t)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				if(!this->enable_write())
 					return *this;
 				__CharType szTemp[64];
@@ -78,6 +91,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (GAIA::N32 t)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				if(!this->enable_write())
 					return *this;
 				__CharType szTemp[64];
@@ -87,6 +101,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (const GAIA::N64& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				__CharType szTemp[64];
 				GAIA::ALGO::castv(t, szTemp, sizeofarray(szTemp));
 				m_str += szTemp;
@@ -94,6 +109,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (GAIA::U8 t)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				if(!this->enable_write())
 					return *this;
 				__CharType szTemp[64];
@@ -103,6 +119,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (GAIA::U16 t)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				if(!this->enable_write())
 					return *this;
 				__CharType szTemp[64];
@@ -112,6 +129,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (GAIA::U32 t)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				if(!this->enable_write())
 					return *this;
 				__CharType szTemp[64];
@@ -121,6 +139,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (const GAIA::U64& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				if(!this->enable_write())
 					return *this;
 				__CharType szTemp[64];
@@ -130,6 +149,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (GAIA::F32 t)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				if(!this->enable_write())
 					return *this;
 				__CharType szTemp[64];
@@ -139,6 +159,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (const GAIA::F64& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				if(!this->enable_write())
 					return *this;
 				__CharType szTemp[64];
@@ -148,6 +169,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (const GAIA::WCH& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				if(!this->enable_write())
 					return *this;
 				__CharType szTemp[64];
@@ -157,6 +179,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (const GAIA::CH* p)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				if(!this->enable_write())
 					return *this;
 				m_str += p;
@@ -164,6 +187,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (const GAIA::WCH* p)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				if(!this->enable_write())
 					return *this;
 				m_str += p;
@@ -171,6 +195,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (const GAIA::X128& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				if(!this->enable_write())
 					return *this;
 				__CharType szTemp[64];
@@ -180,86 +205,103 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator >> (GAIA::BL& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				this->readvalue(t);
 				return *this;
 			}
 			GINL virtual StringStream& operator >> (GAIA::NM& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				this->readvalue(t);
 				return *this;
 			}
 			GINL virtual StringStream& operator >> (GAIA::UM& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				this->readvalue(t);
 				return *this;
 			}
 			GINL virtual StringStream& operator >> (GAIA::N8& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				this->readvalue(t);
 				return *this;
 			}
 			GINL virtual StringStream& operator >> (GAIA::N16& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				this->readvalue(t);
 				return *this;
 			}
 			GINL virtual StringStream& operator >> (GAIA::N32& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				this->readvalue(t);
 				return *this;
 			}
 			GINL virtual StringStream& operator >> (GAIA::N64& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				this->readvalue(t);
 				return *this;
 			}
 			GINL virtual StringStream& operator >> (GAIA::U8& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				this->readvalue(t);
 				return *this;
 			}
 			GINL virtual StringStream& operator >> (GAIA::U16& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				this->readvalue(t);
 				return *this;
 			}
 			GINL virtual StringStream& operator >> (GAIA::U32& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				this->readvalue(t);
 				return *this;
 			}
 			GINL virtual StringStream& operator >> (GAIA::U64& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				this->readvalue(t);
 				return *this;
 			}
 			GINL virtual StringStream& operator >> (GAIA::F32& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				this->readvalue(t);
 				return *this;
 			}
 			GINL virtual StringStream& operator >> (GAIA::F64& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				this->readvalue(t);
 				return *this;
 			}
 			GINL virtual StringStream& operator >> (GAIA::WCH& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				this->readchar(t);
 				return *this;
 			}
 			GINL virtual StringStream& operator >> (GAIA::CH* p)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				this->readchars(p);
 				return *this;
 			}
 			GINL virtual StringStream& operator >> (GAIA::WCH* p)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				this->readchars(p);
 				return *this;
 			}
 			GINL virtual StringStream& operator >> (GAIA::X128& t)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				if(!this->enable_read())
 					return *this;
 				if(!t.check(m_str.fptr() + m_sReadIndex))
@@ -270,6 +312,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator >> (StreamFormat& pf)
 			{
+				GAIA::SYNC::Autolock al(m_lrRead);
 				if(!this->enable_read())
 					return *this;
 				pf = m_pf;
@@ -277,6 +320,7 @@ namespace GAIA
 			}
 			GINL virtual StringStream& operator << (const StreamFormat& pf)
 			{
+				GAIA::SYNC::Autolock al(m_lrWrite);
 				m_pf = pf;
 				return *this;
 			}
@@ -286,20 +330,40 @@ namespace GAIA
 					return;
 			}
 
-			GINL GAIA::GVOID setstring(const __CharType* p){m_str = p;}
-			GINL const __CharType* getstring() const{return m_str.fptr();}
-			GINL GAIA::GVOID clear(){m_str.clear(); m_sReadIndex = 0;}
-			GINL GAIA::GVOID destroy(){m_str.destroy(); m_sReadIndex = 0;}
-			GINL GAIA::NUM tell() const{return m_sReadIndex;}
-			GINL GAIA::GVOID seek(GAIA::NUM sReadIndex){m_sReadIndex = sReadIndex;}
+			GINL GAIA::GVOID setstring(const __CharType* p)
+			{
+				m_str = p;
+			}
+			GINL const __CharType* getstring() const
+			{
+				return m_str.fptr();
+			}
+			GINL GAIA::GVOID clear()
+			{
+				m_str.clear();
+				m_sReadIndex = 0;
+			}
+			GINL GAIA::GVOID destroy()
+			{
+				m_str.destroy();
+				m_sReadIndex = 0;
+			}
+			GINL GAIA::NUM tell() const
+			{
+				return m_sReadIndex;
+			}
+			GINL GAIA::GVOID seek(GAIA::NUM sReadIndex)
+			{
+				m_sReadIndex = sReadIndex;
+			}
 
 		private:
 			GINL GAIA::GVOID init()
 			{
 				m_pf.reset();
+				m_sReadIndex = 0;
 				m_bEnableWrite = GAIA::True;
 				m_bEnableRead = GAIA::True;
-				m_sReadIndex = 0;
 			}
 			
 			template<typename _ParamDataType> GAIA::BL readvalue(_ParamDataType& t)
@@ -356,10 +420,12 @@ namespace GAIA
 
 		private:
 			StreamFormat m_pf;
-			GAIA::U8 m_bEnableWrite : 1;
-			GAIA::U8 m_bEnableRead : 1;
 			__StringType m_str;
 			GAIA::NUM m_sReadIndex;
+			GAIA::SYNC::Lock m_lrRead;
+			GAIA::SYNC::Lock m_lrWrite;
+			GAIA::U8 m_bEnableWrite : 1;
+			GAIA::U8 m_bEnableRead : 1;
 		};
 	}
 }

@@ -1332,6 +1332,7 @@
     <ClCompile Include="..\test\t_ctn_trietree.cpp" />
     <ClCompile Include="..\test\t_ctn_vari.cpp" />
     <ClCompile Include="..\test\t_ctn_vector.cpp" />
+    <ClCompile Include="..\test\t_dbg_objwatcher.cpp" />
     <ClCompile Include="..\test\t_dbg_perfcollector.cpp" />
     <ClCompile Include="..\test\t_db_local.cpp" />
     <ClCompile Include="..\test\t_db_remote.cpp" />
@@ -1358,6 +1359,7 @@
     <ClCompile Include="..\test\t_json_jsonreader.cpp" />
     <ClCompile Include="..\test\t_json_jsonwriter.cpp" />
     <ClCompile Include="..\test\t_locale.cpp" />
+    <ClCompile Include="..\test\t_locale_language.cpp" />
     <ClCompile Include="..\test\t_log_log.cpp" />
     <ClCompile Include="..\test\t_math_aabb.cpp" />
     <ClCompile Include="..\test\t_math_aabr.cpp" />
@@ -1386,6 +1388,8 @@
     <ClCompile Include="..\test\t_network_httpserver.cpp" />
     <ClCompile Include="..\test\t_network_socket.cpp" />
     <ClCompile Include="..\test\t_network_sudpsocket.cpp" />
+    <ClCompile Include="..\test\t_pattern_stringindex.cpp" />
+    <ClCompile Include="..\test\t_pattern_textindex.cpp" />
     <ClCompile Include="..\test\t_stream_stringstream.cpp" />
     <ClCompile Include="..\test\t_sync_atomic.cpp" />
     <ClCompile Include="..\test\t_sync_event.cpp" />

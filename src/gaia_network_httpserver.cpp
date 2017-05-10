@@ -73,6 +73,11 @@ namespace GAIA
 					if(descSvr.nAcceptedSocketRecvBufferSize != GINVALID)
 						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, descSvr.nAcceptedSocketRecvBufferSize);
 				}
+				
+				if(descSvr.nSocketSendTimeout != GINVALID)
+					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDTIMEOUT, descSvr.nSocketSendTimeout);
+				if(descSvr.nSocketRecvTimeout != GINVALID)
+					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVTIMEOUT, descSvr.nSocketRecvTimeout);
 			}
 
 			virtual GAIA::N32 Send(const GAIA::GVOID* p, GAIA::N32 nSize)
@@ -128,7 +133,7 @@ namespace GAIA
 				{
 					m_bClosed = GAIA::True;
 					m_pLink->rise_ref("HttpServerAsyncSocket::OnDisconnected:link rise ref");
-					GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
+					GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
 					m_pSvr->m_rclinks.push_back(m_pLink);
 					m_pLink = GNIL;
 				}
@@ -139,7 +144,12 @@ namespace GAIA
 			{
 				GAIA::BL bNeedCallBackToRecycle = GAIA::False;
 				if(!bResult)
+				{
+					GAIA::SYNC::Autolock al(m_lr);
+					if(m_pLink == GNIL)
+						return;
 					bNeedCallBackToRecycle = GAIA::True;
+				}
 				else
 				{
 					GAIA::SYNC::Autolock al(m_lr);
@@ -159,7 +169,7 @@ namespace GAIA
 				{
 					m_bClosed = GAIA::True;
 					m_pLink->rise_ref("HttpServerAsyncSocket::OnSent:link rise ref");
-					GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
+					GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
 					m_pSvr->m_rclinks.push_back(m_pLink);
 					m_pLink = GNIL;
 				}
@@ -168,9 +178,12 @@ namespace GAIA
 			{
 				if(!bResult)
 				{
+					GAIA::SYNC::Autolock al1(m_lr);
+					if(m_pLink == GNIL)
+						return;
 					m_bClosed = GAIA::True;
 					m_pLink->rise_ref("HttpServerAsyncSocket::OnRecved:link rise ref for recv failed");
-					GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
+					GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
 					m_pSvr->m_rclinks.push_back(m_pLink);
 					m_pLink = GNIL;
 					return;
@@ -346,7 +359,7 @@ namespace GAIA
 					   m_lContentLength > m_pSvr->GetDesc().lSingleCallbackLimitSize)
 					{
 						m_pLink->rise_ref("HttpServerAsyncSocket::OnRecv:link rise ref");
-						GAIA::SYNC::AutolockW al(m_pSvr->m_rwRCLinks);
+						GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
 						m_pSvr->m_rclinks.push_back(m_pLink);
 					}
 				}
@@ -415,8 +428,12 @@ namespace GAIA
 			virtual GAIA::BL OnAcceptSocket(GAIA::NETWORK::AsyncSocket& sock, const GAIA::NETWORK::Addr& addrListen)
 			{
 				GAIA::NETWORK::Addr addrPeer;
+			#ifdef GAIA_DEBUG_AST
 				GAIA::BL bGetPeerAddrResult = sock.GetPeerAddress(addrPeer);
 				GAST(bGetPeerAddrResult && addrPeer.check());
+			#else
+				sock.GetPeerAddress(addrPeer);
+			#endif
 
 				if(m_pSvr->m_bLog)
 				{
@@ -462,7 +479,7 @@ namespace GAIA
 				pLink->SetListenAddr(addrListen);
 				pLink->SetAcceptTime(GAIA::TIME::gmt_time());
 				((HttpServerAsyncSocket*)&sock)->SetLink(pLink);
-				GAIA::SYNC::AutolockW al(m_pSvr->m_rwLinks);
+				GAIA::SYNC::Autolock al(m_pSvr->m_lrLinks);
 				m_pSvr->m_links_bypeeraddr.insert(GAIA::CTN::Ref<GAIA::NETWORK::HttpServerLink>(pLink));
 				return GAIA::True;
 			}
@@ -490,7 +507,7 @@ namespace GAIA
 						break;
 					GAIA::BL bExistExecutedTask = m_pSvr->Execute();
 					if(!bExistExecutedTask)
-						GAIA::SYNC::gsleep(1);
+						GAIA::SYNC::gsleep(100);
 				}
 			}
 
@@ -770,10 +787,11 @@ namespace GAIA
 
 			if(GAIA::ALGO::gstrequal(szPath, "/httpinfo"))
 			{
-				strResp += "[GAIA HTTP SERVER STATUS]\n\n";
 				const GAIA::NETWORK::HttpServerStatus& s = this->GetServer().GetStatus();
+				
+				strResp += "[GAIA HTTP SERVER STATUS]\n\n";
 
-				GAIA::U64 uWorkTime = GAIA::TIME::gmt_time() - this->GetServer().GetStatus().uServerStartupTime;
+				GAIA::U64 uWorkTime = GAIA::TIME::gmt_time() - s.uServerStartupTime;
 				GAIA::CH szWorkTime[64];
 				GAIA::TIME::deltatime2string(uWorkTime, szWorkTime);
 				strResp += "\tServerWorkTime = "; strResp += szWorkTime; strResp += "\n\n";
@@ -936,6 +954,8 @@ namespace GAIA
 				strResp += "\tEnableSocketTCPNoDelay = "; strResp += descSvr.bEnableSocketTCPNoDelay; strResp += "\n";
 				strResp += "\tEnableSocketNoBlock = "; strResp += descSvr.bEnableSocketNoBlock; strResp += "\n";
 				strResp += "\tEnableSocketReuseAddr = "; strResp += descSvr.bEnableSocketReuseAddr; strResp += "\n";
+				strResp += "\tSocketSendTimeout = "; strResp += descSvr.nSocketSendTimeout; strResp += "\n";
+				strResp += "\tSocketRecvTimeout = "; strResp += descSvr.nSocketRecvTimeout; strResp += "\n";
 				strResp += "\tListenSocketSendBufferSize = "; strResp += descSvr.nListenSocketSendBufferSize; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, descSvr.nListenSocketSendBufferSize); strResp += "\n";
 				strResp += "\tListenSocketRecvBufferSize = "; strResp += descSvr.nListenSocketRecvBufferSize; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, descSvr.nListenSocketRecvBufferSize); strResp += "\n";
 				strResp += "\tAcceptedSocketSendBufferSize = "; strResp += descSvr.nAcceptedSocketSendBufferSize; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, descSvr.nAcceptedSocketSendBufferSize); strResp += "\n";
@@ -967,6 +987,8 @@ namespace GAIA
 				strResp += "\tMaxAllocSize = "; strResp += memstatus.nMaxAllocSize; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, memstatus.nMaxAllocSize); strResp += "\n";
 				strResp += "\tNotReleaseSize = "; strResp += memstatus.nAllocSizeSum - memstatus.nReleaseSizeSum; strResp += " as "; strResp += GAIA::ALGO::gstrbycapacity(szStorage, memstatus.nAllocSizeSum - memstatus.nReleaseSizeSum); strResp += "\n";
 				strResp += "\tNotReleaseCount = "; strResp += memstatus.nAllocTimesSum - memstatus.nReleaseTimesSum; strResp += "\n";
+				strResp += "\tMinLoc = "; strResp += memstatus.pszMinAllocFileName; strResp += "("; strResp += memstatus.sMinAllocCodeLine; strResp += ")\n";
+				strResp += "\tMaxLoc = "; strResp += memstatus.pszMaxAllocFileName; strResp += "("; strResp += memstatus.sMaxAllocCodeLine; strResp += ")\n";
 			#else
 				strResp += "GAIA_DEBUG_MEMORYLEAK is not define, so can't collect memory infomation.\n";
 			#endif
@@ -1246,7 +1268,7 @@ namespace GAIA
 
 			// Release all links.
 			{
-				GAIA::SYNC::AutolockW al(m_rwLinks);
+				GAIA::SYNC::Autolock al(m_lrLinks);
 				for(__LinkSetType::it it = m_links_bypeeraddr.frontit(); !it.empty(); )
 				{
 					__LinkSetType::_datatype& t = *it;
@@ -1260,7 +1282,7 @@ namespace GAIA
 
 			// Release all request completed links.
 			{
-				GAIA::SYNC::AutolockW al(m_rwRCLinks);
+				GAIA::SYNC::Autolock al(m_lrRCLinks);
 				while(!m_rclinks.empty())
 				{
 					GAIA::NETWORK::HttpServerLink* pLink = m_rclinks.front();
@@ -1284,7 +1306,7 @@ namespace GAIA
 
 			// Get a task.
 			{
-				GAIA::SYNC::AutolockW al(m_rwRCLinks);
+				GAIA::SYNC::Autolock al(m_lrRCLinks);
 				if(m_rclinks.empty())
 					return GAIA::False;
 				pLink = m_rclinks.front();
@@ -1535,7 +1557,7 @@ namespace GAIA
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(HttpServer*)(this)->m_rwBlackList);
 			GAIA::BL bExist = GAIA::False;
-			for(GAIA::CTN::Set<GAIA::NETWORK::HttpServerBlackWhiteNode>::const_it it = m_WhiteList.const_frontit(); !it.empty(); ++it)
+			for(GAIA::CTN::Set<GAIA::NETWORK::HttpServerBlackWhiteNode>::const_it it = m_BlackList.const_frontit(); !it.empty(); ++it)
 			{
 				listResult.push_back(*it);
 				bExist = GAIA::True;
@@ -1590,7 +1612,7 @@ namespace GAIA
 		{
 			GAIA::SYNC::AutolockR al(GCCAST(HttpServer*)(this)->m_rwWhiteList);
 			GAIA::BL bExist = GAIA::False;
-			for(GAIA::CTN::Set<GAIA::NETWORK::HttpServerBlackWhiteNode>::const_it it = m_BlackList.const_frontit(); !it.empty(); ++it)
+			for(GAIA::CTN::Set<GAIA::NETWORK::HttpServerBlackWhiteNode>::const_it it = m_WhiteList.const_frontit(); !it.empty(); ++it)
 			{
 				listResult.push_back(*it);
 				bExist = GAIA::True;
@@ -1802,7 +1824,7 @@ namespace GAIA
 		{
 			// Remove from link list.
 			{
-				GAIA::SYNC::AutolockW al(m_rwLinks);
+				GAIA::SYNC::Autolock al(m_lrLinks);
 				if(!m_links_bypeeraddr.erase(GAIA::CTN::Ref<GAIA::NETWORK::HttpServerLink>(&l)))
 					return GAIA::False;
 			}

@@ -1,4 +1,4 @@
-﻿#ifndef		__GAIA_XML_XMLBASE_H__
+#ifndef		__GAIA_XML_XMLBASE_H__
 #define		__GAIA_XML_XMLBASE_H__
 
 #include "gaia_type.h"
@@ -9,6 +9,9 @@ namespace GAIA
 {
 	namespace XML
 	{
+		/*!
+		 	@brief Specify the xml node type.
+		*/
 		GAIA_ENUM_BEGIN(XML_NODE)
 			XML_NODE_CONTAINER,		// Like <NODE1/>
 			XML_NODE_MULTICONTAINER,// Like <NODE1></NODE1>
@@ -18,9 +21,12 @@ namespace GAIA
 			XML_NODE_COMMENT,		// Like <!--comment content-->
 		GAIA_ENUM_END(XML_NODE)
 
+		/*!
+		 	@brief Specify the xml save text mode.
+		*/
 		GAIA_ENUM_BEGIN(XML_SAVE)
-			XML_SAVE_BESTSIZE,
-			XML_SAVE_BESTREAD,
+			XML_SAVE_BESTSIZE, /*!< Remove all invalid characters(' ', '\t', '\r', '\n' and etc) */
+			XML_SAVE_BESTREAD, /*!< Add line break and indent. */
 		GAIA_ENUM_END(XML_SAVE)
 
 		static const GAIA::TCH XML_DEFAULT_ROOT_NODE_NAME[] = _T("XML_ROOT");
@@ -351,6 +357,18 @@ namespace GAIA
 			0	, //			DEL(delete)
 		};
 
+		/*!
+		 	@brief Check string is a valid xml node name or not.
+		 
+		 	@param nt [in] Specify the xml node type.
+		 
+		 	@param pszNodeName [in] Specify the xml node name.
+		 
+		 	@param sLen [in] Specify the length of parameter pszNode in characters.
+		 		This parameter could be GINVALID, then all the characters in parameter pszNodeName will be checked until to '\0'.
+		 
+		 	@return If characters of parameter pszNodeName are all valid, return GAIA::True, or will return GAIA::False.
+		*/
 		template<typename _DataType> GAIA::BL XmlCheckNodeName(GAIA::XML::XML_NODE nt, const _DataType* pszNodeName, GAIA::NUM sLen = GINVALID)
 		{
 			switch(nt)
@@ -414,6 +432,179 @@ namespace GAIA
 				return GAIA::False;
 			}
 			return GAIA::True;
+		}
+		
+		/*!
+		 	@brief Change xml text format.
+		 
+		 	@param pSrc [in] Specify the source xml text string.
+		 		This parameter can't be NULL.
+		 
+		 	@param sSrcLen [in] Specify the source xml text string length in characters.
+		 		This parameter must above 0.
+		 
+		 	@param pDst [out] Used for saving the converted result.
+		 		This parameter could be GNIL when current function used for calculate length of the result only, then the parameter sDstLen must be GINVALID.
+		 		
+		 
+		 	@param sDstLen [in] Specify the max length of parameter pDst in characters.
+				This parameter could be GINVALID when current function used for calculate length of the result only, then the parameter pDst must be GNIL.
+		 		If parameter pDst is not GNIL, this parameter must above 0.
+		 
+		 	@param savetype [in] Specify the target xml save type.
+		 
+		 	@return If success, return the practice count of result characters.\n
+		 		If failed, return GINVALID.
+		 
+		 	@remarks This function not clean invalid characters when parameter savetype is XML_SAVE_BESTREAD,
+		 		In this situation, you could call this function with parameter savetype filled by XML_SAVE_BESTSIZE first to cleanup invalid characters. 
+		*/
+		template<typename _DataType> GAIA::NUM XmlChangeFormat(const _DataType* pSrc, GAIA::NUM sSrcLen, _DataType* pDst, GAIA::NUM sDstLen, GAIA::XML::XML_SAVE savetype)
+		{
+		#define XMLCHANGEFORMAT_STEPRESULT(v) \
+				do\
+				{\
+					chLast = v;\
+					if(pDst == GNIL)\
+						sRet++;\
+					else\
+					{\
+						if(sRet >= sDstLen)\
+							return GINVALID;\
+						pDst[sRet++] = v;\
+					}\
+				}\
+				while(0)
+		#define XMLCHANGEFORMAT_LINEBREAKTAB \
+			do\
+			{\
+				for(GAIA::NUM d = 0; d < sizeof(szLineBreak) - 1; ++d)\
+					XMLCHANGEFORMAT_STEPRESULT(szLineBreak[d]);\
+				for(GAIA::NUM d = 0; d < sDepth; ++d)\
+					XMLCHANGEFORMAT_STEPRESULT('\t');\
+			}\
+			while(0)
+			
+			// Parameter checkup.
+			GPCHR_FALSE_RET(pSrc != GNIL, GINVALID);
+			GPCHR_FALSE_RET(sSrcLen > 0, GINVALID);
+			GPCHR_FALSE_RET(savetype > GAIA::XML::XML_SAVE_INVALID && savetype < GAIA::XML::XML_SAVE_MAXENUMCOUNT, GINVALID);
+			if(pDst == GNIL)
+				GPCHR_FALSE_RET(sDstLen == 0, GINVALID);
+			else
+				GPCHR_FALSE_RET(sDstLen != 0, GINVALID);
+			GPCHR_FALSE_RET(sDstLen >= 0, GINVALID);
+			
+			// Local variables.
+			GAIA::NUM sRet = 0;
+			_DataType chLast = '\0';
+			
+			// 
+			if(savetype == GAIA::XML::XML_SAVE_BESTSIZE)
+			{
+				GAIA::BL bInString = GAIA::False;
+				for(GAIA::NUM x = 0; x < sSrcLen; ++x)
+				{
+					if(pSrc[x] == '\"')
+					{
+						if(x == 0 || pSrc[x - 1] != '\\')
+							bInString = !bInString;
+						XMLCHANGEFORMAT_STEPRESULT(pSrc[x]);
+					}
+					else
+					{
+						if(bInString)
+							XMLCHANGEFORMAT_STEPRESULT(pSrc[x]);
+						else
+						{
+							if(pSrc[x] > ' ')
+							{
+								if(chLast == '\"')
+								{
+									GAIA::BL bCurrentIsContentChar = GAIA::ALGO::isalpha(pSrc[x]) || GAIA::ALGO::isdigit(pSrc[x]) || pSrc[x] == '_' || pSrc[x] == '-';
+									if(bCurrentIsContentChar)
+										XMLCHANGEFORMAT_STEPRESULT(' ');
+								}
+								XMLCHANGEFORMAT_STEPRESULT(pSrc[x]);
+							}
+							else if(pSrc[x] == ' ' || pSrc[x] == '\t')
+							{
+								if(x > 0 && x + 1 < sSrcLen)
+								{
+									_DataType chprev = pSrc[x - 1];
+									_DataType chnext = pSrc[x + 1];
+									GAIA::BL bPrevIsContentChar = GAIA::ALGO::isalpha(chprev) || GAIA::ALGO::isdigit(chprev) || chprev == '_' || chprev == '-';
+									GAIA::BL bNextIsContentChar = GAIA::ALGO::isalpha(chnext) || GAIA::ALGO::isdigit(chnext) || chnext == '_' || chnext == '-';
+									if(bPrevIsContentChar && bNextIsContentChar)
+										XMLCHANGEFORMAT_STEPRESULT(' ');
+								}
+							}
+						}
+					}
+				}
+			}
+			else if(savetype == GAIA::XML::XML_SAVE_BESTREAD)
+			{
+				GAIA::BL bInString = GAIA::False;
+				GAIA::NUM sDepth = 0;
+				const GAIA::CH szLineBreak[] = GAIA_FILELINEBREAK;
+				for(GAIA::NUM x = 0; x < sSrcLen; ++x)
+				{
+					if(pSrc[x] == '\"')
+					{
+						if(x == 0 || pSrc[x - 1] != '\\')
+							bInString = !bInString;
+					}
+					else if(!bInString)
+					{
+						if(pSrc[x] == '<')
+						{
+							if(x + 1 < sSrcLen && pSrc[x + 1] == '/')
+							{
+								sDepth--;
+								XMLCHANGEFORMAT_LINEBREAKTAB;
+							}
+							else
+							{
+								if(sDepth != 0)
+									XMLCHANGEFORMAT_LINEBREAKTAB;
+								sDepth++;
+							}
+						}
+						else if(pSrc[x] == '/')
+							sDepth--;
+					}
+					XMLCHANGEFORMAT_STEPRESULT(pSrc[x]);
+				}
+			}
+			else
+				GASTFALSE;
+			
+			// Return.
+			return sRet;
+		}
+		
+		GINL GAIA::NUM XmlChangeFormat(const GAIA::TCH* pszSrcFileName, const GAIA::TCH* pszDstFileName, GAIA::XML::XML_SAVE savetype)
+		{
+			// Parameter checkup.
+			GPCHR_FALSE_RET(!GAIA::ALGO::gstremp(pszSrcFileName), GINVALID);
+			GPCHR_FALSE_RET(savetype > GAIA::XML::XML_SAVE_INVALID && savetype < GAIA::XML::XML_SAVE_MAXENUMCOUNT, GINVALID);
+
+			// Local variables.
+			GAIA::NUM sRet = 0;
+			
+			// 
+			if(savetype == GAIA::XML::XML_SAVE_BESTSIZE)
+			{
+			}
+			else if(savetype == GAIA::XML::XML_SAVE_BESTREAD)
+			{
+			}
+			else
+				GASTFALSE;
+			
+			// Return.
+			return sRet;
 		}
 
 		class XmlFactoryHolder : public GAIA::Base

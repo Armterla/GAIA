@@ -168,6 +168,9 @@ namespace GAIA
 		private:
 			GINL GAIA::GVOID init(){m_n = 0;}
 		private:
+	#if NEG_OS == NEG_OS_OSX || NEG_OS == NEG_OS_IOS
+			__attribute__ ((aligned (8)))
+	#endif
 			volatile GAIA::N64 m_n;
 		#ifdef __APPLE__
 		#	pragma clang diagnostic pop

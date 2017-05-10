@@ -198,6 +198,13 @@ namespace GAIA
 				@return If the buffer exist, return a valid pointer, or will return GNIL.
 			*/
 			const GAIA::GVOID* GetRequestBuffer() const{return m_reqbuf.fptr();}
+			
+			/*!
+			 	@brief Get the buffer for request.
+			 
+			 	@return If the buffer exist, return a valid pointer, or will return GNIL.
+			*/
+			GAIA::GVOID* GetRequestBuffer(){return m_reqbuf.fptr();}
 
 			/*!
 				@brief Get the buffer size in bytes for request.
@@ -687,12 +694,14 @@ namespace GAIA
 
 				m_uLogicTimeout = 60 * 1000 * 1000;
 				m_uNetworkResponseTimeout = 16 * 1000 * 1000;
-				m_uRequestTime = 0;
 				m_uWriteCookicTime = 0;
 				m_uReadCookicTime = 0;
+				m_uRequestTime = 0;
+				m_uConnectingTime = 0;
+				m_uConnectedTime = 0;
+				m_uLastSendingTime = 0;
 				m_uLastSentTime = 0;
 				m_uLastRecvedTime = 0;
-				m_uLastSendingTime = 0;
 
 				m_sTotalReqHeadSize = 0;
 				m_sTotalRespHeadSize = 0;
@@ -731,12 +740,14 @@ namespace GAIA
 
 			GAIA::U64 m_uLogicTimeout;
 			GAIA::U64 m_uNetworkResponseTimeout;
-			GAIA::U64 m_uRequestTime;
 			GAIA::U64 m_uWriteCookicTime;
 			GAIA::U64 m_uReadCookicTime;
+			GAIA::U64 m_uRequestTime;
+			GAIA::U64 m_uConnectingTime;
+			GAIA::U64 m_uConnectedTime;
+			GAIA::U64 m_uLastSendingTime;
 			GAIA::U64 m_uLastSentTime;
 			GAIA::U64 m_uLastRecvedTime;
-			GAIA::U64 m_uLastSendingTime;
 
 			GAIA::NUM m_sTotalReqHeadSize;
 			GAIA::NUM m_sTotalRespHeadSize;
@@ -788,6 +799,8 @@ namespace GAIA
 				bEnableSocketReuseAddr = GAIA::True;
 				nSocketSendBufferSize = GINVALID;
 				nSocketRecvBufferSize = GINVALID;
+				nSocketSendTimeout = GINVALID;
+				nSocketRecvTimeout = GINVALID;
 				sMaxCookicCount = DEFAULT_MAX_COOKIC_COUNT;
 				sMaxCookicSize = DEFAULT_MAX_COOKIC_SIZE;
 			}
@@ -818,6 +831,10 @@ namespace GAIA
 				if(nSocketSendBufferSize != GINVALID && nSocketSendBufferSize <= 0)
 					return GAIA::False;
 				if(nSocketRecvBufferSize != GINVALID && nSocketRecvBufferSize <= 0)
+					return GAIA::False;
+				if(nSocketSendTimeout != GINVALID && nSocketSendTimeout <= 0)
+					return GAIA::False;
+				if(nSocketRecvTimeout != GINVALID && nSocketRecvTimeout <= 0)
 					return GAIA::False;
 				if(sMaxCookicCount < 0)
 					return GAIA::False;
@@ -895,6 +912,16 @@ namespace GAIA
 				@brief Specify the socket's receive buffer size in bytes, default is GINVALID means use system default setting.
 			*/
 			GAIA::N32 nSocketRecvBufferSize;
+			
+			/*!
+			 	@brief Specify the socket's send timeout in milliseconds, default is GINVALID means use system default setting.
+			*/
+			GAIA::N32 nSocketSendTimeout;
+			
+			/*!
+			 	@brief Specify the socket's recv timeout in milliseconds, default is GINVALID means use system default setting.
+			*/
+			GAIA::N32 nSocketRecvTimeout;
 
 			/*!
 				@brief Specify the max cookic count, default value is DEFAULT_MAX_COOKIC_COUNT.
@@ -1248,21 +1275,13 @@ namespace GAIA
 					It used for internal, current class's user must set this parameter to GNIL.\n
 					Default value is GNIL.
 
-				@param bConnect [in] Specify execute connect operation or not. Default value is GAIA::True.
-
-				@param bRequest [in] Specify execute request operation or not. Default value is GAIA::True.
-
-				@param bClose [in] Specify execute close operation or not. Default value is GAIA::True.
-
-				@param bRecycleCache [in] Specify execute reccyle cache operation or not. Default value is GAIA::True.
-
 				@return If there exist a task to execute, pop and executed, return GAIA::True, or return GAIA::False.
 
 				@remarks Call this method only pop a unit task in task queue and execute it, so if user need execute all waiting task,
 					call this method many times until GAIA::False be returnned.\n
 					This method is thread safe.\n
 			*/
-			GAIA::BL Execute(GAIA::NETWORK::HttpWorkThread* pWorkThread = GNIL, GAIA::BL bConnect = GAIA::True, GAIA::BL bRequest = GAIA::True, GAIA::BL bClose = GAIA::True, GAIA::BL bRecycleCache = GAIA::True);
+			GAIA::BL Execute(GAIA::NETWORK::HttpWorkThread* pWorkThread = GNIL);
 
 			/*!
 				@brief Enable or disable write cookic to RAM.

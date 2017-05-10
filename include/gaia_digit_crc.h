@@ -9,13 +9,39 @@ namespace GAIA
 {
 	namespace DIGIT
 	{
+		/*!
+		 	@brief Stream based CRC8 algorithm class.
+		*/
 		class CRC8
 		{
 		public:
+			/*!
+			 	@brief Constructor.
+			*/
 			GINL CRC8(){m_crc = 0; this->prepare();}
+			
+			/*!
+			 	@brief Clear current CRC context.
+			*/
 			GINL GAIA::GVOID clear(){m_crc = 0;}
+			
+			/*!
+			 	@brief Get CRC result.
+			 
+			 	@return Return CRC8 result.
+			*/
 			GINL GAIA::U8 result() const{return m_crc;}
-			GINL GAIA::BL build(const GAIA::GVOID* pBuf, GAIA::U32 size)
+			
+			/*!
+			 	@brief Write more binary data for calculating CRC result.
+			 
+			 	@param pBuf [in] Specify the buffer which will be writen.
+			 
+			 	@param size [in] Specify the size of parameter pBuf in bytes.
+			 
+			 	@return If success, return GAIA::True, or will return GAIA::False.
+			*/
+			GINL GAIA::BL update(const GAIA::GVOID* pBuf, GAIA::U32 size)
 			{
 				GAST(!!pBuf);
 				GAST(size > 0);
@@ -31,13 +57,40 @@ namespace GAIA
 			GAIA::U8 m_crc;
 			GAIA::CTN::Vector<GAIA::U8> m_crctable;
 		};
+		
+		/*!
+		 	@brief Stream based CRC16 algorithm class.
+		*/
 		class CRC16
 		{
 		public:
+			/*!
+			 	@brief Constructor.
+			*/
 			GINL CRC16(){m_crc = 0; this->prepare();}
+			
+			/*!
+			 	@brief Clear current CRC context.
+			*/
 			GINL GAIA::GVOID clear(){m_crc = 0;}
+			
+			/*!
+			 	@brief Get CRC result.
+			 
+			 	@return Return CRC16 result.
+			*/
 			GINL GAIA::U16 result() const{return m_crc;}
-			GINL GAIA::BL build(const GAIA::GVOID* pBuf, GAIA::U32 size)
+			
+			/*!
+			 	@brief Write more binary data for calculating CRC result.
+			 
+			 	@param pBuf [in] Specify the buffer which will be writen.
+			 
+			 	@param size [in] Specify the size of parameter pBuf in bytes.
+			 
+			 	@return If success, return GAIA::True, or will return GAIA::False.
+			*/
+			GINL GAIA::BL update(const GAIA::GVOID* pBuf, GAIA::U32 size)
 			{
 				GAST(!!pBuf);
 				GAST(size > 0);
@@ -53,13 +106,40 @@ namespace GAIA
 			GAIA::U16 m_crc;
 			GAIA::CTN::Vector<GAIA::U16> m_crctable;
 		};
+		
+		/*!
+		 	@brief Stream based CRC32 algorithm class.
+		*/
 		class CRC32
 		{
 		public:
+			/*!
+			 	@brief Constructor.
+			*/
 			GINL CRC32(){m_crc = 0; this->prepare();}
+			
+			/*!
+			 	@brief Clear current CRC context.
+			*/
 			GINL GAIA::GVOID clear(){m_crc = 0;}
+			
+			/*!
+			 	@brief Get CRC result.
+			 
+			 	@return Return CRC32 result.
+			*/
 			GINL GAIA::U32 result() const{return m_crc;}
-			GINL GAIA::BL build(const GAIA::GVOID* pBuf, GAIA::U32 size)
+			
+			/*!
+			 	@brief Write more binary data for calculating CRC result.
+			 
+			 	@param pBuf [in] Specify the buffer which will be writen.
+			 
+			 	@param size [in] Specify the size of parameter pBuf in bytes.
+			 
+			 	@return If success, return GAIA::True, or will return GAIA::False.
+			*/
+			GINL GAIA::BL update(const GAIA::GVOID* pBuf, GAIA::U32 size)
 			{
 				GAST(!!pBuf);
 				GAST(size > 0);

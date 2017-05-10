@@ -8,12 +8,26 @@ namespace GAIA
 {
 	namespace DIGIT
 	{
+		/*!
+		 	@brief RC4 crypt algorithm.
+		 		Current class support stream based data crypt or decrypt.
+		 
+		 	_KeySize Specify the middle key size in bytes.
+				Usually, middle key size will be 128(1024 bit) or 256(2048 bit) for safely crypt data.
+		*/
 		template<GAIA::U32 _KeySize> class RC4
 		{
 		public:
 			static const GAIA::U32 _keysize = _KeySize;
-			static const GAIA::U32 _keybytessize = sizeof(GAIA::U32) * _KeySize;
+			
 		public:
+			/*!
+			 	@brief Set middle key. 
+			 
+			 	@param p [in] Specify the middle key.
+			 
+			 	@param uKeySize [in] Specify the middle key size in bytes.
+			*/
 			GINL GAIA::BL set_key(const GAIA::GVOID* p, GAIA::U32 uKeySize)
 			{
 				GAST(uKeySize == sizeof(m_key));
@@ -22,6 +36,14 @@ namespace GAIA
 				GAIA::ALGO::gmemcpy(m_key, p, sizeof(m_key));
 				return GAIA::True;
 			}
+			
+			/*!
+			 	@brief Get middle key.
+			 
+			 	@param p [out] Used for saving the middle key.
+			 
+			 	@param uKeySize [in] Specify the buffer size of parameter p.
+			*/
 			GINL GAIA::BL get_key(GAIA::GVOID* p, GAIA::U32 uKeySize) const
 			{
 				GAST(uKeySize == sizeof(m_key));
@@ -30,6 +52,16 @@ namespace GAIA
 				GAIA::ALGO::gmemcpy(p, m_key, sizeof(m_key));
 				return GAIA::True;
 			}
+			
+			/*!
+			 	@brief Build(Generate) middle key by origin key.
+			 
+			 	@param pKey [in] Specify the origin key.
+			 		It must not NULL.
+			 
+			 	@param uKeySize [in] Specify the size of origin key in bytes.
+			 		It must above zero.
+			*/
 			GINL GAIA::GVOID build_key(const GAIA::GVOID* pKey, GAIA::U32 uKeySize)
 			{
 				GAST(pKey != GNIL);
@@ -47,6 +79,21 @@ namespace GAIA
 					i1 = (i1 + 1) % uKeySize;
 				}
 			}
+			
+			/*!
+			 	@brief Crypt or decrypt binary buffer.
+			 
+			 	@param pSrc [in] Specify the source buffer.
+			 		It must not NULL.
+			 
+			 	@param pDst [out] Specify the destination buffer.
+			 		It must not NULL.
+			 
+			 	@param uSize [in] Specify the source and destination buffer size in bytes.
+			 		It must above zero.
+			 
+			 	@remarks The source buffer size must equal destination buffer size.
+			*/
 			GINL GAIA::GVOID update(const GAIA::GVOID* pSrc, GAIA::GVOID* pDst, GAIA::U32 uSize)
 			{
 				GAST(pSrc != GNIL);
@@ -66,6 +113,7 @@ namespace GAIA
 					((GAIA::U8*)pDst)[x] = ((GAIA::U8*)pSrc)[x] ^ m_key[i];
 				}
 			}
+			
 		private:
 			GAIA::U8 m_key[_KeySize];
 		};

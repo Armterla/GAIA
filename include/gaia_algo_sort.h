@@ -22,7 +22,7 @@ namespace GAIA
 				_DataType pTemp = pBegin + 1;
 				while(pTemp <= pEnd)
 				{
-					if(*pBegin > *pTemp)
+					if(*pTemp < *pBegin)
 						GAIA::ALGO::swap(*pBegin, *pTemp);
 					++pTemp;
 				}
