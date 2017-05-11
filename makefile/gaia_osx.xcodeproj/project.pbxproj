@@ -938,6 +938,7 @@
 				1A4CE12A1EB7810A007AFD08 /* t_dbg_perfcollector.cpp */,
 				1A4CE12B1EB7810A007AFD08 /* t_digit_aes.cpp */,
 				1A4CE12C1EB7810A007AFD08 /* t_digit_base64.cpp */,
+				3B3C9F271EC408490045E8D5 /* t_digit_crc.cpp */,
 				1A4CE12D1EB7810A007AFD08 /* t_digit_diff.cpp */,
 				1A4CE12E1EB7810A007AFD08 /* t_digit_md5.cpp */,
 				1A4CE12F1EB7810A007AFD08 /* t_digit_percentage.cpp */,
@@ -1011,7 +1012,6 @@
 				1A4CE1711EB7810A007AFD08 /* tperf_ctn_dmpgraph.cpp */,
 				1A4CE16F1EB7810A007AFD08 /* tperf_ctn.cpp */,
 				1A4CE1721EB7810A007AFD08 /* tperf_msys_heapesg.cpp */,
-				3B3C9F271EC408490045E8D5 /* t_digit_crc.cpp */,
 			);
 			name = test;
 			path = ../test;
