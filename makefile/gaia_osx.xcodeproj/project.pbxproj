@@ -319,6 +319,7 @@
 		1A4CE2A91EB7829A007AFD08 /* t_pattern_stringindex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A4CE2A81EB7829A007AFD08 /* t_pattern_stringindex.cpp */; };
 		1A4CE2AB1EB78331007AFD08 /* t_pattern_textindex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A4CE2AA1EB78331007AFD08 /* t_pattern_textindex.cpp */; };
 		3B3119D81E6D36CD009462C1 /* libiconv.2.4.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B3119D71E6D36CD009462C1 /* libiconv.2.4.0.tbd */; };
+		3B3C9F281EC408490045E8D5 /* t_digit_crc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B3C9F271EC408490045E8D5 /* t_digit_crc.cpp */; };
 		3B6B9C991E9FBA6E008CF1A0 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B6B9C981E9FBA6E008CF1A0 /* main.cpp */; };
 		3BA2A7BD1EB99E0600B734EC /* t_locale_language.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3BA2A7BC1EB99E0600B734EC /* t_locale_language.cpp */; };
 /* End PBXBuildFile section */
@@ -660,6 +661,7 @@
 		1A4CE2AA1EB78331007AFD08 /* t_pattern_textindex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_pattern_textindex.cpp; path = ../test/t_pattern_textindex.cpp; sourceTree = SOURCE_ROOT; };
 		3B31161E1E6D3538009462C1 /* gaia_osx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gaia_osx; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3119D71E6D36CD009462C1 /* libiconv.2.4.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.4.0.tbd; path = usr/lib/libiconv.2.4.0.tbd; sourceTree = SDKROOT; };
+		3B3C9F271EC408490045E8D5 /* t_digit_crc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_digit_crc.cpp; path = ../test/t_digit_crc.cpp; sourceTree = SOURCE_ROOT; };
 		3B6B9C981E9FBA6E008CF1A0 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = SOURCE_ROOT; };
 		3BA2A7BC1EB99E0600B734EC /* t_locale_language.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_locale_language.cpp; path = ../test/t_locale_language.cpp; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -1009,6 +1011,7 @@
 				1A4CE1711EB7810A007AFD08 /* tperf_ctn_dmpgraph.cpp */,
 				1A4CE16F1EB7810A007AFD08 /* tperf_ctn.cpp */,
 				1A4CE1721EB7810A007AFD08 /* tperf_msys_heapesg.cpp */,
+				3B3C9F271EC408490045E8D5 /* t_digit_crc.cpp */,
 			);
 			name = test;
 			path = ../test;
@@ -1421,6 +1424,7 @@
 				1A4CE1BC1EB7810A007AFD08 /* hpdf_objects.c in Sources */,
 				1A4CE29F1EB7810A007AFD08 /* t_xml_xml.cpp in Sources */,
 				1A4CE1F51EB7810A007AFD08 /* pcre32_ucd.c in Sources */,
+				3B3C9F281EC408490045E8D5 /* t_digit_crc.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
