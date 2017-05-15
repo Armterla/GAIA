@@ -132,6 +132,7 @@ namespace TEST
 	extern GAIA::GVOID t_digit_rc4(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_aes(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_rsa(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_digit_crc(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_md5(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_sha1(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_diff(GAIA::LOG::Log& logobj);
@@ -302,6 +303,7 @@ namespace TEST
 			TITEM("Digit: RC4 test begin!"); t_digit_rc4(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: AES test begin!"); t_digit_aes(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: RSA test begin!"); t_digit_rsa(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Digit: CRC test begin!"); t_digit_crc(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: MD5 test begin!"); t_digit_md5(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: SHA1 test begin!"); t_digit_sha1(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: Diff test begin!"); t_digit_diff(logobj); TITEM("End"); TTEXT("\t");

@@ -931,7 +931,7 @@ namespace GAIA
 				{
 					GAIA::SYNC::Autolock al(m_lrSocks);
 					if(m_socks.size() >= m_desc.sMaxConnCount)
-						bConnectionIsFull = GAIA::False;
+						bConnectionIsFull = GAIA::True;
 				}
 
 				if(!bConnectionIsFull)
