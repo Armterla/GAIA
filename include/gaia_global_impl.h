@@ -61,6 +61,13 @@ GAIA::STREAM::InvalidStream g_gaia_invalidstream;
 
 /* Global assert mode. */
 GAIA::BL g_gaia_assertconfirm = GAIA::True;
+GAIA::BL g_gaia_assertinterrupt = GAIA::True;
+GAIA::BL g_gaia_assertprintconsole = GAIA::True;
+GAIA::BL g_gaia_assertlogout = GAIA::True;
+GAIA::BL g_gaia_assertdebugconfirm = GAIA::True;
+GAIA::BL g_gaia_assertdebuginterrupt = GAIA::True;
+GAIA::BL g_gaia_assertdebugprintconsole = GAIA::True;
+GAIA::BL g_gaia_assertdebuglogout = GAIA::True;
 
 /* Global memory system(msys). */
 GAIA::MSYS::HeapESG g_gaia_globalmsys;

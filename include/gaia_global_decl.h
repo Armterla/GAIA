@@ -24,6 +24,13 @@ extern GAIA::STREAM::InvalidStream g_gaia_invalidstream;
 
 /* Global assert mode. */
 extern GAIA::BL g_gaia_assertconfirm;
+extern GAIA::BL g_gaia_assertinterrupt;
+extern GAIA::BL g_gaia_assertprintconsole;
+extern GAIA::BL g_gaia_assertlogout;
+extern GAIA::BL g_gaia_assertdebugconfirm;
+extern GAIA::BL g_gaia_assertdebuginterrupt;
+extern GAIA::BL g_gaia_assertdebugprintconsole;
+extern GAIA::BL g_gaia_assertdebuglogout;
 
 /* Global memory system(msys). */
 extern GAIA::MSYS::HeapESG g_gaia_globalmsys;
