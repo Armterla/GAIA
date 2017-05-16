@@ -60,6 +60,10 @@ namespace GAIA
 			{
 				return m_alloctimes;
 			}
+			GINL virtual GAIA::U64 recycle_cache(GAIA::UM uRecycleSize = GINVALID)
+			{
+				return 0;
+			}
 		private:
 			GINL GAIA::GVOID init(){}
 		private:
