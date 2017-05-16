@@ -69,6 +69,5 @@ namespace TEST
 			logobj << "\t\tCRT Time = " << uCRTEndTime - uCRTStartTime << "(us)"  << logobj.End();
 			logobj << "\n" << logobj.End();
 		}
-
 	}
 }
