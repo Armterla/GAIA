@@ -34,10 +34,12 @@ namespace GAIA
 				GAIA::UM uSectionIndex = this->GetSectionIndex(uSize + HEAP_BUFFER_HEADERSIZE);
 				if(uSectionIndex == (GAIA::UM)GINVALID)
 				{
+				#ifdef GAIA_HEAP_THREADSAFE
+					m_uPerfCRTAllocCount++;
+				#endif
 					m_capacity.Add(uSize + HEAP_BUFFER_HEADERSIZE);
 					m_size.Add(uSize + HEAP_BUFFER_HEADERSIZE);
 					m_usesize.Add(uSize);
-
 					GAIA::GVOID* pTemp = (GAIA::U8*)malloc(uSize + HEAP_BUFFER_HEADERSIZE);
 					*GSCAST(ALLOC_SIZE_TYPE*)(pTemp) = GSCAST(ALLOC_SIZE_TYPE)(uSize);
 					*GRCAST(GAIA::U16*)(GSCAST(GAIA::U8*)(pTemp) + sizeof(ALLOC_SIZE_TYPE)) = (GAIA::U16)GINVALID;
@@ -45,6 +47,9 @@ namespace GAIA
 				}
 				else
 				{
+				#ifdef GAIA_HEAP_THREADSAFE
+					m_uPerfESGAllocCount++;
+				#endif
 					m_size.Add(m_secsizelist[uSectionIndex]);
 					m_usesize.Add(uSize);
 				}
@@ -59,6 +64,9 @@ namespace GAIA
 						hs.uMinFreeSize = (GAIA::UM)GINVALID;
 						for(GAIA::UM x = 0; x < hs.uObListSize; ++x)
 						{
+						#ifdef GAIA_DEBUG_PERF
+							m_uPerfFindMinSizeOBCount++;
+						#endif
 							OriginBuffer& ob = hs.oblist[x];
 							if(ob.buf != GNIL && ob.uFreeStackSize != 0 && ob.uFreeStackSize < hs.uMinFreeSize)
 							{
@@ -69,6 +77,9 @@ namespace GAIA
 					}
 					if(hs.uMinFreeIndex == (GAIA::UM)GINVALID)
 					{
+					#ifdef GAIA_DEBUG_PERF
+						m_uPerfAllocOBCount++;
+					#endif
 						GAIA::U16 uOriginBufferIndex;
 						if(hs.uFreeStackSize == 0)
 						{
@@ -96,6 +107,9 @@ namespace GAIA
 							*GRCAST(ALLOC_SIZE_TYPE*)(pTemp) = GSCAST(ALLOC_SIZE_TYPE)(uSectionPatchSize);
 							*GRCAST(GAIA::U16*)(pTemp + sizeof(ALLOC_SIZE_TYPE)) = uOriginBufferIndex;
 							this->push(pTemp, newobref.freestack, newobref.uFreeStackSize, newobref.uFreeStackCapacity);
+						#ifdef GAIA_DEBUG_PERF
+							m_uPerfFillNewOBFreeStackCount++;
+						#endif
 						}
 						pRet = newobref.freestack[newobref.uFreeStackSize - 1];
 						--newobref.uFreeStackSize;
@@ -104,6 +118,9 @@ namespace GAIA
 					}
 					else
 					{
+					#ifdef GAIA_DEBUG_PERF
+						m_uPerfUseExistOBCount++;
+					#endif
 						OriginBuffer& ob = hs.oblist[hs.uMinFreeIndex];
 						pRet = ob.freestack[ob.uFreeStackSize - 1];
 						--ob.uFreeStackSize;
@@ -130,12 +147,21 @@ namespace GAIA
 				GAIA::U16 uOBIndex = *GRCAST(GAIA::U16*)(pOriginP + sizeof(ALLOC_SIZE_TYPE));
 				if(uOBIndex == (GAIA::U16)GINVALID)
 				{
+				#ifdef GAIA_HEAP_THREADSAFE
+					m_uPerfCRTFreeCount++;
+				#endif
 					m_capacity.Add(-(GAIA::N64)this->memory_size(p) - (GAIA::N64)HEAP_BUFFER_HEADERSIZE);
 					m_size.Add(-(GAIA::N64)this->memory_size(p) - (GAIA::N64)HEAP_BUFFER_HEADERSIZE);
 					m_usesize.Add(-(GAIA::N64)this->memory_size(p));
 					m_piecesize.Decrease();
 					free(pOriginP);
 					return;
+				}
+				else
+				{
+				#ifdef GAIA_HEAP_THREADSAFE
+					m_uPerfESGFreeCount++;
+				#endif
 				}
 				GAIA::UM uSectionIndex = this->GetSectionIndex(*GRCAST(ALLOC_SIZE_TYPE*)(pOriginP) + HEAP_BUFFER_HEADERSIZE);
 				GAST(uSectionIndex != (GAIA::UM)GINVALID);
@@ -207,6 +233,16 @@ namespace GAIA
 				m_uSecListSize = 0;
 				m_secsizelist = GNIL;
 				m_uSecSizeListSize = 0;
+			#ifdef GAIA_DEBUG_PERF
+				m_uPerfCRTAllocCount = 0;
+				m_uPerfESGAllocCount = 0;
+				m_uPerfCRTFreeCount = 0;
+				m_uPerfESGFreeCount = 0;
+				m_uPerfFindMinSizeOBCount = 0;
+				m_uPerfAllocOBCount = 0;
+				m_uPerfUseExistOBCount = 0;
+				m_uPerfFillNewOBFreeStackCount = 0;
+			#endif
 			}
 			GINL GAIA::UM GetSectionPatchSize(GAIA::UM uIndex) const{return 32 + 32 * uIndex * uIndex;}
 			GINL GAIA::UM GetSectionPatchCount(GAIA::UM uIndex) const{if(uIndex == 0) uIndex = 1; return 40000 / (uIndex * uIndex);}
@@ -347,6 +383,18 @@ namespace GAIA
 			GAIA::SYNC::Atomic m_usesize;
 			GAIA::SYNC::Atomic m_piecesize;
 			GAIA::SYNC::Atomic m_alloctimes;
+			
+		#ifdef GAIA_DEBUG_PERF
+			GAIA::U64 m_uPerfCRTAllocCount;
+			GAIA::U64 m_uPerfESGAllocCount;
+			GAIA::U64 m_uPerfCRTFreeCount;
+			GAIA::U64 m_uPerfESGFreeCount;
+			GAIA::U64 m_uPerfFindMinSizeOBCount;
+			GAIA::U64 m_uPerfAllocOBCount;
+			GAIA::U64 m_uPerfUseExistOBCount;
+			GAIA::U64 m_uPerfFillNewOBFreeStackCount;
+		#endif
+			
 		#ifdef GAIA_HEAP_THREADSAFE
 			GAIA::SYNC::LockPure m_lr;
 		#endif
