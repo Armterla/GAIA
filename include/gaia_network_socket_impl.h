@@ -198,6 +198,9 @@ namespace GAIA
 
 		GINL Socket::Socket()
 		{
+		#ifdef GAIA_DEBUG_INSTANCECOUNT
+			GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_SOCKET, +1);
+		#endif
 			this->init();
 			m_addrBinded.reset();
 			m_addrPeer.reset();
@@ -214,6 +217,9 @@ namespace GAIA
 			{
 				e.SetDispatched(GAIA::True);
 			}
+		#ifdef GAIA_DEBUG_INSTANCECOUNT
+			GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_SOCKET, -1);
+		#endif
 		}
 
 		GINL GAIA::GVOID Socket::Create(GAIA::NETWORK::Socket::SOCKET_TYPE socktype)
@@ -251,6 +257,10 @@ namespace GAIA
 		#endif
 
 			m_SockType = socktype;
+			
+		#ifdef GAIA_DEBUG_INSTANCECOUNT
+			GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_OPENNEDSOCKET, +1);
+		#endif
 		}
 
 		GINL GAIA::GVOID Socket::Close()
@@ -265,6 +275,10 @@ namespace GAIA
 				THROW_LASTERROR;
 		#endif
 			this->init();
+			
+		#ifdef GAIA_DEBUG_INSTANCECOUNT
+			GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_OPENNEDSOCKET, -1);
+		#endif
 		}
 
 		GINL GAIA::GVOID Socket::Shutdown(GAIA::N32 nShutdownFlag)

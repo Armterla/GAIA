@@ -5,6 +5,8 @@
 #include <gaia_assert_impl.h>
 #include <gaia_thread_base_impl.h>
 
+extern GAIA::SYNC::Atomic g_gaia_instancecounttable[GAIA::INSTANCE_COUNT_MAXENUMCOUNT];
+
 namespace GAIA
 {
 #if defined(GAIA_HEAP)
@@ -231,6 +233,11 @@ namespace GAIA
 	#endif
 	}
 #endif
+	
+	GAIA::N64 ChangeInstanceCount(GAIA::INSTANCE_COUNT s, GAIA::N64 lChangeCount)
+	{
+		return g_gaia_instancecounttable[s].Add(lChangeCount);
+	}
 }
 #if defined(GAIA_HEAP)
 #	if GAIA_OS == GAIA_OS_OSX

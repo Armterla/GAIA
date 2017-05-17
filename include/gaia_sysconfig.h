@@ -346,6 +346,12 @@
 #	endif
 #endif
 
+#ifndef __GAIA_NO_DEBUG_INSTANCECOUNT__
+#	ifndef GAIA_DEBUG_INSTANCECOUNT
+#		define GAIA_DEBUG_INSTANCECOUNT
+#	endif
+#endif
+
 /* Debug const flag. */
 #ifdef GAIA_DEBUG_CODING
 #	define GAIA_DEBUG_CONST

@@ -4,6 +4,7 @@
 #include "gaia_type.h"
 #include "gaia_assert.h"
 #include "gaia_platform.h"
+#include "gaia_sync_atomic.h"
 #include "gaia_sync_lock.h"
 #include "gaia_sync_autolock.h"
 #include "gaia_msys_heapcrt.h"
@@ -51,6 +52,9 @@ namespace GAIA
 	};
 }
 GAIA::GlobalCtor g_gaia_globalctor;
+
+/* Instance count table. */
+GAIA::SYNC::Atomic g_gaia_instancecounttable[GAIA::INSTANCE_COUNT_MAXENUMCOUNT];
 
 /* Process time. */
 GAIA::U64 g_gaia_processlaunchtime;

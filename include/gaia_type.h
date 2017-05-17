@@ -857,6 +857,44 @@ namespace GAIA
 		'~'	, //	'~'		CH
 		127	, //			DEL(delete)
 	};
+	
+	GAIA_ENUM_BEGIN(INSTANCE_COUNT)
+		INSTANCE_COUNT_FILE,
+		INSTANCE_COUNT_OPENNEDFILE,
+		INSTANCE_COUNT_FSFINDER,				// Not support.
+		INSTANCE_COUNT_OPENNEDFSFINDER, 		// Not support.
+		INSTANCE_COUNT_SOCKET,
+		INSTANCE_COUNT_OPENNEDSOCKET,
+		INSTANCE_COUNT_DBLOCAL,
+		INSTANCE_COUNT_OPENNEDDBLOCAL,
+		INSTANCE_COUNT_DBLOCALQUERY,
+		INSTANCE_COUNT_PREPAREDDBLOCALQUERY,
+		INSTANCE_COUNT_DBREMOTE,				// Not support.
+		INSTANCE_COUNT_OPENNEDDBREMOTE,			// Not support.
+		INSTANCE_COUNT_DBREMOTEQUERY,			// Not support.
+		INSTANCE_COUNT_PREPAREDDBREMOTEQUERY,	// Not support.
+	GAIA_ENUM_END(INSTANCE_COUNT)
+	
+	static const GAIA::CH* INSTANCE_COUNT_STRING[] = 
+	{
+		"Invalid",
+		"File",
+		"OpennedFile",
+		"FSFinder",
+		"OpennedFSFinder",
+		"Socket",
+		"OpennedSocket",
+		"DBLocal",
+		"OpennedDBLocal",
+		"DBLocalQuery",
+		"PreparedDBLocalQuery",
+		"DBRemote",
+		"OpennedDBRemote",
+		"DBRemoteQuery",
+		"PreparedDBRemoteQuery",
+	};
+	
+	extern GAIA::N64 ChangeInstanceCount(GAIA::INSTANCE_COUNT s, GAIA::N64 lChangeCount);
 }
 
 namespace GAIA{namespace MSYS{class HeapESG; class LeakDetector;}}

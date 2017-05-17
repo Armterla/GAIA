@@ -915,6 +915,10 @@ namespace GAIA
 									GAIA::N32 nNewSocket = accept(nSocket, (sockaddr*)&addraccept, &newaddrlen);
 									if(nNewSocket != GINVALID)
 									{
+									#ifdef GAIA_DEBUG_INSTANCECOUNT
+										GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_OPENNEDSOCKET, +1);
+									#endif
+										
 										GAIA::NETWORK::Addr addrListen;
 										ctx.pSocket->GetBindedAddress(addrListen);
 										GAIA::NETWORK::AsyncSocket* pAcceptedSock = this->OnCreateAcceptingSocket(addrListen);

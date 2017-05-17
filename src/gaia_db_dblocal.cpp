@@ -80,6 +80,10 @@ namespace GAIA
 		};
 		DBLocalQuery::DBLocalQuery(GAIA::DB::DBLocal& db)
 		{
+		#ifdef GAIA_DEBUG_INSTANCECOUNT
+			GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_DBLOCALQUERY, +1);
+		#endif
+			
 			m_ctx = gnew DBLocalQueryContext;
 			m_ctx->pDB = &db;
 		}
@@ -88,6 +92,10 @@ namespace GAIA
 			if(this->IsQueryed())
 				this->Close();
 			gdel m_ctx;
+			
+		#ifdef GAIA_DEBUG_INSTANCECOUNT
+			GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_DBLOCALQUERY, -1);
+		#endif
 		}
 		GAIA::DB::DBLocal* DBLocalQuery::GetDatabase()
 		{
@@ -116,6 +124,11 @@ namespace GAIA
 		#else
 			GTHROW_RET(NotSupport, GAIA::False);
 		#endif
+			
+		#ifdef GAIA_DEBUG_INSTANCECOUNT
+			GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_PREPAREDDBLOCALQUERY, -1);
+		#endif
+			
 			return GAIA::True;
 		}
 		GAIA::BL DBLocalQuery::Prepare(const GAIA::CH* pszSQL)
@@ -157,6 +170,10 @@ namespace GAIA
 			#endif
 			}
 
+		#ifdef GAIA_DEBUG_INSTANCECOUNT
+			GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_PREPAREDDBLOCALQUERY, +1);
+		#endif
+			
 			return GAIA::True;
 		}
 		GAIA::BL DBLocalQuery::Exec(const GAIA::CH* pszSQL)
@@ -529,6 +546,10 @@ namespace GAIA
 		}
 		DBLocal::DBLocal()
 		{
+		#ifdef GAIA_DEBUG_INSTANCECOUNT
+			GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_DBLOCAL, +1);
+		#endif
+			
 			m_ctx = gnew DBLocalContext;
 		}
 		DBLocal::~DBLocal()
@@ -536,6 +557,10 @@ namespace GAIA
 			if(this->IsOpen())
 				this->Close();
 			gdel m_ctx;
+			
+		#ifdef GAIA_DEBUG_INSTANCECOUNT
+			GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_DBLOCAL, -1);
+		#endif
 		}
 		GAIA::BL DBLocal::Open(const GAIA::CH* pszDBName)
 		{
@@ -551,6 +576,11 @@ namespace GAIA
 			if(sqlite3_open(pszDBName, &m_ctx->pSqliteDB) != SQLITE_OK)
 				return GAIA::False;
 			m_ctx->strDBName = pszDBName;
+			
+		#	ifdef GAIA_DEBUG_INSTANCECOUNT
+				GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_OPENNEDDBLOCAL, +1);
+		#	endif
+			
 			return GAIA::True;
 		#else
 			GTHROW_RET(NotSupport, GAIA::False);
@@ -566,6 +596,11 @@ namespace GAIA
 			m_ctx->strDBName.clear();
 			m_ctx->syncmode = GAIA::DB::DB_SYNC_MODE_INVALID;
 			m_ctx->sCacheSize = GINVALID;
+			
+		#	ifdef GAIA_DEBUG_INSTANCECOUNT
+				GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_OPENNEDDBLOCAL, -1);
+		#	endif
+			
 			return GAIA::True;
 		#else
 			GTHROW_RET(NotSupport, GAIA::False);
