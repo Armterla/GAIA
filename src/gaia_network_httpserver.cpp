@@ -135,6 +135,7 @@ namespace GAIA
 					m_pLink->rise_ref("HttpServerAsyncSocket::OnDisconnected:link rise ref");
 					GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
 					m_pSvr->m_rclinks.push_back(m_pLink);
+					m_pSvr->m_ExecEvent.Fire();
 					m_pLink = GNIL;
 				}
 			}
@@ -171,6 +172,7 @@ namespace GAIA
 					m_pLink->rise_ref("HttpServerAsyncSocket::OnSent:link rise ref");
 					GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
 					m_pSvr->m_rclinks.push_back(m_pLink);
+					m_pSvr->m_ExecEvent.Fire();
 					m_pLink = GNIL;
 				}
 			}
@@ -185,6 +187,7 @@ namespace GAIA
 					m_pLink->rise_ref("HttpServerAsyncSocket::OnRecved:link rise ref for recv failed");
 					GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
 					m_pSvr->m_rclinks.push_back(m_pLink);
+					m_pSvr->m_ExecEvent.Fire();
 					m_pLink = GNIL;
 					return;
 				}
@@ -361,6 +364,7 @@ namespace GAIA
 						m_pLink->rise_ref("HttpServerAsyncSocket::OnRecv:link rise ref");
 						GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
 						m_pSvr->m_rclinks.push_back(m_pLink);
+						m_pSvr->m_ExecEvent.Fire();
 					}
 				}
 			}
@@ -505,9 +509,7 @@ namespace GAIA
 				{
 					if(m_bStopCmd)
 						break;
-					GAIA::BL bExistExecutedTask = m_pSvr->Execute();
-					if(!bExistExecutedTask)
-						GAIA::SYNC::gsleep(100);
+					m_pSvr->Execute(100);
 				}
 			}
 
@@ -1300,10 +1302,14 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		GAIA::BL HttpServer::Execute()
+		GAIA::BL HttpServer::Execute(GAIA::U64 uWaitMilliSeconds)
 		{
 			GAIA::NETWORK::HttpServerLink* pLink;
 
+			if(!m_ExecEvent.Wait(uWaitMilliSeconds))
+				return GAIA::False;
+			
+			
 			// Get a task.
 			{
 				GAIA::SYNC::Autolock al(m_lrRCLinks);
