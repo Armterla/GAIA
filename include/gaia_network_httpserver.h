@@ -1003,7 +1003,7 @@ namespace GAIA
 				@remarks
 					Call this function will cause HttpServerCallBack::OnRequest be callback.
 			*/
-			GAIA::BL Execute(GAIA::U64 uWaitMilliSeconds = 0);
+			GAIA::BL Execute(GAIA::U32 uWaitMilliSeconds = 0);
 
 			/*!
 				@brief Open a address for Http provide Http service.

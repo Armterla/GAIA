@@ -1302,7 +1302,7 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		GAIA::BL HttpServer::Execute(GAIA::U64 uWaitMilliSeconds)
+		GAIA::BL HttpServer::Execute(GAIA::U32 uWaitMilliSeconds)
 		{
 			GAIA::NETWORK::HttpServerLink* pLink;
 
