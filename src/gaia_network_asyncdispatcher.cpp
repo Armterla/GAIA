@@ -954,11 +954,10 @@ namespace GAIA
 										}
 										if(this->OnAcceptSocket(*pAcceptedSock, addrListen))
 										{
-											struct kevent ke[2];
+											struct kevent ke[1];
 											EV_SET(&ke[0], nNewSocket, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
-											EV_SET(&ke[1], nNewSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, pCtxSend);
 											GAIA::N32 kqep = this->select_kqep(nNewSocket);
-											GAIA::NUM sResult = kevent(kqep, ke, 2, GNIL, 0, GNIL);
+											GAIA::NUM sResult = kevent(kqep, ke, 1, GNIL, 0, GNIL);
 											if(sResult != GINVALID)
 											{
 												GAST(sResult == 0);
@@ -1048,10 +1047,9 @@ namespace GAIA
 									ctx.pSocket->OnConnected(GAIA::True, addrPeer);
 								}
 
-								struct kevent ke[2];
-								EV_SET(&ke[0], nSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, &ctx);
-								EV_SET(&ke[1], nSocket, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
-								GAIA::NUM sResult = kevent(pThread->kqep, ke, 2, GNIL, 0, GNIL);
+								struct kevent ke[1];
+								EV_SET(&ke[0], nSocket, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
+								GAIA::NUM sResult = kevent(pThread->kqep, ke, 1, GNIL, 0, GNIL);
 								if(sResult != GINVALID)
 								{
 									GAST(sResult == 0);
