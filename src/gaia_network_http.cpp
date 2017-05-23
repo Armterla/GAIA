@@ -9,10 +9,6 @@
 #include <gaia_network_base_impl.h>
 #include <gaia_network_socket_impl.h>
 
-// DEBUG START.
-static GAIA::NETWORK::HttpRequest* s_pRequest = GNIL;
-// DEBUG END.
-
 namespace GAIA
 {
 	namespace NETWORK
@@ -1028,11 +1024,6 @@ namespace GAIA
 							}
 							GCATCHBASE
 							{
-								// DEBUG START.
-								{
-									s_pRequest = pRequest;
-								}
-								// DEBUG END.
 								pRequest->m_NetworkError = GAIA::NETWORK::NETWORK_ERROR_CONNECT_FAILED;
 								pNeedCloseRequests->push_back(pRequest);
 								
@@ -1419,16 +1410,6 @@ namespace GAIA
 
 		GVOID Http::InternalCloseRequest(HttpRequest& req)
 		{
-			// DEBUG START.
-			{
-				if(&req == s_pRequest)
-				{
-					GAIA::NUM s = 0;
-					s = 1;
-				}
-			}
-			// DEBUG END.
-			
 			// Socket object.
 			{
 				if(req.m_pSock != GNIL)
