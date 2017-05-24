@@ -1067,7 +1067,7 @@ namespace GAIA
 										ctx.pSocket->rise_ref("AsyncDispatcher::Execute:BeginSend");
 										{
 											GAIA::SYNC::Autolock al(ctx.pSocket->m_lrSend);
-											GAIA::NUM sNeedSendSize = ctx.pSocket->m_sendbuf.read(pThread->tempbuf.fptr(), sSendAbleSize);
+											GAIA::NUM sNeedSendSize = ctx.pSocket->m_sendbuf.peek(pThread->tempbuf.fptr(), sSendAbleSize);
 											if(sNeedSendSize > 0)
 											{
 												GAIA::NUM sSendedSize = (GAIA::NUM)send(nSocket, pThread->tempbuf.fptr(), sNeedSendSize, 0);
@@ -1076,11 +1076,11 @@ namespace GAIA
 													GAIA::N32 nErr = errno;
 													GERR << "[AsyncDispatcher] AsyncDispatcher::Execute: socket send failed, errno = " << nErr << GEND;
 												}
-												GAST(sSendedSize == sNeedSendSize);
-												
+												if(sSendedSize > 0)
 												{
+													ctx.pSocket->m_sendbuf.drop(sSendedSize);
 													GAIA::SYNC::AutolockPure al(ctx.pSocket->m_lrCB);
-													ctx.pSocket->OnSent(GAIA::True, pThread->tempbuf.fptr(), sSendedSize, sSendedSize + pThread->tempbuf.remain());
+													ctx.pSocket->OnSent(GAIA::True, pThread->tempbuf.fptr(), sSendedSize, sNeedSendSize);
 												}
 											}
 											if(!ctx.pSocket->m_sendbuf.empty())
