@@ -125,5 +125,30 @@ namespace TEST
 			TERROR;
 		if(b.endwith("Hello", GAIA::ALGO::gstrlen("World")))
 			TERROR;
+		b.clear();
+		for(GAIA::NUM x = 0; x < 10; ++x)
+		{
+			if(!b.write(&x, sizeof(x)))
+			{
+				TERROR;
+				break;
+			}
+		}
+		for(GAIA::NUM x = 0; x < 10; ++x)
+		{
+			GAIA::NUM r;
+			if(!b.peek(&r, sizeof(r)))
+			{
+				TERROR;
+				break;
+			}
+			if(!b.drop(sizeof(r)))
+			{
+				TERROR;
+				break;
+			}
+		}
+		if(b.remain() != 0)
+			TERROR;
 	}
 }
