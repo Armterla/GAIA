@@ -47,39 +47,6 @@ namespace GAIA
 			}
 			GINL GAIA::NETWORK::HttpServerLink* GetLink() const{return m_pLink;}
 
-			virtual GAIA::GVOID Create()
-			{
-				GAIA::NETWORK::AsyncSocket::Create();
-
-				const GAIA::NETWORK::HttpServerDesc& descSvr = m_pSvr->GetDesc();
-				if(descSvr.bEnableSocketTCPNoDelay)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY, GAIA::True);
-				if(descSvr.bEnableSocketNoBlock)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
-				if(descSvr.bEnableSocketReuseAddr)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEADDR, GAIA::True);
-
-				if(m_bListenSocket)
-				{
-					if(descSvr.nListenSocketSendBufferSize != GINVALID)
-						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, descSvr.nListenSocketSendBufferSize);
-					if(descSvr.nListenSocketRecvBufferSize != GINVALID)
-						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, descSvr.nListenSocketRecvBufferSize);
-				}
-				else
-				{
-					if(descSvr.nAcceptedSocketSendBufferSize != GINVALID)
-						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, descSvr.nAcceptedSocketSendBufferSize);
-					if(descSvr.nAcceptedSocketRecvBufferSize != GINVALID)
-						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, descSvr.nAcceptedSocketRecvBufferSize);
-				}
-				
-				if(descSvr.nSocketSendTimeout != GINVALID)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDTIMEOUT, descSvr.nSocketSendTimeout);
-				if(descSvr.nSocketRecvTimeout != GINVALID)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVTIMEOUT, descSvr.nSocketRecvTimeout);
-			}
-
 			virtual GAIA::N32 Send(const GAIA::GVOID* p, GAIA::N32 nSize)
 			{
 				GAIA::N32 nSent = GAIA::NETWORK::AsyncSocket::Send(p, nSize);
@@ -88,7 +55,39 @@ namespace GAIA
 			}
 
 		protected:
-			virtual GAIA::GVOID OnCreated(GAIA::BL bResult){}
+			virtual GAIA::GVOID OnCreated(GAIA::BL bResult)
+			{
+				if(bResult)
+				{
+					const GAIA::NETWORK::HttpServerDesc& descSvr = m_pSvr->GetDesc();
+					if(descSvr.bEnableSocketTCPNoDelay)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY, GAIA::True);
+					if(descSvr.bEnableSocketNoBlock)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
+					if(descSvr.bEnableSocketReuseAddr)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEADDR, GAIA::True);
+					
+					if(m_bListenSocket)
+					{
+						if(descSvr.nListenSocketSendBufferSize != GINVALID)
+							this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, descSvr.nListenSocketSendBufferSize);
+						if(descSvr.nListenSocketRecvBufferSize != GINVALID)
+							this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, descSvr.nListenSocketRecvBufferSize);
+					}
+					else
+					{
+						if(descSvr.nAcceptedSocketSendBufferSize != GINVALID)
+							this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, descSvr.nAcceptedSocketSendBufferSize);
+						if(descSvr.nAcceptedSocketRecvBufferSize != GINVALID)
+							this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, descSvr.nAcceptedSocketRecvBufferSize);
+					}
+					
+					if(descSvr.nSocketSendTimeout != GINVALID)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDTIMEOUT, descSvr.nSocketSendTimeout);
+					if(descSvr.nSocketRecvTimeout != GINVALID)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVTIMEOUT, descSvr.nSocketRecvTimeout);
+				}
+			}
 			virtual GAIA::GVOID OnClosed(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnBound(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
 			virtual GAIA::GVOID OnConnected(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr)
@@ -438,7 +437,7 @@ namespace GAIA
 			#else
 				sock.GetPeerAddress(addrPeer);
 			#endif
-
+				
 				if(m_pSvr->m_bLog)
 				{
 					GAIA::CH szAddressPeer[32];
@@ -485,6 +484,7 @@ namespace GAIA
 				((HttpServerAsyncSocket*)&sock)->SetLink(pLink);
 				GAIA::SYNC::Autolock al(m_pSvr->m_lrLinks);
 				m_pSvr->m_links_bypeeraddr.insert(GAIA::CTN::Ref<GAIA::NETWORK::HttpServerLink>(pLink));
+				
 				return GAIA::True;
 			}
 

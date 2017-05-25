@@ -51,23 +51,21 @@ namespace TEST
 			m_bExistDiffThreadCallBack = GAIA::False;
 		}
 
-		virtual GAIA::GVOID Create()
-		{
-			GAIA::NETWORK::AsyncSocket::Create();
-
-		#if GAIA_OS != GAIA_OS_WINDOWS
-			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, 1024 * 1024);
-			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, 1024 * 1024);
-			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
-			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEADDR, GAIA::True);
-		#else
-			this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY, GAIA::True);
-		#endif
-		}
-
 	protected:
 		virtual GAIA::GVOID OnCreated(GAIA::BL bResult)
 		{
+			if(bResult)
+			{
+			#if GAIA_OS != GAIA_OS_WINDOWS
+				this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, 1024 * 1024);
+				this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, 1024 * 1024);
+				this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
+				this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEADDR, GAIA::True);
+			#else
+				this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY, GAIA::True);
+			#endif
+			}
+			
 			m_nCreatedCount[bResult]++;
 			if(m_bNoMoreCallBack)
 				m_nCreatedCount[2]++;

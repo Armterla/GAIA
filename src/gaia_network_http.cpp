@@ -72,31 +72,30 @@ namespace GAIA
 
 			~HttpAsyncSocket(){}
 
-			virtual GAIA::GVOID Create()
-			{
-				GAIA::NETWORK::AsyncSocket::Create();
-
-				const GAIA::NETWORK::HttpDesc& descHttp = m_pHttp->GetDesc();
-				if(descHttp.bEnableSocketTCPNoDelay)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY, GAIA::True);
-				if(descHttp.bEnableSocketNoBlock)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
-				if(descHttp.bEnableSocketReuseAddr)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEADDR, GAIA::True);
-
-				if(descHttp.nSocketSendBufferSize != GINVALID)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, descHttp.nSocketSendBufferSize);
-				if(descHttp.nSocketRecvBufferSize != GINVALID)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, descHttp.nSocketRecvBufferSize);
-				
-				if(descHttp.nSocketSendTimeout != GINVALID)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDTIMEOUT, descHttp.nSocketSendTimeout);
-				if(descHttp.nSocketRecvTimeout != GINVALID)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVTIMEOUT, descHttp.nSocketRecvTimeout);
-			}
-
 		protected:
-			virtual GAIA::GVOID OnCreated(GAIA::BL bResult){}
+			virtual GAIA::GVOID OnCreated(GAIA::BL bResult)
+			{
+				if(bResult)
+				{
+					const GAIA::NETWORK::HttpDesc& descHttp = m_pHttp->GetDesc();
+					if(descHttp.bEnableSocketTCPNoDelay)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY, GAIA::True);
+					if(descHttp.bEnableSocketNoBlock)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
+					if(descHttp.bEnableSocketReuseAddr)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEADDR, GAIA::True);
+					
+					if(descHttp.nSocketSendBufferSize != GINVALID)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, descHttp.nSocketSendBufferSize);
+					if(descHttp.nSocketRecvBufferSize != GINVALID)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, descHttp.nSocketRecvBufferSize);
+					
+					if(descHttp.nSocketSendTimeout != GINVALID)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDTIMEOUT, descHttp.nSocketSendTimeout);
+					if(descHttp.nSocketRecvTimeout != GINVALID)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVTIMEOUT, descHttp.nSocketRecvTimeout);
+				}
+			}
 			virtual GAIA::GVOID OnClosed(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnBound(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
 			virtual GAIA::GVOID OnConnected(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr)
