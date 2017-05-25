@@ -35,7 +35,7 @@ namespace GAIA
 				GAIA::UM uSectionIndex = this->GetSectionIndex(uSize + HEAP_BUFFER_HEADERSIZE);
 				if(uSectionIndex == (GAIA::UM)GINVALID)
 				{
-				#ifdef GAIA_HEAP_THREADSAFE
+				#ifdef GAIA_DEBUG_PERF
 					m_uPerfCRTAllocCount++;
 				#endif
 					m_capacity.Add(uSize + HEAP_BUFFER_HEADERSIZE);
@@ -48,7 +48,7 @@ namespace GAIA
 				}
 				else
 				{
-				#ifdef GAIA_HEAP_THREADSAFE
+				#ifdef GAIA_DEBUG_PERF
 					m_uPerfESGAllocCount++;
 				#endif
 					m_size.Add(m_secsizelist[uSectionIndex]);
@@ -157,7 +157,7 @@ namespace GAIA
 				GAIA::U16 uOBIndex = *GRCAST(GAIA::U16*)(pOriginP + sizeof(ALLOC_SIZE_TYPE));
 				if(uOBIndex == (GAIA::U16)GINVALID)
 				{
-				#ifdef GAIA_HEAP_THREADSAFE
+				#ifdef GAIA_DEBUG_PERF
 					m_uPerfCRTFreeCount++;
 				#endif
 					m_capacity.Add(-(GAIA::N64)this->memory_size(p) - (GAIA::N64)HEAP_BUFFER_HEADERSIZE);
@@ -169,7 +169,7 @@ namespace GAIA
 				}
 				else
 				{
-				#ifdef GAIA_HEAP_THREADSAFE
+				#ifdef GAIA_DEBUG_PERF
 					m_uPerfESGFreeCount++;
 				#endif
 				}
