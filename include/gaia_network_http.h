@@ -794,9 +794,9 @@ namespace GAIA
 				uMaxConnTime = DEFAULT_MAX_CONN_TIME;
 				GAIA::ALGO::gstrcpy(szHttpVer, GAIA::NETWORK::HTTP_VERSION_STRING);
 				sHttpVerLen = GAIA::ALGO::gstrlen(szHttpVer);
-				bEnableSocketTCPNoDelay = GAIA::True;
+				bEnableSocketTCPNoDelay = GAIA::False;
 				bEnableSocketNoBlock = GAIA::False;
-				bEnableSocketReuseAddr = GAIA::True;
+				bEnableSocketReuseAddr = GAIA::False;
 				nSocketSendBufferSize = GINVALID;
 				nSocketRecvBufferSize = GINVALID;
 				nSocketSendTimeout = GINVALID;

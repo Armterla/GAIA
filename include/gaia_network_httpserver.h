@@ -104,9 +104,9 @@ namespace GAIA
 				uMaxResponseCountPerMinute = DEFAULT_MAX_RESPONSE_COUNT_PER_MINUTE;
 				GAIA::ALGO::gstrcpy(szHttpVer, GAIA::NETWORK::HTTP_VERSION_STRING);
 				sHttpVerLen = GAIA::ALGO::gstrlen(szHttpVer);
-				bEnableSocketTCPNoDelay = GAIA::True;
+				bEnableSocketTCPNoDelay = GAIA::False;
 				bEnableSocketNoBlock = GAIA::False;
-				bEnableSocketReuseAddr = GAIA::True;
+				bEnableSocketReuseAddr = GAIA::False;
 				nSocketSendTimeout = GINVALID;
 				nSocketRecvTimeout = GINVALID;
 				nListenSocketSendBufferSize = GINVALID;
