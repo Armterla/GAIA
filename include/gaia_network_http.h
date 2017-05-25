@@ -828,9 +828,9 @@ namespace GAIA
 					return GAIA::False;
 				if(GAIA::ALGO::gstrlen(szHttpVer) != sHttpVerLen)
 					return GAIA::False;
-				if(nSocketSendBufferSize != GINVALID && nSocketSendBufferSize <= 0)
+				if(nSocketSendBufferSize != GINVALID && nSocketSendBufferSize < 0)
 					return GAIA::False;
-				if(nSocketRecvBufferSize != GINVALID && nSocketRecvBufferSize <= 0)
+				if(nSocketRecvBufferSize != GINVALID && nSocketRecvBufferSize < 0)
 					return GAIA::False;
 				if(nSocketSendTimeout != GINVALID && nSocketSendTimeout <= 0)
 					return GAIA::False;

@@ -149,13 +149,13 @@ namespace GAIA
 					return GAIA::False;
 				if(nSocketRecvTimeout != GINVALID && nSocketRecvTimeout <= 0)
 					return GAIA::False;
-				if(nListenSocketSendBufferSize != GINVALID && nListenSocketSendBufferSize <= 0)
+				if(nListenSocketSendBufferSize != GINVALID && nListenSocketSendBufferSize < 0)
 					return GAIA::False;
-				if(nListenSocketRecvBufferSize != GINVALID && nListenSocketRecvBufferSize <= 0)
+				if(nListenSocketRecvBufferSize != GINVALID && nListenSocketRecvBufferSize < 0)
 					return GAIA::False;
-				if(nAcceptedSocketSendBufferSize != GINVALID && nAcceptedSocketSendBufferSize <= 0)
+				if(nAcceptedSocketSendBufferSize != GINVALID && nAcceptedSocketSendBufferSize < 0)
 					return GAIA::False;
-				if(nAcceptedSocketRecvBufferSize != GINVALID && nAcceptedSocketRecvBufferSize <= 0)
+				if(nAcceptedSocketRecvBufferSize != GINVALID && nAcceptedSocketRecvBufferSize < 0)
 					return GAIA::False;
 				if(lSingleCallbackLimitSize < 0)
 					return GAIA::False;
