@@ -14,7 +14,7 @@ namespace TEST
 		{
 			// Depth1 test.
 			{
-				static const GAIA::CH SOURCE_COMPACT[] = "{\"a\":\"1\",\"b\":\"2\",\"c\":3}";
+				static const GAIA::CH SOURCE_COMPACT[] = "{\"a\":\"1\",\"b\":\"-2\",\"c\":-3}";
 				jr.SetBuffer(SOURCE_COMPACT, sizeof(SOURCE_COMPACT) - 1);
 				GTRY
 				{
@@ -61,8 +61,8 @@ namespace TEST
 						psz = jr.Read(nt, sNodeNameLen);
 						TAST(psz != GNIL);
 						TAST(nt == GAIA::JSON::JSON_NODE_VALUE);
-						TAST(sNodeNameLen == 1);
-						TAST(*psz == '2');
+						TAST(sNodeNameLen == 2);
+						TAST(psz[0] == '-' && psz[1] == '2');
 
 						psz = jr.Read(nt, sNodeNameLen);
 						TAST(psz != GNIL);
@@ -73,8 +73,8 @@ namespace TEST
 						psz = jr.Read(nt, sNodeNameLen);
 						TAST(psz != GNIL);
 						TAST(nt == GAIA::JSON::JSON_NODE_VALUE);
-						TAST(sNodeNameLen == 1);
-						TAST(*psz == '3');
+						TAST(sNodeNameLen == 2);
+						TAST(psz[0] == '-' && psz[1] == '3');
 
 						psz = jr.Peek(nt, sNodeNameLen); // Mix operation.
 						GAST(psz != GNIL);

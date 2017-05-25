@@ -8,6 +8,7 @@
 #include "gaia_sync_lockrw.h"
 #include "gaia_sync_autolockr.h"
 #include "gaia_sync_autolockw.h"
+#include "gaia_sync_event.h"
 #include "gaia_ctn_ref.h"
 #include "gaia_ctn_vector.h"
 #include "gaia_ctn_queue.h"
@@ -103,9 +104,9 @@ namespace GAIA
 				uMaxResponseCountPerMinute = DEFAULT_MAX_RESPONSE_COUNT_PER_MINUTE;
 				GAIA::ALGO::gstrcpy(szHttpVer, GAIA::NETWORK::HTTP_VERSION_STRING);
 				sHttpVerLen = GAIA::ALGO::gstrlen(szHttpVer);
-				bEnableSocketTCPNoDelay = GAIA::True;
+				bEnableSocketTCPNoDelay = GAIA::False;
 				bEnableSocketNoBlock = GAIA::False;
-				bEnableSocketReuseAddr = GAIA::True;
+				bEnableSocketReuseAddr = GAIA::False;
 				nSocketSendTimeout = GINVALID;
 				nSocketRecvTimeout = GINVALID;
 				nListenSocketSendBufferSize = GINVALID;
@@ -148,13 +149,13 @@ namespace GAIA
 					return GAIA::False;
 				if(nSocketRecvTimeout != GINVALID && nSocketRecvTimeout <= 0)
 					return GAIA::False;
-				if(nListenSocketSendBufferSize != GINVALID && nListenSocketSendBufferSize <= 0)
+				if(nListenSocketSendBufferSize != GINVALID && nListenSocketSendBufferSize < 0)
 					return GAIA::False;
-				if(nListenSocketRecvBufferSize != GINVALID && nListenSocketRecvBufferSize <= 0)
+				if(nListenSocketRecvBufferSize != GINVALID && nListenSocketRecvBufferSize < 0)
 					return GAIA::False;
-				if(nAcceptedSocketSendBufferSize != GINVALID && nAcceptedSocketSendBufferSize <= 0)
+				if(nAcceptedSocketSendBufferSize != GINVALID && nAcceptedSocketSendBufferSize < 0)
 					return GAIA::False;
-				if(nAcceptedSocketRecvBufferSize != GINVALID && nAcceptedSocketRecvBufferSize <= 0)
+				if(nAcceptedSocketRecvBufferSize != GINVALID && nAcceptedSocketRecvBufferSize < 0)
 					return GAIA::False;
 				if(lSingleCallbackLimitSize < 0)
 					return GAIA::False;
@@ -992,13 +993,17 @@ namespace GAIA
 			/*!
 				@brief Execute HttpServer.
 
+			 	@param uWaitMilliSeconds [in] Specify the time for wait a valid request in milliseconds.
+			 		0 means no wait, GINVALID means infinite.
+			 		Default value is 0.
+			 
 				@return If exist some task to dispatch, and be dispatched, return GAIA::True,
 					or will return GAIA::False.
 
 				@remarks
 					Call this function will cause HttpServerCallBack::OnRequest be callback.
 			*/
-			GAIA::BL Execute();
+			GAIA::BL Execute(GAIA::U32 uWaitMilliSeconds = 0);
 
 			/*!
 				@brief Open a address for Http provide Http service.
@@ -1424,6 +1429,8 @@ namespace GAIA
 			GAIA::CTN::Vector<GAIA::NETWORK::HttpServerCallBack*> m_cbs;
 			GAIA::BL m_bCreated;
 			GAIA::BL m_bBegin;
+			
+			GAIA::SYNC::Event m_ExecEvent;
 
 			GAIA::SYNC::Lock m_lrLinks;
 			__LinkSetType m_links_bypeeraddr;

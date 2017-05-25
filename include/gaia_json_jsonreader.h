@@ -204,6 +204,7 @@ namespace GAIA
 						default:
 							{
 								if((*pLocalNext >= '0' && *pLocalNext <= '9') ||
+								   *pLocalNext == '-' || 
 								   *pLocalNext == 't' ||
 								   *pLocalNext == 'f')
 								{
@@ -241,11 +242,11 @@ namespace GAIA
 							p++;
 							bValueIsString = GAIA::True;
 						}
-						else if(*pLocalNext >= '0' && *pLocalNext <= '9')
+						else if((*pLocalNext >= '0' && *pLocalNext <= '9') || *pLocalNext == '-' || *pLocalNext == '.')
 						{
 							do
 							{
-								if((*pLocalNext >= '0' && *pLocalNext <= '9') || *pLocalNext == '.')
+								if((*pLocalNext >= '0' && *pLocalNext <= '9') || *pLocalNext == '-' || *pLocalNext == '.')
 									++pLocalNext;
 								else
 									break;
@@ -273,6 +274,11 @@ namespace GAIA
 								{
 									dotcnt++;
 									if(dotcnt > 1)
+										GTHROW_RET(DataError, GNIL);
+								}
+								else if(*pTemp == '-')
+								{
+									if(pTemp != p)
 										GTHROW_RET(DataError, GNIL);
 								}
 							}

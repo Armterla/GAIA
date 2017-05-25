@@ -85,6 +85,29 @@ namespace GAIA
 				return GAIA::True;
 			}
 			GINL GAIA::GVOID keep_remain(){this->keep(this->remain());}
+			GINL GAIA::BL peek(GAIA::GVOID* p, const _SizeType& size) const
+			{
+				GAST(!!p);
+				if(p == GNIL)
+					return GAIA::False;
+				GAST(size != 0);
+				if(size == 0)
+					return GAIA::False;
+				if(size > this->capacity() - this->read_size())
+					GTHROW_RET(ExceedContent, GAIA::False);
+				GAIA::ALGO::gmemcpy(p, m_pRead, size);
+				return GAIA::True;
+			}
+			GINL GAIA::BL drop(const _SizeType& size)
+			{
+				GAST(size != 0);
+				if(size == 0)
+					return GAIA::False;
+				if(size > this->capacity() - this->read_size())
+					GTHROW_RET(ExceedContent, GAIA::False);
+				m_pRead += size;
+				return GAIA::True;
+			}
 			GINL GAIA::BL write(const GAIA::GVOID* p, const _SizeType& size)
 			{
 				GAST(!!p);

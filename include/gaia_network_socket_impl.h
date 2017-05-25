@@ -198,6 +198,9 @@ namespace GAIA
 
 		GINL Socket::Socket()
 		{
+		#ifdef GAIA_DEBUG_INSTANCECOUNT
+			GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_SOCKET, +1);
+		#endif
 			this->init();
 			m_addrBinded.reset();
 			m_addrPeer.reset();
@@ -214,6 +217,9 @@ namespace GAIA
 			{
 				e.SetDispatched(GAIA::True);
 			}
+		#ifdef GAIA_DEBUG_INSTANCECOUNT
+			GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_SOCKET, -1);
+		#endif
 		}
 
 		GINL GAIA::GVOID Socket::Create(GAIA::NETWORK::Socket::SOCKET_TYPE socktype)
@@ -251,20 +257,37 @@ namespace GAIA
 		#endif
 
 			m_SockType = socktype;
+			
+		#ifdef GAIA_DEBUG_INSTANCECOUNT
+			GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_OPENNEDSOCKET, +1);
+		#endif
 		}
 
 		GINL GAIA::GVOID Socket::Close()
 		{
 			if(!this->IsCreated())
 				GTHROW(Illegal);
+
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			if(closesocket(m_nSocket) == GINVALID)
-				THROW_LASTERROR;
+			{
+				GAIA::N32 nOSError = WSAGetLastError();
+				if(nOSError != WSAEWOULDBLOCK)
+					THROW_LASTERROR;
+			}
 		#else
 			if(close(m_nSocket) == GINVALID)
-				THROW_LASTERROR;
+			{
+				GAIA::N32 nOSError = errno;
+				if(nOSError != EWOULDBLOCK)
+					THROW_LASTERROR;
+			}
 		#endif
 			this->init();
+			
+		#ifdef GAIA_DEBUG_INSTANCECOUNT
+			GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_OPENNEDSOCKET, -1);
+		#endif
 		}
 
 		GINL GAIA::GVOID Socket::Shutdown(GAIA::N32 nShutdownFlag)
@@ -429,6 +452,64 @@ namespace GAIA
 				#endif
 				}
 				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_LINGER:
+				{
+					if(m_nLingerSecond == (GAIA::N32)v)
+						return;
+					m_nLingerSecond = v;
+					GAIA::N32 l[2];
+					if(m_nLingerSecond < 0)
+					{
+						l[0] = 0;
+						l[1] = 0;
+					}
+					else
+					{
+						l[0] = 1;
+						l[1] = m_nLingerSecond;
+					}
+					if(setsockopt(m_nSocket, SOL_SOCKET, SO_LINGER, (GAIA::CH*)l, sizeof(l)) != 0)
+						THROW_LASTERROR;
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_BROADCAST:
+				{
+					if(m_bBroadcast == (GAIA::BL)v)
+						return;
+					m_bBroadcast = (GAIA::BL)v;
+					GAIA::N32 nOption = m_bBroadcast;
+					if(setsockopt(m_nSocket, SOL_SOCKET, SO_BROADCAST, (GAIA::CH*)&nOption, sizeof(nOption)) != 0)
+						THROW_LASTERROR;
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_DONTROUTE:
+				{
+					if(m_bDontRoute == (GAIA::BL)v)
+						return;
+					m_bDontRoute = (GAIA::BL)v;
+					GAIA::N32 nOption = m_bDontRoute;
+					if(setsockopt(m_nSocket, SOL_SOCKET, SO_DONTROUTE, (GAIA::CH*)&nOption, sizeof(nOption)) != 0)
+						THROW_LASTERROR;
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_SENDLOWAT:
+				{
+					if(m_nSendLoWat == (GAIA::N32)v)
+						return;
+					m_nSendLoWat = v;
+					if(setsockopt(m_nSocket, SOL_SOCKET, SO_RCVLOWAT, (GAIA::CH*)&m_nSendLoWat, sizeof(m_nSendLoWat)))
+						THROW_LASTERROR;
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_RECVLOWAT:
+				{
+					if(m_nRecvLoWat == (GAIA::N32)v)
+						return;
+					m_nRecvLoWat = v;
+					if(setsockopt(m_nSocket, SOL_SOCKET, SO_RCVLOWAT, (GAIA::CH*)&m_nRecvLoWat, sizeof(m_nRecvLoWat)))
+						THROW_LASTERROR;
+				}
+				break;
 			default:
 				GTHROW(InvalidParam);
 			}
@@ -484,6 +565,31 @@ namespace GAIA
 			case GAIA::NETWORK::Socket::SOCKET_OPTION_RECVTIMEOUT:
 				{
 					v = m_nRecvTimeout;
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_LINGER:
+				{
+					v = m_nLingerSecond;
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_BROADCAST:
+				{
+					v = (GAIA::BL)m_bBroadcast;
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_DONTROUTE:
+				{
+					v = (GAIA::BL)m_bDontRoute;
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_SENDLOWAT:
+				{
+					v = m_nSendLoWat;
+				}
+				break;
+			case GAIA::NETWORK::Socket::SOCKET_OPTION_RECVLOWAT:
+				{
+					v = m_nRecvLoWat;
 				}
 				break;
 			default:
@@ -841,6 +947,9 @@ namespace GAIA
 			m_nRecvBufferSize = GINVALID;
 			m_nSendTimeout = GINVALID;
 			m_nRecvTimeout = GINVALID;
+			m_nSendLoWat = GINVALID;
+			m_nRecvLoWat = GINVALID;
+			m_nLingerSecond = GINVALID;
 			m_bBinded = GAIA::False;
 			m_bConnected = GAIA::False;
 			m_bNotBlock = GAIA::False;
@@ -848,6 +957,8 @@ namespace GAIA
 			m_bReusePort = GAIA::False;
 			m_bTCPNoDelay = GAIA::False;
 			m_bKeepAlive = GAIA::False;
+			m_bBroadcast = GAIA::False;
+			m_bDontRoute = GAIA::False;
 		}
 
 		GINL GAIA::BL Socket::SetFD(GAIA::N32 nFD)

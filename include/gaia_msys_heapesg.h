@@ -6,6 +6,7 @@
 #include "gaia_msys_base.h"
 #include "gaia_sync_atomic.h"
 #include "gaia_sync_lockpure.h"
+#include "gaia_algo_memory.h"
 #include <stdlib.h>
 
 namespace GAIA
@@ -34,10 +35,12 @@ namespace GAIA
 				GAIA::UM uSectionIndex = this->GetSectionIndex(uSize + HEAP_BUFFER_HEADERSIZE);
 				if(uSectionIndex == (GAIA::UM)GINVALID)
 				{
+				#ifdef GAIA_DEBUG_PERF
+					m_uPerfCRTAllocCount++;
+				#endif
 					m_capacity.Add(uSize + HEAP_BUFFER_HEADERSIZE);
 					m_size.Add(uSize + HEAP_BUFFER_HEADERSIZE);
 					m_usesize.Add(uSize);
-
 					GAIA::GVOID* pTemp = (GAIA::U8*)malloc(uSize + HEAP_BUFFER_HEADERSIZE);
 					*GSCAST(ALLOC_SIZE_TYPE*)(pTemp) = GSCAST(ALLOC_SIZE_TYPE)(uSize);
 					*GRCAST(GAIA::U16*)(GSCAST(GAIA::U8*)(pTemp) + sizeof(ALLOC_SIZE_TYPE)) = (GAIA::U16)GINVALID;
@@ -45,6 +48,9 @@ namespace GAIA
 				}
 				else
 				{
+				#ifdef GAIA_DEBUG_PERF
+					m_uPerfESGAllocCount++;
+				#endif
 					m_size.Add(m_secsizelist[uSectionIndex]);
 					m_usesize.Add(uSize);
 				}
@@ -59,6 +65,9 @@ namespace GAIA
 						hs.uMinFreeSize = (GAIA::UM)GINVALID;
 						for(GAIA::UM x = 0; x < hs.uObListSize; ++x)
 						{
+						#ifdef GAIA_DEBUG_PERF
+							m_uPerfFindMinSizeOBCount++;
+						#endif
 							OriginBuffer& ob = hs.oblist[x];
 							if(ob.buf != GNIL && ob.uFreeStackSize != 0 && ob.uFreeStackSize < hs.uMinFreeSize)
 							{
@@ -69,6 +78,12 @@ namespace GAIA
 					}
 					if(hs.uMinFreeIndex == (GAIA::UM)GINVALID)
 					{
+						if(m_uCacheSize > m_uMaxCacheSize)
+							this->RecycleCacheInternal(m_uCacheSize - m_uMaxCacheSize);
+						
+					#ifdef GAIA_DEBUG_PERF
+						m_uPerfAllocOBCount++;
+					#endif
 						GAIA::U16 uOriginBufferIndex;
 						if(hs.uFreeStackSize == 0)
 						{
@@ -77,6 +92,7 @@ namespace GAIA
 							newob.freestack = GNIL;
 							newob.uFreeStackSize = 0;
 							newob.uFreeStackCapacity = 0;
+							newob.uCacheIndex = GINVALID;
 							uOriginBufferIndex = (GAIA::U16)hs.uObListSize;
 							this->push(newob, hs.oblist, hs.uObListSize, hs.uObListCapacity);
 						}
@@ -96,6 +112,9 @@ namespace GAIA
 							*GRCAST(ALLOC_SIZE_TYPE*)(pTemp) = GSCAST(ALLOC_SIZE_TYPE)(uSectionPatchSize);
 							*GRCAST(GAIA::U16*)(pTemp + sizeof(ALLOC_SIZE_TYPE)) = uOriginBufferIndex;
 							this->push(pTemp, newobref.freestack, newobref.uFreeStackSize, newobref.uFreeStackCapacity);
+						#ifdef GAIA_DEBUG_PERF
+							m_uPerfFillNewOBFreeStackCount++;
+						#endif
 						}
 						pRet = newobref.freestack[newobref.uFreeStackSize - 1];
 						--newobref.uFreeStackSize;
@@ -104,7 +123,15 @@ namespace GAIA
 					}
 					else
 					{
+					#ifdef GAIA_DEBUG_PERF
+						m_uPerfUseExistOBCount++;
+					#endif
 						OriginBuffer& ob = hs.oblist[hs.uMinFreeIndex];
+						if(ob.uCacheIndex != GINVALID)
+						{
+							this->PopFromCache(uSectionIndex, hs.uMinFreeIndex, ob.uCacheIndex);
+							ob.uCacheIndex = GINVALID;
+						}
 						pRet = ob.freestack[ob.uFreeStackSize - 1];
 						--ob.uFreeStackSize;
 						--hs.uMinFreeSize;
@@ -130,12 +157,21 @@ namespace GAIA
 				GAIA::U16 uOBIndex = *GRCAST(GAIA::U16*)(pOriginP + sizeof(ALLOC_SIZE_TYPE));
 				if(uOBIndex == (GAIA::U16)GINVALID)
 				{
+				#ifdef GAIA_DEBUG_PERF
+					m_uPerfCRTFreeCount++;
+				#endif
 					m_capacity.Add(-(GAIA::N64)this->memory_size(p) - (GAIA::N64)HEAP_BUFFER_HEADERSIZE);
 					m_size.Add(-(GAIA::N64)this->memory_size(p) - (GAIA::N64)HEAP_BUFFER_HEADERSIZE);
 					m_usesize.Add(-(GAIA::N64)this->memory_size(p));
 					m_piecesize.Decrease();
 					free(pOriginP);
 					return;
+				}
+				else
+				{
+				#ifdef GAIA_DEBUG_PERF
+					m_uPerfESGFreeCount++;
+				#endif
 				}
 				GAIA::UM uSectionIndex = this->GetSectionIndex(*GRCAST(ALLOC_SIZE_TYPE*)(pOriginP) + HEAP_BUFFER_HEADERSIZE);
 				GAST(uSectionIndex != (GAIA::UM)GINVALID);
@@ -150,21 +186,7 @@ namespace GAIA
 					OriginBuffer& ob = hs.oblist[uOBIndex];
 					this->push(pOriginP, ob.freestack, ob.uFreeStackSize, ob.uFreeStackCapacity);
 					if(ob.uFreeStackSize == this->GetSectionPatchCount(uSectionIndex))
-					{
-						m_capacity.Add(-((GAIA::N64)m_secsizelist[uSectionIndex] * (GAIA::N64)ob.uFreeStackSize));
-						if(uOBIndex == hs.uMinFreeIndex)
-						{
-							hs.uMinFreeIndex = (GAIA::UM)GINVALID;
-							hs.uMinFreeSize = (GAIA::UM)GINVALID;
-						}
-						free(ob.freestack);
-						ob.freestack = GNIL;
-						ob.uFreeStackSize = 0;
-						ob.uFreeStackCapacity = 0;
-						free(ob.buf);
-						ob.buf = GNIL;
-						this->push(uOBIndex, hs.freestack, hs.uFreeStackSize, hs.uFreeStackCapacity);
-					}
+						ob.uCacheIndex = this->PushToCache(uSectionIndex, uOBIndex);
 				}
 			#ifdef GAIA_HEAP_THREADSAFE
 				m_lr.Leave();
@@ -179,6 +201,17 @@ namespace GAIA
 			GINL virtual GAIA::UM use_size(){return (GAIA::UM)m_usesize;}
 			GINL virtual GAIA::UM piece_size(){return (GAIA::UM)m_piecesize;}
 			GINL virtual GAIA::U64 alloc_times(){return m_alloctimes;}
+			GINL virtual GAIA::U64 recycle_cache(GAIA::UM uRecycleSize = GINVALID)
+			{
+			#ifdef GAIA_HEAP_THREADSAFE
+				m_lr.Enter();
+			#endif
+				GAIA::U64 uRet = this->RecycleCacheInternal();
+			#ifdef GAIA_HEAP_THREADSAFE
+				m_lr.Leave();
+			#endif
+				return uRet;
+			}
 		private:
 			class OriginBuffer
 			{
@@ -187,6 +220,7 @@ namespace GAIA
 				GAIA::U8** freestack;
 				GAIA::UM uFreeStackSize;
 				GAIA::UM uFreeStackCapacity;
+				GAIA::UM uCacheIndex;
 			};
 			class Section
 			{
@@ -200,6 +234,12 @@ namespace GAIA
 				GAIA::UM uMinFreeIndex;
 				GAIA::UM uMinFreeSize;
 			};
+			class Cache
+			{
+			public:
+				GAIA::U16 uSectionIndex;
+				GAIA::U16 uOBIndex;
+			};
 		private:
 			GINL GAIA::GVOID init()
 			{
@@ -207,6 +247,28 @@ namespace GAIA
 				m_uSecListSize = 0;
 				m_secsizelist = GNIL;
 				m_uSecSizeListSize = 0;
+				m_uCacheSize = 0;
+				m_uMaxCacheSize = 1024 * 1024 * 10;
+				m_pCacheHashTable = GNIL;
+				m_cachelist = GNIL;
+				m_uCacheListSize = 0;
+				m_uCacheListCapacity = 0;
+				m_cachefreestack = GNIL;
+				m_uCacheFreeStackSize = 0;
+				m_uCacheFreeStackCapacity = 0;
+			#ifdef GAIA_DEBUG_PERF
+				m_uPerfCRTAllocCount = 0;
+				m_uPerfESGAllocCount = 0;
+				m_uPerfCRTFreeCount = 0;
+				m_uPerfESGFreeCount = 0;
+				m_uPerfFindMinSizeOBCount = 0;
+				m_uPerfAllocOBCount = 0;
+				m_uPerfUseExistOBCount = 0;
+				m_uPerfFillNewOBFreeStackCount = 0;
+				m_uPerfPushCacheCount = 0;
+				m_uPerfPopCacheCount = 0;
+				m_uPerfRecycleCacheCount = 0;
+			#endif
 			}
 			GINL GAIA::UM GetSectionPatchSize(GAIA::UM uIndex) const{return 32 + 32 * uIndex * uIndex;}
 			GINL GAIA::UM GetSectionPatchCount(GAIA::UM uIndex) const{if(uIndex == 0) uIndex = 1; return 40000 / (uIndex * uIndex);}
@@ -261,6 +323,9 @@ namespace GAIA
 						m_seclist[x] = temp;
 						m_secsizelist[x] = this->GetSectionPatchSize(x);
 					}
+					GAST((HEAP_SECTION_COUNT * 65536 % 8) == 0);
+					m_pCacheHashTable = (GAIA::U8*)malloc(HEAP_SECTION_COUNT * 65536 / 8); // 800KB.
+					GAIA::ALGO::gmemset(m_pCacheHashTable, 0, HEAP_SECTION_COUNT * 65536 / 8);
 				}
 			#ifdef GAIA_HEAP_THREADSAFE
 				m_lr.Leave();
@@ -272,6 +337,27 @@ namespace GAIA
 				m_lr.Enter();
 			#endif
 				{
+					this->RecycleCacheInternal();
+					if(m_pCacheHashTable != GNIL)
+					{
+						free(m_pCacheHashTable);
+						m_pCacheHashTable = GNIL;
+					}
+					if(m_cachelist != GNIL)
+					{
+						free(m_cachelist);
+						m_cachelist = GNIL;
+						m_uCacheListSize = 0;
+						m_uCacheListCapacity = 0;
+					}
+					if(m_cachefreestack != GNIL)
+					{
+						free(m_cachefreestack);
+						m_cachefreestack = GNIL;
+						m_uCacheFreeStackSize = 0;
+						m_uCacheFreeStackCapacity = 0;
+					}
+					
 					if(m_seclist != GNIL)
 					{
 						for(GAIA::UM x = 0; x < HEAP_SECTION_COUNT; ++x)
@@ -306,6 +392,146 @@ namespace GAIA
 			#ifdef GAIA_HEAP_THREADSAFE
 				m_lr.Leave();
 			#endif
+			}
+			GINL GAIA::UM PushToCache(GAIA::UM uSectionIndex, GAIA::UM uOBIndex) // Return the cache index.
+			{
+			#ifdef GAIA_DEBUG_PERF
+				m_uPerfPushCacheCount++;
+			#endif
+				
+				GAST(uSectionIndex < 100);
+				GAST(uOBIndex < 65536);
+				GAIA::UM uIndex = uSectionIndex * 65536 + uOBIndex;
+				GAIA::UM uByteIndex = uIndex / 8;
+				GAIA::UM uBitIndex = uIndex % 8;
+				if(m_pCacheHashTable[uByteIndex] & (1 << uBitIndex))
+				{
+					GASTFALSE;
+					return GINVALID;
+				}
+				m_pCacheHashTable[uByteIndex] |= (GAIA::U8)((1 << uBitIndex) & 0xFF);
+				
+				Cache c;
+				c.uSectionIndex = (GAIA::U16)uSectionIndex;
+				c.uOBIndex = (GAIA::U16)uOBIndex;
+				GAIA::UM uRet;
+				if(m_uCacheFreeStackSize == 0)
+				{
+					uRet = m_uCacheListSize;
+					this->push(c, m_cachelist, m_uCacheListSize, m_uCacheListCapacity);
+				}
+				else
+				{
+					m_uCacheFreeStackSize--;
+					uRet = m_cachefreestack[m_uCacheFreeStackSize];
+					m_cachelist[uRet] = c;
+				}
+				
+				GAIA::UM uSectionPatchCount = this->GetSectionPatchCount(uSectionIndex);
+				GAIA::UM uSectionPatchSize = m_secsizelist[uSectionIndex];
+				GAIA::UM uBufSize = uSectionPatchCount * uSectionPatchSize;
+				m_uCacheSize += uBufSize;
+				
+				return uRet;
+			}
+			GINL GAIA::BL PopFromCache(GAIA::UM uSectionIndex, GAIA::UM uOBIndex, GAIA::UM uCacheIndex)
+			{
+			#ifdef GAIA_DEBUG_PERF
+				m_uPerfPopCacheCount++;
+			#endif
+				
+				GAST(uSectionIndex < 100);
+				GAST(uOBIndex < 65536);
+				GAIA::UM uIndex = uSectionIndex * 65536 + uOBIndex;
+				GAIA::UM uByteIndex = uIndex / 8;
+				GAIA::UM uBitIndex = uIndex % 8;
+				if(!(m_pCacheHashTable[uByteIndex] & (1 << uBitIndex)))
+				{
+					GASTFALSE;
+					return GAIA::False;
+				}
+				m_pCacheHashTable[uByteIndex] &= ~((GAIA::U8)((1 << uBitIndex) & 0xFF));
+				
+				GAST(uCacheIndex >= 0 && uCacheIndex < m_uCacheListSize);
+				Cache& c = m_cachelist[uCacheIndex];
+				c.uSectionIndex = GINVALID;
+				c.uOBIndex = GINVALID;
+				this->push(uCacheIndex, m_cachefreestack, m_uCacheFreeStackSize, m_uCacheFreeStackCapacity);
+				
+				GAIA::UM uSectionPatchCount = this->GetSectionPatchCount(uSectionIndex);
+				GAIA::UM uSectionPatchSize = m_secsizelist[uSectionIndex];
+				GAIA::UM uBufSize = uSectionPatchCount * uSectionPatchSize;
+				GAST(m_uCacheSize >= uBufSize);
+				m_uCacheSize -= uBufSize;
+				
+				return GAIA::True;
+			}
+			GINL GAIA::U64 RecycleCacheInternal(GAIA::UM uRecycleSize = GINVALID)
+			{
+			#ifdef GAIA_DEBUG_PERF
+				m_uPerfRecycleCacheCount++;
+			#endif
+				
+				GAIA::U64 uRet = 0;
+				for(GAIA::UM x = 0; x < m_uCacheListSize; ++x)
+				{
+					Cache& c = m_cachelist[x];
+					if(c.uSectionIndex == (GAIA::U16)GINVALID && c.uOBIndex == (GAIA::U16)GINVALID)
+						continue;
+					GAST(c.uSectionIndex < 100);
+					{
+						GAIA::UM uIndex = c.uSectionIndex * 65536 + c.uOBIndex;
+						GAIA::UM uByteIndex = uIndex / 8;
+						GAIA::UM uBitIndex = uIndex % 8;
+						GAST(m_pCacheHashTable[uByteIndex] & (1 << uBitIndex));
+						m_pCacheHashTable[uByteIndex] &= ~((GAIA::U8)((1 << uBitIndex) & 0xFF));
+					}
+					Section& hs = m_seclist[c.uSectionIndex];
+					OriginBuffer& ob = hs.oblist[c.uOBIndex];
+					GAIA::N64 lCacheSize = (GAIA::N64)m_secsizelist[c.uSectionIndex] * (GAIA::N64)ob.uFreeStackSize;
+					GAST(lCacheSize <= m_uCacheSize);
+					m_uCacheSize -= lCacheSize;
+					m_capacity.Add(-lCacheSize);
+					if(c.uOBIndex == hs.uMinFreeIndex)
+					{
+						hs.uMinFreeIndex = (GAIA::UM)GINVALID;
+						hs.uMinFreeSize = (GAIA::UM)GINVALID;
+					}
+					if(ob.freestack != GNIL)
+					{
+						free(ob.freestack);
+						ob.freestack = GNIL;
+					}
+					ob.uFreeStackSize = 0;
+					ob.uFreeStackCapacity = 0;
+					if(ob.buf != GNIL)
+					{
+						free(ob.buf);
+						ob.buf = GNIL;
+					}
+					ob.uCacheIndex = GINVALID;
+					this->push(c.uOBIndex, hs.freestack, hs.uFreeStackSize, hs.uFreeStackCapacity);
+					uRet += lCacheSize;
+					c.uSectionIndex = GINVALID;
+					c.uOBIndex = GINVALID;
+					if(uRet >= uRecycleSize)
+						break;
+				}
+				GAIA::UM uCursor = 0;
+				for(GAIA::UM x = 0; x < m_uCacheListSize; ++x)
+				{
+					Cache& c = m_cachelist[x];
+					if(c.uSectionIndex != (GAIA::U16)GINVALID && c.uOBIndex != (GAIA::U16)GINVALID)
+					{
+						Section& hs = m_seclist[c.uSectionIndex];
+						OriginBuffer& ob = hs.oblist[c.uOBIndex];
+						ob.uCacheIndex = uCursor;
+						m_cachelist[uCursor++] = c;
+					}
+				}
+				m_uCacheListSize = uCursor;
+				m_uCacheFreeStackSize = 0;
+				return uRet;
 			}
 			template<typename _DataType> GAIA::GVOID push(const _DataType& t, _DataType*& p, GAIA::UM& uSize, GAIA::UM& uCapacity)
 			{
@@ -342,11 +568,35 @@ namespace GAIA
 			GAIA::UM m_uSecListSize;
 			GAIA::UM* m_secsizelist;
 			GAIA::UM m_uSecSizeListSize;
+			GAIA::UM m_uCacheSize;
+			GAIA::UM m_uMaxCacheSize;
+			GAIA::U8* m_pCacheHashTable;
+			Cache* m_cachelist;
+			GAIA::UM m_uCacheListSize;
+			GAIA::UM m_uCacheListCapacity;
+			GAIA::UM* m_cachefreestack;
+			GAIA::UM m_uCacheFreeStackSize;
+			GAIA::UM m_uCacheFreeStackCapacity;
 			GAIA::SYNC::Atomic m_capacity;
 			GAIA::SYNC::Atomic m_size;
 			GAIA::SYNC::Atomic m_usesize;
 			GAIA::SYNC::Atomic m_piecesize;
 			GAIA::SYNC::Atomic m_alloctimes;
+			
+		#ifdef GAIA_DEBUG_PERF
+			GAIA::U64 m_uPerfCRTAllocCount;
+			GAIA::U64 m_uPerfESGAllocCount;
+			GAIA::U64 m_uPerfCRTFreeCount;
+			GAIA::U64 m_uPerfESGFreeCount;
+			GAIA::U64 m_uPerfFindMinSizeOBCount;
+			GAIA::U64 m_uPerfAllocOBCount;
+			GAIA::U64 m_uPerfUseExistOBCount;
+			GAIA::U64 m_uPerfFillNewOBFreeStackCount;
+			GAIA::U64 m_uPerfPushCacheCount;
+			GAIA::U64 m_uPerfPopCacheCount;
+			GAIA::U64 m_uPerfRecycleCacheCount;
+		#endif
+			
 		#ifdef GAIA_HEAP_THREADSAFE
 			GAIA::SYNC::LockPure m_lr;
 		#endif

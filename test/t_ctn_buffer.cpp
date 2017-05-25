@@ -165,5 +165,23 @@ namespace TEST
 		b.proxy((GAIA::U8*)szTemp, (GAIA::U8*)szTemp + 32);
 		TAST(b.capacity() == 32);
 		b.proxy(GNIL, GNIL);
+		for(GAIA::NUM x = 0; x < 10; ++x)
+			b.write(&x, sizeof(x));
+		for(GAIA::NUM x = 0; x < 10; ++x)
+		{
+			GAIA::NUM r;
+			if(!b.peek(&r, sizeof(r)))
+			{
+				TERROR;
+				break;
+			}
+			if(!b.drop(sizeof(r)))
+			{
+				TERROR;
+				break;
+			}
+		}
+		if(b.remain() != 0)
+			TERROR;
 	}
 }

@@ -49,6 +49,58 @@ namespace GAIA
 				m_bufs.destroy();
 				this->init();
 			}
+			GINL _SizeType peek(GAIA::GVOID* p, const _SizeType& size) const
+			{
+				GAST(!!p);
+				if(p == GNIL)
+					return 0;
+				GAST(size != 0);
+				if(size <= 0)
+					return 0;
+				_SizeType size1 = size;
+				GAIA::U8* p1 = (GAIA::U8*)p;
+				for(typename __BufferListType::const_it it = m_bufs.const_frontit(); !it.empty(); ++it)
+				{
+					const Node& n = *it;
+					_SizeType sizepeek = GAIA::ALGO::gmin(size1, n.pBuf->remain());
+					n.pBuf->peek(p1, sizepeek);
+					p1 += sizepeek;
+					size1 -= sizepeek;
+					if(size1 == 0)
+						break;
+				}
+				return size - size1;
+
+			}
+			GINL _SizeType drop(const _SizeType& size)
+			{
+				GAST(size != 0);
+				if(size <= 0)
+					return 0;
+				for(_SizeType x = 0; x < size; )
+				{
+					if(m_bufs.empty())
+					{
+						GAST(m_size == 0);
+						return x;
+					}
+					Node& n = m_bufs.front();
+					_SizeType r = GAIA::ALGO::gmin(size - x, n.pBuf->remain());
+					
+					n.pBuf->seek_read(r, GAIA::SEEK_TYPE_FORWARD);
+					
+					x += r;
+					m_size -= r;
+					
+					if(n.pBuf->remain() == 0)
+					{
+						gdel n.pBuf;
+						typename __BufferListType::it itfront = m_bufs.frontit();
+						m_bufs.erase(itfront);
+					}
+				}
+				return size;
+			}
 			GINL GAIA::GVOID write(const GAIA::GVOID* p, const _SizeType& size)
 			{
 				GAST(!!p);
@@ -95,7 +147,10 @@ namespace GAIA
 				for(_SizeType x = 0; x < size; )
 				{
 					if(m_bufs.empty())
+					{
+						GAST(m_size == 0);
 						return x;
+					}
 					Node& n = m_bufs.front();
 					_SizeType r = GAIA::ALGO::gmin(size - x, n.pBuf->remain());
 

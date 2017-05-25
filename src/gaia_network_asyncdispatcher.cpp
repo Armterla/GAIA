@@ -915,6 +915,10 @@ namespace GAIA
 									GAIA::N32 nNewSocket = accept(nSocket, (sockaddr*)&addraccept, &newaddrlen);
 									if(nNewSocket != GINVALID)
 									{
+									#ifdef GAIA_DEBUG_INSTANCECOUNT
+										GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_OPENNEDSOCKET, +1);
+									#endif
+										
 										GAIA::NETWORK::Addr addrListen;
 										ctx.pSocket->GetBindedAddress(addrListen);
 										GAIA::NETWORK::AsyncSocket* pAcceptedSock = this->OnCreateAcceptingSocket(addrListen);
@@ -950,11 +954,10 @@ namespace GAIA
 										}
 										if(this->OnAcceptSocket(*pAcceptedSock, addrListen))
 										{
-											struct kevent ke[2];
+											struct kevent ke[1];
 											EV_SET(&ke[0], nNewSocket, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
-											EV_SET(&ke[1], nNewSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, pCtxSend);
 											GAIA::N32 kqep = this->select_kqep(nNewSocket);
-											GAIA::NUM sResult = kevent(kqep, ke, 2, GNIL, 0, GNIL);
+											GAIA::NUM sResult = kevent(kqep, ke, 1, GNIL, 0, GNIL);
 											if(sResult != GINVALID)
 											{
 												GAST(sResult == 0);
@@ -1044,10 +1047,9 @@ namespace GAIA
 									ctx.pSocket->OnConnected(GAIA::True, addrPeer);
 								}
 
-								struct kevent ke[2];
-								EV_SET(&ke[0], nSocket, EVFILT_WRITE, EV_ADD | EV_ONESHOT, 0, 0, &ctx);
-								EV_SET(&ke[1], nSocket, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
-								GAIA::NUM sResult = kevent(pThread->kqep, ke, 2, GNIL, 0, GNIL);
+								struct kevent ke[1];
+								EV_SET(&ke[0], nSocket, EVFILT_READ, EV_ADD, 0, 0, pCtxRecv);
+								GAIA::NUM sResult = kevent(pThread->kqep, ke, 1, GNIL, 0, GNIL);
 								if(sResult != GINVALID)
 								{
 									GAST(sResult == 0);
@@ -1065,7 +1067,7 @@ namespace GAIA
 										ctx.pSocket->rise_ref("AsyncDispatcher::Execute:BeginSend");
 										{
 											GAIA::SYNC::Autolock al(ctx.pSocket->m_lrSend);
-											GAIA::NUM sNeedSendSize = ctx.pSocket->m_sendbuf.read(pThread->tempbuf.fptr(), sSendAbleSize);
+											GAIA::NUM sNeedSendSize = ctx.pSocket->m_sendbuf.peek(pThread->tempbuf.fptr(), sSendAbleSize);
 											if(sNeedSendSize > 0)
 											{
 												GAIA::NUM sSendedSize = (GAIA::NUM)send(nSocket, pThread->tempbuf.fptr(), sNeedSendSize, 0);
@@ -1074,11 +1076,11 @@ namespace GAIA
 													GAIA::N32 nErr = errno;
 													GERR << "[AsyncDispatcher] AsyncDispatcher::Execute: socket send failed, errno = " << nErr << GEND;
 												}
-												GAST(sSendedSize == sNeedSendSize);
-												
+												if(sSendedSize > 0)
 												{
+													ctx.pSocket->m_sendbuf.drop(sSendedSize);
 													GAIA::SYNC::AutolockPure al(ctx.pSocket->m_lrCB);
-													ctx.pSocket->OnSent(GAIA::True, pThread->tempbuf.fptr(), sSendedSize, sSendedSize + pThread->tempbuf.remain());
+													ctx.pSocket->OnSent(GAIA::True, pThread->tempbuf.fptr(), sSendedSize, sNeedSendSize);
 												}
 											}
 											if(!ctx.pSocket->m_sendbuf.empty())

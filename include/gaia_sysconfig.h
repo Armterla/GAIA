@@ -316,33 +316,39 @@
 #	endif
 #endif
 
-#ifndef __GAIA_NO_DEBUG_THROWEXCEPTION
+#ifndef __GAIA_NO_DEBUG_THROWEXCEPTION__
 #	ifndef GAIA_DEBUG_THROWEXCEPTION
 #		define GAIA_DEBUG_THROWEXCEPTION
 #	endif
 #endif
 
-#ifndef __GAIA_NO_DEBUG_CACHEEXCEPTION
+#ifndef __GAIA_NO_DEBUG_CACHEEXCEPTION__
 #	ifndef GAIA_DEBUG_CATCHEXCEPTION
 #		define GAIA_DEBUG_CATCHEXCEPTION
 #	endif
 #endif
 
-#ifndef __GAIA_NO_DEBUG_ASTDEBUG
+#ifndef __GAIA_NO_DEBUG_ASTDEBUG__
 #	ifndef GAIA_DEBUG_ASTDEBUG
 #		define GAIA_DEBUG_ASTDEBUG
 #	endif
 #endif
 
-#ifndef	__GAIA_NO_DEBUG_PERF
+#ifndef	__GAIA_NO_DEBUG_PERF__
 #	ifndef GAIA_DEBUG_PERF
 #		define GAIA_DEBUG_PERF
 #	endif
 #endif
 
-#ifndef __GAIA_NO_DEBUG_OBJWATCH
+#ifndef __GAIA_NO_DEBUG_OBJWATCH__
 #	ifndef GAIA_DEBUG_OBJWATCH
 #		define GAIA_DEBUG_OBJWATCH
+#	endif
+#endif
+
+#ifndef __GAIA_NO_DEBUG_INSTANCECOUNT__
+#	ifndef GAIA_DEBUG_INSTANCECOUNT
+#		define GAIA_DEBUG_INSTANCECOUNT
 #	endif
 #endif
 

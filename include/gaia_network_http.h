@@ -794,9 +794,9 @@ namespace GAIA
 				uMaxConnTime = DEFAULT_MAX_CONN_TIME;
 				GAIA::ALGO::gstrcpy(szHttpVer, GAIA::NETWORK::HTTP_VERSION_STRING);
 				sHttpVerLen = GAIA::ALGO::gstrlen(szHttpVer);
-				bEnableSocketTCPNoDelay = GAIA::True;
+				bEnableSocketTCPNoDelay = GAIA::False;
 				bEnableSocketNoBlock = GAIA::False;
-				bEnableSocketReuseAddr = GAIA::True;
+				bEnableSocketReuseAddr = GAIA::False;
 				nSocketSendBufferSize = GINVALID;
 				nSocketRecvBufferSize = GINVALID;
 				nSocketSendTimeout = GINVALID;
@@ -828,9 +828,9 @@ namespace GAIA
 					return GAIA::False;
 				if(GAIA::ALGO::gstrlen(szHttpVer) != sHttpVerLen)
 					return GAIA::False;
-				if(nSocketSendBufferSize != GINVALID && nSocketSendBufferSize <= 0)
+				if(nSocketSendBufferSize != GINVALID && nSocketSendBufferSize < 0)
 					return GAIA::False;
-				if(nSocketRecvBufferSize != GINVALID && nSocketRecvBufferSize <= 0)
+				if(nSocketRecvBufferSize != GINVALID && nSocketRecvBufferSize < 0)
 					return GAIA::False;
 				if(nSocketSendTimeout != GINVALID && nSocketSendTimeout <= 0)
 					return GAIA::False;

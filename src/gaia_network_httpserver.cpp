@@ -40,46 +40,6 @@ namespace GAIA
 					m_pSvr->ReleaseBuffer(m_pRecvBufSwap);
 			}
 
-			GINL GAIA::GVOID SetLink(GAIA::NETWORK::HttpServerLink* pLink)
-			{
-				GAIA::SYNC::Autolock al(m_lr);
-				m_pLink = pLink;
-			}
-			GINL GAIA::NETWORK::HttpServerLink* GetLink() const{return m_pLink;}
-
-			virtual GAIA::GVOID Create()
-			{
-				GAIA::NETWORK::AsyncSocket::Create();
-
-				const GAIA::NETWORK::HttpServerDesc& descSvr = m_pSvr->GetDesc();
-				if(descSvr.bEnableSocketTCPNoDelay)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY, GAIA::True);
-				if(descSvr.bEnableSocketNoBlock)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
-				if(descSvr.bEnableSocketReuseAddr)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEADDR, GAIA::True);
-
-				if(m_bListenSocket)
-				{
-					if(descSvr.nListenSocketSendBufferSize != GINVALID)
-						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, descSvr.nListenSocketSendBufferSize);
-					if(descSvr.nListenSocketRecvBufferSize != GINVALID)
-						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, descSvr.nListenSocketRecvBufferSize);
-				}
-				else
-				{
-					if(descSvr.nAcceptedSocketSendBufferSize != GINVALID)
-						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, descSvr.nAcceptedSocketSendBufferSize);
-					if(descSvr.nAcceptedSocketRecvBufferSize != GINVALID)
-						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, descSvr.nAcceptedSocketRecvBufferSize);
-				}
-				
-				if(descSvr.nSocketSendTimeout != GINVALID)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDTIMEOUT, descSvr.nSocketSendTimeout);
-				if(descSvr.nSocketRecvTimeout != GINVALID)
-					this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVTIMEOUT, descSvr.nSocketRecvTimeout);
-			}
-
 			virtual GAIA::N32 Send(const GAIA::GVOID* p, GAIA::N32 nSize)
 			{
 				GAIA::N32 nSent = GAIA::NETWORK::AsyncSocket::Send(p, nSize);
@@ -88,7 +48,39 @@ namespace GAIA
 			}
 
 		protected:
-			virtual GAIA::GVOID OnCreated(GAIA::BL bResult){}
+			virtual GAIA::GVOID OnCreated(GAIA::BL bResult)
+			{
+				if(bResult)
+				{
+					const GAIA::NETWORK::HttpServerDesc& descSvr = m_pSvr->GetDesc();
+					if(descSvr.bEnableSocketTCPNoDelay)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_TCPNODELAY, GAIA::True);
+					if(descSvr.bEnableSocketNoBlock)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_NOBLOCK, GAIA::True);
+					if(descSvr.bEnableSocketReuseAddr)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_REUSEADDR, GAIA::True);
+					
+					if(m_bListenSocket)
+					{
+						if(descSvr.nListenSocketSendBufferSize != GINVALID)
+							this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, descSvr.nListenSocketSendBufferSize);
+						if(descSvr.nListenSocketRecvBufferSize != GINVALID)
+							this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, descSvr.nListenSocketRecvBufferSize);
+					}
+					else
+					{
+						if(descSvr.nAcceptedSocketSendBufferSize != GINVALID)
+							this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDBUFSIZE, descSvr.nAcceptedSocketSendBufferSize);
+						if(descSvr.nAcceptedSocketRecvBufferSize != GINVALID)
+							this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVBUFSIZE, descSvr.nAcceptedSocketRecvBufferSize);
+					}
+					
+					if(descSvr.nSocketSendTimeout != GINVALID)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_SENDTIMEOUT, descSvr.nSocketSendTimeout);
+					if(descSvr.nSocketRecvTimeout != GINVALID)
+						this->SetOption(GAIA::NETWORK::Socket::SOCKET_OPTION_RECVTIMEOUT, descSvr.nSocketRecvTimeout);
+				}
+			}
 			virtual GAIA::GVOID OnClosed(GAIA::BL bResult){}
 			virtual GAIA::GVOID OnBound(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
 			virtual GAIA::GVOID OnConnected(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr)
@@ -116,16 +108,14 @@ namespace GAIA
 			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult, GAIA::BL bByRemote)
 			{
 				//
+				GAIA::SYNC::Autolock al(m_lr);
+				if(m_pLink == GNIL)
+					return;
+				if(m_pSvr->m_bLog)
 				{
-					GAIA::SYNC::Autolock al(m_lr);
-					if(m_pLink == GNIL)
-						return;
-					if(m_pSvr->m_bLog)
-					{
-						GAIA::CH szAddressPeer[32];
-						m_pLink->GetPeerAddr().tostring(szAddressPeer);
-						GDEV << "[HttpSvr] HttpServerAsyncSocket::OnDisconnected " << szAddressPeer << GEND;
-					}
+					GAIA::CH szAddressPeer[32];
+					m_pLink->GetPeerAddr().tostring(szAddressPeer);
+					GDEV << "[HttpSvr] HttpServerAsyncSocket::OnDisconnected " << szAddressPeer << GEND;
 				}
 
 				//
@@ -135,6 +125,7 @@ namespace GAIA
 					m_pLink->rise_ref("HttpServerAsyncSocket::OnDisconnected:link rise ref");
 					GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
 					m_pSvr->m_rclinks.push_back(m_pLink);
+					m_pSvr->m_ExecEvent.Fire();
 					m_pLink = GNIL;
 				}
 			}
@@ -143,16 +134,15 @@ namespace GAIA
 			virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nPracticeSize, GAIA::N32 nSize)
 			{
 				GAIA::BL bNeedCallBackToRecycle = GAIA::False;
+				GAIA::SYNC::Autolock al(m_lr);
 				if(!bResult)
 				{
-					GAIA::SYNC::Autolock al(m_lr);
 					if(m_pLink == GNIL)
 						return;
 					bNeedCallBackToRecycle = GAIA::True;
 				}
 				else
 				{
-					GAIA::SYNC::Autolock al(m_lr);
 					if(m_pLink == GNIL)
 						return;
 					if(m_pSvr->m_bLog)
@@ -171,20 +161,22 @@ namespace GAIA
 					m_pLink->rise_ref("HttpServerAsyncSocket::OnSent:link rise ref");
 					GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
 					m_pSvr->m_rclinks.push_back(m_pLink);
+					m_pSvr->m_ExecEvent.Fire();
 					m_pLink = GNIL;
 				}
 			}
 			virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize)
 			{
+				GAIA::SYNC::Autolock al1(m_lr);
 				if(!bResult)
 				{
-					GAIA::SYNC::Autolock al1(m_lr);
 					if(m_pLink == GNIL)
 						return;
 					m_bClosed = GAIA::True;
 					m_pLink->rise_ref("HttpServerAsyncSocket::OnRecved:link rise ref for recv failed");
 					GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
 					m_pSvr->m_rclinks.push_back(m_pLink);
+					m_pSvr->m_ExecEvent.Fire();
 					m_pLink = GNIL;
 					return;
 				}
@@ -198,7 +190,6 @@ namespace GAIA
 				}
 
 				// Try to analyze http information.
-				GAIA::SYNC::Autolock al(m_lr);
 				if(m_pLink == GNIL)
 					return;
 				if(m_pRecvBuf == GNIL)
@@ -361,6 +352,7 @@ namespace GAIA
 						m_pLink->rise_ref("HttpServerAsyncSocket::OnRecv:link rise ref");
 						GAIA::SYNC::Autolock al(m_pSvr->m_lrRCLinks);
 						m_pSvr->m_rclinks.push_back(m_pLink);
+						m_pSvr->m_ExecEvent.Fire();
 					}
 				}
 			}
@@ -434,7 +426,7 @@ namespace GAIA
 			#else
 				sock.GetPeerAddress(addrPeer);
 			#endif
-
+				
 				if(m_pSvr->m_bLog)
 				{
 					GAIA::CH szAddressPeer[32];
@@ -478,9 +470,14 @@ namespace GAIA
 				pLink->SetPeerAddr(addrPeer);
 				pLink->SetListenAddr(addrListen);
 				pLink->SetAcceptTime(GAIA::TIME::gmt_time());
-				((HttpServerAsyncSocket*)&sock)->SetLink(pLink);
+				{
+					HttpServerAsyncSocket* pHttpAsyncSock = (HttpServerAsyncSocket*)&sock;
+					GAIA::SYNC::Autolock al(pHttpAsyncSock->m_lr);
+					pHttpAsyncSock->m_pLink = pLink;
+				}
 				GAIA::SYNC::Autolock al(m_pSvr->m_lrLinks);
 				m_pSvr->m_links_bypeeraddr.insert(GAIA::CTN::Ref<GAIA::NETWORK::HttpServerLink>(pLink));
+				
 				return GAIA::True;
 			}
 
@@ -505,9 +502,7 @@ namespace GAIA
 				{
 					if(m_bStopCmd)
 						break;
-					GAIA::BL bExistExecutedTask = m_pSvr->Execute();
-					if(!bExistExecutedTask)
-						GAIA::SYNC::gsleep(100);
+					m_pSvr->Execute(100);
 				}
 			}
 
@@ -1300,10 +1295,14 @@ namespace GAIA
 			return GAIA::True;
 		}
 
-		GAIA::BL HttpServer::Execute()
+		GAIA::BL HttpServer::Execute(GAIA::U32 uWaitMilliSeconds)
 		{
 			GAIA::NETWORK::HttpServerLink* pLink;
 
+			if(!m_ExecEvent.Wait(uWaitMilliSeconds))
+				return GAIA::False;
+			
+			
 			// Get a task.
 			{
 				GAIA::SYNC::Autolock al(m_lrRCLinks);
@@ -1822,6 +1821,13 @@ namespace GAIA
 
 		GAIA::BL HttpServer::RecycleLink(GAIA::NETWORK::HttpServerLink& l)
 		{
+			//
+			if(l.m_pSock != GNIL)
+			{
+				GAIA::SYNC::Autolock al(l.m_pSock->m_lr);
+				l.m_pSock->m_pLink = GNIL;
+			}
+			
 			// Remove from link list.
 			{
 				GAIA::SYNC::Autolock al(m_lrLinks);

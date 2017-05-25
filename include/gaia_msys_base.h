@@ -105,6 +105,12 @@ namespace GAIA
 				@brief Get allocated times.
 			*/
 			virtual GAIA::U64 alloc_times() = 0;
+			
+			/*!
+			 	@brief Recycle cache memory.
+			*/
+			virtual GAIA::U64 recycle_cache(GAIA::UM uRecycleSize = GINVALID) = 0;
+			
 		private:
 		};
 	}

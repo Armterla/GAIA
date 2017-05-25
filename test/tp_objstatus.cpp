@@ -32,8 +32,6 @@ namespace TEST
 		s << "GAIA::DIGIT::Zip size = " << sizeof(GAIA::DIGIT::Zip) << GAIA_FILELINEBREAK_RN;
 		s << "GAIA::DIGIT::Diff size = " << sizeof(GAIA::DIGIT::Diff) << GAIA_FILELINEBREAK_RN;
 		s << "GAIA::DIGIT::MD5 size = " << sizeof(GAIA::DIGIT::MD5) << GAIA_FILELINEBREAK_RN;
-		s << "GAIA::DIGIT::CRC8 size = " << sizeof(GAIA::DIGIT::CRC8) << GAIA_FILELINEBREAK_RN;
-		s << "GAIA::DIGIT::CRC16 size = " << sizeof(GAIA::DIGIT::CRC16) << GAIA_FILELINEBREAK_RN;
 		s << "GAIA::DIGIT::CRC32 size = " << sizeof(GAIA::DIGIT::CRC32) << GAIA_FILELINEBREAK_RN;
 		s << "GAIA::DIGIT::SHA1 size = " << sizeof(GAIA::DIGIT::SHA1) << GAIA_FILELINEBREAK_RN;
 

@@ -59,5 +59,25 @@ namespace TEST
 			TERROR;
 		if(b.readx<GAIA::NUM>() != 456)
 			TERROR;
+		b.destroy();
+		for(GAIA::NUM x = 0; x < 10; ++x)
+			b.write(&x, sizeof(x));
+		for(GAIA::NUM x = 0; x < 10; ++x)
+		{
+			GAIA::NUM r;
+			if(b.peek(&r, sizeof(r)) != sizeof(r))
+			{
+				TERROR;
+				break;
+			}
+			if(b.drop(sizeof(r)) != sizeof(r))
+			{
+				TERROR;
+				break;
+			}
+		}
+		if(b.size() != 0)
+			TERROR;
+
 	}
 }

@@ -40,6 +40,11 @@ namespace GAIA
 				SOCKET_OPTION_KEEPALIVE,
 				SOCKET_OPTION_SENDTIMEOUT,
 				SOCKET_OPTION_RECVTIMEOUT,
+				SOCKET_OPTION_LINGER,
+				SOCKET_OPTION_BROADCAST,
+				SOCKET_OPTION_DONTROUTE,
+				SOCKET_OPTION_SENDLOWAT,
+				SOCKET_OPTION_RECVLOWAT,
 			GAIA_ENUM_END(SOCKET_OPTION)
 
 			/*!
@@ -310,6 +315,9 @@ namespace GAIA
 			GAIA::N32 m_nRecvBufferSize;
 			GAIA::N32 m_nSendTimeout;
 			GAIA::N32 m_nRecvTimeout;
+			GAIA::N32 m_nSendLoWat;
+			GAIA::N32 m_nRecvLoWat;
+			GAIA::N32 m_nLingerSecond; // GINVALID means close linger, 0 means recycle immediately, above zero means linger seconds.
 			GAIA::NETWORK::Addr m_addrBinded;
 			GAIA::NETWORK::Addr m_addrPeer;
 			GAIA::BL m_bBinded : 1;
@@ -319,6 +327,8 @@ namespace GAIA
 			GAIA::BL m_bReusePort : 1;
 			GAIA::BL m_bTCPNoDelay : 1;
 			GAIA::BL m_bKeepAlive : 1;
+			GAIA::BL m_bBroadcast : 1;
+			GAIA::BL m_bDontRoute : 1;
 		};
 	}
 }

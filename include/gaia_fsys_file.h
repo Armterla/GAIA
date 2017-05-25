@@ -23,8 +23,23 @@ namespace GAIA
 		class File : public FileBase
 		{
 		public:
-			GINL File(){m_fileopentype = OPEN_TYPE_INVALID; m_size = m_offset = 0; m_pFile = GNIL;}
-			GINL virtual ~File(){if(this->IsOpen()) this->Close();}
+			GINL File()
+			{
+			#ifdef GAIA_DEBUG_INSTANCECOUNT
+				GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_FILE, +1);
+			#endif
+				m_fileopentype = OPEN_TYPE_INVALID;
+				m_size = m_offset = 0;
+				m_pFile = GNIL;
+			}
+			GINL virtual ~File()
+			{
+				if(this->IsOpen())
+					this->Close();
+			#ifdef GAIA_DEBUG_INSTANCECOUNT
+				GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_FILE, -1);
+			#endif
+			}
 			GINL virtual GAIA::BL Open(const GAIA::TCH* fileurl, const GAIA::UM& opentype)
 			{
 				if(this->IsOpen())
@@ -128,6 +143,9 @@ namespace GAIA
 				}
 				m_strFileUrl = fileurl;
 				m_fileopentype = opentype;
+			#ifdef GAIA_DEBUG_INSTANCECOUNT
+				GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_OPENNEDFILE, +1);
+			#endif
 				return GAIA::True;
 			}
 			GINL virtual GAIA::BL Close()
@@ -139,6 +157,9 @@ namespace GAIA
 					m_fileopentype = OPEN_TYPE_INVALID;
 					m_strFileUrl.destroy();
 					m_size = m_offset = 0;
+				#ifdef GAIA_DEBUG_INSTANCECOUNT
+					GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_OPENNEDFILE, -1);
+				#endif
 					return GAIA::True;
 				}
 				return GAIA::False;

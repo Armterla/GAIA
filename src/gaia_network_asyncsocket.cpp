@@ -116,6 +116,9 @@ namespace GAIA
 					 &GuidDisonnectEx, sizeof(GuidDisonnectEx), 
 					 &m_pfnDisconnectEx, sizeof(m_pfnDisconnectEx), 
 					 &dwBytes, GNIL, GNIL);
+		#	ifdef GAIA_DEBUG_INSTANCECOUNT
+				GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_OPENNEDSOCKET, +1);
+		#	endif
 		#else
 			m_sock.Create(GAIA::NETWORK::Socket::SOCKET_TYPE_STREAM);
 			m_nBackupSocket = m_sock.GetFD();

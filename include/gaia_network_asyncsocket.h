@@ -233,14 +233,14 @@ namespace GAIA
 			GAIA::BL GetPeerAddress(GAIA::NETWORK::Addr& addr){return m_sock.GetPeerAddress(addr);}
 
 		protected:
-
+			
 			/*!
-				@brief On async socket create callback.
+				@brief On async socket created callback.
 			*/
 			virtual GAIA::GVOID OnCreated(GAIA::BL bResult){}
-
+			
 			/*!
-				@brief On async socket close callback.
+				@brief On async socket closed callback.
 			*/
 			virtual GAIA::GVOID OnClosed(GAIA::BL bResult){}
 
