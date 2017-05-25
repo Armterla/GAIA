@@ -387,5 +387,10 @@ namespace GAIA
 			m_bPushForRecycleAble = GAIA::True;
 		#endif
 		}
+
+		GAIA::GVOID test()
+		{
+			
+		}
 	}
 }
