@@ -958,6 +958,9 @@
     <ClCompile Include="..\test\t_pattern_textindex.cpp">
       <Filter>GAIA\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\t_digit_crc.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\test\preheader.h">
