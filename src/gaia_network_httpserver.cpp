@@ -577,20 +577,33 @@ namespace GAIA
 			}
 			pBuf->write("\r\n", 2);
 
-			// Send.
 			GAIA::NUM sSendedHeadSize = pBuf->write_size();
-			m_pSock->Send(pBuf->fptr(), sSendedHeadSize);
-			m_pSvr->ReleaseBuffer(pBuf);
-
-			// Write body.
-			if(p != GNIL)
+			if(sSendedHeadSize < 1024 && p != GNIL && sSize < 4096)
 			{
+				// Write body.
 				GAST(sSize > 0);
-				m_pSock->Send(p, sSize);
+				pBuf->write(p, sSize);
+				
+				// Send.
+				m_pSock->Send(pBuf->fptr(), pBuf->write_size());
+				m_pSvr->ReleaseBuffer(pBuf);
 			}
 			else
-				GAST(sSize == 0);
-
+			{
+				// Send head.
+				m_pSock->Send(pBuf->fptr(), pBuf->write_size());
+				m_pSvr->ReleaseBuffer(pBuf);
+				
+				// Send body.
+				if(p != GNIL)
+				{
+					GAST(sSize > 0);
+					m_pSock->Send(p, sSize);
+				}
+				else
+					GAST(sSize == 0);
+			}
+			
 			// Statistics.
 			GAIA::NETWORK::HttpServerStatus& s = m_pSvr->GetStatus();
 			if(m_sResponseTimes++ == 0)
@@ -1301,7 +1314,6 @@ namespace GAIA
 
 			if(!m_ExecEvent.Wait(uWaitMilliSeconds))
 				return GAIA::False;
-			
 			
 			// Get a task.
 			{
