@@ -1,8 +1,11 @@
+# Constants declarations.
 CC=gcc
 CPPC=g++
 CPPCFLAGS=-O2 -I../include/ -DINVALID -Wall -c
 CPPCFLAGS=-O2 -I../include/ -DINVALID -Wall -c
 
+
+# Objects
 objects=\
 	adler32.o \
 	bignum.o \
@@ -182,11 +185,12 @@ objects=\
 	uncompr.o \
 	zutil.o 
 
-
+# Link
 link: $(objects)
 	$(CPPC) $(objects) -o gaia
 
 
+# Every objects
 adler32.o: ../src/adler32.c
 	$(CC) $(CPPCFLAGS) ../src/adler32.c
 
@@ -719,6 +723,7 @@ zutil.o: ../src/zutil.c
 	$(CC) $(CPPCFLAGS) ../src/zutil.c
 
 
+# Clean.
 .PHONY: clean
 clean:
 	-rm adler32.o
