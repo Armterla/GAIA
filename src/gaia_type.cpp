@@ -10,7 +10,7 @@ extern GAIA::SYNC::Atomic g_gaia_instancecounttable[GAIA::INSTANCE_COUNT_MAXENUM
 namespace GAIA
 {
 #if defined(GAIA_HEAP)
-#	if GAIA_OS == GAIA_OS_OSX
+#	if GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_LINUX
 	    GAIA::GVOID* Base::operator new(GAIA::UM size GAIA_NEW_INFO)
 		{
 		#if defined(GAIA_HEAP_FORCLASS)
@@ -240,7 +240,7 @@ namespace GAIA
 	}
 }
 #if defined(GAIA_HEAP)
-#	if GAIA_OS == GAIA_OS_OSX
+#	if GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_LINUX
         GAIA::GVOID* operator new(GAIA::UM size GAIA_NEW_INFO)
 		{
 		#if defined(GAIA_HEAP_FORGLOBAL)
