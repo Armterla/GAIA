@@ -1185,7 +1185,7 @@ namespace GAIA
 		/*!
 			@brief Http request manager class.
 		*/
-		class Http : public GAIA::Base
+		class Http : public GAIA::Entity
 		{
 			friend class HttpWorkThread;
 			friend class HttpAsyncSocket;

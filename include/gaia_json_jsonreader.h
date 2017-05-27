@@ -859,7 +859,7 @@ namespace GAIA
 			{
 				while(p <= m_pBack)
 				{
-					if(*p >= sizeof(ascii_json_validchar) || ascii_json_validchar[*p])
+					if(*p >= sizeof(ascii_json_validchar) || ascii_json_validchar[(GAIA::U8)*p])
 						return p;
 					++p;
 				}

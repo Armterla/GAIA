@@ -178,7 +178,7 @@ namespace GAIA
 								GTHROW_RET(DataError, GNIL);
 							do
 							{
-								if(*p > sizeof(ascii_xml_validnamechar) || !ascii_xml_validnamechar[*p])
+								if(*p > sizeof(ascii_xml_validnamechar) || !ascii_xml_validnamechar[(GAIA::U8)*p])
 									break;
 								++p;
 							}
@@ -201,7 +201,7 @@ namespace GAIA
 								GTHROW_RET(DataError, GNIL);
 							do
 							{
-								if(*p > sizeof(ascii_xml_validnamechar) || !ascii_xml_validnamechar[*p])
+								if(*p > sizeof(ascii_xml_validnamechar) || !ascii_xml_validnamechar[(GAIA::U8)*p])
 									break;
 								++p;
 							}
@@ -282,7 +282,7 @@ namespace GAIA
 							GTHROW_RET(DataError, GNIL);
 						do
 						{
-							if(*p > sizeof(ascii_xml_validnamechar) || !ascii_xml_validnamechar[*p])
+							if(*p > sizeof(ascii_xml_validnamechar) || !ascii_xml_validnamechar[(GAIA::U8)*p])
 								break;
 							++p;
 						}
@@ -792,7 +792,7 @@ namespace GAIA
 			{
 				while(p <= m_pBack)
 				{
-					if(*p >= sizeof(ascii_xml_validchar) || ascii_xml_validchar[*p])
+					if(*p >= sizeof(ascii_xml_validchar) || ascii_xml_validchar[(GAIA::U8)*p])
 						return p;
 					++p;
 				}

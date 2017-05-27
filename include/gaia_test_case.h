@@ -18,7 +18,7 @@ namespace GAIA
 			friend class Controller;
 
 		public:
-			class Desc : public GAIA::Base
+			class Desc : public GAIA::Entity
 			{
 			public:
 				GINL GAIA::GVOID reset()

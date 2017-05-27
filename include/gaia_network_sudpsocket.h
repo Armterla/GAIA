@@ -27,7 +27,7 @@ namespace GAIA
 				Feature 1 : Use serial number solve udp datagram lose, datagram repeat, datagram order mistake problem.\n
 				Feature 2 : Support safe udp datagram and unsafe udp datagram mix usage.\n
 		*/
-		class SUDPSocket : public GAIA::Base
+		class SUDPSocket : public GAIA::Entity
 		{
 		public:
 			static const GAIA::U64 DEFAULT_TIMEOUT_TIME = 10 * 1000 * 1000;

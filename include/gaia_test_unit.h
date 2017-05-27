@@ -10,7 +10,7 @@ namespace GAIA
 {
 	namespace TEST
 	{
-		class Unit : public GAIA::Base
+		class Unit : public GAIA::Entity
 		{
 			friend class Controller;
 		protected:

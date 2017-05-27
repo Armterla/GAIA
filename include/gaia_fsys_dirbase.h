@@ -12,7 +12,7 @@ namespace GAIA
 		/*!
 			@brief File finder base class.
 		*/
-		class FSFinderBase : public GAIA::Base
+		class FSFinderBase : public GAIA::Entity
 		{
 		public:
 			

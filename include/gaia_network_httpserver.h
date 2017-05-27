@@ -863,7 +863,7 @@ namespace GAIA
 
 			@remarks HttpServer is a thread-safe class.
 		*/
-		class HttpServer : public GAIA::Base
+		class HttpServer : public GAIA::Entity
 		{
 			friend class HttpServerLink;
 			friend class HttpServerWorkThread;
