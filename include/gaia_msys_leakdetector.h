@@ -218,7 +218,7 @@ namespace GAIA
 							finder.status.diff(finded.status);
 							if(finder.status.isreset())
 							{
-								it = nodes.erase(it);
+								nodes.erase(it++);
 								continue;
 							}
 						}
@@ -230,7 +230,7 @@ namespace GAIA
 						__AllocNodeList::const_iterator itfinded = older.allocnodes.find(finder);
 						if(itfinded != older.allocnodes.end())
 						{
-							it = allocnodes.erase(it);
+							allocnodes.erase(it++);
 							continue;
 						}
 						++it;
