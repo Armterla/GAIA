@@ -44,7 +44,7 @@ namespace GAIA
 				for(typename __BufferListType::it it = m_bufs.frontit(); !it.empty(); ++it)
 				{
 					Node& n = *it;
-					gdel n.pBuf;
+					m_bufpool.release(n.pBuf);
 				}
 				m_bufs.destroy();
 				this->init();
@@ -94,7 +94,7 @@ namespace GAIA
 					
 					if(n.pBuf->remain() == 0)
 					{
-						gdel n.pBuf;
+						m_bufpool.release(n.pBuf);
 						typename __BufferListType::it itfront = m_bufs.frontit();
 						m_bufs.erase(itfront);
 					}
@@ -114,7 +114,8 @@ namespace GAIA
 					Node n;
 					if(m_bufs.empty() || m_bufs.back().pBuf->write_size() >= _BlockSize)
 					{
-						n.pBuf = gnew __BufferType;
+						n.pBuf = m_bufpool.alloc();
+						n.pBuf->clear();
 						m_bufs.push_back(n);
 					}
 					else
@@ -161,7 +162,7 @@ namespace GAIA
 
 					if(n.pBuf->remain() == 0)
 					{
-						gdel n.pBuf;
+						m_bufpool.release(n.pBuf);
 						typename __BufferListType::it itfront = m_bufs.frontit();
 						m_bufs.erase(itfront);
 					}
@@ -423,8 +424,10 @@ namespace GAIA
 				__BufferType* pBuf;
 			};
 		private:
+			typedef GAIA::CTN::BasicPool<__BufferType, _SizeType, _ExtendType> __BufferPoolType;
 			typedef GAIA::CTN::BasicList<Node, _SizeType, _ExtendType> __BufferListType;
 		private:
+			__BufferPoolType m_bufpool;
 			__BufferListType m_bufs;
 			_SizeType m_size;
 		};
