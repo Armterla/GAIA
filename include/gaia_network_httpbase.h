@@ -25,7 +25,7 @@ namespace GAIA
 	namespace NETWORK
 	{
 		/*!
-			@brief Current supported HTTP protocal version.
+			@brief Current supported HTTP protocol version.
 		*/
 		static const GAIA::CH* HTTP_VERSION_STRING = "HTTP/1.1";
 		static const GAIA::U16 HTTP_DEFAULT_PORT = 80;
@@ -96,7 +96,7 @@ namespace GAIA
 		GAIA_ENUM_BEGIN(HTTP_CODE)
 			/* Information */
 			HTTP_CODE_CONTINUE,					// 100
-			HTTP_CODE_SWITCHINGPROTOCALS,		// 101
+			HTTP_CODE_SWITCHINGPROTOCOLS,		// 101
 
 			/* Successful */
 			HTTP_CODE_OK,						// 200
@@ -151,7 +151,7 @@ namespace GAIA
 
 			/* Information */
 			HTTP_CODE_CONTINUE,					// 100
-			HTTP_CODE_SWITCHINGPROTOCALS,		// 101
+			HTTP_CODE_SWITCHINGPROTOCOLS,		// 101
 
 			/* Successful */
 			HTTP_CODE_OK,						// 200
@@ -206,7 +206,7 @@ namespace GAIA
 
 			/* Information */
 			"100",	// HTTP_CODE_CONTINUE
-			"101",	// HTTP_CODE_SWITCHINGPROTOCALS
+			"101",	// HTTP_CODE_SWITCHINGPROTOCOLS
 
 			/* Successful */
 			"200",	// HTTP_CODE_OK
@@ -261,7 +261,7 @@ namespace GAIA
 
 			/* Information */
 			3, // "100",	HTTP_CODE_CONTINUE
-			3, // "101",	HTTP_CODE_SWITCHINGPROTOCALS
+			3, // "101",	HTTP_CODE_SWITCHINGPROTOCOLS
 
 			/* Successful */
 			3, // "200",	HTTP_CODE_OK
@@ -316,7 +316,7 @@ namespace GAIA
 
 			/* Information */
 			100,	// HTTP_CODE_CONTINUE,
-			101,	// HTTP_CODE_SWITCHINGPROTOCALS,
+			101,	// HTTP_CODE_SWITCHINGPROTOCOLS,
 
 			/* Successful */
 			200,	// HTTP_CODE_OK
@@ -371,7 +371,7 @@ namespace GAIA
 
 			/* Information */
 			"Continue",						// HTTP_CODE_CONTINUE(100)
-			"Switching Protocals",			// HTTP_CODE_SWITCHINGPROTOCALS(101)
+			"Switching Protocols",			// HTTP_CODE_SWITCHINGPROTOCOLS(101)
 
 			/* Successful */
 			"OK",							// HTTP_CODE_OK(200)
@@ -426,7 +426,7 @@ namespace GAIA
 
 			/* Information */
 			sizeof("Continue") - 1,						// HTTP_CODE_CONTINUE(100)
-			sizeof("Switching Protocals") - 1,			// HTTP_CODE_SWITCHINGPROTOCALS(101)
+			sizeof("Switching Protocols") - 1,			// HTTP_CODE_SWITCHINGPROTOCOLS(101)
 
 			/* Successful */
 			sizeof("OK") - 1,							// HTTP_CODE_OK(200)
@@ -704,7 +704,7 @@ namespace GAIA
 					return GAIA::False;
 
 				// Local variable declarations.
-				GAIA::NUM sProtocalBegin = GINVALID, sProtocalEnd = GINVALID;
+				GAIA::NUM sProtocolBegin = GINVALID, sProtocolEnd = GINVALID;
 				GAIA::NUM sHostNameBegin = GINVALID, sHostNameEnd = GINVALID;
 				GAIA::NUM sPortBegin = GINVALID, sPortEnd = GINVALID;
 				GAIA::NUM sPathBegin = GINVALID, sPathEnd = GINVALID;
@@ -726,10 +726,10 @@ namespace GAIA
 							{
 								if(x + 2 < sUrlSize && pszUrl[x + 1] == '/' && pszUrl[x + 2] == '/')
 								{
-									GAST(sProtocalBegin == GINVALID);
-									GAST(sProtocalEnd == GINVALID);
-									sProtocalBegin = 0;
-									sProtocalEnd = x;
+									GAST(sProtocolBegin == GINVALID);
+									GAST(sProtocolEnd == GINVALID);
+									sProtocolBegin = 0;
+									sProtocolEnd = x;
 									sHostNameBegin = x + 3;
 									x += 2;
 								}
@@ -797,14 +797,14 @@ namespace GAIA
 					//
 					if(sHostNameBegin == GINVALID && sHostNameEnd != GINVALID)
 					{
-						GAST(sProtocalBegin == GINVALID);
-						GAST(sProtocalEnd == GINVALID);
+						GAST(sProtocolBegin == GINVALID);
+						GAST(sProtocolEnd == GINVALID);
 						sHostNameBegin = 0;
 					}
 
 					// Close end index.
-					if(sProtocalBegin != GINVALID && sProtocalEnd == GINVALID)
-						sProtocalEnd = sUrlSize;
+					if(sProtocolBegin != GINVALID && sProtocolEnd == GINVALID)
+						sProtocolEnd = sUrlSize;
 					if(sHostNameBegin != GINVALID && sHostNameEnd == GINVALID)
 						sHostNameEnd = sUrlSize;
 					if(sPortBegin != GINVALID && sPortEnd == GINVALID)
@@ -819,7 +819,7 @@ namespace GAIA
 						sFragmentEnd = sUrlSize;
 
 					// If URL is a host address only, like "www.google.com" or "127.0.0.1".
-					if(sProtocalBegin == GINVALID &&
+					if(sProtocolBegin == GINVALID &&
 					   sHostNameBegin == GINVALID &&
 					   sPortBegin == GINVALID &&
 					   sPathBegin == GINVALID &&
@@ -836,7 +836,7 @@ namespace GAIA
 				{
 					GAIA::NUM listOffset[] =
 					{
-						sProtocalBegin, sProtocalEnd,
+						sProtocolBegin, sProtocolEnd,
 						sHostNameBegin, sHostNameEnd,
 						sPortBegin, sPortEnd,
 						sPathBegin, sPathEnd,
@@ -868,10 +868,10 @@ namespace GAIA
 							return GAIA::False;
 					}
 
-					if(sProtocalBegin >= 0 && sProtocalEnd <= sUrlSize && sProtocalBegin < sProtocalEnd)
+					if(sProtocolBegin >= 0 && sProtocolEnd <= sUrlSize && sProtocolBegin < sProtocolEnd)
 					{
-						m_protocal.psz = m_url.fptr() + sProtocalBegin;
-						m_protocal.sLen = sProtocalEnd - sProtocalBegin;
+						m_protocol.psz = m_url.fptr() + sProtocolBegin;
+						m_protocol.sLen = sProtocolEnd - sProtocolBegin;
 					}
 
 					if(sHostNameBegin >= 0 && sHostNameEnd <= sUrlSize && sHostNameBegin < sHostNameEnd)
@@ -992,23 +992,23 @@ namespace GAIA
 			}
 
 			/*!
-				@brief Get protocal in HttpURL.
+				@brief Get protocol in HttpURL.
 
-				@param psz [out] Used for saving the protocal string.
+				@param psz [out] Used for saving the protocol string.
 
 				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
 
-				@param pResultSize [out] Used for saving the result protocal string's size in characters(without '\0').
+				@param pResultSize [out] Used for saving the result protocol string's size in characters(without '\0').
 
 				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.\n
 					If parameter psz is GNIL, current function return GNIL, and parameter pResultSize will be filled result length.\n
 			*/
-			GINL GAIA::CH* GetProtocal(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
+			GINL GAIA::CH* GetProtocol(GAIA::CH* psz, GAIA::NUM sMaxSize = GINVALID, GAIA::NUM* pResultSize = GNIL) const
 			{
 				if(!GCCAST(HttpURL*)(this)->Analyze())
 					return GNIL;
-				return this->get_analyzed_node(m_protocal, psz, sMaxSize, pResultSize);
+				return this->get_analyzed_node(m_protocol, psz, sMaxSize, pResultSize);
 			}
 
 			/*!
@@ -1019,7 +1019,7 @@ namespace GAIA
 				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
 
-				@param pResultSize [out] Use for saving the result protocal string's size in characters(without '\0').
+				@param pResultSize [out] Use for saving the result protocol string's size in characters(without '\0').
 
 				@return If current HttpURL is empty or HttpURL's content can't be analyzed, return GNIL.\n
 					If parameter psz is GNIL, current function return GNIL, and parameter pResultSize will be filled result length.\n
@@ -1452,7 +1452,7 @@ namespace GAIA
 			GINL GAIA::GVOID init(){this->clear_analyzed();}
 			GINL GAIA::GVOID clear_analyzed()
 			{
-				m_protocal.reset();
+				m_protocol.reset();
 				m_hostname.reset();
 				m_port.reset();
 				m_path.reset();
@@ -1487,7 +1487,7 @@ namespace GAIA
 
 		private:
 			GAIA::CTN::AString m_url;
-			Node m_protocal;
+			Node m_protocol;
 			Node m_hostname;
 			Node m_port;
 			Node m_path;

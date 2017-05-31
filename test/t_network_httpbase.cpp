@@ -7,7 +7,7 @@ namespace TEST
 	{
 		// HttpURL test.
 		{
-			GAIA::CH szProtocal[128];
+			GAIA::CH szProtocol[128];
 			GAIA::CH szHostName[128];
 			GAIA::CH szPort[128];
 			GAIA::CH szPath[128];
@@ -112,9 +112,9 @@ namespace TEST
 			TAST(!hu.Empty());
 
 			GAIA::NUM sPracSize;
-			if(hu.GetProtocal(szProtocal, sizeof(szProtocal), &sPracSize) != szProtocal)
+			if(hu.GetProtocol(szProtocol, sizeof(szProtocol), &sPracSize) != szProtocol)
 				TERROR;
-			if(!GAIA::ALGO::gstrequal(szProtocal, "http"))
+			if(!GAIA::ALGO::gstrequal(szProtocol, "http"))
 				TERROR;
 			if(sPracSize != sizeof("http") - 1)
 				TERROR;
@@ -287,7 +287,7 @@ namespace TEST
 				TERROR;
 			
 			hu = TEST_URL9;
-			if(hu.GetProtocal(szProtocal, sizeof(szProtocal), &sPracSize) != GNIL)
+			if(hu.GetProtocol(szProtocol, sizeof(szProtocol), &sPracSize) != GNIL)
 				TERROR;
 			if(hu.GetHostName(szHostName, sizeof(szHostName), &sPracSize) != szHostName)
 				TERROR;
@@ -315,7 +315,7 @@ namespace TEST
 				TERROR;
 			
 			hu = TEST_URL10;
-			if(hu.GetProtocal(szProtocal, sizeof(szProtocal), &sPracSize) != GNIL)
+			if(hu.GetProtocol(szProtocol, sizeof(szProtocol), &sPracSize) != GNIL)
 				TERROR;
 			if(hu.GetHostName(szHostName, sizeof(szHostName), &sPracSize) != GNIL)
 				TERROR;

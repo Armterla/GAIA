@@ -588,7 +588,7 @@ namespace GAIA
 			GINL const GAIA::U64& GetAcceptTime() const{return m_uAcceptTime;}
 
 			/*!
-				@brief Response peer by http protocal.
+				@brief Response peer by http protocol.
 
 				@param httpcode [in] Specify the http code.
 					If success, return HTTP_CODE_OK, if failed by resource not found, return HTTP_CODE_NOTFOUND.
