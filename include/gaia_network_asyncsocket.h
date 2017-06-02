@@ -20,6 +20,8 @@ namespace GAIA
 	{
 		/*!
 			@brief Async context type.
+
+		 		It is for internal usage.
 		*/
 		GAIA_ENUM_BEGIN(ASYNC_CONTEXT_TYPE)
 			ASYNC_CONTEXT_TYPE_STOP,
@@ -32,6 +34,8 @@ namespace GAIA
 
 		/*!
 			@brief Async context.
+		 
+		 		It is for internal usage.
 		*/
 		class AsyncContext : public GAIA::Base
 		{
@@ -106,16 +110,28 @@ namespace GAIA
 				@brief Create async socket.
 
 				@exception
-					GAIA::ECT::EctIllegal If async socket is created.
+					GAIA::ECT::EctInvalidParam If socktype is not a valid type.
 
-				@remarks This function is async call.
+				@exception
+					GAIA::ECT::EctIllegal If socket is created.
+
+				@exception
+					GAIA::ECT::EctNetwork If there is not enough resource to create socket, throw it.
+
+				@remarks This function is sync call.
 			*/
 			virtual GAIA::GVOID Create();
 
 			/*!
 				@brief Close async socket.
 
-				@remarks This function is async call.
+				@exception
+					GAIA::ECT::EctIllegal If socket is not created.
+
+				@exception
+					GAIA::ECT::EctNetwork If close socket failed.
+			 
+				@remarks This function is sync call.
 			*/
 			virtual GAIA::GVOID Close();
 
@@ -124,7 +140,13 @@ namespace GAIA
 
 				@param nShutdownFlag [in] Specify shutdown flag. @see GAIA::NETWORK::Socket::SOCKET_SHUTDOWN_FLAG.
 
-				@remarks This function is async call.
+				@exception
+					GAIA::ECT::EctIllegal If socket is not created.
+
+				@exception
+					GAIA::ECT::EctNetwork If shutdown socket failed.
+			 
+				@remarks This function is sync call.
 
 				@see GAIA::NETWORK::Socket::SOCKET_SHUTDOWN_FLAG.
 			*/
@@ -152,6 +174,8 @@ namespace GAIA
 
 				@exception
 					GAIA::ECT::EctNetwork If set socket option failed.
+			 
+				@remarks This function is sync call.
 
 				@see GAIA::NETWORK::Socket::SOCKET_OPTION.
 			*/
@@ -179,7 +203,13 @@ namespace GAIA
 
 				@param addr [in] Specify the address where will be bound.
 
-				@remarks This function is async call.
+				@exception
+					GAIA::ECT::EctIllegal If socket is not created.
+
+				@exception
+					GAIA::ECT::EctNetwork If bind socket failed.
+			 
+				@remarks This function is sync call.
 			*/
 			virtual GAIA::GVOID Bind(const GAIA::NETWORK::Addr& addr);
 
@@ -194,6 +224,9 @@ namespace GAIA
 				@brief Connect async socket to a network address, include IP and port.
 
 				@param addr [in] Specify the address where will connect.
+			 
+				@exception
+					GAIA::ECT::EctIllegal If socket is not created.
 
 				@remarks This function is async call.
 			*/
@@ -219,6 +252,9 @@ namespace GAIA
 				@param nSize [in] Specify the buffer's size which will be sent.
 
 				@return Return the practice size which will be sent.
+			 
+				@exception
+					GAIA::ECT::EctIllegal If socket is not created.
 
 				@remarks This function is async call.
 			*/
@@ -280,113 +316,113 @@ namespace GAIA
 			/*!
 				@brief On async socket created callback.
 			 
-			 	@param bResult [in] If create socket successfully, this parameter will be GAIA::True, or will be GAIA::False.
+				@param bResult [in] If create socket successfully, this parameter will be GAIA::True, or will be GAIA::False.
 			 
-			 	@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
+				@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
 			*/
 			virtual GAIA::GVOID OnCreated(GAIA::BL bResult){}
 			
 			/*!
 				@brief On async socket closed callback.
 			 
-			 	@param bResult [in] If close socket successfully, this parameter will be GAIA::True, or will be GAIA::False.
+				@param bResult [in] If close socket successfully, this parameter will be GAIA::True, or will be GAIA::False.
 			 
-			 	@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
+				@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
 			*/
 			virtual GAIA::GVOID OnClosed(GAIA::BL bResult){}
 
 			/*!
 				@brief On async socket binded callback.
 			 
-			 	@param bResult [in] If bind socket to address successfully, this parameter will be GAIA::True, or will be GAIA::False.
+				@param bResult [in] If bind socket to address successfully, this parameter will be GAIA::True, or will be GAIA::False.
 			 
-			 	@param addr [in] Specify the bound address.
+				@param addr [in] Specify the bound address.
 			 
-			 	@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
+				@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
 			*/
 			virtual GAIA::GVOID OnBound(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
 
 			/*!
 				@brief On async socket connected callback.
 			 
-			 	@param bResult [in] If socket connect to peer successfully, this parameter will be GAIA::True, or will be GAIA::False.
+				@param bResult [in] If socket connect to peer successfully, this parameter will be GAIA::True, or will be GAIA::False.
 			 
-			 	@param addr [in] Specify the address where had connected to.
+				@param addr [in] Specify the address where had connected to.
 			 
-			 	@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
+				@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
 			*/
 			virtual GAIA::GVOID OnConnected(GAIA::BL bResult, const GAIA::NETWORK::Addr& addr){}
 
 			/*!
 				@brief On async socket disconnected callback.
 			 
-			 	@param bResult [in] If socket disconnect successfully, this parameter will be GAIA::True, or will be GAIA::False.
+				@param bResult [in] If socket disconnect successfully, this parameter will be GAIA::True, or will be GAIA::False.
 			 
-			 	@param bByRemote [in] Specify the disconnect reason, if disconnect by remote side(peer), this parameter will be GAIA::True, or will be GAIA::False.
+				@param bByRemote [in] Specify the disconnect reason, if disconnect by remote side(peer), this parameter will be GAIA::True, or will be GAIA::False.
 			 
-			 	@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
+				@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
 			*/
 			virtual GAIA::GVOID OnDisconnected(GAIA::BL bResult, GAIA::BL bByRemote){}
 
 			/*!
 				@brief On async socket started listen.
 			 
-			 	@param bResult [in] If socket listen successfully, this parameter will be GAIA::True, or will be GAIA::False.
+				@param bResult [in] If socket listen successfully, this parameter will be GAIA::True, or will be GAIA::False.
 			 
-			 	@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
+				@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
 			*/
 			virtual GAIA::GVOID OnListened(GAIA::BL bResult){}
 
 			/*!
 				@brief On async socket be accepted by a listen socket.
-			 		Current object(this) will be the listen socket.
+					Current object(this) will be the listen socket.
 			 
-			 	@param bResult [in] If accepted a new socket by a listen socket, this parameter will be GAIA::True, or will be GAIA::False.
+				@param bResult [in] If accepted a new socket by a listen socket, this parameter will be GAIA::True, or will be GAIA::False.
 
-			 	@param addrListen [in] Specify the address where had listen to.
+				@param addrListen [in] Specify the address where had listen to.
 			 
-			 	@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
+				@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
 			*/
 			virtual GAIA::GVOID OnAccepted(GAIA::BL bResult, const GAIA::NETWORK::Addr& addrListen){}
 
 			/*!
 				@brief On async socket sent callback.
 			 
-			 	@param bResult [in] If socket send data successfully, this parameter will be GAIA::True, or will be GAIA::False.
+				@param bResult [in] If socket send data successfully, this parameter will be GAIA::True, or will be GAIA::False.
 			 
-			 	@param pData [in] Specify the buffer which had been sent.
+				@param pData [in] Specify the buffer which had been sent.
 			 
-			 	@param nPracticeSize [in] Specify the practice size about the sent data in bytes.
+				@param nPracticeSize [in] Specify the practice size about the sent data in bytes.
 			 
-			 	@param nSize [in] Specify the wanted send size about the sent data in bytes.
+				@param nSize [in] Specify the wanted send size about the sent data in bytes.
 			 
-			 	@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
+				@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
 			*/
 			virtual GAIA::GVOID OnSent(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nPracticeSize, GAIA::N32 nSize){}
 
 			/*!
 				@brief On async socket recv callback.
 			 
-			 	@param bResult [in] If socket receive data successfully, this parameter will be GAIA::True, or will be GAIA::False.
+				@param bResult [in] If socket receive data successfully, this parameter will be GAIA::True, or will be GAIA::False.
 			 
-			 	@param pData [in] Specify the received data buffer.
+				@param pData [in] Specify the received data buffer.
 			 
-			 	@param nSize [in] Specify the received data size in bytes.
+				@param nSize [in] Specify the received data size in bytes.
 			 
-			 	@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
+				@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
 			*/
 			virtual GAIA::GVOID OnRecved(GAIA::BL bResult, const GAIA::GVOID* pData, GAIA::N32 nSize){}
 
 			/*!
 				@brief On async socket shutdown callback.
 			 
-			 	@param bResult [in] If socket shutdowned successfully, this parameter will be GAIA::True, or will be GAIA::False.
+				@param bResult [in] If socket shutdowned successfully, this parameter will be GAIA::True, or will be GAIA::False.
 			 
-			 	@param nShutdownFlag [in] Specify the shutdown flag. @see GAIA::NETWORK::Socket::SOCKET_SHUTDOWN_FLAG.
+				@param nShutdownFlag [in] Specify the shutdown flag. @see GAIA::NETWORK::Socket::SOCKET_SHUTDOWN_FLAG.
 			 
-			 	@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
+				@remarks This function will be callbacked in multi-thread(any AsyncDispatcherThread) in designement.
 			 
-			 	@see GAIA::NETWORK::Socket::SOCKET_SHUTDOWN_FLAG.
+				@see GAIA::NETWORK::Socket::SOCKET_SHUTDOWN_FLAG.
 			*/
 			virtual GAIA::GVOID OnShutdowned(GAIA::BL bResult, GAIA::N32 nShutdownFlag){}
 
