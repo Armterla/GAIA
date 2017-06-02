@@ -379,5 +379,39 @@ namespace TEST
 				}
 			}
 		}
+		
+		// Special test.
+		{
+			GTRY
+			{
+				jr.Reset();
+				static const GAIA::CH SPECIAL_JSON[] = "{\"postid\":10,\"replyid\":0,\"content\":\"<!DOCTYPE html PUBLIC \\\"-\\/\\/W3C\\/\\/DTD XHTML 1.0 Strict\\/\\/EN\\\" \\\"http:\\/\\/www.w3.org\\/TR\\/xhtml1\\/DTD\\/xhtml1-strict.dtd\\\"><html><head><meta charset=\\\"utf-8\\\"\\/><title>template title<\\/title><\\/head><body><h8><p>&nbsp&nbsp&nbsp&nbsp￦ﾗﾶ￥ﾀﾙ<\\/p><\\/h8><\\/body><\\/html>\",\"pic_infos\":[]}";
+				GAIA::JSON::JSON_NODE nt;
+				GAIA::NUM sNodeNameLen;
+				const GAIA::CH* psz;
+				jr.SetBuffer(SPECIAL_JSON, sizeof(SPECIAL_JSON));
+				psz = jr.Begin(nt, sNodeNameLen);
+				{
+					psz = jr.Read(nt, sNodeNameLen);
+					psz = jr.Read(nt, sNodeNameLen);
+					
+					psz = jr.Read(nt, sNodeNameLen);
+					psz = jr.Read(nt, sNodeNameLen);
+					
+					psz = jr.Read(nt, sNodeNameLen);
+					psz = jr.Read(nt, sNodeNameLen);
+					
+					psz = jr.Begin(nt, sNodeNameLen);
+					{
+					}
+					psz = jr.End(&nt);
+				}
+				psz = jr.End(&nt);
+			}
+			GCATCHBASE
+			{
+				TERROR;
+			}
+		}
 	}
 }
