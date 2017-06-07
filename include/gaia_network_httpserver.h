@@ -890,7 +890,8 @@ namespace GAIA
 				@return If success, return GAIA::True, or return GAIA::False.
 
 				@remarks
-					Regist a same object twice will cause failed.
+					Regist a same object twice will cause failed.\n
+			 		First registed callback will first callbacked. FIFO.
 			*/
 			GAIA::BL RegistCallBack(GAIA::NETWORK::HttpServerCallBack& cb);
 
