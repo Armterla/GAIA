@@ -1476,6 +1476,12 @@ namespace GAIA
 					GASTFALSE;
 				return ret;
 			}
+			GINL GAIA::U64 hash() const
+			{
+				if(this->empty())
+					return 0;
+				return GAIA::ALGO::hash(this->fptr());
+			}
 		private:
 			GAIA::CTN::BasicChars<_DataType, _SizeType, _Size> m_chars;
 			GAIA::CTN::BasicString<_DataType, _SizeType> m_string;

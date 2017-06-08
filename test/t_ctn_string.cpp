@@ -831,5 +831,8 @@ namespace TEST
 		GAIA::CTN::WString strLocale2(strLocale1.fptr(), "UTF-8");
 		if(strLocale2 != strLocale)
 			TERROR;
+		
+		str = "HelloWorld!";
+		TAST(str.hash() != 0);
 	}
 }

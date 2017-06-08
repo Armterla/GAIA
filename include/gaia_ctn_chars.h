@@ -8,6 +8,7 @@
 #include "gaia_algo_string.h"
 #include "gaia_algo_search.h"
 #include "gaia_algo_replace.h"
+#include "gaia_algo_hash.h"
 
 namespace GAIA
 {
@@ -1587,6 +1588,12 @@ namespace GAIA
 				else
 					GASTFALSE;
 				return ret;
+			}
+			GINL GAIA::U64 hash() const
+			{
+				if(this->empty())
+					return 0;
+				return GAIA::ALGO::hash(this->fptr());
 			}
 		private:
 			GINL GAIA::GVOID init(){m_pFront[0] = 0; m_size = 0;}

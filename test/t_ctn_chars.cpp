@@ -784,5 +784,8 @@ namespace TEST
 		GAIA::CTN::WChars chsLocale2(chsLocale1.fptr(), "UTF-8");
 		if(chsLocale2 != chsLocale)
 			TERROR;
+		
+		chs = "HelloWorld!";
+		TAST(chs.hash() != 0);
 	}
 }

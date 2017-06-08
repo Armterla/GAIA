@@ -221,5 +221,44 @@ namespace TEST
 			TERROR;
 		else if(*cit != 2)
 			TERROR;
+		
+		// By String.
+		{
+			GAIA::CTN::HashMap<GAIA::CTN::AString, GAIA::N32> hm_str;
+			TAST(hm_str.insert("Hello World", 1));
+			TAST(hm_str.insert("Hello Kitty", 2));
+			GAIA::N32* pFinded = hm_str.find("Hello World");
+			TAST(pFinded != GNIL && *pFinded == 1);
+			pFinded = hm_str.find("Hello Kitty");
+			TAST(pFinded != GNIL && *pFinded == 2);
+			pFinded = hm_str.find("Hello Arm");
+			TAST(pFinded == GNIL);
+		}
+		
+		// By Chars.
+		{
+			GAIA::CTN::HashMap<GAIA::CTN::AChars, GAIA::N32> hm_chs;
+			TAST(hm_chs.insert("Hello World", 1));
+			TAST(hm_chs.insert("Hello Kitty", 2));
+			GAIA::N32* pFinded = hm_chs.find("Hello World");
+			TAST(pFinded != GNIL && *pFinded == 1);
+			pFinded = hm_chs.find("Hello Kitty");
+			TAST(pFinded != GNIL && *pFinded == 2);
+			pFinded = hm_chs.find("Hello Arm");
+			TAST(pFinded == GNIL);
+		}
+		
+		// By CharsString.
+		{
+			GAIA::CTN::HashMap<GAIA::CTN::ACharsString, GAIA::N32> hm_chsstr;
+			TAST(hm_chsstr.insert("Hello World", 1));
+			TAST(hm_chsstr.insert("Hello Kitty", 2));
+			GAIA::N32* pFinded = hm_chsstr.find("Hello World");
+			TAST(pFinded != GNIL && *pFinded == 1);
+			pFinded = hm_chsstr.find("Hello Kitty");
+			TAST(pFinded != GNIL && *pFinded == 2);
+			pFinded = hm_chsstr.find("Hello Arm");
+			TAST(pFinded == GNIL);
+		}
 	}
 }
