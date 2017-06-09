@@ -158,6 +158,7 @@ namespace GAIA
 		GINL GAIA::BL empty() const{return u64_0 == 0 && u64_1 == 0;}
 		GINL GAIA::GVOID clear(){u64_0 = u64_1 = 0;}
 		GINL GAIA::GVOID uuid();
+		GINL GAIA::U64 hash() const;
 		template<typename _ParamDataType> GAIA::BL check(const _ParamDataType* psz) const;
 		template<typename _ParamDataType> GAIA::GVOID fromstring(const _ParamDataType* psz);
 		template<typename _ParamDataType> _ParamDataType* tostring(_ParamDataType* psz) const;

@@ -224,40 +224,142 @@ namespace TEST
 		
 		// By String.
 		{
-			GAIA::CTN::HashMap<GAIA::CTN::AString, GAIA::N32> hm_str;
-			TAST(hm_str.insert("Hello World", 1));
-			TAST(hm_str.insert("Hello Kitty", 2));
-			GAIA::N32* pFinded = hm_str.find("Hello World");
+			GAIA::CTN::HashMap<GAIA::CTN::AString, GAIA::N32> hmtemp;
+			TAST(hmtemp.insert("Hello World", 1));
+			TAST(hmtemp.insert("Hello Kitty", 2));
+			GAIA::N32* pFinded = hmtemp.find("Hello World");
 			TAST(pFinded != GNIL && *pFinded == 1);
-			pFinded = hm_str.find("Hello Kitty");
+			pFinded = hmtemp.find("Hello Kitty");
 			TAST(pFinded != GNIL && *pFinded == 2);
-			pFinded = hm_str.find("Hello Arm");
+			pFinded = hmtemp.find("Hello Arm");
 			TAST(pFinded == GNIL);
 		}
 		
 		// By Chars.
 		{
-			GAIA::CTN::HashMap<GAIA::CTN::AChars, GAIA::N32> hm_chs;
-			TAST(hm_chs.insert("Hello World", 1));
-			TAST(hm_chs.insert("Hello Kitty", 2));
-			GAIA::N32* pFinded = hm_chs.find("Hello World");
+			GAIA::CTN::HashMap<GAIA::CTN::AChars, GAIA::N32> hmtemp;
+			TAST(hmtemp.insert("Hello World", 1));
+			TAST(hmtemp.insert("Hello Kitty", 2));
+			GAIA::N32* pFinded = hmtemp.find("Hello World");
 			TAST(pFinded != GNIL && *pFinded == 1);
-			pFinded = hm_chs.find("Hello Kitty");
+			pFinded = hmtemp.find("Hello Kitty");
 			TAST(pFinded != GNIL && *pFinded == 2);
-			pFinded = hm_chs.find("Hello Arm");
+			pFinded = hmtemp.find("Hello Arm");
 			TAST(pFinded == GNIL);
 		}
 		
 		// By CharsString.
 		{
-			GAIA::CTN::HashMap<GAIA::CTN::ACharsString, GAIA::N32> hm_chsstr;
-			TAST(hm_chsstr.insert("Hello World", 1));
-			TAST(hm_chsstr.insert("Hello Kitty", 2));
-			GAIA::N32* pFinded = hm_chsstr.find("Hello World");
+			GAIA::CTN::HashMap<GAIA::CTN::ACharsString, GAIA::N32> hmtemp;
+			TAST(hmtemp.insert("Hello World", 1));
+			TAST(hmtemp.insert("Hello Kitty", 2));
+			GAIA::N32* pFinded = hmtemp.find("Hello World");
 			TAST(pFinded != GNIL && *pFinded == 1);
-			pFinded = hm_chsstr.find("Hello Kitty");
+			pFinded = hmtemp.find("Hello Kitty");
 			TAST(pFinded != GNIL && *pFinded == 2);
-			pFinded = hm_chsstr.find("Hello Arm");
+			pFinded = hmtemp.find("Hello Arm");
+			TAST(pFinded == GNIL);
+		}
+		
+		// By X128.
+		{
+			GAIA::X128 t1, t2, t3;
+			t1.uuid();
+			t2.uuid();
+			t3.uuid();
+			GAIA::CTN::HashMap<GAIA::X128, GAIA::CTN::AString> hmtemp;
+			TAST(hmtemp.insert(t1, "t1"));
+			TAST(hmtemp.insert(t2, "t2"));
+			GAIA::CTN::AString* pFinded = hmtemp.find(t1);
+			TAST(pFinded != GNIL && *pFinded == "t1");
+			pFinded = hmtemp.find(t2);
+			TAST(pFinded != GNIL && *pFinded == "t2");
+			pFinded = hmtemp.find(t3);
+			TAST(pFinded == GNIL);
+		}
+		
+		// By RID32.
+		{
+			GAIA::MATH::RID32 t1, t2, t3;
+			t1.uuid();
+			t2.uuid();
+			t3.uuid();
+			GAIA::CTN::HashMap<GAIA::MATH::RID32, GAIA::CTN::AString> hmtemp;
+			TAST(hmtemp.insert(t1, "t1"));
+			TAST(hmtemp.insert(t2, "t2"));
+			GAIA::CTN::AString* pFinded = hmtemp.find(t1);
+			TAST(pFinded != GNIL && *pFinded == "t1");
+			pFinded = hmtemp.find(t2);
+			TAST(pFinded != GNIL && *pFinded == "t2");
+			pFinded = hmtemp.find(t3);
+			TAST(pFinded == GNIL);
+		}
+		
+		// By RID64.
+		{
+			GAIA::MATH::RID64 t1, t2, t3;
+			t1.uuid();
+			t2.uuid();
+			t3.uuid();
+			GAIA::CTN::HashMap<GAIA::MATH::RID64, GAIA::CTN::AString> hmtemp;
+			TAST(hmtemp.insert(t1, "t1"));
+			TAST(hmtemp.insert(t2, "t2"));
+			GAIA::CTN::AString* pFinded = hmtemp.find(t1);
+			TAST(pFinded != GNIL && *pFinded == "t1");
+			pFinded = hmtemp.find(t2);
+			TAST(pFinded != GNIL && *pFinded == "t2");
+			pFinded = hmtemp.find(t3);
+			TAST(pFinded == GNIL);
+		}
+		
+		// By RID128.
+		{
+			GAIA::MATH::RID128 t1, t2, t3;
+			t1.uuid();
+			t2.uuid();
+			t3.uuid();
+			GAIA::CTN::HashMap<GAIA::MATH::RID128, GAIA::CTN::AString> hmtemp;
+			TAST(hmtemp.insert(t1, "t1"));
+			TAST(hmtemp.insert(t2, "t2"));
+			GAIA::CTN::AString* pFinded = hmtemp.find(t1);
+			TAST(pFinded != GNIL && *pFinded == "t1");
+			pFinded = hmtemp.find(t2);
+			TAST(pFinded != GNIL && *pFinded == "t2");
+			pFinded = hmtemp.find(t3);
+			TAST(pFinded == GNIL);
+		}
+		
+		// By Addr.
+		{
+			GAIA::NETWORK::Addr t1, t2, t3;
+			t1.fromstring("192.168.1.2:1234");
+			t2.fromstring("192.168.1.1:1235");
+			t3.fromstring("192.168.1.3:1236");
+			GAIA::CTN::HashMap<GAIA::NETWORK::Addr, GAIA::CTN::AString> hmtemp;
+			TAST(hmtemp.insert(t1, "t1"));
+			TAST(hmtemp.insert(t2, "t2"));
+			GAIA::CTN::AString* pFinded = hmtemp.find(t1);
+			TAST(pFinded != GNIL && *pFinded == "t1");
+			pFinded = hmtemp.find(t2);
+			TAST(pFinded != GNIL && *pFinded == "t2");
+			pFinded = hmtemp.find(t3);
+			TAST(pFinded == GNIL);
+		}
+		
+		// By IP.
+		{
+			GAIA::NETWORK::IP t1, t2, t3;
+			t1.fromstring("192.168.1.1");
+			t2.fromstring("192.168.1.2");
+			t3.fromstring("192.168.1.3");
+			GAIA::CTN::HashMap<GAIA::NETWORK::IP, GAIA::CTN::AString> hmtemp;
+			TAST(hmtemp.insert(t1, "t1"));
+			TAST(hmtemp.insert(t2, "t2"));
+			GAIA::CTN::AString* pFinded = hmtemp.find(t1);
+			TAST(pFinded != GNIL && *pFinded == "t1");
+			pFinded = hmtemp.find(t2);
+			TAST(pFinded != GNIL && *pFinded == "t2");
+			pFinded = hmtemp.find(t3);
 			TAST(pFinded == GNIL);
 		}
 	}

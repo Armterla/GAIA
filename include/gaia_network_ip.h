@@ -5,6 +5,7 @@
 #include "gaia_assert.h"
 #include "gaia_algo_compare.h"
 #include "gaia_algo_string.h"
+#include "gaia_algo_hash.h"
 
 namespace GAIA
 {
@@ -45,6 +46,7 @@ namespace GAIA
 				*(p - 1) = 0;
 				return psz;
 			}
+			GINL GAIA::U64 hash() const{return GAIA::ALGO::hash(u);}
 			GINL IP& operator = (const IP& src){GAST(&src != this); u = src.u; return *this;}
 			template<typename _ParamDataType> IP& operator = (const _ParamDataType* psz){this->fromstring(psz); return *this;}
 			GINL IP operator + (const IP& src) const{IP ret; ret.u = u + src.u; return ret;}

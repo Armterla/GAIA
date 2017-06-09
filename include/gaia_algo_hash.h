@@ -98,6 +98,36 @@ namespace GAIA
 		{
 			return GAIA::ALGO::hash((GAIA::U64)p);
 		}
+		GINL GAIA::U64 hash(const GAIA::GVOID* p, GAIA::NUM sSize)
+		{
+			GAIA::U64 uRet = 0;
+			GAIA::NUM s64Size = sSize / 8;
+			for(GAIA::NUM x = 0; x < s64Size; ++x)
+			{
+				uRet += *(GAIA::U64*)p;
+				p = ((GAIA::U8*)p) + sizeof(GAIA::U64);
+			}
+			if(sSize % 8 >= 4)
+			{
+				uRet += *(GAIA::U32*)p;
+				p = ((GAIA::U8*)p) + sizeof(GAIA::U32);
+			}
+			if(sSize % 4 >= 2)
+			{
+				uRet += *(GAIA::U16*)p;
+				p = ((GAIA::U8*)p) + sizeof(GAIA::U16);
+			}
+			if(sSize % 2 != 0)
+			{
+				uRet += *(GAIA::U8*)p;
+				p = ((GAIA::U8*)p) + sizeof(GAIA::U8);
+			}
+			return uRet;
+		}
+		GINL GAIA::U64 hash(GAIA::GVOID* p, GAIA::NUM sSize)
+		{
+			return GAIA::ALGO::hash((const GAIA::GVOID*)p, sSize);
+		}
 	}
 }
 

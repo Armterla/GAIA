@@ -4,6 +4,7 @@
 #include "gaia_type.h"
 #include "gaia_assert.h"
 #include "gaia_algo_string.h"
+#include "gaia_algo_hash.h"
 
 namespace GAIA
 {
@@ -21,6 +22,7 @@ namespace GAIA
 			GINL GAIA::GVOID uuid();
 			template<typename _ParamDataType> GAIA::GVOID fromstring(const _ParamDataType* psz){GAIA::ALGO::str2hex(psz, sizeofarray(u), u);}
 			template<typename _ParamDataType> _ParamDataType* tostring(_ParamDataType* psz) const{GAIA::ALGO::hex2str(u, sizeofarray(u), psz); return psz;}
+			GINL GAIA::U64 hash() const{return GAIA::ALGO::hash(u64_0 + u64_1);}
 			GINL GAIA::MATH::RID128& operator = (const GAIA::MATH::RID128& src){u64_0 = src.u64_0; u64_1 = src.u64_1; return *this;}
 			GINL GAIA::N32 compare(const GAIA::MATH::RID128& src) const
 			{
@@ -68,6 +70,7 @@ namespace GAIA
 			GINL GAIA::GVOID uuid();
 			template<typename _ParamDataType> GAIA::GVOID fromstring(const _ParamDataType* psz){GAIA::ALGO::str2hex(psz, sizeofarray(u), u);}
 			template<typename _ParamDataType> _ParamDataType* tostring(_ParamDataType* psz) const{GAIA::ALGO::hex2str(u, sizeofarray(u), psz); return psz;}
+			GINL GAIA::U64 hash() const{return GAIA::ALGO::hash(u64_0);}
 			GINL GAIA::MATH::RID64& operator = (const GAIA::MATH::RID64& src){u64_0 = src.u64_0; return *this;}
 			GINL GAIA::N32 compare(const GAIA::MATH::RID64& src) const
 			{
@@ -108,6 +111,7 @@ namespace GAIA
 			GINL GAIA::GVOID uuid();
 			template<typename _ParamDataType> GAIA::GVOID fromstring(const _ParamDataType* psz){GAIA::ALGO::str2hex(psz, sizeofarray(u), u);}
 			template<typename _ParamDataType> _ParamDataType* tostring(_ParamDataType* psz) const{GAIA::ALGO::hex2str(u, sizeofarray(u), psz); return psz;}
+			GINL GAIA::U64 hash() const{return GAIA::ALGO::hash(u0);}
 			GINL GAIA::MATH::RID32& operator = (const GAIA::MATH::RID32& src){u0 = src.u0; return *this;}
 			GINL GAIA::N32 compare(const GAIA::MATH::RID32& src) const
 			{
