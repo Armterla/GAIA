@@ -167,6 +167,12 @@ namespace TEST
 
 	extern GAIA::GVOID t_misc_cmdparam(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_misc_cmdline(GAIA::LOG::Log& logobj);
+	
+	// GAIA performance test proc.
+	extern GAIA::GVOID tperf_msys_heapesg(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID tperf_ctn(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID tperf_ctn_avltree(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID tperf_ctn_dmpgraph(GAIA::LOG::Log& logobj);
 
 	GINL GAIA::GVOID t_all(GAIA::LOG::Log& logobj)
 	{
@@ -341,12 +347,6 @@ namespace TEST
 		}
 		TTEXT("[GAIA UNIT TEST END]");
 	}
-
-	// GAIA performance test proc.
-	extern GAIA::GVOID tperf_msys_heapesg(GAIA::LOG::Log& logobj);
-	extern GAIA::GVOID tperf_ctn(GAIA::LOG::Log& logobj);
-	extern GAIA::GVOID tperf_ctn_avltree(GAIA::LOG::Log& logobj);
-	extern GAIA::GVOID tperf_ctn_dmpgraph(GAIA::LOG::Log& logobj);
 
 	GINL GAIA::GVOID t_all_perf(GAIA::LOG::Log& logobj)
 	{
