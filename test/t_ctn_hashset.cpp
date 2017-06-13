@@ -264,6 +264,110 @@ namespace TEST
 			TAST(pFinded == GNIL);
 		}
 		
+		// By Array.
+		{
+			GAIA::CTN::Array<GAIA::NUM, 10> v1, v2, v3;
+			v1.push_back(1);
+			v2.push_back(2);
+			v3.push_back(3);
+			GAIA::CTN::HashSet<GAIA::CTN::Array<GAIA::NUM, 10> > hstemp;
+			TAST(hstemp.insert(v1));
+			TAST(hstemp.insert(v2));
+			GAIA::CTN::Array<GAIA::NUM, 10>* pFinded = hstemp.find(v1);
+			TAST(pFinded != GNIL && pFinded->front() == 1);
+			pFinded = hstemp.find(v2);
+			TAST(pFinded != GNIL && pFinded->front() == 2);
+			pFinded = hstemp.find(v3);
+			TAST(pFinded == GNIL);
+			
+		}
+		
+		// By Vector.
+		{
+			GAIA::CTN::Vector<GAIA::NUM> v1, v2, v3;
+			v1.push_back(1);
+			v2.push_back(2);
+			v3.push_back(3);
+			GAIA::CTN::HashSet<GAIA::CTN::Vector<GAIA::NUM> > hstemp;
+			TAST(hstemp.insert(v1));
+			TAST(hstemp.insert(v2));
+			GAIA::CTN::Vector<GAIA::NUM>* pFinded = hstemp.find(v1);
+			TAST(pFinded != GNIL && pFinded->front() == 1);
+			pFinded = hstemp.find(v2);
+			TAST(pFinded != GNIL && pFinded->front() == 2);
+			pFinded = hstemp.find(v3);
+			TAST(pFinded == GNIL);
+		}
+		
+		// By ArrayVector.
+		{
+			GAIA::CTN::ArrayVector<GAIA::NUM, 10> v1, v2, v3;
+			v1.push_back(1);
+			v2.push_back(2);
+			v3.push_back(3);
+			GAIA::CTN::HashSet<GAIA::CTN::ArrayVector<GAIA::NUM, 10> > hstemp;
+			TAST(hstemp.insert(v1));
+			TAST(hstemp.insert(v2));
+			GAIA::CTN::ArrayVector<GAIA::NUM, 10>* pFinded = hstemp.find(v1);
+			TAST(pFinded != GNIL && pFinded->front() == 1);
+			pFinded = hstemp.find(v2);
+			TAST(pFinded != GNIL && pFinded->front() == 2);
+			pFinded = hstemp.find(v3);
+			TAST(pFinded == GNIL);
+		}
+		
+		// By Buffer.
+		{
+			GAIA::CTN::Buffer v1, v2, v3;
+			v1.write("HelloWorld", sizeof("HelloWorld"));
+			v2.write("HelloKitty", sizeof("HelloKitty"));
+			v3.write("HelloArm", sizeof("HelloArm"));
+			GAIA::CTN::HashSet<GAIA::CTN::Buffer> hstemp;
+			TAST(hstemp.insert(v1));
+			TAST(hstemp.insert(v2));
+			GAIA::CTN::Buffer* pFinded = hstemp.find(v1);
+			TAST(pFinded != GNIL && GAIA::ALGO::gstrequal(pFinded->fptr(), "HelloWorld"));
+			pFinded = hstemp.find(v2);
+			TAST(pFinded != GNIL && GAIA::ALGO::gstrequal(pFinded->fptr(), "HelloKitty"));
+			pFinded = hstemp.find(v3);
+			TAST(pFinded == GNIL);
+		}
+		
+		// By StackBuffer.
+		{
+			GAIA::CTN::StackBuffer<128> v1, v2, v3;
+			v1.write("HelloWorld", sizeof("HelloWorld"));
+			v2.write("HelloKitty", sizeof("HelloKitty"));
+			v3.write("HelloArm", sizeof("HelloArm"));
+			GAIA::CTN::HashSet<GAIA::CTN::StackBuffer<128> > hstemp;
+			TAST(hstemp.insert(v1));
+			TAST(hstemp.insert(v2));
+			GAIA::CTN::StackBuffer<128>* pFinded = hstemp.find(v1);
+			TAST(pFinded != GNIL && GAIA::ALGO::gstrequal(pFinded->fptr(), "HelloWorld"));
+			pFinded = hstemp.find(v2);
+			TAST(pFinded != GNIL && GAIA::ALGO::gstrequal(pFinded->fptr(), "HelloKitty"));
+			pFinded = hstemp.find(v3);
+			TAST(pFinded == GNIL);
+		}
+		
+		// By Msg
+		{
+			GAIA::CTN::Msg v1, v2, v3;
+			v1.push(1);
+			v2.push(2);
+			v3.push(3);
+			GAIA::CTN::HashSet<GAIA::CTN::Msg> hstemp;
+			TAST(hstemp.insert(v1));
+			TAST(hstemp.insert(v2));
+			GAIA::CTN::Msg* pFinded = hstemp.find(v1);
+			TAST(pFinded != GNIL && (GAIA::NUM)pFinded->pop() == 1);
+			pFinded = hstemp.find(v2);
+			TAST(pFinded != GNIL && (GAIA::NUM)pFinded->pop() == 2);
+			pFinded = hstemp.find(v3);
+			TAST(pFinded == GNIL);
+			
+		}
+		
 		// By X128.
 		{
 			GAIA::X128 t1, t2, t3;

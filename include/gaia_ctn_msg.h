@@ -5,6 +5,7 @@
 #include "gaia_assert.h"
 #include "gaia_algo_compare.h"
 #include "gaia_algo_string.h"
+#include "gaia_algo_hash.h"
 
 namespace GAIA
 {
@@ -1042,6 +1043,12 @@ namespace GAIA
 				return GAIA::ALGO::gmemcmp(m_p, src.m_p, m_nSize);
 			}
 			GCLASS_COMPARE_BYCOMPARE(__MyType)
+			GINL GAIA::U64 hash() const
+			{
+				if(this->empty())
+					return 0;
+				return GAIA::ALGO::hash((const GAIA::GVOID*)this->fptr(), this->size());
+			}
 		private:
 			GINL GAIA::GVOID init()
 			{

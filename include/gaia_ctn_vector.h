@@ -1,4 +1,4 @@
-﻿#ifndef		__GAIA_CTN_VECTOR_H__
+#ifndef		__GAIA_CTN_VECTOR_H__
 #define		__GAIA_CTN_VECTOR_H__
 
 #include "gaia_type.h"
@@ -10,6 +10,7 @@
 #include "gaia_algo_sort.h"
 #include "gaia_algo_unique.h"
 #include "gaia_algo_replace.h"
+#include "gaia_algo_hash.h"
 #include "gaia_ctn.h"
 
 namespace GAIA
@@ -750,6 +751,12 @@ namespace GAIA
 					ret.m_pContainer = this;
 				}
 				return ret;
+			}
+			GINL GAIA::U64 hash() const
+			{
+				if(this->empty())
+					return 0;
+				return GAIA::ALGO::hash((const GAIA::GVOID*)this->fptr(), this->datasize());
 			}
 		private:
 			GINL GAIA::GVOID init(){m_pFront = GNIL; m_capacity = m_size = 0;}

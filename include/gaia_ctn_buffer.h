@@ -7,6 +7,7 @@
 #include "gaia_algo_extend.h"
 #include "gaia_algo_string.h"
 #include "gaia_algo_search.h"
+#include "gaia_algo_hash.h"
 
 namespace GAIA
 {
@@ -402,6 +403,12 @@ namespace GAIA
 				return *this;
 			}
 			GINL operator GAIA::U8*(){return m_pFront;}
+			GINL GAIA::U64 hash() const
+			{
+				if(this->empty())
+					return 0;
+				return GAIA::ALGO::hash((const GAIA::GVOID*)this->fptr(), this->write_size());
+			}
 		private:
 			GINL GAIA::GVOID init(){m_pFront = m_pBack = m_pWrite = m_pRead = GNIL;}
 			GINL GAIA::BL seek_ptr(const _SizeType& size, SEEK_TYPE seektype, GAIA::U8*& p)

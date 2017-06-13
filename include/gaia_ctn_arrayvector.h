@@ -5,6 +5,7 @@
 #include "gaia_assert.h"
 #include "gaia_iterator.h"
 #include "gaia_algo_extend.h"
+#include "gaia_algo_hash.h"
 #include "gaia_ctn.h"
 #include "gaia_ctn_array.h"
 #include "gaia_ctn_vector.h"
@@ -806,6 +807,12 @@ namespace GAIA
 					ret.m_index = this->size() - 1;
 				}
 				return ret;
+			}
+			GINL GAIA::U64 hash() const
+			{
+				if(this->empty())
+					return 0;
+				return GAIA::ALGO::hash((const GAIA::GVOID*)this->fptr(), this->datasize());
 			}
 		private:
 			__ArrayType m_arr;

@@ -8,6 +8,7 @@
 #include "gaia_algo_sort.h"
 #include "gaia_algo_unique.h"
 #include "gaia_algo_replace.h"
+#include "gaia_algo_hash.h"
 #include "gaia_iterator.h"
 
 namespace GAIA
@@ -603,6 +604,12 @@ namespace GAIA
 					ret.m_pContainer = this;
 				}
 				return ret;
+			}
+			GINL GAIA::U64 hash() const
+			{
+				if(this->empty())
+					return 0;
+				return GAIA::ALGO::hash((const GAIA::GVOID*)this->fptr(), this->datasize());
 			}
 			GINL __MyType& operator += (const __MyType& src)
 			{
