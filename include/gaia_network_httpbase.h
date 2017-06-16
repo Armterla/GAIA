@@ -995,6 +995,7 @@ namespace GAIA
 				@brief Get protocol in HttpURL.
 
 				@param psz [out] Used for saving the protocol string.
+			 		It could be GNIL when calculate the length of protocol string. At this time parameter sMaxSize must be GINVALID.
 
 				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
@@ -1015,6 +1016,7 @@ namespace GAIA
 				@brief Get host name in HttpURL.
 
 				@param psz [out] Used for saving the host name string.
+					It could be GNIL when calculate the length of host name string. At this time parameter sMaxSize must be GINVALID.
 
 				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
@@ -1035,6 +1037,7 @@ namespace GAIA
 				@brief Get port in HttpURL.
 
 				@param psz [out] Used for saving the port string.
+			 		It could be GNIL when calculate the length of port string. At this time parameter sMaxSize must be GINVALID.
 
 				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
@@ -1069,6 +1072,7 @@ namespace GAIA
 				@brief Get the path string in HttpURL.
 
 				@param psz [out] Used for saving the paths string.
+			 		It could be GNIL when calculate the length of path string. At this time parameter sMaxSize must be GINVALID.
 
 				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
@@ -1089,6 +1093,7 @@ namespace GAIA
 				@brief Get relative part.
 
 				@param psz [out] Used for saving the relative part string.
+					It could be GNIL when calculate the length of relative part string. At this time parameter sMaxSize must be GINVALID.
 
 				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
@@ -1143,6 +1148,7 @@ namespace GAIA
 				@brief Get the full parameters string in HttpURL.
 
 				@param psz [out] Used for saving the parameters string.
+			 		It could be GNIL when calculate the length of full param string. At this time parameter sMaxSize must be GINVALID.
 
 				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
@@ -1163,6 +1169,7 @@ namespace GAIA
 				@brief Get the full queries string in HttpURL.
 
 				@param psz [out] Used for saving the queries string.
+			 		It could be GNIL when calculate the length of full param string. At this time parameter sMaxSize must be GINVALID.
 
 				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
@@ -1183,6 +1190,7 @@ namespace GAIA
 				@brief Get the fragment string in HttpURL.
 
 				@param psz [out] Used for saving the fragment string.
+			 		It could be GNIL when calculate the length of fragment string. At this time parameter sMaxSize must be GINVALID.
 
 				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
@@ -1233,6 +1241,7 @@ namespace GAIA
 				@param sIndex [in] Specify the parameter's index.
 
 				@param psz [out] Used for saving the parameter.
+			 		It could be GNIL when calculate the length of param string. At this time parameter sMaxSize must be GINVALID.
 
 				@param sMaxSize [in] Specify parameter psz's max size in characters.
 					If it is GINVALID, means parameter psz's buffer size is enough.
@@ -1291,8 +1300,10 @@ namespace GAIA
 				@brief Get query by a index.
 
 				@param pszName [out] Used for saving the query name string.
+			 		It could be GNIL when calculate the length of query string. At this time parameter sMaxNameSize must be GINVALID.
 
 				@param pszValue [out] Used for saving the query value string.
+			 		It could be GNIL when calculate the length of value string. At this time parameter sMaxValueSize must be GINVALID.
 
 				@param sMaxNameSize [in] Specify parameter pszName's max size in characters.
 					If it is GINVALID, means parameter pszName's buffer size is enough.
@@ -1304,7 +1315,9 @@ namespace GAIA
 
 				@param pValueResultSize [out] Used for saving the result query's value size in characters(without '\0').
 
-				@return If get the query successfully, return GAIA::True, or will return GAIA::False.
+				@return If get the query successfully, return GAIA::True, or will return GAIA::False.\n
+			 		If parameter pszName is GNIL, parameter pNameResultSize will be filled result length.\n
+			 		If parameter pszValue is GNIL, parameter pValueResultSize will be filled result length.\n
 			*/
 			GINL GAIA::BL GetQuery(GAIA::NUM sIndex, GAIA::CH* pszName, GAIA::CH* pszValue, GAIA::NUM sMaxNameSize = GINVALID, GAIA::NUM sMaxValueSize = GINVALID, GAIA::NUM* pNameResultSize = GNIL, GAIA::NUM* pValueResultSize = GNIL) const
 			{
@@ -1327,16 +1340,24 @@ namespace GAIA
 				@param pszName [in] Specify the query's name.
 
 				@param pszValue [out] Used for saving the query value.
+			 		It could be GNIL when calculate the length of query string. At this time parameter sMaxValueSize must be GINVALID.
 
 				@param sMaxValueSize [in] Specify parameter pszValue's max size in characters.
 					If it is GINVALID, means parameter pszValue's buffer size is enough.
 
 				@param pValueResultSize [out] Used for saving the result query's value size in characters(without '\0').
 
-				@return If get query value sucessfully, return pszValue, or will return GNIL.
+				@return If get query value sucessfully, return pszValue.\n
+			 		If parameter pszName is GNIL or "", return GNIL.\n
+			 		If url analyze failed, return GNIL.\n
+			 		If not query node matched parameter pszName, return GNIL.\n
+			 		If parameter pszValue is GNIL, parameter pValueResultSize will be filled result length.\n
 			*/
 			GINL GAIA::CH* GetQueryByName(const GAIA::CH* pszName, GAIA::CH* pszValue, GAIA::NUM sMaxValueSize = GINVALID, GAIA::NUM* pValueResultSize = GNIL) const
 			{
+				GAST(!GAIA::ALGO::gstremp(pszName));
+				if(GAIA::ALGO::gstremp(pszName))
+					return GNIL;
 				if(!GCCAST(HttpURL*)(this)->Analyze())
 					return GNIL;
 				GAST(m_queries.size() % 2 == 0);
@@ -1937,6 +1958,8 @@ namespace GAIA
 			GINL const GAIA::CH* GetValueByName(const GAIA::CH* pszName) const
 			{
 				GAST(!GAIA::ALGO::gstremp(pszName));
+				if(GAIA::ALGO::gstremp(pszName))
+					return GNIL;
 				Node nfinder;
 				nfinder.pszName = pszName;
 				if(m_bSorted)
