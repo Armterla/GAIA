@@ -437,5 +437,31 @@ namespace TEST
 				}
 			}
 		}
+		
+		// Special test.
+		{
+			GTRY
+			{
+				xr.Reset();
+				static const GAIA::CH SPECIAL_XML[] = "<node0 prop0=\"0\" prop1=\"1\"/>";
+				GAIA::XML::XML_NODE nt;
+				GAIA::NUM sNodeNameLen;
+				const GAIA::CH* psz;
+				xr.SetBuffer(SPECIAL_XML, sizeof(SPECIAL_XML));
+				psz = xr.Begin(nt, sNodeNameLen);
+				{
+					xr.ReadNameByName<GAIA::CH>();
+					psz = xr.Read(nt, sNodeNameLen);
+					
+					xr.ReadNameByName("prop1");
+					psz = xr.Read(nt, sNodeNameLen);
+				}
+				psz = xr.End(&nt);
+			}
+			GCATCHBASE
+			{
+				TERROR;
+			}
+		}
 	}
 }

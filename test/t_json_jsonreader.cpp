@@ -392,10 +392,10 @@ namespace TEST
 				jr.SetBuffer(SPECIAL_JSON, sizeof(SPECIAL_JSON));
 				psz = jr.Begin(nt, sNodeNameLen);
 				{
-					psz = jr.Read(nt, sNodeNameLen);
+					jr.ReadNameByName<GAIA::CH>();
 					psz = jr.Read(nt, sNodeNameLen);
 					
-					psz = jr.Read(nt, sNodeNameLen);
+					jr.ReadNameByName("replyid");
 					psz = jr.Read(nt, sNodeNameLen);
 					
 					psz = jr.Read(nt, sNodeNameLen);

@@ -477,6 +477,49 @@ namespace GAIA
 				m_pCursor = pNext;
 				return p;
 			}
+			
+			/*!
+				@brief Read a name node and it's name must match the parameter.
+
+				@param p [out] Used for saving name node's name.
+					It could be GNIL if not need match the name string.
+
+				@exception GAIA::ECT::EctIllegal
+					If can't read a name node's name, throw it.
+
+				@exception GAIA::ECT::EctIllegal
+					If the node is not a name node, throw it.
+
+				@exception GAIA::ECT::DataError
+					If the next name node's name not match parameter p, throw it.
+			*/
+			template<typename _ParamDataType> GAIA::GVOID ReadNameByName(const _ParamDataType* p = GNIL)
+			{
+				GAIA::XML::XML_NODE nt;
+				_SizeType nodenamelen;
+				const _DataType* pNext;
+				const _DataType* pRet = this->Peek(nt, nodenamelen, &pNext);
+				if(pRet == GNIL)
+					GTHROW(Illegal);
+				switch(nt)
+				{
+				case GAIA::XML::XML_NODE_NAME:
+					{
+						if(!GAIA::ALGO::gstremp(p))
+						{
+							if(!GAIA::ALGO::gstrequal(p, pRet, nodenamelen) || p[nodenamelen] != '\0')
+								GTHROW(DataError);
+						}
+					}
+					break;
+				case GAIA::XML::XML_NODE_VALUE:
+					GTHROW(Illegal);
+				default:
+					GTHROW(Illegal);
+				}
+				GAST(nodenamelen != 0);
+				m_pCursor = pNext;
+			}
 
 			/*!
 				@brief Read a value node's name.
