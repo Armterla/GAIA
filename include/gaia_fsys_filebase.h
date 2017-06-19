@@ -64,7 +64,6 @@ namespace GAIA
 				@brief Specify the file is a directory or not.
 			*/
 			GAIA::BL bDirectory : 1;
-
 		};
 
 		/*!
