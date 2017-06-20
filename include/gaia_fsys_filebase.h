@@ -129,7 +129,7 @@ namespace GAIA
 			/*!
 				@brief Resize the file.
 			 
-			 	@param [in] Specify the new file size.
+			 	@param size [in] Specify the new file size.
 			 
 			 	@return If resize file successfully, return GAIA::True, or return GAIA::False.
 			*/
@@ -153,7 +153,7 @@ namespace GAIA
 			 
 			 	@param size [in] Specify the buffer size of parameter pSrc in bytes.
 			 
-			 	@param Return the practice write size.
+			 	@return Return the practice write size.
 			*/
 			virtual GAIA::N32 Write(const GAIA::GVOID* pSrc, GAIA::N32 size) = 0;
 
