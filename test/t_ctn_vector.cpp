@@ -170,6 +170,11 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			if(!vec.exist(*cit))
+			{
+				TERROR;
+				break;
+			}
 			if(vec.rfind(*cit, vec.size() - 1) == GINVALID)
 			{
 				TERROR;

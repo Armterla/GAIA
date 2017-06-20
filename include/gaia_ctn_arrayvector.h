@@ -1,4 +1,4 @@
-﻿#ifndef		__GAIA_CTN_ARRAYVECTOR_H__
+#ifndef		__GAIA_CTN_ARRAYVECTOR_H__
 #define		__GAIA_CTN_ARRAYVECTOR_H__
 
 #include "gaia_type.h"
@@ -511,6 +511,10 @@ namespace GAIA
 					return m_vec.rfind(t, index);
 				else
 					return m_arr.rfind(t, index);
+			}
+			GINL BL exist(const _DataType& t)
+			{
+				return this->find(t) != GINVALID;
 			}
 			GINL _SizeType replace(const _DataType& tOld, const _DataType& tNew)
 			{

@@ -170,6 +170,11 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			if(!av.exist(*cit))
+			{
+				TERROR;
+				break;
+			}
 			if(av.rfind(*cit, av.size() - 1) == GINVALID)
 			{
 				TERROR;

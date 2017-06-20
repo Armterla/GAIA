@@ -1,4 +1,4 @@
-﻿#ifndef		__GAIA_CTN_ARRAY_H__
+#ifndef		__GAIA_CTN_ARRAY_H__
 #define		__GAIA_CTN_ARRAY_H__
 
 #include "gaia_type.h"
@@ -327,6 +327,10 @@ namespace GAIA
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
+			}
+			GINL BL exist(const _DataType& t)
+			{
+				return this->find(t) != GINVALID;
 			}
 			GINL _SizeType replace(const _DataType& tOld, const _DataType& tNew)
 			{

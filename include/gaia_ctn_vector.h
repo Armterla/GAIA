@@ -470,6 +470,10 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
 			}
+			GINL BL exist(const _DataType& t)
+			{
+				return this->find(t) != GINVALID;
+			}
 			GINL _SizeType replace(const _DataType& tOld, const _DataType& tNew)
 			{
 				return GAIA::ALGO::replace(this->fptr(), this->size(), tOld, tNew);

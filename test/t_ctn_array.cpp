@@ -175,6 +175,11 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			if(!arr.exist(*cit))
+			{
+				TERROR;
+				break;
+			}
 			if(arr.rfind(*cit, arr.size() - 1) == GINVALID)
 			{
 				TERROR;
