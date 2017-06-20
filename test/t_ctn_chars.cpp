@@ -541,17 +541,17 @@ namespace TEST
 		if(chs.rfind((__TCharsType)_T("rr"), chs.size() - 1) != GINVALID)
 			TERROR;
 		chs = _T("HelloWorld");
-		if(!chs.contains("Hello"))
+		if(!chs.exist("Hello"))
 			TERROR;
-		if(!chs.contains("World"))
+		if(!chs.exist("World"))
 			TERROR;
-		if(!chs.contains("oW"))
+		if(!chs.exist("oW"))
 			TERROR;
-		if(!chs.contains('W'))
+		if(!chs.exist('W'))
 			TERROR;
-		if(chs.contains('A'))
+		if(chs.exist('A'))
 			TERROR;
-		if(!chs.contains(chs))
+		if(!chs.exist(chs))
 			TERROR;
 		chs = _T("HelloWorld");
 		if(chs.compare("HelloWorld") != 0)

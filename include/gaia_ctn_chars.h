@@ -1,4 +1,4 @@
-﻿#ifndef 	__GAIA_CTN_CHARS_H__
+#ifndef 	__GAIA_CTN_CHARS_H__
 #define 	__GAIA_CTN_CHARS_H__
 
 #include "gaia_type.h"
@@ -565,15 +565,15 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
 			}
-			template<typename _ParamDataType> GAIA::BL contains(const _ParamDataType& t) const
+			template<typename _ParamDataType> GAIA::BL exist(const _ParamDataType& t) const
 			{
 				return this->find(t, 0) != GINVALID;
 			}
-			template<typename _ParamDataType> GAIA::BL contains(const _ParamDataType* p) const
+			template<typename _ParamDataType> GAIA::BL exist(const _ParamDataType* p) const
 			{
 				return this->find(p, 0) != GINVALID;
 			}
-			GINL GAIA::BL contains(const __MyType& src) const
+			GINL GAIA::BL exist(const __MyType& src) const
 			{
 				return this->find(src, 0) != GINVALID;
 			}

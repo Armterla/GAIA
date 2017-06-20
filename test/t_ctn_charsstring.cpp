@@ -546,17 +546,17 @@ namespace TEST
 		if(str.rfind((__StrType)_T("rr"), str.size() - 1) != GINVALID)
 			TERROR;
 		str = _T("HelloWorld");
-		if(!str.contains("Hello"))
+		if(!str.exist("Hello"))
 			TERROR;
-		if(!str.contains("World"))
+		if(!str.exist("World"))
 			TERROR;
-		if(!str.contains("oW"))
+		if(!str.exist("oW"))
 			TERROR;
-		if(!str.contains('W'))
+		if(!str.exist('W'))
 			TERROR;
-		if(str.contains('A'))
+		if(str.exist('A'))
 			TERROR;
-		if(!str.contains(str))
+		if(!str.exist(str))
 			TERROR;
 		str = _T("HelloWorld");
 		if(str.compare("HelloWorld") != 0)
