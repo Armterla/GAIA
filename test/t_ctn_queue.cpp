@@ -34,6 +34,16 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			if(q.find(x) != x)
+			{
+				TERROR;
+				break;
+			}
+			if(!q.exist(x))
+			{
+				TERROR;
+				break;
+			}
 		}
 		if(q.capacity() != 100)
 			TERROR;

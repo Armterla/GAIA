@@ -317,6 +317,19 @@ namespace GAIA
 				}
 				return ret;
 			}
+			GINL _SizeType find(const _DataType& t) const
+			{
+				for(_SizeType x = 0; x < this->size(); ++x)
+				{
+					if((*this)[x] == t)
+						return x;
+				}
+				return GINVALID;
+			}
+			GINL GAIA::BL exist(const _DataType& t) const
+			{
+				return this->find(t) != GINVALID;
+			}
 			GINL __MyType& operator = (const __MyType& src)
 			{
 				GAST(&src != this);
