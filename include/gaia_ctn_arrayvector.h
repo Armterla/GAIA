@@ -512,7 +512,7 @@ namespace GAIA
 				else
 					return m_arr.rfind(t, index);
 			}
-			GINL BL exist(const _DataType& t)
+			GINL GAIA::BL exist(const _DataType& t) const
 			{
 				return this->find(t) != GINVALID;
 			}

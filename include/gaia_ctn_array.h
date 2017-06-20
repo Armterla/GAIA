@@ -328,7 +328,7 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
 			}
-			GINL BL exist(const _DataType& t)
+			GINL GAIA::BL exist(const _DataType& t) const
 			{
 				return this->find(t) != GINVALID;
 			}
