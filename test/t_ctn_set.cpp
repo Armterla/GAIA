@@ -50,6 +50,11 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			if(!s.find(x))
+			{
+				TERROR;
+				break;
+			}
 			if(GSCAST(const __SetType*)(&s)->find(x) == GNIL)
 			{
 				TERROR;

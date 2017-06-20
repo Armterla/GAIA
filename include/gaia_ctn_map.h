@@ -128,6 +128,7 @@ namespace GAIA
 					return GNIL;
 				return &pNode->m_data;
 			}
+			GINL GAIA::BL exist(const _KeyType& key) const{return this->find(key) != GNIL;}
 			GINL it findit(const _KeyType& key){it ret; Node f; f.m_key = key; ret.m_iter = m_avltree.findit(f); return ret;}
 			GINL const_it const_findit(const _KeyType& key) const{const_it ret; Node f; f.m_key = key; ret.m_iter = m_avltree.const_findit(f); return ret;}
 			GINL it upper_equal(const _KeyType& key){it ret; Node f; f.m_key = key; ret.m_iter = m_avltree.upper_equal(f); return ret;}

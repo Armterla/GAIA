@@ -46,6 +46,11 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			if(!avl.exist(x))
+			{
+				TERROR;
+				break;
+			}
 			__AVLType::it ittemp = avl.findit(x);
 			if(ittemp.empty())
 			{

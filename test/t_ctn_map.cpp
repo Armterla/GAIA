@@ -50,6 +50,11 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			if(!m.exist(x))
+			{
+				TERROR;
+				break;
+			}
 			if(GSCAST(const __MapType*)(&m)->find(x) == GNIL)
 			{
 				TERROR;

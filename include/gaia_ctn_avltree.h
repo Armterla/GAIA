@@ -442,6 +442,10 @@ namespace GAIA
 					return GNIL;
 				return &pFinded->t;
 			}
+			GINL GAIA::BL exist(const _DataType& t) const
+			{
+				return this->find(t) != GNIL;
+			}
 			GINL it findit(const _DataType& t)
 			{
 				it iter;
