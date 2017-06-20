@@ -330,6 +330,10 @@ namespace GAIA
 			{
 				return GCCAST(__MyType*)(this)->find(k);
 			}
+			GINL GAIA::BL exist(const _KeyType& k) const
+			{
+				return this->find(k) != GNIL;
+			}
 			GINL it findit(const _KeyType& k)
 			{
 				it ret;

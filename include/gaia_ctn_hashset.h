@@ -325,6 +325,10 @@ namespace GAIA
 			{
 				return GCCAST(__MyType*)(this)->find(t);
 			}
+			GINL GAIA::BL exist(const _DataType& t) const
+			{
+				return this->find(t) != GNIL;
+			}
 			GINL it findit(const _DataType& t)
 			{
 				it ret;

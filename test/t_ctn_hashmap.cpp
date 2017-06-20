@@ -48,6 +48,11 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			if(!hm.exist(x))
+			{
+				TERROR;
+				break;
+			}
 			__HashMapType::it it = hm.findit(x);
 			if(it.empty())
 			{

@@ -51,6 +51,11 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			if(!hs.exist(x))
+			{
+				TERROR;
+				break;
+			}
 			__HashSetType::it it = hs.findit(x);
 			if(it.empty())
 			{
