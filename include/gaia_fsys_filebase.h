@@ -128,36 +128,64 @@ namespace GAIA
 
 			/*!
 				@brief Resize the file.
+			 
+			 	@param [in] Specify the new file size.
+			 
+			 	@return If resize file successfully, return GAIA::True, or return GAIA::False.
 			*/
 			virtual GAIA::BL Resize(const GAIA::FSYS::FileBase::__FileSizeType& size) = 0;
 
 			/*!
 				@brief Read data from file.
+			 
+			 	@param pDst [in] Used for save the readed result.
+			 
+			 	@param size [in] Specify the buffer size of parameter pDst in bytes.
+			 
+			 	@return Return the practice read size.
 			*/
 			virtual GAIA::N32 Read(GAIA::GVOID* pDst, GAIA::N32 size) = 0;
 
 			/*!
 				@brief Write data to file.
+			 
+			 	@param pSrc [in] Specify the buffer which will be write to file.
+			 
+			 	@param size [in] Specify the buffer size of parameter pSrc in bytes.
+			 
+			 	@param Return the practice write size.
 			*/
 			virtual GAIA::N32 Write(const GAIA::GVOID* pSrc, GAIA::N32 size) = 0;
 
 			/*!
 				@brief Seek file pointer.
+			 
+			 	@param offset [in] Specify the size of seek offset in bytes.
+			 
+			 	@param seektype [in] Specify the seek mode.
+			 
+			 	@return If seek successfully, return GAIA::True, or will return GAIA::False.
 			*/
 			virtual GAIA::BL Seek(const GAIA::FSYS::FileBase::__FileSizeType& offset, GAIA::SEEK_TYPE seektype = GAIA::SEEK_TYPE_BEGIN) = 0;
 
 			/*!
 				@brief Retrieve the file pointer.
+			 
+			 	@return Return current location of file pointer.
 			*/
 			virtual GAIA::FSYS::FileBase::__FileSizeType Tell() const = 0;
 
 			/*!
 				@brief Flush the file's write buffer.
+			 
+			 	@return If flush success, return GAIA::True, or will return GAIA::False.
 			*/
 			virtual GAIA::BL Flush() = 0;
 
 			/*!
 				@brief Read a object from file.
+			 
+			 	@return If read object successfully, return GAIA::True, or will return GAIA::False.
 			 
 				@remarks The object must be a base c data type, or a struct with all c data type member variables,\n
 					c data type is char, short, int, long long, float, double, bool.\n
@@ -178,6 +206,8 @@ namespace GAIA
 			/*!
 				@brief Write a object to file.
 			 
+			 	@return If write object successfully, return GAIA::True, or will return GAIA::False.
+			 
 				@remarks The object must be a base c data type, or a struct with all c data type member variables,\n
 					c data type is char, short, int, long long, float, double, bool.\n
 					The integer type support "unsigned" indicator.\n
@@ -194,6 +224,8 @@ namespace GAIA
 
 			/*!
 				@brief Write a string to file.
+			 
+			 	@return If write string successfully, return GAIA::True, or will return GAIA::False.
 			 
 				@remarks This method write a integer(int) type for string length first, and then write the string without '\0'.
 			*/
@@ -215,6 +247,8 @@ namespace GAIA
 
 			/*!
 				@brief Read a string from file.
+			 
+			 	@return If read a string successfully, return GAIA::True, or will return GAIA::False.
 			 
 				@remarks This method read a integer(int) type from file for string length first, and then read the string without '\0'.\n
 					But '\0' will be filled to the last location of parameter pszString.
@@ -243,6 +277,8 @@ namespace GAIA
 			/*!
 				@brief Write a text string to the file.
 			 
+			 	@return If write text successfully, return GAIA::True, or will return GAIA::False.
+			 
 				@remarks This method write the string without '\0'.
 			*/
 			template<typename _ParamType> GAIA::BL WriteText(const _ParamType* pszText)
@@ -258,6 +294,8 @@ namespace GAIA
 			/*!
 				@brief Stream operator for read object.
 			 
+			 	@return Return current object.
+			 
 				@remarks The object must be a base c data type, or a struct with all c data type member variables,\n
 					c data type is char, short, int, long long, float, double, bool.\n
 					The integer type support "unsigned" indicator.\n
@@ -266,6 +304,8 @@ namespace GAIA
 
 			/*!
 				@brief Stream operator for write object.
+			 
+			 	@return Return current object.
 			 
 				@remarks The object must be a base c data type, or a struct with all c data type member variables,\n
 					c data type is char, short, int, long long, float, double, bool.\n
