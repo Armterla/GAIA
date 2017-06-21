@@ -834,5 +834,125 @@ namespace TEST
 		
 		str = "HelloWorld!";
 		TAST(str.hash() != 0);
+		
+		{
+			str = "c:\\user/abc/1.txt";
+			GAIA::CH szTemp[GAIA::MAXPL];
+			GAIA::NUM sResultSize;
+			if(str.fbigname((GAIA::CH*)GNIL, GINVALID, &sResultSize) != GNIL)
+				TERROR;
+			if(sResultSize != 1)
+				TERROR;
+			if(str.fbigname(szTemp, sizeof(szTemp), &sResultSize) == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szTemp, "1"))
+				TERROR;
+			if(sResultSize != 1)
+				TERROR;
+			if(str.fbigname() != "1")
+				TERROR;
+			if(str.fbigname(str1) != "1")
+				TERROR;
+			if(str1 != "1")
+				TERROR;
+			if(str.tofbigname() != "1")
+				TERROR;
+		}
+		
+		{
+			str = "c:\\user/abc/1.txt";
+			GAIA::CH szTemp[GAIA::MAXPL];
+			GAIA::NUM sResultSize;
+			if(str.fextname((GAIA::CH*)GNIL, GINVALID, &sResultSize) != GNIL)
+				TERROR;
+			if(sResultSize != 3)
+				TERROR;
+			if(str.fextname(szTemp, sizeof(szTemp), &sResultSize) == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szTemp, "txt"))
+				TERROR;
+			if(sResultSize != 3)
+				TERROR;
+			if(str.fextname() != "txt")
+				TERROR;
+			if(str.fextname(str1) != "txt")
+				TERROR;
+			if(str1 != "txt")
+				TERROR;
+			if(str.tofextname() != "txt")
+				TERROR;
+		}
+		
+		{
+			str = "c:\\user/abc/1.txt";
+			GAIA::CH szTemp[GAIA::MAXPL];
+			GAIA::NUM sResultSize;
+			if(str.fname((GAIA::CH*)GNIL, GINVALID, &sResultSize) != GNIL)
+				TERROR;
+			if(sResultSize != 5)
+				TERROR;
+			if(str.fname(szTemp, sizeof(szTemp), &sResultSize) == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szTemp, "1.txt"))
+				TERROR;
+			if(sResultSize != 5)
+				TERROR;
+			if(str.fname() != "1.txt")
+				TERROR;
+			if(str.fname(str1) != "1.txt")
+				TERROR;
+			if(str1 != "1.txt")
+				TERROR;
+			if(str.tofname() != "1.txt")
+				TERROR;
+		}
+		
+		{
+			str = "c:\\user/abc/1.txt";
+			GAIA::CH szTemp[GAIA::MAXPL];
+			GAIA::NUM sResultSize;
+			if(str.fpath((GAIA::CH*)GNIL, GINVALID, &sResultSize) != GNIL)
+				TERROR;
+			if(sResultSize != 12)
+				TERROR;
+			if(str.fpath(szTemp, sizeof(szTemp), &sResultSize) == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szTemp, "c:\\user/abc/"))
+				TERROR;
+			if(sResultSize != 12)
+				TERROR;
+			if(str.fpath() != "c:\\user/abc/")
+				TERROR;
+			if(str.fpath(str1) != "c:\\user/abc/")
+				TERROR;
+			if(str1 != "c:\\user/abc/")
+				TERROR;
+			if(str.tofpath() != "c:\\user/abc/")
+				TERROR;
+		}
+		
+		{
+			str = "c:\\user/abc/1.txt";
+			GAIA::CH szTemp[GAIA::MAXPL];
+			GAIA::NUM sResultSize;
+			if(str.fpathbigname((GAIA::CH*)GNIL, GINVALID, &sResultSize) != GNIL)
+				TERROR;
+			if(sResultSize != 13)
+				TERROR;
+			if(str.fpathbigname(szTemp, sizeof(szTemp), &sResultSize) == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szTemp, "c:\\user/abc/1"))
+				TERROR;
+			if(sResultSize != 13)
+				TERROR;
+			if(str.fpathbigname() != "c:\\user/abc/1")
+				TERROR;
+			if(str.fpathbigname(str1) != "c:\\user/abc/1")
+				TERROR;
+			if(str1 != "c:\\user/abc/1")
+				TERROR;
+			if(str.tofpathbigname() != "c:\\user/abc/1")
+				TERROR;
+		}
 	}
 }
