@@ -62,6 +62,8 @@ namespace TEST
 			TERROR;
 		if(ol.find(_T("HelloWorld1")) == GINVALID)
 			TERROR;
+		if(!ol.exist(_T("HelloWorld0")))
+			TERROR;
 		GAIA::CTN::TString strTemp = SAMPLE_COUNT - 1;
 		strTemp = _T("HelloWorld") + strTemp;
 		if(ol.find(strTemp) == GINVALID)

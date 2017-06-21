@@ -207,6 +207,10 @@ namespace GAIA
 				}
 				return GINVALID;
 			}
+			GINL GAIA::BL exist(const _DataType& t) const
+			{
+				return this->find(t) != GINVALID;
+			}
 			GINL _SizeType count(const _DataType& t) const
 			{
 				_SizeType ret = 0;
