@@ -443,7 +443,7 @@ namespace TEST
 			GTRY
 			{
 				xr.Reset();
-				static const GAIA::CH SPECIAL_XML[] = "<node0 prop0=\"0\" prop1=\"1\"/>";
+				static const GAIA::CH SPECIAL_XML[] = "<node0 prop0=\"0\" prop1=\"1\" prop2=\"2\"/>";
 				GAIA::XML::XML_NODE nt;
 				GAIA::NUM sNodeNameLen;
 				const GAIA::CH* psz;
@@ -455,6 +455,9 @@ namespace TEST
 					
 					xr.ReadNameByName("prop1");
 					psz = xr.Read(nt, sNodeNameLen);
+					
+					xr.ReadName();
+					xr.ReadValue();
 				}
 				psz = xr.End(&nt);
 			}

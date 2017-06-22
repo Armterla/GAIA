@@ -398,8 +398,8 @@ namespace TEST
 					jr.ReadNameByName("replyid");
 					psz = jr.Read(nt, sNodeNameLen);
 					
-					psz = jr.Read(nt, sNodeNameLen);
-					psz = jr.Read(nt, sNodeNameLen);
+					jr.ReadName();
+					jr.ReadValue();
 					
 					psz = jr.Begin(nt, sNodeNameLen);
 					{
