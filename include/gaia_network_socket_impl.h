@@ -903,7 +903,7 @@ namespace GAIA
 
 		GINL GAIA::BL Socket::GetBindedAddress(GAIA::NETWORK::Addr& addr)
 		{
-			if(!m_addrBinded.check())
+			if(m_addrBinded.uPort == 0)
 				return GAIA::False;
 			addr = m_addrBinded;
 			return GAIA::True;
