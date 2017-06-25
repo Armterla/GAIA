@@ -381,6 +381,107 @@ namespace GAIA
 					GTHROW(Illegal);
 				return (GAIA::TYPEID)m_p[m_nCursor];
 			}
+			GINL GAIA::N32 type_size() const
+			{
+				GAIA::TYPEID tid = this->type_id();
+				switch(tid)
+				{
+				case TYPEID_NM:
+					return sizeof(GAIA::NM);
+				case TYPEID_UM:
+					return sizeof(GAIA::UM);
+				case TYPEID_BL:
+					return sizeof(GAIA::BL);
+				case TYPEID_N8:
+					return sizeof(GAIA::N8);
+				case TYPEID_U8:
+					return sizeof(GAIA::U8);
+				case TYPEID_N16:
+					return sizeof(GAIA::N16);
+				case TYPEID_U16:
+					return sizeof(GAIA::U16);
+				case TYPEID_N32:
+					return sizeof(GAIA::N32);
+				case TYPEID_U32:
+					return sizeof(GAIA::U32);
+				case TYPEID_N64:
+					return sizeof(GAIA::N64);
+				case TYPEID_U64:
+					return sizeof(GAIA::U64);
+				case TYPEID_X128:
+					return sizeof(GAIA::X128);
+				case TYPEID_F32:
+					return sizeof(GAIA::F32);
+				case TYPEID_F64:
+					return sizeof(GAIA::F64);
+				case TYPEID_CHARPOINTER:
+				case TYPEID_CONSTCHARPOINTER:
+					{
+						if(m_nCursor + sizeof(GAIA::U8) + sizeof(GAIA::U16) > m_nSize)
+							GTHROW(Illegal);
+						return *(GAIA::U16*)&m_p[m_nCursor + sizeof(GAIA::U8)] * sizeof(GAIA::CH);
+					}
+				case TYPEID_WCHARPOINTER:
+				case TYPEID_CONSTWCHARPOINTER:
+					{
+						if(m_nCursor + sizeof(GAIA::U8) + sizeof(GAIA::U16) > m_nSize)
+							GTHROW(Illegal);
+						return *(GAIA::U16*)&m_p[m_nCursor + sizeof(GAIA::U8)] * sizeof(GAIA::WCH);
+					}
+				case TYPEID_POINTER:
+					{
+						if(m_nCursor + sizeof(GAIA::U8) + sizeof(GAIA::N32) > m_nSize)
+							GTHROW(Illegal);
+						return *(GAIA::N32*)&m_p[m_nCursor + sizeof(GAIA::U8)];
+					}
+				case TYPEID_CONSTPOINTER:
+					{
+						if(m_nCursor + sizeof(GAIA::U8) + sizeof(GAIA::N32) > m_nSize)
+							GTHROW(Illegal);
+						return *(GAIA::N32*)&m_p[m_nCursor + sizeof(GAIA::U8)];
+					}
+				default:
+					GTHROW(Illegal);
+				}
+			}
+			GINL GAIA::N32 type_offset() const
+			{
+				GAIA::TYPEID tid = this->type_id();
+				switch(tid)
+				{
+				case TYPEID_NM:
+				case TYPEID_UM:
+				case TYPEID_BL:
+				case TYPEID_N8:
+				case TYPEID_U8:
+				case TYPEID_N16:
+				case TYPEID_U16:
+				case TYPEID_N32:
+				case TYPEID_U32:
+				case TYPEID_N64:
+				case TYPEID_U64:
+				case TYPEID_X128:
+				case TYPEID_F32:
+				case TYPEID_F64:
+					{
+						return m_nCursor + sizeof(GAIA::U8);
+					}
+				case TYPEID_CHARPOINTER:
+				case TYPEID_CONSTCHARPOINTER:
+				case TYPEID_WCHARPOINTER:
+				case TYPEID_CONSTWCHARPOINTER:
+					{
+						return m_nCursor + sizeof(GAIA::U8) + sizeof(GAIA::N16);
+					}
+				case TYPEID_POINTER:
+				case TYPEID_CONSTPOINTER:
+					{
+						return m_nCursor + sizeof(GAIA::U8) + sizeof(GAIA::N32);
+					}
+				default:
+					GTHROW(Illegal);
+				}
+			}
 			GAIA::GVOID jump(GAIA::N32 nStep)
 			{
 				if(nStep < 0)
