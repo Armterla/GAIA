@@ -1256,17 +1256,27 @@ namespace GAIA
 		_DataType1 gstrbycapacity(_DataType1 dst, _DataType2 storagesize)
 		{
 			GAIA::CH szUnit[32];
-			if(storagesize >= 1024 * 1024 * 1024)
+			if(storagesize >= 1024LL * 1024LL * 1024LL * 1024LL * 1024LL)
+			{
+				storagesize = storagesize / 1024 / 1024 / 1024 / 1024 * 1000 / 1024;
+				GAIA::ALGO::gstrcpy(szUnit, "(PB)");
+			}
+			else if(storagesize >= 1024LL * 1024LL * 1024LL * 1024LL)
+			{
+				storagesize = storagesize / 1024 / 1024 / 1024 * 1000 / 1024;
+				GAIA::ALGO::gstrcpy(szUnit, "(TB)");
+			}
+			else if(storagesize >= 1024LL * 1024LL * 1024LL)
 			{
 				storagesize = storagesize / 1024 / 1024 * 1000 / 1024;
 				GAIA::ALGO::gstrcpy(szUnit, "(GB)");
 			}
-			else if(storagesize >= 1024 * 1024)
+			else if(storagesize >= 1024LL * 1024LL)
 			{
 				storagesize = storagesize / 1024 * 100 / 1024;
 				GAIA::ALGO::gstrcpy(szUnit, "(MB)");
 			}
-			else if(storagesize >= 1024)
+			else if(storagesize >= 1024LL)
 			{
 				storagesize = storagesize * 10 / 1024;
 				GAIA::ALGO::gstrcpy(szUnit, "(KB)");
@@ -1275,7 +1285,17 @@ namespace GAIA
 				GAIA::ALGO::gstrcpy(szUnit, "(Bytes)");
 			GAIA::ALGO::castv(storagesize, dst, 32);
 			GAIA::NUM sLen = GAIA::ALGO::gstrlen(dst);
-			if(szUnit[1] == 'G')
+			if(szUnit[1] == 'P')
+			{
+				insert(dst, sLen, '.', sLen - 3);
+				++sLen;
+			}
+			else if(szUnit[1] == 'T')
+			{
+				insert(dst, sLen, '.', sLen - 3);
+				++sLen;
+			}
+			else if(szUnit[1] == 'G')
 			{
 				insert(dst, sLen, '.', sLen - 3);
 				++sLen;
