@@ -76,9 +76,9 @@ namespace TEST
 		s << "GAIA::NETWORK::Http size = " << sizeof(GAIA::NETWORK::Http) << GAIA_FILELINEBREAK_RN;
 		
 		GAIA::FSYS::File f;
-		GAIA::TCH* pszFileName = gnew GAIA::TCH[GAIA::MAXPL];
+		GAIA::CH* pszFileName = gnew GAIA::CH[GAIA::MAXPL];
 		GAIA::ALGO::gstrcpy(pszFileName, g_gaia_appdocdir);
-		GAIA::ALGO::gstrcat(pszFileName, _T("objstatus.txt"));
+		GAIA::ALGO::gstrcat(pszFileName, "objstatus.txt");
 		if(!f.Open(pszFileName, GAIA::FSYS::File::OPEN_TYPE_CREATEALWAYS | GAIA::FSYS::File::OPEN_TYPE_WRITE))
 		{
 			TERROR;

@@ -666,7 +666,7 @@ namespace GAIA
 
 			// Calculate file url.
 			const GAIA::CH* pszURL = url.ToString();
-			GAIA::CTN::TCharsString strFileURL = this->GetServer().GetDesc().pszRootPath;
+			GAIA::CTN::ACharsString strFileURL = this->GetServer().GetDesc().pszRootPath;
 			if(GAIA::ALGO::gstrcmpnil(pszURL, "/") == 0)
 				strFileURL += "index.html";
 			else

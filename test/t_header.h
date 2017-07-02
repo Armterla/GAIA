@@ -371,7 +371,7 @@ namespace TEST
 		GINL TestLogCallBack()
 		{
 			this->Reset();
-			m_file.Open(_T("test_result.txt"), GAIA::FSYS::File::OPEN_TYPE_WRITE | GAIA::FSYS::File::OPEN_TYPE_CREATEALWAYS);
+			m_file.Open("test_result.txt", GAIA::FSYS::File::OPEN_TYPE_WRITE | GAIA::FSYS::File::OPEN_TYPE_CREATEALWAYS);
 		}
 
 		GINL GAIA::GVOID Reset()

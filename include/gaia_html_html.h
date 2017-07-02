@@ -49,8 +49,8 @@ namespace GAIA
 
 			GINL GAIA::GVOID Reset();
 
-			GINL GAIA::BL LoadFromFile(const GAIA::TCH* pszFileName);
-			GINL GAIA::BL SaveToFile(const GAIA::TCH* pszFileName, GAIA::HTML::HTML_SAVE st = GAIA::HTML::HTML_SAVE_BESTREAD);
+			GINL GAIA::BL LoadFromFile(const GAIA::CH* pszFileName);
+			GINL GAIA::BL SaveToFile(const GAIA::CH* pszFileName, GAIA::HTML::HTML_SAVE st = GAIA::HTML::HTML_SAVE_BESTREAD);
 			GINL GAIA::BL LoadFromMem(const GAIA::TCH* pszSrc, const GAIA::NUM& sSize);
 			GINL GAIA::BL SaveToMem(GAIA::TCH* pszDst, const GAIA::NUM& sSize, GAIA::HTML::HTML_SAVE st = GAIA::HTML::HTML_SAVE_BESTREAD);
 

@@ -8,7 +8,7 @@ namespace TEST
 		typedef GAIA::FSYS::File __FileType;
 		typedef GAIA::FSYS::Dir __DirType;
 
-		GAIA::TCH TEST_FILE_NAME[GAIA::MAXPL];
+		GAIA::CH TEST_FILE_NAME[GAIA::MAXPL];
 		if(GAIA::ALGO::gstremp(g_gaia_appdocdir))
 			GAIA::ALGO::gstrcpy(TEST_FILE_NAME, "../testres/filetest.txt");
 		else

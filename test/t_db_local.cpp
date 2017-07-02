@@ -6,10 +6,8 @@ namespace TEST
 	extern GAIA::GVOID t_db_local(GAIA::LOG::Log& logobj)
 	{
 		GAIA::CH szFileName[GAIA::MAXPL];
-		GAIA::TCH szFileNameT[GAIA::MAXPL];
 		GAIA::ALGO::gstrcpy(szFileName, g_gaia_appdocdir);
 		GAIA::ALGO::gstrcat(szFileName, "test.db");
-		GAIA::ALGO::gstrcpy(szFileNameT, szFileName);
 		
 		GAIA::DB::DBLocal db;
 		if(!db.Open(szFileName))
@@ -138,7 +136,7 @@ namespace TEST
 			if(!db.Close())
 				TERROR;
 			GAIA::FSYS::Dir dir;
-			if(!dir.RemoveFile(szFileNameT))
+			if(!dir.RemoveFile(szFileName))
 				TERROR;
 		}
 	}

@@ -93,7 +93,7 @@ namespace TEST
 
 		json.EndWriteNode(cur);
 		
-		GAIA::TCH szFileName[GAIA::MAXPL];
+		GAIA::CH szFileName[GAIA::MAXPL];
 		GAIA::ALGO::gstrcpy(szFileName, g_gaia_appdocdir);
 		GAIA::ALGO::gstrcat(szFileName, "test.json");
 

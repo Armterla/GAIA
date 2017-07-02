@@ -43,7 +43,7 @@ namespace GAIA
 			/*!
 				@brief Specify the file's name.
 			*/
-			const GAIA::TCH* pszName;
+			const GAIA::CH* pszName;
 
 			/*!
 				@brief Specify the file's create time.
@@ -91,7 +91,7 @@ namespace GAIA
 			 
 				@return If open file successfully, return GAIA::True, or will return GAIA::False.
 			*/
-			virtual GAIA::BL Open(const GAIA::TCH* fileurl, const GAIA::UM& opentype) = 0;
+			virtual GAIA::BL Open(const GAIA::CH* fileurl, const GAIA::UM& opentype) = 0;
 
 			/*!
 				@brief Close the file.
@@ -112,7 +112,7 @@ namespace GAIA
 			 
 				@return Return file url.
 			*/
-			virtual const GAIA::TCH* GetFileUrl() const = 0;
+			virtual const GAIA::CH* GetFileUrl() const = 0;
 
 			/*!
 				@brief Get file's open type.

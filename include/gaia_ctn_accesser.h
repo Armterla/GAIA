@@ -160,7 +160,7 @@ namespace GAIA
 				m_atm = atm;
 				return GAIA::True;
 			}
-			GINL GAIA::BL bindfile(GAIA::FSYS::FileBase* pFile, GAIA::UM atm, GAIA::TCH* pszNewFileName = GNIL, GAIA::NUM sNewFileNameMaxLen = GINVALID)
+			GINL GAIA::BL bindfile(GAIA::FSYS::FileBase* pFile, GAIA::UM atm, GAIA::CH* pszNewFileName = GNIL, GAIA::NUM sNewFileNameMaxLen = GINVALID)
 			{
 				if(pFile == GNIL)
 				{
@@ -175,7 +175,7 @@ namespace GAIA
 					opentype |= GAIA::FSYS::File::OPEN_TYPE_CREATEALWAYS;
 					GAIA::X128 x128;
 					x128.uuid();
-					GAIA::TCH szTempFileName[GAIA::MAXPL];
+					GAIA::CH szTempFileName[GAIA::MAXPL];
 					GAIA::ALGO::gstrcpy(szTempFileName, g_gaia_appdocdir);
 					x128.tostring(szTempFileName + GAIA::ALGO::gstrlen(g_gaia_appdocdir));
 					GAIA::ALGO::gstrcat(szTempFileName, _T(".acc"));

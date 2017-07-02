@@ -30,87 +30,87 @@ namespace GAIA
 		class DirBase : public GAIA::Entity
 		{
 		public:
-			typedef GAIA::CTN::BasicTrieTree<GAIA::CTN::TString, GAIA::NM, GAIA::ALGO::ExtendGold<GAIA::NM> > __ResultTree;
+			typedef GAIA::CTN::BasicTrieTree<GAIA::CTN::AString, GAIA::NM, GAIA::ALGO::ExtendGold<GAIA::NM> > __ResultTree;
 
 		public:
 			/*!
 				@brief Get process's binary directory.
 			*/
-			virtual GAIA::GVOID GetBinaryDir(GAIA::CTN::TString& result) = 0;
+			virtual GAIA::GVOID GetBinaryDir(GAIA::CTN::AString& result) = 0;
 
 			/*!
 				@brief Set process's work directory.(current directory)
 			*/
-			virtual GAIA::BL SetWorkingDir(const GAIA::TCH* pszPath) = 0;
+			virtual GAIA::BL SetWorkingDir(const GAIA::CH* pszPath) = 0;
 
 			/*!
 				@brief Get process's work directory.(current directory)
 			*/
-			virtual GAIA::GVOID GetWorkingDir(GAIA::CTN::TString& result) = 0;
+			virtual GAIA::GVOID GetWorkingDir(GAIA::CTN::AString& result) = 0;
 
 			/*!
 				@brief Create a directory.
 			*/
-			virtual GAIA::BL Create(const GAIA::TCH* pszName, GAIA::BL bOverlapped) = 0;
+			virtual GAIA::BL Create(const GAIA::CH* pszName, GAIA::BL bOverlapped) = 0;
 
 			/*!
 				@brief Remove a directory.
 			*/
-			virtual GAIA::BL Remove(const GAIA::TCH* pszName, GAIA::BL bOverlapped) = 0;
+			virtual GAIA::BL Remove(const GAIA::CH* pszName, GAIA::BL bOverlapped) = 0;
 
 			/*!
 				@brief Copy directory.
 			*/
-			virtual GAIA::BL Copy(const GAIA::TCH* pszSrcName, const GAIA::TCH* pszDstName, GAIA::BL bOverlapped) = 0;
+			virtual GAIA::BL Copy(const GAIA::CH* pszSrcName, const GAIA::CH* pszDstName, GAIA::BL bOverlapped) = 0;
 
 			/*!
 				@brief Move directory.
 			*/
-			virtual GAIA::BL Move(const GAIA::TCH* pszSrcName, const GAIA::TCH* pszDstName) = 0;
+			virtual GAIA::BL Move(const GAIA::CH* pszSrcName, const GAIA::CH* pszDstName) = 0;
 
 			/*!
 				@brief Check the directory exist or not.
 			*/
-			virtual GAIA::BL Exist(const GAIA::TCH* pszName) = 0;
+			virtual GAIA::BL Exist(const GAIA::CH* pszName) = 0;
 
 			/*!
 				@brief Check a directory is empty or not.
 			 
 				@return If the directory is empty, return GAIA::True, or will return GAIA::False.
 			*/
-			virtual GAIA::BL Empty(const GAIA::TCH* pszName, GAIA::BL& bEmpty) = 0;
+			virtual GAIA::BL Empty(const GAIA::CH* pszName, GAIA::BL& bEmpty) = 0;
 
 			/*!
 				@brief Remove a file.
 			*/
-			virtual GAIA::BL RemoveFile(const GAIA::TCH* pszName) = 0;
+			virtual GAIA::BL RemoveFile(const GAIA::CH* pszName) = 0;
 
 			/*!
 				@brief Copy file.
 			*/
-			virtual GAIA::BL CopyFile(const GAIA::TCH* pszSrcName, const GAIA::TCH* pszDstName) = 0;
+			virtual GAIA::BL CopyFile(const GAIA::CH* pszSrcName, const GAIA::CH* pszDstName) = 0;
 
 			/*!
 				@brief Move file.
 			*/
-			virtual GAIA::BL MoveFile(const GAIA::TCH* pszSrcName, const GAIA::TCH* pszDstName) = 0;
+			virtual GAIA::BL MoveFile(const GAIA::CH* pszSrcName, const GAIA::CH* pszDstName) = 0;
 
 			/*!
 				@brief Check the file exist or not.
 			*/
-			virtual GAIA::BL ExistFile(const GAIA::TCH* pszName) = 0;
+			virtual GAIA::BL ExistFile(const GAIA::CH* pszName) = 0;
 
 			/*!
 				@brief Get file's information.
 			 
 				@see GAIA:FSYS::FileInfo.
 			*/
-			virtual GAIA::BL GetInfo(const GAIA::TCH* pszName, FileInfo& fi) = 0;
+			virtual GAIA::BL GetInfo(const GAIA::CH* pszName, FileInfo& fi) = 0;
 
 			/*!
 				@brief Begin search file directory.
 			*/
-			virtual GAIA::FSYS::FSFinderBase* Find(const GAIA::TCH* pszDirName) = 0;
+			virtual GAIA::FSYS::FSFinderBase* Find(const GAIA::CH* pszDirName) = 0;
 
 			/*!
 				@brief Find next file.
@@ -125,7 +125,7 @@ namespace GAIA
 			/*!
 				@brief Collect files in a directory.
 			*/
-			virtual GAIA::BL CollectFile(const GAIA::TCH* pszName, const GAIA::TCH* pszFilter, GAIA::BL bOverlapped, __ResultTree& treeResult) = 0;
+			virtual GAIA::BL CollectFile(const GAIA::CH* pszName, const GAIA::CH* pszFilter, GAIA::BL bOverlapped, __ResultTree& treeResult) = 0;
 
 		private:
 			/*!
