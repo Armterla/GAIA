@@ -1,4 +1,4 @@
-﻿#ifndef		__GAIA_SYS_CONFIG_H__
+#ifndef		__GAIA_SYS_CONFIG_H__
 #define		__GAIA_SYS_CONFIG_H__
 
 #define GINL inline
@@ -61,6 +61,12 @@
 #	else
 #		define GAIA_OS GAIA_OS_OSX
 #	endif
+#endif
+
+/* OS can't support features(TEMP USAGE). */
+#if GAIA_OS == GAIA_OS_IOS
+#	define __GAIA_NO_HEAP__
+#	define __GAIA_NO_DEBUG_MEMORYLEAK__
 #endif
 
 /* Simulator. */
