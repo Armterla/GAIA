@@ -345,7 +345,7 @@
 		1A4CE0371EB7810A007AFD08 /* deflate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = deflate.c; sourceTree = "<group>"; };
 		1A4CE0381EB7810A007AFD08 /* gaia_db_dblocal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gaia_db_dblocal.cpp; sourceTree = "<group>"; };
 		1A4CE0391EB7810A007AFD08 /* gaia_db_dbremote.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gaia_db_dbremote.cpp; sourceTree = "<group>"; };
-		1A4CE03A1EB7810A007AFD08 /* gaia_digit_diff.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gaia_digit_diff.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
+		1A4CE03A1EB7810A007AFD08 /* gaia_digit_diff.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gaia_digit_diff.cpp; sourceTree = "<group>"; };
 		1A4CE03B1EB7810A007AFD08 /* gaia_digit_regexp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gaia_digit_regexp.cpp; sourceTree = "<group>"; };
 		1A4CE03C1EB7810A007AFD08 /* gaia_digit_zip.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gaia_digit_zip.cpp; sourceTree = "<group>"; };
 		1A4CE03D1EB7810A007AFD08 /* gaia_doc_pdf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gaia_doc_pdf.cpp; sourceTree = "<group>"; };

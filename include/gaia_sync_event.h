@@ -39,8 +39,14 @@ namespace GAIA
 			{
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				::CloseHandle(m_hSem);
-			#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
-				dispatch_release(m_sem);
+			#elif GAIA_OS == GAIA_OS_OSX
+			#	if !__has_feature(objc_arc)
+					dispatch_release(m_sem);
+			#	endif
+			#elif GAIA_OS == GAIA_OS_IOS
+			#	if !__has_feature(objc_arc)
+					dispatch_release(m_sem);
+			#	endif
 			#else
 				pthread_mutex_destroy(&m_mutex);
 				pthread_cond_destroy(&m_cond);

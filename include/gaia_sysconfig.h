@@ -52,9 +52,32 @@
 #		define GAIA_OS GAIA_OS_WINDOWS
 #	elif defined(__linux__)
 #		define GAIA_OS GAIA_OS_LINUX
+#	elif defined(TARGET_OS_MAC)
+#		if TARGET_OS_OSX
+#			define GAIA_OS GAIA_OS_OSX
+#		elif TARGET_OS_IOS
+#			define GAIA_OS GAIA_OS_IOS
+#		endif
 #	else
 #		define GAIA_OS GAIA_OS_OSX
 #	endif
+#endif
+
+/* Simulator. */
+#define GAIA_SIMULATOR_DISABLE 0
+#define GAIA_SIMULATOR_ENABLE 1
+#if GAIA_OS_IOS
+#	if defined(TARGET_OS_SIMULATOR)
+#		if TARGET_OS_SIMULATOR
+#			define GAIA_SIMULATOR GAIA_SIMULATOR_ENABLE
+#		else
+#			define GAIA_SIMULATOR GAIA_SIMULATOR_DISABLE
+#		endif
+#	else
+#		define GAIA_SIMULATOR GAIA_SIMULATOR_DISABLE
+#	endif
+#else
+#	define GAIA_SIMULATOR GAIA_SIMULATOR_DISABLE
 #endif
 
 /* Compiler profile. */

@@ -69,7 +69,7 @@ namespace GAIA
 				m_offset = 0;
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				if(_fseeki64((FILE*)m_pFile, 0, SEEK_END) != 0)
-			#elif GAIA_OS == GAIA_OS_OSX
+			#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 				if(fseeko((FILE*)m_pFile, 0, SEEK_END) != 0)
 			#else
 				if(fseeko64((FILE*)m_pFile, 0, SEEK_END) != 0)
@@ -80,7 +80,7 @@ namespace GAIA
 				}
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				m_size = _ftelli64((FILE*)m_pFile);
-			#elif GAIA_OS == GAIA_OS_OSX
+			#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 				m_size = ftello((FILE*)m_pFile);
 			#else
 				m_size = ftello64((FILE*)m_pFile);
@@ -93,7 +93,7 @@ namespace GAIA
 				}
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				if(_fseeki64((FILE*)m_pFile, 0, SEEK_SET) != 0)
-			#elif GAIA_OS == GAIA_OS_OSX
+			#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 				if(fseeko((FILE*)m_pFile, 0, SEEK_SET) != 0)
 			#else
 				if(fseeko64((FILE*)m_pFile, 0, SEEK_SET) != 0)
@@ -141,7 +141,7 @@ namespace GAIA
 					#if GAIA_OS == GAIA_OS_WINDOWS
 						if(_chsize_s(fileno((FILE*)m_pFile), size) != 0)
 							return GAIA::False;
-					#elif GAIA_OS == GAIA_OS_OSX
+					#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 						if(ftruncate(fileno((FILE*)m_pFile), size) != 0)
 					#else
 						if(ftruncate64(fileno((FILE*)m_pFile), size) != 0)
@@ -153,7 +153,7 @@ namespace GAIA
 					{
 					#if GAIA_OS == GAIA_OS_WINDOWS
 						GAIA::FSYS::FileBase::__FileSizeType cur = _ftelli64((FILE*)m_pFile);
-					#elif GAIA_OS == GAIA_OS_OSX
+					#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 						GAIA::FSYS::FileBase::__FileSizeType cur = ftello((FILE*)m_pFile);
 					#else
 						GAIA::FSYS::FileBase::__FileSizeType cur = ftello64((FILE*)m_pFile);
@@ -163,7 +163,7 @@ namespace GAIA
 							return GAIA::False;
 					#if GAIA_OS == GAIA_OS_WINDOWS
 						if(_fseeki64((FILE*)m_pFile, size - 1, SEEK_SET) != 0)
-					#elif GAIA_OS == GAIA_OS_OSX
+					#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 						if(fseeko((FILE*)m_pFile, size - 1, SEEK_SET) != 0)
 					#else
 						if(fseeko64((FILE*)m_pFile, size - 1, SEEK_SET) != 0)
@@ -176,7 +176,7 @@ namespace GAIA
 							return GAIA::False;
 					#if GAIA_OS == GAIA_OS_WINDOWS
 						if(_fseeki64((FILE*)m_pFile, cur, SEEK_SET) != 0)
-					#elif GAIA_OS == GAIA_OS_OSX
+					#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 						if(fseeko((FILE*)m_pFile, cur, SEEK_SET) != 0)
 					#else
 						if(fseeko64((FILE*)m_pFile, cur, SEEK_SET) != 0)
@@ -247,7 +247,7 @@ namespace GAIA
 					return GAIA::True;
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				if(_fseeki64((FILE*)m_pFile, toffset, SEEK_SET) == 0)
-			#elif GAIA_OS == GAIA_OS_OSX
+			#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 				if(fseeko((FILE*)m_pFile, toffset, SEEK_SET) == 0)
 			#else
 				if(fseeko64((FILE*)m_pFile, toffset, SEEK_SET) == 0)

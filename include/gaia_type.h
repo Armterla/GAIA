@@ -302,7 +302,7 @@ namespace GAIA
 	{
 	public:
 	#if defined(GAIA_HEAP)
-	#	if GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_LINUX
+	#	if GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_LINUX
 			GAIA::GVOID* operator new(GAIA::UM size GAIA_NEW_INFO);
 			GAIA::GVOID* operator new[](GAIA::UM size GAIA_NEW_INFO);
 	#	else
@@ -905,7 +905,7 @@ extern GAIA::MSYS::HeapESG g_gaia_globalmsys;
 #endif
 
 #if defined(GAIA_HEAP)
-#	if GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_LINUX
+#	if GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_LINUX
 		extern GAIA::GVOID* operator new(GAIA::UM size GAIA_NEW_INFO);
 		extern GAIA::GVOID* operator new[](GAIA::UM size GAIA_NEW_INFO);
 #	else
