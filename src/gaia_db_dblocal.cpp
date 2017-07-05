@@ -6,6 +6,7 @@
 
 #include <gaia_type.h>
 #include <gaia_assert.h>
+#include <gaia_sync_lockfree.h>
 #include <gaia_ctn_string.h>
 #include <gaia_ctn_charsstring.h>
 #include <gaia_db_dblocal.h>
@@ -74,7 +75,7 @@ namespace GAIA
 			GAIA::CTN::AString strDBName;
 			GAIA::DB::DB_SYNC_MODE syncmode;
 			GAIA::NUM sCacheSize;
-			GAIA::SYNC::Lock lrTransaction;
+			GAIA::SYNC::LockFree lrTransaction;
 			GAIA::N64 nTransactionRefCount;
 			GAIA::NUM sTransactionMethod;
 		};
