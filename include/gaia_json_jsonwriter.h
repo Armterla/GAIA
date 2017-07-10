@@ -85,6 +85,14 @@ namespace GAIA
 					If not call SetBuffer with a buffer pointer, will return GNIL, and parameter size be filled by 0.
 			*/
 			GINL GAIA::GVOID* GetBuffer(_SizeType& size) const{size = m_size; return m_pFront;}
+			
+			/*!
+			 	@brief Get the buffer which used for JsonWriter write to.
+			 
+			 	@return Return the buffer which had be set.
+			 		If not call SetBuffer with a buffer pointer, will return GNIL.
+			*/
+			GINL const GAIA::GVOID* GetBuffer() const{return m_pFront;}
 
 			/*!
 				@brief Get the buffer's size in bytes which had be set to current JsonWriter.

@@ -88,6 +88,14 @@ namespace GAIA
 			GINL const GAIA::GVOID* GetBuffer(_SizeType& size) const{size = m_size; return m_pFront;}
 
 			/*!
+			 	@brief Get the buffer which used for XmlReader read from.
+			 
+			 	@return Return the buffer which had be set.
+			 		If not call SetBuffer with a buffer pointer, will return GNIL.
+			*/
+			GINL const GAIA::GVOID* GetBuffer() const{return m_pFront;}
+			
+			/*!
 				@brief Get the buffer's size in bytes which had be set to current XmlReader.
 
 				@return Return the buffer's size in bytes.
