@@ -626,6 +626,43 @@ namespace GAIA
 				GAST(nodenamelen != 0);
 				m_pCursor = pNext;
 			}
+			
+			/*!
+				@brief Try to read a name node or a value node.
+
+				@param nodenamelen [out] Used for saving the value node's name's length in characters.
+
+				@param pValueIsString [out] Used for saving the value is a string or not.\n
+					If node is not a value node, this parameter is ignored.\n
+					This parameter could be GNIL means ignored.\n
+
+				@return Return the value node's name without '\0'.
+
+				@exception GAIA::ECT::EctIllegal
+					If can't read a value node's name, throw it.
+
+				@exception GAIA::ECT::EctDataError
+					If the source json's format exist error, and can't read, throw it.
+			*/
+			GINL const _DataType* ReadValueEx(_SizeType& nodenamelen, GAIA::BL* pValueIsString = GNIL)
+			{
+				GAIA::JSON::JSON_NODE nt;
+				const _DataType* pNext;
+				const _DataType* pRet = this->Peek(nt, nodenamelen, &pNext, pValueIsString);
+				if(pRet == GNIL)
+					GTHROW_RET(Illegal, GNIL);
+				switch(nt)
+				{
+				case GAIA::JSON::JSON_NODE_NAME:
+					GTHROW_RET(Illegal, GNIL);
+				case GAIA::JSON::JSON_NODE_VALUE:
+					break;
+				default:
+					GTHROW_RET(Illegal, GNIL);
+				}
+				m_pCursor = pNext;
+				return pRet;
+			}
 
 			/*!
 				@brief Read a value node's name.
