@@ -578,6 +578,62 @@ namespace GAIA
 				}
 				return iter;
 			}
+			template<typename _ParamKeyType> it upper_equal(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k))
+			{
+				it iter;
+				if(!this->empty())
+				{
+					_DataType* p = GAIA::ALGO::upper_equal(this->fptr(), this->bptr(), k, cmpor);
+					if(p != GNIL)
+					{
+						iter.m_pContainer = this;
+						iter.m_index = GSCAST(_SizeType)(p - this->fptr());
+					}
+				}
+				return iter;
+			}
+			template<typename _ParamKeyType> const_it upper_equal(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k)) const
+			{
+				const_it iter;
+				if(!this->empty())
+				{
+					const _DataType* p = GAIA::ALGO::upper_equal(this->fptr(), this->bptr(), k, cmpor);
+					if(p != GNIL)
+					{
+						iter.m_pContainer = this;
+						iter.m_index = GSCAST(_SizeType)(p - this->fptr());
+					}
+				}
+				return iter;
+			}
+			template<typename _ParamKeyType> it lower_equal(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k))
+			{
+				it iter;
+				if(!this->empty())
+				{
+					_DataType* p = GAIA::ALGO::lower_equal(this->fptr(), this->bptr(), k, cmpor);
+					if(p != GNIL)
+					{
+						iter.m_pContainer = this;
+						iter.m_index = GSCAST(_SizeType)(p - this->fptr());
+					}
+				}
+				return iter;
+			}
+			template<typename _ParamKeyType> const_it lower_equal(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k)) const
+			{
+				const_it iter;
+				if(!this->empty())
+				{
+					const _DataType* p = GAIA::ALGO::lower_equal(this->fptr(), this->bptr(), k, cmpor);
+					if(p != GNIL)
+					{
+						iter.m_pContainer = this;
+						iter.m_index = GSCAST(_SizeType)(p - this->fptr());
+					}
+				}
+				return iter;
+			}
 			GINL it frontit()
 			{
 				it ret;

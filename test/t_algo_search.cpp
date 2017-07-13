@@ -159,6 +159,33 @@ namespace TEST
 				TERROR;
 			if(arrvecNode.const_binary_searchit(x, NodeCmpor) - arrvecNode.const_frontit() != x)
 				TERROR;
+			
+			if(listNode.lower_equal(x, NodeCmpor).empty())
+				TERROR;
+			if(listNode.upper_equal(x, NodeCmpor).empty())
+				TERROR;
+			if((*(const GAIA::CTN::Vector<Node>*)&listNode).lower_equal(x, NodeCmpor).empty())
+				TERROR;
+			if((*(const GAIA::CTN::Vector<Node>*)&listNode).upper_equal(x, NodeCmpor).empty())
+				TERROR;
+			
+			if(arrNode.lower_equal(x, NodeCmpor).empty())
+				TERROR;
+			if(arrNode.upper_equal(x, NodeCmpor).empty())
+				TERROR;
+			if((*(const GAIA::CTN::Array<Node, SAMPLE_COUNT>*)&arrNode).lower_equal(x, NodeCmpor).empty())
+				TERROR;
+			if((*(const GAIA::CTN::Array<Node, SAMPLE_COUNT>*)&arrNode).upper_equal(x, NodeCmpor).empty())
+				TERROR;
+			
+			if(arrvecNode.lower_equal(x, NodeCmpor).empty())
+				TERROR;
+			if(arrvecNode.upper_equal(x, NodeCmpor).empty())
+				TERROR;
+			if((*(const GAIA::CTN::ArrayVector<Node, SAMPLE_COUNT>*)&arrvecNode).lower_equal(x, NodeCmpor).empty())
+				TERROR;
+			if((*(const GAIA::CTN::ArrayVector<Node, SAMPLE_COUNT>*)&arrvecNode).upper_equal(x, NodeCmpor).empty())
+				TERROR;
 		}
 	}
 }

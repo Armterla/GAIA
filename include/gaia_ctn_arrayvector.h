@@ -756,6 +756,74 @@ namespace GAIA
 				}
 				return ret;
 			}
+			template<typename _ParamKeyType> it upper_equal(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k))
+			{
+				it ret;
+				if(m_vec.capacity() != 0)
+				{
+					typename __VectorType::it ittemp = m_vec.upper_equal(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_vec.frontit();
+				}
+				else
+				{
+					typename __ArrayType::it ittemp = m_arr.upper_equal(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_arr.frontit();
+				}
+				return ret;
+			}
+			template<typename _ParamKeyType> const_it upper_equal(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k)) const
+			{
+				const_it ret;
+				if(m_vec.capacity() != 0)
+				{
+					typename __VectorType::const_it ittemp = m_vec.upper_equal(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_vec.const_frontit();
+				}
+				else
+				{
+					typename __ArrayType::const_it ittemp = m_arr.upper_equal(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_arr.const_frontit();
+				}
+				return ret;
+			}
+			template<typename _ParamKeyType> it lower_equal(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k))
+			{
+				it ret;
+				if(m_vec.capacity() != 0)
+				{
+					typename __VectorType::it ittemp = m_vec.lower_equal(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_vec.frontit();
+				}
+				else
+				{
+					typename __ArrayType::it ittemp = m_arr.lower_equal(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_arr.frontit();
+				}
+				return ret;
+			}
+			template<typename _ParamKeyType> const_it lower_equal(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k)) const
+			{
+				const_it ret;
+				if(m_vec.capacity() != 0)
+				{
+					typename __VectorType::const_it ittemp = m_vec.lower_equal(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_vec.const_frontit();
+				}
+				else
+				{
+					typename __ArrayType::const_it ittemp = m_arr.lower_equal(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_arr.const_frontit();
+				}
+				return ret;
+			}
 			GINL __MyType& operator += (const __MyType& src)
 			{
 				this->reserve_keep(this->size() + src.size());
