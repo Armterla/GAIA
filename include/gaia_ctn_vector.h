@@ -517,6 +517,15 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				return GSCAST(_SizeType)(pFinded - this->fptr());
 			}
+			template<typename _ParamKeyType> _SizeType binary_search(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k)) const
+			{
+				if(this->size() <= 0)
+					return (_SizeType)GINVALID;
+				const _DataType* pFinded = GAIA::ALGO::gbinary_search(this->fptr(), this->bptr(), k, cmpor);
+				if(pFinded == GNIL)
+					return (_SizeType)GINVALID;
+				return GSCAST(_SizeType)(pFinded - this->fptr());
+			}
 			GINL it binary_searchit(const _DataType& t)
 			{
 				it iter;
@@ -527,10 +536,30 @@ namespace GAIA
 				iter.m_index = findedidx;
 				return iter;
 			}
+			template<typename _ParamKeyType> it binary_searchit(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k))
+			{
+				it iter;
+				_SizeType findedidx = this->binary_search(k, cmpor);
+				if(findedidx == GINVALID)
+					return iter;
+				iter.m_pContainer = this;
+				iter.m_index = findedidx;
+				return iter;
+			}
 			GINL const_it const_binary_searchit(const _DataType& t) const
 			{
 				const_it iter;
 				_SizeType findedidx = this->binary_search(t);
+				if(findedidx == GINVALID)
+					return iter;
+				iter.m_pContainer = this;
+				iter.m_index = findedidx;
+				return iter;
+			}
+			template<typename _ParamKeyType> const_it const_binary_searchit(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k)) const
+			{
+				const_it iter;
+				_SizeType findedidx = this->binary_search(k, cmpor);
 				if(findedidx == GINVALID)
 					return iter;
 				iter.m_pContainer = this;

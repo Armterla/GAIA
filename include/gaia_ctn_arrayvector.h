@@ -565,6 +565,13 @@ namespace GAIA
 				else
 					return m_arr.binary_search(t);
 			}
+			template<typename _ParamKeyType> _SizeType binary_search(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k)) const
+			{
+				if(m_vec.capacity() != 0)
+					return m_vec.binary_search(k, cmpor);
+				else
+					return m_arr.binary_search(k, cmpor);
+			}
 			GINL it binary_searchit(const _DataType& t)
 			{
 				it ret;
@@ -582,6 +589,23 @@ namespace GAIA
 				}
 				return ret;
 			}
+			template<typename _ParamKeyType> it binary_searchit(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k))
+			{
+				it ret;
+				if(m_vec.capacity() != 0)
+				{
+					typename __VectorType::it ittemp = m_vec.binary_searchit(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_vec.frontit();
+				}
+				else
+				{
+					typename __ArrayType::it ittemp = m_arr.binary_searchit(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_arr.frontit();
+				}
+				return ret;
+			}
 			GINL const_it const_binary_searchit(const _DataType& t) const
 			{
 				const_it ret;
@@ -594,6 +618,23 @@ namespace GAIA
 				else
 				{
 					typename __ArrayType::const_it ittemp = m_arr.const_binary_searchit(t);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_arr.const_frontit();
+				}
+				return ret;
+			}
+			template<typename _ParamKeyType> const_it const_binary_searchit(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k)) const
+			{
+				const_it ret;
+				if(m_vec.capacity() != 0)
+				{
+					typename __VectorType::const_it ittemp = m_vec.const_binary_searchit(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_vec.const_frontit();
+				}
+				else
+				{
+					typename __ArrayType::const_it ittemp = m_arr.const_binary_searchit(k, cmpor);
 					ret.m_pContainer = this;
 					ret.m_index = ittemp - m_arr.const_frontit();
 				}
