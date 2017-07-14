@@ -5,8 +5,104 @@
 
 namespace TEST
 {
+	#define DERIVED_METHOD public virtual
+	class BaseBase : DERIVED_METHOD GAIA::Base
+	{
+	public:
+		virtual GAIA::N32 func(){return m_nbase;}
+		const GAIA::GVOID* GetThisPtr() const{return this;}
+	public:
+		GAIA::N32 m_nbase;
+	};
+	class Base1 : DERIVED_METHOD BaseBase
+	{
+	public:
+		virtual GAIA::N32 func() const{return m_n1;}
+		const GAIA::GVOID* GetThisPtr() const{return this;}
+	public:
+		GAIA::N32 m_n1;
+	};
+	class Base2 : DERIVED_METHOD BaseBase
+	{
+	public:
+		virtual GAIA::N32 func() const{return m_n2;}
+		const GAIA::GVOID* GetThisPtr() const{return this;}
+	public:
+		GAIA::N32 m_n2;
+	};
+	class BaseExtend : DERIVED_METHOD Base1, DERIVED_METHOD Base2
+	{
+	public:
+		virtual GAIA::N32 func() const{return m_v;}
+		const GAIA::GVOID* GetThisPtr() const{return this;}
+	public:
+		GAIA::NUM m_v;
+	};
+	
 	extern GAIA::GVOID tp_compiler(GAIA::LOG::Log& logobj)
 	{
+		BaseExtend n;
+		BaseExtend* pn = &n;
+		Base1* p1 = pn;
+		Base2* p2 = pn;
+		BaseBase* pbase = pn;
+		GAIA::GVOID* pvoid = pn;
+		if(((GAIA::N64)p1) == ((GAIA::N64)pn))
+		{
+			g_gaia_stdstream << "Left = " << (GAIA::N64)p1 << ", Right = " << (GAIA::N64)pn << "\n";
+			TERROR;
+		}
+		if(((GAIA::N64)p2) == ((GAIA::N64)pn))
+		{
+			g_gaia_stdstream << "Left = " << (GAIA::N64)p2 << ", Right = " << (GAIA::N64)pn << "\n";
+			TERROR;
+		}
+		if(((GAIA::N64)pbase) == ((GAIA::N64)pn))
+		{
+			g_gaia_stdstream << "Left = " << (GAIA::N64)pbase << ", Right = " << (GAIA::N64)pn << "\n";
+			TERROR;
+		}
+		if(((GAIA::N64)pvoid) != ((GAIA::N64)pn))
+		{
+			g_gaia_stdstream << "Left = " << (GAIA::N64)pvoid << ", Right = " << (GAIA::N64)pn << "\n";
+			TERROR;
+		}
+		if(((GAIA::N64)p1) != ((GAIA::N64)p1->GetThisPtr()))
+		{
+			g_gaia_stdstream << "Left = " << (GAIA::N64)p1 << ", Right = " << (GAIA::N64)pn << "\n";
+			TERROR;
+		}
+		if(((GAIA::N64)p2) != ((GAIA::N64)p2->GetThisPtr()))
+		{
+			g_gaia_stdstream << "Left = " << (GAIA::N64)p2 << ", Right = " << (GAIA::N64)pn << "\n";
+			TERROR;
+		}
+		if(((GAIA::N64)pbase) != ((GAIA::N64)pbase->GetThisPtr()))
+		{
+			g_gaia_stdstream << "Left = " << (GAIA::N64)pbase << ", Right = " << (GAIA::N64)pn << "\n";
+			TERROR;
+		}
+		if(((GAIA::N64)pn) != ((GAIA::N64)pn->GetThisPtr()))
+		{
+			g_gaia_stdstream << "Left = " << (GAIA::N64)pvoid << ", Right = " << (GAIA::N64)pn << "\n";
+			TERROR;
+		}
+		if(n.GetThisPtr() == n.Base1::GetThisPtr())
+		{
+			g_gaia_stdstream << "Left = " << (GAIA::N64)n.GetThisPtr() << ", Right = " << (GAIA::N64)n.Base1::GetThisPtr() << "\n";
+			TERROR;
+		}
+		if(n.GetThisPtr() == n.Base2::GetThisPtr())
+		{
+			g_gaia_stdstream << "Left = " << (GAIA::N64)n.GetThisPtr() << ", Right = " << (GAIA::N64)n.Base2::GetThisPtr() << "\n";
+			TERROR;
+		}
+		if(n.GetThisPtr() == n.BaseBase::GetThisPtr())
+		{
+			g_gaia_stdstream << "Left = " << (GAIA::N64)n.GetThisPtr() << ", Right = " << (GAIA::N64)n.BaseBase::GetThisPtr() << "\n";
+			TERROR;
+		}
+		
 		GAIA::STREAM::StringStream s;
 
 		s << "[TYPE SIZE]" << GAIA_FILELINEBREAK_RN;
