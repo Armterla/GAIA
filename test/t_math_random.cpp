@@ -9,13 +9,13 @@ namespace TEST
 
 		GAIA::CTN::Vector<GAIA::NUM> listRandom;
 
-		GAIA::MATH::xrandom_seed(0);
+		GAIA::MATH::grand_seed(0);
 		for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
-			listRandom.push_back(GAIA::MATH::xrandom());
-		GAIA::MATH::xrandom_seed(0);
+			listRandom.push_back(GAIA::MATH::grand());
+		GAIA::MATH::grand_seed(0);
 		for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
 		{
-			if(GAIA::MATH::xrandom() != listRandom[x])
+			if(GAIA::MATH::grand() != listRandom[x])
 			{
 				TERROR;
 				break;

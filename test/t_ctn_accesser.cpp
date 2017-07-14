@@ -131,7 +131,7 @@ namespace TEST
 			//	acc.expandable(GAIA::True);
 			//	acc.bindmem(GNIL, 0, __AccType::ACCESS_TYPE_READ | __AccType::ACCESS_TYPE_WRITE);
 			//	for(GAIA::NUM x = 0; x < 100; ++x)
-			//		acc[x] = GAIA::MATH::xrandom();
+			//		acc[x] = GAIA::MATH::grand();
 			//	GAIA::ALGO::bsort(acc, acc + 99);
 			//	if(!GAIA::ALGO::issorted(acc, acc + 99))
 			//	{
@@ -395,7 +395,7 @@ namespace TEST
 			//	GAIA::TCH szNewFileName[GAIA::MAXPL];
 			//	TAST(acc.bindfile(GNIL, __AccType::ACCESS_TYPE_READ | __AccType::ACCESS_TYPE_WRITE, szNewFileName, sizeof(szNewFileName)));
 			//	for(GAIA::NUM x = 0; x < 100; ++x)
-			//		acc[x] = GAIA::MATH::xrandom();
+			//		acc[x] = GAIA::MATH::grand();
 			//	GAIA::ALGO::bsort(acc, acc + 99);
 			//	if(!GAIA::ALGO::issorted(acc, acc + 99))
 			//		TERROR;

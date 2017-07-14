@@ -3,28 +3,28 @@
 
 namespace TEST
 {
-	class BaseBase : public virtual GAIA::Base
+	class BaseBaseForSort : public virtual GAIA::Base
 	{
 	public:
 		virtual GAIA::N32 func(){return m_nbase;}
 	public:
 		GAIA::N32 m_nbase;
 	};
-	class Base1 : public virtual BaseBase
+	class Base1ForSort : public virtual BaseBaseForSort
 	{
 	public:
 		virtual GAIA::N32 func() const{return m_n1;}
 	public:
 		GAIA::N32 m_n1;
 	};
-	class Base2 : public virtual BaseBase
+	class Base2ForSort : public virtual BaseBaseForSort
 	{
 	public:
 		virtual GAIA::N32 func() const{return m_n2;}
 	public:
 		GAIA::N32 m_n2;
 	};
-	class Node : public virtual Base1, public virtual Base2
+	class BaseExtendForSort : public virtual Base1ForSort, public virtual Base2ForSort
 	{
 	public:
 		virtual GAIA::N32 func() const{return m_v;}
@@ -33,8 +33,8 @@ namespace TEST
 	};
 	GINL GAIA::N32 CmporForNode(const GAIA::GVOID* p1, const GAIA::GVOID* p2)
 	{
-		const Node& t1 = *(Node*)p1;
-		const Node& t2 = *(Node*)p2;
+		const BaseExtendForSort& t1 = *(BaseExtendForSort*)p1;
+		const BaseExtendForSort& t2 = *(BaseExtendForSort*)p2;
 		if(t1.m_v < t2.m_v)
 			return -1;
 		else if(t1.m_v > t2.m_v)
@@ -80,7 +80,7 @@ namespace TEST
 		
 		// With comparator test.
 		{
-			GAIA::CTN::Vector<Node> listNode;
+			GAIA::CTN::Vector<BaseExtendForSort> listNode;
 			listNode.resize(1000);
 			for(GAIA::NUM x = 0; x < listNode.size(); ++x)
 				listNode[x].m_v = x;

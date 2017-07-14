@@ -6,7 +6,7 @@
 namespace TEST
 {
 	#define DERIVED_METHOD public virtual
-	class BaseBase : DERIVED_METHOD GAIA::Base
+	class BaseBaseForVirtualDerived : DERIVED_METHOD GAIA::Base
 	{
 	public:
 		virtual GAIA::N32 func(){return m_nbase;}
@@ -14,7 +14,7 @@ namespace TEST
 	public:
 		GAIA::N32 m_nbase;
 	};
-	class Base1 : DERIVED_METHOD BaseBase
+	class Base1ForVirtualDerived : DERIVED_METHOD BaseBaseForVirtualDerived
 	{
 	public:
 		virtual GAIA::N32 func() const{return m_n1;}
@@ -22,7 +22,7 @@ namespace TEST
 	public:
 		GAIA::N32 m_n1;
 	};
-	class Base2 : DERIVED_METHOD BaseBase
+	class Base2ForVirtualDerived : DERIVED_METHOD BaseBaseForVirtualDerived
 	{
 	public:
 		virtual GAIA::N32 func() const{return m_n2;}
@@ -30,7 +30,7 @@ namespace TEST
 	public:
 		GAIA::N32 m_n2;
 	};
-	class BaseExtend : DERIVED_METHOD Base1, DERIVED_METHOD Base2
+	class BaseExtendForVirtualDerived : DERIVED_METHOD Base1ForVirtualDerived, DERIVED_METHOD Base2ForVirtualDerived
 	{
 	public:
 		virtual GAIA::N32 func() const{return m_v;}
@@ -41,11 +41,11 @@ namespace TEST
 	
 	extern GAIA::GVOID tp_compiler(GAIA::LOG::Log& logobj)
 	{
-		BaseExtend n;
-		BaseExtend* pn = &n;
-		Base1* p1 = pn;
-		Base2* p2 = pn;
-		BaseBase* pbase = pn;
+		BaseExtendForVirtualDerived n;
+		BaseExtendForVirtualDerived* pn = &n;
+		Base1ForVirtualDerived* p1 = pn;
+		Base2ForVirtualDerived* p2 = pn;
+		BaseBaseForVirtualDerived* pbase = pn;
 		GAIA::GVOID* pvoid = pn;
 		if(((GAIA::N64)p1) == ((GAIA::N64)pn))
 		{
@@ -87,19 +87,19 @@ namespace TEST
 			g_gaia_stdstream << "Left = " << (GAIA::N64)pvoid << ", Right = " << (GAIA::N64)pn << "\n";
 			TERROR;
 		}
-		if(n.GetThisPtr() == n.Base1::GetThisPtr())
+		if(n.GetThisPtr() == n.Base1ForVirtualDerived::GetThisPtr())
 		{
-			g_gaia_stdstream << "Left = " << (GAIA::N64)n.GetThisPtr() << ", Right = " << (GAIA::N64)n.Base1::GetThisPtr() << "\n";
+			g_gaia_stdstream << "Left = " << (GAIA::N64)n.GetThisPtr() << ", Right = " << (GAIA::N64)n.Base1ForVirtualDerived::GetThisPtr() << "\n";
 			TERROR;
 		}
-		if(n.GetThisPtr() == n.Base2::GetThisPtr())
+		if(n.GetThisPtr() == n.Base2ForVirtualDerived::GetThisPtr())
 		{
-			g_gaia_stdstream << "Left = " << (GAIA::N64)n.GetThisPtr() << ", Right = " << (GAIA::N64)n.Base2::GetThisPtr() << "\n";
+			g_gaia_stdstream << "Left = " << (GAIA::N64)n.GetThisPtr() << ", Right = " << (GAIA::N64)n.Base2ForVirtualDerived::GetThisPtr() << "\n";
 			TERROR;
 		}
-		if(n.GetThisPtr() == n.BaseBase::GetThisPtr())
+		if(n.GetThisPtr() == n.BaseBaseForVirtualDerived::GetThisPtr())
 		{
-			g_gaia_stdstream << "Left = " << (GAIA::N64)n.GetThisPtr() << ", Right = " << (GAIA::N64)n.BaseBase::GetThisPtr() << "\n";
+			g_gaia_stdstream << "Left = " << (GAIA::N64)n.GetThisPtr() << ", Right = " << (GAIA::N64)n.BaseBaseForVirtualDerived::GetThisPtr() << "\n";
 			TERROR;
 		}
 		

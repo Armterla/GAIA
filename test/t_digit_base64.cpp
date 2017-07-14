@@ -36,11 +36,11 @@ namespace TEST
 
 		for(GAIA::N32 x = 0; x < 10000; ++x)
 		{
-			GAIA::NUM sSrcLen = GAIA::MATH::xrandom();
+			GAIA::NUM sSrcLen = GAIA::MATH::grand();
 			sSrcLen %= 256;
 			sSrcLen++;
 			for(GAIA::N32 y = 0; y < sSrcLen; ++y)
-				src[y] = (GAIA::U8)(GAIA::MATH::xrandom() % 26) + 'a';
+				src[y] = (GAIA::U8)(GAIA::MATH::grand() % 26) + 'a';
 			src[sSrcLen] = '\0';
 			nResEncode = GAIA::DIGIT::base64encode(dst, (GAIA::N32)sizeof(dst), src, sSrcLen);
 			dst[nResEncode] = '\0';
