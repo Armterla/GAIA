@@ -409,6 +409,32 @@ namespace GAIA
 				@brief XmlWriter::Write's overwrite member function for write GAIA::F64 type.
 			*/
 			GAIA::GVOID Write(GAIA::XML::XML_NODE nt, const GAIA::F64& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp);}
+			
+			/*!
+			 	@brief Write a sub xml string to current xml.
+			 
+				@exception GAIA::ECT::InvalidParam
+					If parameter p is NULL or "", throw it.
+			 
+			 	@exception GAIA::ECT::InvalidParam
+			 		If parameter size is not GINVALID, and it below equal zero, throw it.
+			 
+			 	@exception GAIA::ECT::BufNotEnough
+			 		If the buffer is not enough for write, throw it
+			 
+			 	@remarks
+			 		Becareful, this method could make the xml format broken. 
+			*/
+			template<typename _ParamDataType> GAIA::GVOID WriteSubJson(const _ParamDataType* p, _SizeType size = GINVALID)
+			{
+				if(GAIA::ALGO::gstremp(p))
+					GTHROW(InvalidParam);
+				if(size == GINVALID)
+					size = GAIA::ALGO::gstrlen(p);
+				if(size <= 0)
+					GTHROW(InvalidParam);
+				this->write(p, size);
+			}
 
 			/*!
 				@brief Another method to call XmlWriter::Write member function will simpler form.
