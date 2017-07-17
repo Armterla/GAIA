@@ -231,7 +231,7 @@ namespace GAIA
 			if(pBegin == pEnd)
 			{
 				GAIA::N32 nCmp = cmpor(pBegin, &key);
-				if(nCmp == 0)
+				if(nCmp >= 0)
 					return pBegin;
 				return GNIL;
 			}
