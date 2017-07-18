@@ -133,6 +133,76 @@ namespace GAIA
 			}
 			return GNIL;
 		}
+		template<typename _DataType1, typename _SizeType, typename _DataType2> _DataType1 gstrrch(_DataType1 p, _SizeType size, const _DataType2& c)
+		{
+			if(size <= 0)
+				return GNIL;
+			size--;
+			for(;;)
+			{
+				if(p[size] == c)
+					return p + size;
+				if(size == 0)
+					break;
+				size--;
+			}
+			return GNIL;
+		}
+		template<typename _DataType1, typename _SizeType, typename _DataType2> _DataType1 gstrirch(_DataType1 p, _SizeType size, const _DataType2& c)
+		{
+			if(size <= 0)
+				return GNIL;
+			size--;
+			for(;;)
+			{
+				if(GAIA::ALGO::tolower(p[size]) == GAIA::ALGO::tolower(c))
+					return p + size;
+				if(size == 0)
+					break;
+				size--;
+			}
+			return GNIL;
+		}
+		template<typename _DataType1, typename _SizeType, typename _DataType2> _DataType1 gstrrchs(_DataType1 p, _SizeType size, _DataType2 key)
+		{
+			if(size <= 0)
+				return GNIL;
+			size--;
+			for(;;)
+			{
+				_DataType2 k = key;
+				while(*k != '\0')
+				{
+					if(p[size] == *k)
+						return p + size;
+					++k;
+				}
+				if(size == 0)
+					break;
+				size--;
+			}
+			return GNIL;
+		}
+		template<typename _DataType1, typename _SizeType, typename _DataType2> _DataType1 gstrirchs(_DataType1 p, _SizeType size, _DataType2 key)
+		{
+			if(size <= 0)
+				return GNIL;
+			size--;
+			for(;;)
+			{
+				_DataType2 k = key;
+				while(*k != '\0')
+				{
+					if(GAIA::ALGO::tolower(p[size]) == GAIA::ALGO::tolower(*k))
+						return p + size;
+					++k;
+				}
+				if(size == 0)
+					break;
+				size--;
+			}
+			return GNIL;
+		}
 		template<typename _DataType1, typename _DataType2> GAIA::BL gstrstartwith(_DataType1 p1, _DataType2 p2)
 		{
 			while(*p2 != '\0')
@@ -504,6 +574,42 @@ namespace GAIA
 				if(p - p2 == p2size)
 					return p1;
 				++p1;
+			}
+			return GNIL;
+		}
+		template<typename _DataType1, typename _SizeType, typename _DataType2>
+		_DataType1 gstrrstr(_DataType1 p1, _DataType2 p2, _SizeType size)
+		{
+			GAST(!!p1);
+			GAST(!!p2);
+			GAST(size >= 0);
+			_SizeType p2size = GAIA::ALGO::gstrlen(p2);
+			if(p2size > size)
+				return GNIL;
+			_DataType1 p = p1 + size - p2size;
+			while(p >= p1)
+			{
+				if(GAIA::ALGO::gstrcmp(p, p2, p2size) == 0)
+					return p;
+				--p;
+			}
+			return GNIL;
+		}
+		template<typename _DataType1, typename _SizeType, typename _DataType2>
+		_DataType1 gstrirstr(_DataType1 p1, _DataType2 p2, _SizeType size)
+		{
+			GAST(!!p1);
+			GAST(!!p2);
+			GAST(size >= 0);
+			_SizeType p2size = GAIA::ALGO::gstrlen(p2);
+			if(p2size > size)
+				return GNIL;
+			_DataType1 p = p1 + size - p2size;
+			while(p >= p1)
+			{
+				if(GAIA::ALGO::gstricmp(p, p2, p2size) == 0)
+					return p;
+				--p;
 			}
 			return GNIL;
 		}
