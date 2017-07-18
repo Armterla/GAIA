@@ -615,7 +615,7 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				else if(index == GINVALID)
 					index = this->size() - 1;
-				const _DataType* pFinded = GAIA::ALGO::gstrrch(m_pFront + index, this->size() - index, t);
+				const _DataType* pFinded = GAIA::ALGO::gstrrch(m_pFront, index + 1, t);
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
@@ -631,7 +631,7 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				else if(index == GINVALID)
 					index = this->size() - 1;
-				const _DataType* pFinded = GAIA::ALGO::gstrrstr(m_pFront + index, p, this->size());
+				const _DataType* pFinded = GAIA::ALGO::gstrrstr(m_pFront, p, index + 1);
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
@@ -647,7 +647,7 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				else if(index == GINVALID)
 					index = this->size() - 1;
-				const _DataType* pFinded = GAIA::ALGO::gstrrstr(m_pFront + index, src.m_pFront, this->size());
+				const _DataType* pFinded = GAIA::ALGO::gstrrstr(m_pFront, src.m_pFront, index + 1);
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
@@ -711,7 +711,7 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				else if(index == GINVALID)
 					index = this->size() - 1;
-				const _DataType* pFinded = GAIA::ALGO::gstrirch(m_pFront + index, this->size() - index, t);
+				const _DataType* pFinded = GAIA::ALGO::gstrirch(m_pFront, index + 1, t);
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
@@ -727,7 +727,7 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				else if(index == GINVALID)
 					index = this->size() - 1;
-				const _DataType* pFinded = GAIA::ALGO::gstrirstr(m_pFront + index, p, this->size());
+				const _DataType* pFinded = GAIA::ALGO::gstrirstr(m_pFront, p, index + 1);
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
@@ -743,7 +743,7 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				else if(index == GINVALID)
 					index = this->size() - 1;
-				const _DataType* pFinded = GAIA::ALGO::gstrirstr(m_pFront + index, src.m_pFront, this->size());
+				const _DataType* pFinded = GAIA::ALGO::gstrirstr(m_pFront, src.m_pFront, index + 1);
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
