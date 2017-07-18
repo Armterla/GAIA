@@ -545,6 +545,32 @@ namespace TEST
 			TERROR;
 		if(str.rfind((__StrType)_T("rr"), str.size() - 1) != GINVALID)
 			TERROR;
+		if(str.rfindi('L', str.size() - 1) != 18)
+			TERROR;
+		if(str.rfindi('D', str.size() - 1) != 19)
+			TERROR;
+		if(str.rfindi('h', str.size() - 1) != 10)
+			TERROR;
+		if(str.rfindi('X', str.size() - 1) != GINVALID)
+			TERROR;
+		if(str.rfindi(_T("hello"), str.size() - 1) != 10)
+			TERROR;
+		if(str.rfindi(_T("Ld"), str.size() - 1) != 18)
+			TERROR;
+		if(str.rfindi(_T("helloworldH"), str.size() - 1) != 0)
+			TERROR;
+		if(str.rfindi(_T("RR"), str.size() - 1) != GINVALID)
+			TERROR;
+		if(str.rfindi((__StrType)_T("R"), str.size() - 1) != 17)
+			TERROR;
+		if(str.rfindi((__StrType)_T("Rl"), str.size() - 1) != 17)
+			TERROR;
+		if(str.rfindi((__StrType)_T("lD"), str.size() - 1) != 18)
+			TERROR;
+		if(str.rfindi((__StrType)_T("HelloWorldH"), str.size() - 1) != 0)
+			TERROR;
+		if(str.rfindi((__StrType)_T("rR"), str.size() - 1) != GINVALID)
+			TERROR;
 		str = _T("HelloWorld");
 		if(!str.exist("Hello"))
 			TERROR;
@@ -557,6 +583,18 @@ namespace TEST
 		if(str.exist('A'))
 			TERROR;
 		if(!str.exist(str))
+			TERROR;
+		if(!str.existi("hello"))
+			TERROR;
+		if(!str.existi("world"))
+			TERROR;
+		if(!str.existi("ow"))
+			TERROR;
+		if(!str.existi('w'))
+			TERROR;
+		if(str.existi('a'))
+			TERROR;
+		if(!str.existi(str))
 			TERROR;
 		str = _T("HelloWorld");
 		if(str.compare("HelloWorld") != 0)

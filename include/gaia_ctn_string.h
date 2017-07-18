@@ -574,7 +574,7 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				if(index >= this->size())
 					return (_SizeType)GINVALID;
-				const _DataType* pFinded = GAIA::ALGO::find((const _DataType*)m_pFront + index, this->bptr() + 1, t);
+				const _DataType* pFinded = GAIA::ALGO::gstrch((const _DataType*)m_pFront + index, t);
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
@@ -615,7 +615,7 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				else if(index == GINVALID)
 					index = this->size() - 1;
-				const _DataType* pFinded = GAIA::ALGO::rfind(m_pFront, m_pFront + index, t);
+				const _DataType* pFinded = GAIA::ALGO::gstrrch(m_pFront + index, this->size() - index, t);
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
@@ -631,7 +631,7 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				else if(index == GINVALID)
 					index = this->size() - 1;
-				const _DataType* pFinded = GAIA::ALGO::rfinds(m_pFront, m_pFront + index, p, GAIA::ALGO::gstrlen(p));
+				const _DataType* pFinded = GAIA::ALGO::gstrrstr(m_pFront + index, p, this->size());
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
@@ -647,7 +647,7 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				else if(index == GINVALID)
 					index = this->size() - 1;
-				const _DataType* pFinded = GAIA::ALGO::rfinds(m_pFront, m_pFront + index, src.m_pFront, src.size());
+				const _DataType* pFinded = GAIA::ALGO::gstrrstr(m_pFront + index, src.m_pFront, this->size());
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
@@ -663,6 +663,102 @@ namespace GAIA
 			GINL GAIA::BL exist(const __MyType& src) const
 			{
 				return this->find(src, 0) != GINVALID;
+			}
+			template<typename _ParamDataType> _SizeType findi(const _ParamDataType& t, const _SizeType& index = 0) const
+			{
+				if(this->empty())
+					return (_SizeType)GINVALID;
+				if(index >= this->size())
+					return (_SizeType)GINVALID;
+				const _DataType* pFinded = GAIA::ALGO::gstrich((const _DataType*)m_pFront + index, t);
+				if(pFinded == GNIL)
+					return (_SizeType)GINVALID;
+				return (_SizeType)(pFinded - m_pFront);
+			}
+			template<typename _ParamDataType> _SizeType findi(const _ParamDataType* p, const _SizeType& index = 0) const
+			{
+				GAST(!!p);
+				if(p == GNIL)
+					return (_SizeType)GINVALID;
+				if(this->empty())
+					return (_SizeType)GINVALID;
+				if(index >= this->size())
+					return (_SizeType)GINVALID;
+				const _DataType* pFinded = GAIA::ALGO::gstristr(m_pFront + index, p);
+				if(pFinded == GNIL)
+					return (_SizeType)GINVALID;
+				return (_SizeType)(pFinded - m_pFront);
+			}
+			GINL _SizeType findi(const __MyType& src, const _SizeType& index = 0) const
+			{
+				GAST(!src.empty());
+				if(src.empty())
+					return (_SizeType)GINVALID;
+				if(this->empty())
+					return (_SizeType)GINVALID;
+				if(index >= this->size())
+					return (_SizeType)GINVALID;
+				const _DataType* pFinded = GAIA::ALGO::gstristr(m_pFront + index, src.m_pFront);
+				if(pFinded == GNIL)
+					return (_SizeType)GINVALID;
+				return (_SizeType)(pFinded - m_pFront);
+			}
+			template<typename _ParamDataType> _SizeType rfindi(const _ParamDataType& t, _SizeType index = GINVALID) const
+			{
+				if(this->empty())
+					return (_SizeType)GINVALID;
+				if(index >= this->size())
+					return (_SizeType)GINVALID;
+				else if(index == GINVALID)
+					index = this->size() - 1;
+				const _DataType* pFinded = GAIA::ALGO::gstrirch(m_pFront + index, this->size() - index, t);
+				if(pFinded == GNIL)
+					return (_SizeType)GINVALID;
+				return (_SizeType)(pFinded - m_pFront);
+			}
+			template<typename _ParamDataType> _SizeType rfindi(const _ParamDataType* p, _SizeType index = GINVALID) const
+			{
+				GAST(!!p);
+				if(p == GNIL)
+					return (_SizeType)GINVALID;
+				if(this->empty())
+					return (_SizeType)GINVALID;
+				if(index >= this->size())
+					return (_SizeType)GINVALID;
+				else if(index == GINVALID)
+					index = this->size() - 1;
+				const _DataType* pFinded = GAIA::ALGO::gstrirstr(m_pFront + index, p, this->size());
+				if(pFinded == GNIL)
+					return (_SizeType)GINVALID;
+				return (_SizeType)(pFinded - m_pFront);
+			}
+			GINL _SizeType rfindi(const __MyType& src, _SizeType index = GINVALID) const
+			{
+				GAST(!src.empty());
+				if(src.empty())
+					return (_SizeType)GINVALID;
+				if(this->empty())
+					return (_SizeType)GINVALID;
+				if(index >= this->size())
+					return (_SizeType)GINVALID;
+				else if(index == GINVALID)
+					index = this->size() - 1;
+				const _DataType* pFinded = GAIA::ALGO::gstrirstr(m_pFront + index, src.m_pFront, this->size());
+				if(pFinded == GNIL)
+					return (_SizeType)GINVALID;
+				return (_SizeType)(pFinded - m_pFront);
+			}
+			template<typename _ParamDataType> GAIA::BL existi(const _ParamDataType& t) const
+			{
+				return this->findi(t, 0) != GINVALID;
+			}
+			template<typename _ParamDataType> GAIA::BL existi(const _ParamDataType* p) const
+			{
+				return this->findi(p, 0) != GINVALID;
+			}
+			GINL GAIA::BL existi(const __MyType& src) const
+			{
+				return this->findi(src, 0) != GINVALID;
 			}
 			template<typename _ParamDataType> GAIA::BL startwith(const _ParamDataType& t) const
 			{

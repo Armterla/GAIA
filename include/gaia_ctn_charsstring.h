@@ -603,6 +603,54 @@ namespace GAIA
 			{
 				return this->find(src.fptr(), 0) != GINVALID;
 			}
+			template<typename _ParamDataType> _SizeType findi(const _ParamDataType& t, const _SizeType& index = 0) const
+			{
+				if(m_string.capacity() != 0)
+					return m_string.findi(t, index);
+				return m_chars.findi(t, index);
+			}
+			template<typename _ParamDataType> _SizeType findi(const _ParamDataType* p, const _SizeType& index = 0) const
+			{
+				if(m_string.capacity() != 0)
+					return m_string.findi(p, index);
+				return m_chars.findi(p, index);
+			}
+			GINL _SizeType findi(const __MyType& src, const _SizeType& index = 0) const
+			{
+				if(m_string.capacity() != 0)
+					return m_string.findi(src, index);
+				return m_chars.findi(src, index);
+			}
+			template<typename _ParamDataType> _SizeType rfindi(const _ParamDataType& t, _SizeType index = GINVALID) const
+			{
+				if(m_string.capacity() != 0)
+					return m_string.rfindi(t, index);
+				return m_chars.rfindi(t, index);
+			}
+			template<typename _ParamDataType> _SizeType rfindi(const _ParamDataType* p, _SizeType index = GINVALID) const
+			{
+				if(m_string.capacity() != 0)
+					return m_string.rfindi(p, index);
+				return m_chars.rfindi(p, index);
+			}
+			GINL _SizeType rfindi(const __MyType& src, _SizeType index = GINVALID) const
+			{
+				if(m_string.capacity() != 0)
+					return m_string.rfindi(src.fptr(), index);
+				return m_chars.rfindi(src.fptr(), index);
+			}
+			template<typename _ParamDataType> GAIA::BL existi(const _ParamDataType& t) const
+			{
+				return this->findi(t, 0) != GINVALID;
+			}
+			template<typename _ParamDataType> GAIA::BL existi(const _ParamDataType* p) const
+			{
+				return this->findi(p, 0) != GINVALID;
+			}
+			GINL GAIA::BL existi(const __MyType& src) const
+			{
+				return this->findi(src.fptr(), 0) != GINVALID;
+			}
 			template<typename _ParamDataType> GAIA::BL startwith(const _ParamDataType& t) const
 			{
 				if(this->empty())

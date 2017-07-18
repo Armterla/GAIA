@@ -540,6 +540,32 @@ namespace TEST
 			TERROR;
 		if(chs.rfind((__TCharsType)_T("rr"), chs.size() - 1) != GINVALID)
 			TERROR;
+		if(chs.rfindi('L', chs.size() - 1) != 18)
+			TERROR;
+		if(chs.rfindi('D', chs.size() - 1) != 19)
+			TERROR;
+		if(chs.rfindi('h', chs.size() - 1) != 10)
+			TERROR;
+		if(chs.rfindi('X', chs.size() - 1) != GINVALID)
+			TERROR;
+		if(chs.rfindi(_T("hello"), chs.size() - 1) != 10)
+			TERROR;
+		if(chs.rfindi(_T("Ld"), chs.size() - 1) != 18)
+			TERROR;
+		if(chs.rfindi(_T("helloworldH"), chs.size() - 1) != 0)
+			TERROR;
+		if(chs.rfindi(_T("RR"), chs.size() - 1) != GINVALID)
+			TERROR;
+		if(chs.rfindi((__TCharsType)_T("R"), chs.size() - 1) != 17)
+			TERROR;
+		if(chs.rfindi((__TCharsType)_T("Rl"), chs.size() - 1) != 17)
+			TERROR;
+		if(chs.rfindi((__TCharsType)_T("lD"), chs.size() - 1) != 18)
+			TERROR;
+		if(chs.rfindi((__TCharsType)_T("HelloWorldH"), chs.size() - 1) != 0)
+			TERROR;
+		if(chs.rfindi((__TCharsType)_T("rR"), chs.size() - 1) != GINVALID)
+			TERROR;
 		chs = _T("HelloWorld");
 		if(!chs.exist("Hello"))
 			TERROR;
@@ -552,6 +578,18 @@ namespace TEST
 		if(chs.exist('A'))
 			TERROR;
 		if(!chs.exist(chs))
+			TERROR;
+		if(!chs.existi("hello"))
+			TERROR;
+		if(!chs.existi("world"))
+			TERROR;
+		if(!chs.existi("ow"))
+			TERROR;
+		if(!chs.existi('w'))
+			TERROR;
+		if(chs.existi('a'))
+			TERROR;
+		if(!chs.existi(chs))
 			TERROR;
 		chs = _T("HelloWorld");
 		if(chs.compare("HelloWorld") != 0)
