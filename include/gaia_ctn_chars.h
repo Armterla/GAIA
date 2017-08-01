@@ -2124,9 +2124,21 @@ namespace GAIA
 		typedef BasicChars<GAIA::CH, GAIA::NUM, 64> AChars64;
 		typedef BasicChars<GAIA::WCH, GAIA::NUM, 64> WChars64;
 		typedef BasicChars<GAIA::TCH, GAIA::NUM, 64> TChars64;
+		typedef BasicChars<GAIA::CH, GAIA::NUM, 96> AChars96;
+		typedef BasicChars<GAIA::WCH, GAIA::NUM, 96> WChars96;
+		typedef BasicChars<GAIA::TCH, GAIA::NUM, 96> TChars96;
 		typedef BasicChars<GAIA::CH, GAIA::NUM, 128> AChars128;
 		typedef BasicChars<GAIA::WCH, GAIA::NUM, 128> WChars128;
 		typedef BasicChars<GAIA::TCH, GAIA::NUM, 128> TChars128;
+		typedef BasicChars<GAIA::CH, GAIA::NUM, 512> AChars512;
+		typedef BasicChars<GAIA::WCH, GAIA::NUM, 512> WChars512;
+		typedef BasicChars<GAIA::TCH, GAIA::NUM, 512> TChars512;
+		typedef BasicChars<GAIA::CH, GAIA::NUM, 1024> AChars1024;
+		typedef BasicChars<GAIA::WCH, GAIA::NUM, 1024> WChars1024;
+		typedef BasicChars<GAIA::TCH, GAIA::NUM, 1024> TChars1024;
+		typedef BasicChars<GAIA::CH, GAIA::NUM, 2048> AChars2048;
+		typedef BasicChars<GAIA::WCH, GAIA::NUM, 2048> WChars2048;
+		typedef BasicChars<GAIA::TCH, GAIA::NUM, 2048> TChars2048;
 	}
 }
 
