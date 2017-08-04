@@ -38,7 +38,7 @@ namespace GAIA
 				GAST(hFF != (HANDLE)GINVALID);
 				if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 				{
-					GAIA::TCH* pEnd = GAIA::ALGO::gstrend(fdata.cFileName);
+					GAIA::CH* pEnd = GAIA::ALGO::gstrend(fdata.cFileName);
 					GAST(pEnd - fdata.cFileName < GAIA::MAXPL - 1);
 					if(pEnd[-1] != '/' && pEnd[-1] != '\\')
 					{
@@ -513,7 +513,7 @@ namespace GAIA
 				while(GAIA::ALGO::gstrcmp(pRet->fdata.cFileName, _T(".")) == 0 ||
 					GAIA::ALGO::gstrcmp(pRet->fdata.cFileName, _T("..")) == 0)
 				{
-					if(!::FindNextFileW(pRet->hFF, &pRet->fdata))
+					if(!::FindNextFileA(pRet->hFF, &pRet->fdata))
 					{
 						::FindClose(pRet->hFF);
 						gdel pRet;
@@ -537,7 +537,7 @@ namespace GAIA
 			{
 				FSFinder& f = (FSFinder&)df;
 			#if GAIA_OS == GAIA_OS_WINDOWS
-				if(!::FindNextFile(f.hFF, &f.fdata))
+				if(!::FindNextFileA(f.hFF, &f.fdata))
 					return GAIA::False;
 				f.UpdateFileInfo();
 				return GAIA::True;
