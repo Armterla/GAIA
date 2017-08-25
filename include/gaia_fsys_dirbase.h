@@ -17,11 +17,11 @@ namespace GAIA
 		public:
 			
 			/*!
-				@brief Get file's information.
+				@brief Get file's description.
 			 
-				@see GAIA::FSYS::FileInfo.
+				@see GAIA::FSYS::FileDesc.
 			*/
-			virtual const FileInfo& GetInfo() const = 0;
+			virtual const FileDesc& GetDesc() const = 0;
 		};
 
 		/*!
@@ -101,11 +101,11 @@ namespace GAIA
 			virtual GAIA::BL ExistFile(const GAIA::CH* pszName) = 0;
 
 			/*!
-				@brief Get file's information.
+				@brief Get file's description.
 			 
-				@see GAIA:FSYS::FileInfo.
+				@see GAIA:FSYS::FileDesc.
 			*/
-			virtual GAIA::BL GetInfo(const GAIA::CH* pszName, FileInfo& fi) = 0;
+			virtual GAIA::BL GetDesc(const GAIA::CH* pszName, FileDesc& fdesc) = 0;
 
 			/*!
 				@brief Begin search file directory.

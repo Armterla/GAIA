@@ -10,9 +10,9 @@ namespace GAIA
 	namespace FSYS
 	{
 		/*!
-			@brief File information class.
+			@brief File description class.
 		*/
-		class FileInfo : public GAIA::Base
+		class FileDesc : public GAIA::Base
 		{
 		public:
 			/*!

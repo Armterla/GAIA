@@ -28,9 +28,9 @@ namespace GAIA
 		{
 			friend class Dir;
 		public:
-			virtual const FileInfo& GetInfo() const
+			virtual const FileDesc& GetDesc() const
 			{
-				return fi;
+				return fdesc;
 			}
 			GINL GAIA::GVOID UpdateFileInfo()
 			{
@@ -46,11 +46,11 @@ namespace GAIA
 						pEnd[1] = '\0';
 					}
 				}
-				fi.pszName = fdata.cFileName;
-				fi.bDirectory = (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
-				GAIA::TIME::FileTimeToTime(fdata.ftCreationTime, fi.uCreateTime);
-				GAIA::TIME::FileTimeToTime(fdata.ftLastAccessTime, fi.uLastReadTime);
-				GAIA::TIME::FileTimeToTime(fdata.ftLastWriteTime, fi.uLastWriteTime);
+				fdesc.pszName = fdata.cFileName;
+				fdesc.bDirectory = (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+				GAIA::TIME::FileTimeToTime(fdata.ftCreationTime, fdesc.uCreateTime);
+				GAIA::TIME::FileTimeToTime(fdata.ftLastAccessTime, fdesc.uLastReadTime);
+				GAIA::TIME::FileTimeToTime(fdata.ftLastWriteTime, fdesc.uLastWriteTime);
 			#else
 				// TODO:
 			#endif
@@ -63,7 +63,7 @@ namespace GAIA
 		#if GAIA_OS == GAIA_OS_WINDOWS
 				hFF = (HANDLE)GINVALID;
 				zeromem(&fdata);
-				fi.reset();
+				fdesc.reset();
 		#else
 		#endif
 			}
@@ -74,7 +74,7 @@ namespace GAIA
 		#else
 			// TODO:
 		#endif
-			FileInfo fi;
+			FileDesc fdesc;
 		};
 
 		class Dir : public GAIA::FSYS::DirBase
@@ -294,19 +294,19 @@ namespace GAIA
 					return GAIA::False;
 				if(GAIA::ALGO::gstremp(pszDstName))
 					return GAIA::False;
-				GAIA::FSYS::FileInfo fi;
-				if(!this->GetInfo(pszSrcName, fi))
+				GAIA::FSYS::FileDesc fdesc;
+				if(!this->GetDesc(pszSrcName, fdesc))
 					return GAIA::False;
-				if(!fi.bDirectory)
+				if(!fdesc.bDirectory)
 					return GAIA::False;
 				if(!this->Exist(pszDstName))
 				{
 					if(!this->Create(pszDstName, bOverlapped))
 						return GAIA::False;
 				}
-				if(!this->GetInfo(pszDstName, fi))
+				if(!this->GetDesc(pszDstName, fdesc))
 					return GAIA::False;
-				if(!fi.bDirectory)
+				if(!fdesc.bDirectory)
 					return GAIA::False;
 				GAIA::FSYS::FSFinderBase* pFinder = this->Find(pszSrcName);
 				if(pFinder == GNIL)
@@ -314,7 +314,7 @@ namespace GAIA
 				GAIA::BL bExistError = GAIA::False;
 				while(pFinder != NULL)
 				{
-					const GAIA::FSYS::FileInfo& fifinded = pFinder->GetInfo();
+					const GAIA::FSYS::FileDesc& fifinded = pFinder->GetDesc();
 					GAIA::CH szTempSrc[GAIA::MAXPL];
 					GAIA::CH szTempDst[GAIA::MAXPL];
 					GAIA::ALGO::gstrcpy(szTempSrc, pszSrcName);
@@ -386,10 +386,10 @@ namespace GAIA
 			{
 				if(GAIA::ALGO::gstremp(pszName))
 					return GAIA::False;
-				GAIA::FSYS::FileInfo fi;
-				if(!this->GetInfo(pszName, fi))
+				GAIA::FSYS::FileDesc fdesc;
+				if(!this->GetDesc(pszName, fdesc))
 					return GAIA::False;
-				if(!fi.bDirectory)
+				if(!fdesc.bDirectory)
 					return GAIA::False;
 				GAIA::FSYS::FSFinderBase* pFinder = this->Find(pszName);
 				if(pFinder == GNIL)
@@ -465,7 +465,7 @@ namespace GAIA
 				return GAIA::False;
 			#endif
 			}
-			GINL virtual GAIA::BL GetInfo(const GAIA::CH* pszName, FileInfo& fi)
+			GINL virtual GAIA::BL GetDesc(const GAIA::CH* pszName, FileDesc& fdesc)
 			{
 				if(GAIA::ALGO::gstremp(pszName))
 					return GAIA::False;
@@ -476,16 +476,16 @@ namespace GAIA
 				HANDLE hFile = ::CreateFileA(pszName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, GNIL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, GNIL);
 				if(hFile == INVALID_HANDLE_VALUE)
 					return GAIA::False;
-				fi.pszName = pszName;
-				fi.bDirectory = dwFileAttr & FILE_ATTRIBUTE_DIRECTORY;
+				fdesc.pszName = pszName;
+				fdesc.bDirectory = dwFileAttr & FILE_ATTRIBUTE_DIRECTORY;
 				FILETIME tCreateTime, tLastWriteTime, tLastReadTime;
 				if(!::GetFileTime(hFile, &tCreateTime, &tLastReadTime, &tLastWriteTime))
 					return GAIA::False;
 				if(!::CloseHandle(hFile))
 					return GAIA::False;
-				GAIA::TIME::FileTimeToTime(tCreateTime, fi.uCreateTime);
-				GAIA::TIME::FileTimeToTime(tLastReadTime, fi.uLastReadTime);
-				GAIA::TIME::FileTimeToTime(tLastWriteTime, fi.uLastWriteTime);
+				GAIA::TIME::FileTimeToTime(tCreateTime, fdesc.uCreateTime);
+				GAIA::TIME::FileTimeToTime(tLastReadTime, fdesc.uLastReadTime);
+				GAIA::TIME::FileTimeToTime(tLastWriteTime, fdesc.uLastWriteTime);
 			#else
 				// TODO:
 			#endif

@@ -3,23 +3,23 @@
 
 namespace TEST
 {
-	extern GAIA::GVOID t_ctn_ptr(GAIA::LOG::Log& logobj)
+	extern GAIA::GVOID t_ctn_pter(GAIA::LOG::Log& logobj)
 	{
 		static const GAIA::N32 ELEMENT_COUNT = 100;
 		GAIA::N32* pElements = gnew GAIA::N32[ELEMENT_COUNT];
 		for(GAIA::N32 x = 0; x < ELEMENT_COUNT; ++x)
 			pElements[x] = x;
-		typedef GAIA::CTN::Ptr<GAIA::N32> __PtrType;
+		typedef GAIA::CTN::Pter<GAIA::N32> __PterType;
 		{
-			__PtrType pp;
+			__PterType pp;
 			TAST(pp.empty());
 		}
-		__PtrType p = pElements;
+		__PterType p = pElements;
 		if(p.empty())
 			TERROR;
 		if(*p != 0)
 			TERROR;
-		if(**GSCAST(const __PtrType*)(&p) != 0)
+		if(**GSCAST(const __PterType*)(&p) != 0)
 			TERROR;
 		for(GAIA::N32 x = 0; x < ELEMENT_COUNT; ++x)
 		{
@@ -31,7 +31,7 @@ namespace TEST
 		}
 		for(GAIA::N32 x = 0; x < ELEMENT_COUNT; ++x)
 		{
-			if((*GSCAST(const __PtrType*)(&p))[x] != x)
+			if((*GSCAST(const __PterType*)(&p))[x] != x)
 			{
 				TERROR;
 				break;
@@ -47,7 +47,7 @@ namespace TEST
 				break;
 			}
 		}
-		__PtrType p1 = p;
+		__PterType p1 = p;
 		TAST(p1 == p && p1 >= p && p1 <= p);
 		if(p1 != p || p1 > p || p1 < p)
 			TERROR;

@@ -1,4 +1,4 @@
-﻿#ifndef		__T_GAIA_HEADER_H__
+#ifndef		__T_GAIA_HEADER_H__
 #define		__T_GAIA_HEADER_H__
 
 #include "gaia_type.h"
@@ -54,7 +54,7 @@ namespace TEST
 	extern GAIA::GVOID t_ctn_bufferrw(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_ctn_stackbuffer(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_ctn_msg(GAIA::LOG::Log& logobj);
-	extern GAIA::GVOID t_ctn_ptr(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_ctn_pter(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_ctn_ref(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_ctn_array(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_ctn_vector(GAIA::LOG::Log& logobj);
@@ -235,7 +235,7 @@ namespace TEST
 			TITEM("Container: BufferRW test begin!"); t_ctn_bufferrw(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Container: StackBuffer test begin!"); t_ctn_stackbuffer(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Container: Msg test begin!"); t_ctn_msg(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("Container: Ptr test begin!"); t_ctn_ptr(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Container: Pter test begin!"); t_ctn_pter(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Container: Ref test begin!"); t_ctn_ref(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Container: Array test begin!"); t_ctn_array(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Container: Vector test begin!"); t_ctn_vector(logobj); TITEM("End"); TTEXT("\t");

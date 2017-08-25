@@ -84,7 +84,7 @@ namespace TEST
 			}
 
 			GAIA::CTN::Map<GAIA::X128, GAIA::N32> m;
-			std::map<GAIA::X128, GAIA::N32, std::less<GAIA::X128>, STLAllocator<GAIA::N32> > stdm;
+			std::map<GAIA::X128, GAIA::N32, std::less<GAIA::X128>, STLAllocator<std::pair<const GAIA::X128, GAIA::N32> > > stdm;
 
 			GAIA::U64 uMapStartTime = GAIA::TIME::tick_time();
 			for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
