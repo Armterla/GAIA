@@ -333,11 +333,12 @@ namespace GAIA
 				}
 			}
 			GINL GAIA::U32 type() const{return GAIA::ALGO::strtype(m_pFront);}
-			template<typename _ParamDataType> __MyType& assign(const _ParamDataType* p, const _SizeType& size)
+			template<typename _ParamDataType> __MyType& assign(const _ParamDataType* p, _SizeType size = GINVALID)
 			{
-				GAST(size >= 0);
+				if(size < 0)
+					size = GAIA::ALGO::gstrlen(p);
 				GAST((const GAIA::GVOID*)(p + size) <= (const GAIA::GVOID*)m_pFront || 
-					(const GAIA::GVOID*)(m_pFront + this->capacity()) <= (const GAIA::GVOID*)p || 
+					 (const GAIA::GVOID*)(m_pFront + this->capacity()) <= (const GAIA::GVOID*)p || 
 					 size < this->size());
 				if(p == GNIL || size == 0)
 				{
@@ -346,6 +347,23 @@ namespace GAIA
 				}
 				this->resize(size);
 				GAIA::ALGO::gstrcpy(m_pFront, p, size);
+				return *this;
+			}
+			template<typename _ParamDataType> __MyType& append(const _ParamDataType* p, _SizeType size = GINVALID)
+			{
+				if(size < 0)
+					size = GAIA::ALGO::gstrlen(p);
+				GAST((const GAIA::GVOID*)(p + size) <= (const GAIA::GVOID*)m_pFront || 
+					 (const GAIA::GVOID*)(m_pFront + this->capacity()) <= (const GAIA::GVOID*)p || 
+					 size < this->size());
+				if(p == GNIL || size == 0)
+				{
+					this->clear();
+					return *this;
+				}
+				_SizeType oldsize = this->size();
+				this->resize_keep(oldsize + size);
+				GAIA::ALGO::gstrcpy(m_pFront + oldsize, p, size);
 				return *this;
 			}
 			GINL _DataType* fptr()

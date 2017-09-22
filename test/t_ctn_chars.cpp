@@ -1,4 +1,4 @@
-﻿#include "preheader.h"
+#include "preheader.h"
 #include "t_common.h"
 
 namespace TEST
@@ -798,6 +798,19 @@ namespace TEST
 		chs = chs + (GAIA::BL)GAIA::False;
 		chs = chs + x128;
 		if(chs != "-11-11-11-11-11-1.0-1.011012345678123456781234567812345678")
+			TERROR;
+		
+		chs.assign("Hello World");
+		if(chs != "Hello World")
+			TERROR;
+		chs.append("Hello Kitty");
+		if(chs != "Hello WorldHello Kitty")
+			TERROR;
+		chs.assign("Hello World", 5);
+		if(chs != "Hello")
+			TERROR;
+		chs.append("Hello Kitty", 5);
+		if(chs != "HelloHello")
 			TERROR;
 
 		chs = (const GAIA::TCH*)GNIL;
