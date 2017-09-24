@@ -186,6 +186,7 @@
 #include	"gaia_digit_percentage.h"
 #include	"gaia_digit_md5.h"
 #include	"gaia_digit_sha1.h"
+#include	"gaia_digit_hmac.h"
 #include	"gaia_digit_regexp.h"
 #include	"gaia_digit_crypt.h"
 #include	"gaia_digit_rc4.h"
