@@ -135,6 +135,7 @@ namespace TEST
 	extern GAIA::GVOID t_digit_crc(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_md5(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_sha1(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_digit_hmac(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_diff(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_zip(GAIA::LOG::Log& logobj);
 
@@ -312,6 +313,7 @@ namespace TEST
 			TITEM("Digit: CRC test begin!"); t_digit_crc(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: MD5 test begin!"); t_digit_md5(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: SHA1 test begin!"); t_digit_sha1(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Digit: HMAC test begin!"); t_digit_hmac(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: Diff test begin!"); t_digit_diff(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: Zip test begin!"); t_digit_zip(logobj); TITEM("End"); TTEXT("\t");
 

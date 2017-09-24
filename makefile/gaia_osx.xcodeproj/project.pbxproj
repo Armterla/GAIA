@@ -318,6 +318,7 @@
 		1A4CE2A71EB7810B007AFD08 /* tperf_msys_heapesg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A4CE1721EB7810A007AFD08 /* tperf_msys_heapesg.cpp */; };
 		1A4CE2A91EB7829A007AFD08 /* t_pattern_stringindex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A4CE2A81EB7829A007AFD08 /* t_pattern_stringindex.cpp */; };
 		1A4CE2AB1EB78331007AFD08 /* t_pattern_textindex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A4CE2AA1EB78331007AFD08 /* t_pattern_textindex.cpp */; };
+		1A80BD411F780E1100AA3AF8 /* t_digit_hmac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A80BD401F780E1100AA3AF8 /* t_digit_hmac.cpp */; };
 		3B3119D81E6D36CD009462C1 /* libiconv.2.4.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B3119D71E6D36CD009462C1 /* libiconv.2.4.0.tbd */; };
 		3B3C9F281EC408490045E8D5 /* t_digit_crc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B3C9F271EC408490045E8D5 /* t_digit_crc.cpp */; };
 		3B6B9C991E9FBA6E008CF1A0 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B6B9C981E9FBA6E008CF1A0 /* main.cpp */; };
@@ -659,6 +660,7 @@
 		1A4CE1721EB7810A007AFD08 /* tperf_msys_heapesg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tperf_msys_heapesg.cpp; sourceTree = "<group>"; };
 		1A4CE2A81EB7829A007AFD08 /* t_pattern_stringindex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_pattern_stringindex.cpp; path = ../test/t_pattern_stringindex.cpp; sourceTree = SOURCE_ROOT; };
 		1A4CE2AA1EB78331007AFD08 /* t_pattern_textindex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_pattern_textindex.cpp; path = ../test/t_pattern_textindex.cpp; sourceTree = SOURCE_ROOT; };
+		1A80BD401F780E1100AA3AF8 /* t_digit_hmac.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_digit_hmac.cpp; sourceTree = "<group>"; };
 		3B31161E1E6D3538009462C1 /* gaia_osx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gaia_osx; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3119D71E6D36CD009462C1 /* libiconv.2.4.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.4.0.tbd; path = usr/lib/libiconv.2.4.0.tbd; sourceTree = SDKROOT; };
 		3B3C9F271EC408490045E8D5 /* t_digit_crc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_digit_crc.cpp; path = ../test/t_digit_crc.cpp; sourceTree = SOURCE_ROOT; };
@@ -875,6 +877,7 @@
 			children = (
 				1A4CE0EC1EB7810A007AFD08 /* preheader.cpp */,
 				1A4CE0ED1EB7810A007AFD08 /* preheader.h */,
+				1A80BD401F780E1100AA3AF8 /* t_digit_hmac.cpp */,
 				1A4CE0EE1EB7810A007AFD08 /* t_algo_base.cpp */,
 				1A4CE0EF1EB7810A007AFD08 /* t_algo_compare.cpp */,
 				1A4CE0F01EB7810A007AFD08 /* t_algo_hash.cpp */,
@@ -1366,6 +1369,7 @@
 				1A4CE17E1EB7810A007AFD08 /* gaia_img_base.cpp in Sources */,
 				1A4CE25E1EB7810A007AFD08 /* t_db_remote.cpp in Sources */,
 				1A4CE1921EB7810A007AFD08 /* hpdf_binary.c in Sources */,
+				1A80BD411F780E1100AA3AF8 /* t_digit_hmac.cpp in Sources */,
 				1A4CE1EC1EB7810A007AFD08 /* pcre32_jit_compile.c in Sources */,
 				1A4CE2A61EB7810A007AFD08 /* tperf_ctn_dmpgraph.cpp in Sources */,
 				1A4CE23E1EB7810A007AFD08 /* t_ctn_graph.cpp in Sources */,

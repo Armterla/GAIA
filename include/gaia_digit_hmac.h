@@ -10,25 +10,33 @@ namespace GAIA
 {
 	namespace DIGIT
 	{
-		GINL GAIA::GVOID hmacsha1(const GAIA::U8* pSrc, GAIA::NUM sSrcLen, const GAIA::U8* pKey, GAIA::NUM pKeyLen, GAIA::U8* res)
+		GINL GAIA::GVOID hmacsha1(const GAIA::GVOID* pSrc, GAIA::NUM sSrcLen, const GAIA::GVOID* pKey, GAIA::NUM sKeyLen, GAIA::GVOID* pRes)
 		{
+			GPCHR_TRUE(pSrc == GNIL);
+			GPCHR_TRUE(sSrcLen <= 0);
+			GPCHR_TRUE(pKey == GNIL);
+			GPCHR_TRUE(sKeyLen <= 0);
+			GPCHR_TRUE(pRes == GNIL);
+			const GAIA::U8* pSrcPrac = (const GAIA::U8*)pSrc;
+			const GAIA::U8* pKeyPrac = (const GAIA::U8*)pKey;
+			GAIA::U8* res = (GAIA::U8*)pRes;
 			GAIA::U8 kipad[65];
 			GAIA::U8 kopad[65];
 			GAIA::U8 tk[20];
 			GAIA::U8* temp;
-			if(pKeyLen > 64)
+			if(sKeyLen > 64)
 			{
 				GAIA::DIGIT::SHA1 sha1t;
-				sha1t.update(pKey, pKeyLen);
+				sha1t.update(pKeyPrac, sKeyLen);
 				sha1t.result(tk);
-				pKey = tk;
-				pKeyLen = 20;
+				pKeyPrac = tk;
+				sKeyLen = 20;
 			}
 
 			zeromems(kipad);
 			zeromems(kopad);
-			GAIA::ALGO::gmemcpy(kipad, pKey, pKeyLen);
-			GAIA::ALGO::gmemcpy(kopad, pKey, pKeyLen);
+			GAIA::ALGO::gmemcpy(kipad, pKeyPrac, sKeyLen);
+			GAIA::ALGO::gmemcpy(kopad, pKeyPrac, sKeyLen);
 
 			for(GAIA::NUM i = 0; i < 64; i++)
 			{
@@ -38,7 +46,7 @@ namespace GAIA
 			temp = gnew GAIA::U8[65 + sSrcLen];
 			GAIA::ALGO::gmemset(temp, 0, 65 + sSrcLen);
 			GAIA::ALGO::gmemcpy(temp, kipad, 64);
-			GAIA::ALGO::gmemcpy(temp + 64, pSrc, sSrcLen);
+			GAIA::ALGO::gmemcpy(temp + 64, pSrcPrac, sSrcLen);
 
 			GAIA::DIGIT::SHA1 sha1;
 			sha1.update(temp, 64 + sSrcLen);
