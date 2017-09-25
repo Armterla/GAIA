@@ -10,13 +10,35 @@ namespace GAIA
 {
 	namespace DIGIT
 	{
+		/*!
+			@brief Calculate HMAC-SHA1 digest.
+
+			@param pSrc [in] Specify the source data.
+
+			@param sSrcLen [in] Specify the source data length in bytes.
+
+			@param pKey [in] Specify the key data.
+
+			@param sKeyLen [in] Specify the key length in bytes.
+
+			@param pRes [out] Used for saving the HMAC-SHA1 digest result, it's length must 20 bytes at least.
+
+			@return If success return GAIA::True or will return GAIA::False.
+		 
+			@remarks
+				If the parameter pSrc == GNIL, this function will failed and return GAIA::False.
+				If sSrcLen <= 0, this function will failed and return GAIA::False.
+				If pKey == GNIL, this function will failed and return GAIA::False.
+				If sKeyLen <= 0, this function will failed and return GAIA::False.
+				If pRes == GNIL, this function will failed and return GAIA::False.
+		*/
 		GINL GAIA::GVOID hmacsha1(const GAIA::GVOID* pSrc, GAIA::NUM sSrcLen, const GAIA::GVOID* pKey, GAIA::NUM sKeyLen, GAIA::GVOID* pRes)
 		{
-			GPCHR_TRUE(pSrc == GNIL);
-			GPCHR_TRUE(sSrcLen <= 0);
-			GPCHR_TRUE(pKey == GNIL);
-			GPCHR_TRUE(sKeyLen <= 0);
-			GPCHR_TRUE(pRes == GNIL);
+			GPCHR_TRUE_RETURN(pSrc == GNIL, GAIA::False);
+			GPCHR_TRUE_RETURN(sSrcLen <= 0, GAIA::False);
+			GPCHR_TRUE_RETURN(pKey == GNIL, GAIA::False);
+			GPCHR_TRUE_RETURN(sKeyLen <= 0, GAIA::False);
+			GPCHR_TRUE_RETURN(pRes == GNIL, GAIA::False);
 			const GAIA::U8* pSrcPrac = (const GAIA::U8*)pSrc;
 			const GAIA::U8* pKeyPrac = (const GAIA::U8*)pKey;
 			GAIA::U8* res = (GAIA::U8*)pRes;
@@ -71,6 +93,8 @@ namespace GAIA
 				GAIA::ALGO::swap(res[x + 0], res[x + 3]);
 				GAIA::ALGO::swap(res[x + 1], res[x + 2]);
 			}
+			
+			return GAIA::True;
 		}
 	}
 }
