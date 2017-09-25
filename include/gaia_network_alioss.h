@@ -4,8 +4,10 @@
 #include "gaia_type.h"
 #include "gaia_assert.h"
 #include "gaia_ctn_buffer.h"
+#include "gaia_ctn_chars.h"
+#include "gaia_ctn_string.h"
+#include "gaia_ctn_charsstring.h"
 #include "gaia_fsys_file.h"
-#include "gaia_fsys_dir.h"
 #include "gaia_network_ip.h"
 #include "gaia_network_addr.h"
 #include "gaia_network_httpbase.h"
@@ -47,57 +49,62 @@ namespace GAIA
 				{
 					pDownloadBuf = GNIL;
 				}
-				virtual GAIA::GVOID OnBegin()
+				GINL ~HttpRequestForAliOSS()
+				{
+				}
+				GINL virtual GAIA::GVOID OnBegin()
 				{
 					
 				}
-				virtual GAIA::GVOID OnEnd(GAIA::BL bCanceled)
+				GINL virtual GAIA::GVOID OnEnd(GAIA::BL bCanceled)
 				{
 					
 				}
-				virtual GAIA::GVOID OnState(GAIA::NETWORK::HTTP_REQUEST_STATE newstate)
+				GINL virtual GAIA::GVOID OnState(GAIA::NETWORK::HTTP_REQUEST_STATE newstate)
 				{
 					
 				}
-				virtual GAIA::GVOID OnPause()
+				GINL virtual GAIA::GVOID OnPause()
 				{
 					
 				}
-				virtual GAIA::GVOID OnResume()
+				GINL virtual GAIA::GVOID OnResume()
 				{
 					
 				}
-				virtual GAIA::GVOID OnSent(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize)
+				GINL virtual GAIA::GVOID OnSent(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize)
 				{
 					
 				}
-				virtual GAIA::GVOID OnRecved(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize)
+				GINL virtual GAIA::GVOID OnRecved(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize)
 				{
 					
 				}
-				virtual GAIA::GVOID OnSentHead(const GAIA::CH* pszHttpVersion, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& head)
+				GINL virtual GAIA::GVOID OnSentHead(const GAIA::CH* pszHttpVersion, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& head)
 				{
 					
 				}
-				virtual GAIA::GVOID OnSentBody(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize)
+				GINL virtual GAIA::GVOID OnSentBody(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize)
 				{
 					
 				}
-				virtual GAIA::GVOID OnRecvedHead(const GAIA::CH* pszHttpVersion, const GAIA::CH* pszHttpCode, const GAIA::CH* pszHttpCodeDesc, const GAIA::NETWORK::HttpHead& head)
+				GINL virtual GAIA::GVOID OnRecvedHead(const GAIA::CH* pszHttpVersion, const GAIA::CH* pszHttpCode, const GAIA::CH* pszHttpCodeDesc, const GAIA::NETWORK::HttpHead& head)
 				{
 
 				}
-				virtual GAIA::GVOID OnRecvedBody(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize)
+				GINL virtual GAIA::GVOID OnRecvedBody(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize)
 				{
 
 				}
-				virtual GAIA::N64 OnRequestBodyData(GAIA::N64 lOffset, GAIA::GVOID* pData, GAIA::NUM sMaxDataSize)
+				GINL virtual GAIA::N64 OnRequestBodyData(GAIA::N64 lOffset, GAIA::GVOID* pData, GAIA::NUM sMaxDataSize)
 				{
 					return 0;
 				}
 			public:
 				GAIA::CTN::Buffer bufDownload;
 				GAIA::CTN::Buffer* pDownloadBuf;
+				GAIA::CTN::ACharsString strFileName;
+				GAIA::FSYS::File file;
 			};
 			
 		public:
@@ -147,7 +154,7 @@ namespace GAIA
 				GAIA::NETWORK::HttpURL url;
 				url.FromString(strCombineURL.fptr());
 				
-				// Calculate Host.
+				// Calculate host.
 				GAIA::CTN::AChars chsHost;
 				chsHost = pszBucket;
 				chsHost += ".";
@@ -186,6 +193,7 @@ namespace GAIA
 				{
 					pRequest->Wait();
 					pRequest->drop_ref();
+					pRequest = GNIL;
 				}
 			}
 			
@@ -220,7 +228,7 @@ namespace GAIA
 				GAIA::NETWORK::HttpURL url;
 				url.FromString(strCombineURL.fptr());
 				
-				// Calculate Host.
+				// Calculate host.
 				GAIA::CTN::AChars chsHost;
 				chsHost = pszBucket;
 				chsHost += ".";
@@ -253,6 +261,7 @@ namespace GAIA
 				{
 					pRequest->Wait();
 					pRequest->drop_ref();
+					pRequest = GNIL;
 				}
 			}
 			
@@ -270,10 +279,68 @@ namespace GAIA
 				if(!aoa.check())
 					GTHROW(InvalidParam);
 				
-				// Check file exist.
-				GAIA::FSYS::Dir dir;
-				if(!dir.ExistFile(pszFile))
+				// New request.
+				HttpRequestForAliOSS* pRequest;
+				if(pUserRequest == GNIL)
+					pRequest = gnew HttpRequestForAliOSS(*m_pHttp);
+				else
+					pRequest = pUserRequest;
+				pRequest->strFileName = pszFile;
+				
+				// Open file.
+				if(!pRequest->file.Open(pszFile, GAIA::FSYS::File::OPEN_TYPE_READ))
+				{
+					pRequest->drop_ref();
+					pRequest = GNIL;
 					GTHROW(IO);
+				}
+				
+				// Calculate URL.
+				GAIA::CTN::ACharsString strCombineURL;
+				this->CombineURL(pszDomain, pszBucket, pszURL, strCombineURL);
+				GAIA::NETWORK::HttpURL url;
+				url.FromString(strCombineURL.fptr());
+				
+				// Calculate host.
+				GAIA::CTN::AChars chsHost;
+				chsHost = pszBucket;
+				chsHost += ".";
+				chsHost += pszDomain;
+				
+				// Calculate content length.
+				GAIA::CTN::AChars chsContentLength;
+				chsContentLength = pRequest->file.Size();
+				
+				// Calculate date.
+				GAIA::CTN::ACharsString strDate;
+				this->GetCurrentDate(strDate);
+				
+				// Calculate signature.
+				GAIA::CTN::ACharsString strSignature;
+				this->Signature(GAIA::NETWORK::HTTP_METHOD_PUT, strDate.fptr(), pszBucket, pszURL, aoa, strSignature);
+				
+				// Initialize head.
+				GAIA::NETWORK::HttpHead head;
+				head.Set(GAIA::NETWORK::HTTP_HEADNAME_HOST, chsHost.fptr());
+				head.Set(GAIA::NETWORK::HTTP_HEADNAME_CONTENTLENGTH, chsContentLength.fptr());
+				head.Set(GAIA::NETWORK::HTTP_HEADNAME_DATE, strDate.fptr());
+				head.Set(GAIA::NETWORK::HTTP_HEADNAME_AUTHORIZATION, strSignature.fptr());
+				
+				// Setup request.
+				pRequest->SetMethod(GAIA::NETWORK::HTTP_METHOD_PUT);
+				pRequest->SetURL(url);
+				pRequest->SetHead(head);
+				
+				// Request.
+				pRequest->Request();
+				
+				// Wait.
+				if(pUserRequest == GNIL)
+				{
+					pRequest->Wait();
+					pRequest->drop_ref();
+					pRequest = GNIL;
+				}
 			}
 			
 			GINL GAIA::GVOID DownloadFile(const GAIA::CH* pszDomain, const GAIA::CH* pszBucket, const GAIA::CH* pszURL, const GAIA::CH* pszFile, const AliOSSAccess& aoa, HttpRequestForAliOSS* pUserRequest = GNIL)
@@ -289,6 +356,64 @@ namespace GAIA
 					GTHROW(InvalidParam);
 				if(!aoa.check())
 					GTHROW(InvalidParam);
+				
+				// New request.
+				HttpRequestForAliOSS* pRequest;
+				if(pUserRequest == GNIL)
+					pRequest = gnew HttpRequestForAliOSS(*m_pHttp);
+				else
+					pRequest = pUserRequest;
+				pRequest->strFileName = pszFile;
+				
+				// Open file.
+				if(!pRequest->file.Open(pszFile, GAIA::FSYS::File::OPEN_TYPE_WRITE | GAIA::FSYS::File::OPEN_TYPE_CREATEALWAYS))
+				{
+					pRequest->drop_ref();
+					pRequest = GNIL;
+					GTHROW(IO);
+				}
+				
+				// Calculate URL.
+				GAIA::CTN::ACharsString strCombineURL;
+				this->CombineURL(pszDomain, pszBucket, pszURL, strCombineURL);
+				GAIA::NETWORK::HttpURL url;
+				url.FromString(strCombineURL.fptr());
+				
+				// Calculate host.
+				GAIA::CTN::AChars chsHost;
+				chsHost = pszBucket;
+				chsHost += ".";
+				chsHost += pszDomain;
+				
+				// Calculate date.
+				GAIA::CTN::ACharsString strDate;
+				this->GetCurrentDate(strDate);
+				
+				// Calculate signature.
+				GAIA::CTN::ACharsString strSignature;
+				this->Signature(GAIA::NETWORK::HTTP_METHOD_GET, strDate.fptr(), pszBucket, pszURL, aoa, strSignature);
+				
+				// Initialize head.
+				GAIA::NETWORK::HttpHead head;
+				head.Set(GAIA::NETWORK::HTTP_HEADNAME_HOST, chsHost.fptr());
+				head.Set(GAIA::NETWORK::HTTP_HEADNAME_DATE, strDate.fptr());
+				head.Set(GAIA::NETWORK::HTTP_HEADNAME_AUTHORIZATION, strSignature.fptr());
+				
+				// Setup request.
+				pRequest->SetMethod(GAIA::NETWORK::HTTP_METHOD_GET);
+				pRequest->SetURL(url);
+				pRequest->SetHead(head);
+				
+				// Request.
+				pRequest->Request();
+				
+				// Wait.
+				if(pUserRequest == GNIL)
+				{
+					pRequest->Wait();
+					pRequest->drop_ref();
+					pRequest = GNIL;
+				}
 			}
 			
 			GINL GAIA::GVOID Collect(const GAIA::CH* pszDomain, const GAIA::CH* pszBucket, const GAIA::CH* pszURL, const AliOSSAccess& aoa, HttpRequestForAliOSS* pUserRequest = GNIL)
@@ -316,7 +441,54 @@ namespace GAIA
 				if(!aoa.check())
 					GTHROW(InvalidParam);
 				
-				// 
+				// New request.
+				HttpRequestForAliOSS* pRequest;
+				if(pUserRequest == GNIL)
+					pRequest = gnew HttpRequestForAliOSS(*m_pHttp);
+				else
+					pRequest = pUserRequest;
+				
+				// Calculate URL.
+				GAIA::CTN::ACharsString strCombineURL;
+				this->CombineURL(pszDomain, pszBucket, pszURL, strCombineURL);
+				GAIA::NETWORK::HttpURL url;
+				url.FromString(strCombineURL.fptr());
+				
+				// Calculate host.
+				GAIA::CTN::AChars chsHost;
+				chsHost = pszBucket;
+				chsHost += ".";
+				chsHost += pszDomain;
+				
+				// Calculate date.
+				GAIA::CTN::ACharsString strDate;
+				this->GetCurrentDate(strDate);
+				
+				// Calculate signature.
+				GAIA::CTN::ACharsString strSignature;
+				this->Signature(GAIA::NETWORK::HTTP_METHOD_DELETE, strDate.fptr(), pszBucket, pszURL, aoa, strSignature);
+				
+				// Initialize head.
+				GAIA::NETWORK::HttpHead head;
+				head.Set(GAIA::NETWORK::HTTP_HEADNAME_HOST, chsHost.fptr());
+				head.Set(GAIA::NETWORK::HTTP_HEADNAME_DATE, strDate.fptr());
+				head.Set(GAIA::NETWORK::HTTP_HEADNAME_AUTHORIZATION, strSignature.fptr());
+				
+				// Setup request.
+				pRequest->SetMethod(GAIA::NETWORK::HTTP_METHOD_DELETE);
+				pRequest->SetURL(url);
+				pRequest->SetHead(head);
+				
+				// Request.
+				pRequest->Request();
+				
+				// Wait.
+				if(pUserRequest == GNIL)
+				{
+					pRequest->Wait();
+					pRequest->drop_ref();
+					pRequest = GNIL;
+				}
 			}
 			
 		private:
