@@ -32,13 +32,13 @@ namespace GAIA
 				If sKeyLen <= 0, this function will failed and return GAIA::False.
 				If pRes == GNIL, this function will failed and return GAIA::False.
 		*/
-		GINL GAIA::GVOID hmacsha1(const GAIA::GVOID* pSrc, GAIA::NUM sSrcLen, const GAIA::GVOID* pKey, GAIA::NUM sKeyLen, GAIA::GVOID* pRes)
+		GINL GAIA::BL hmacsha1(const GAIA::GVOID* pSrc, GAIA::NUM sSrcLen, const GAIA::GVOID* pKey, GAIA::NUM sKeyLen, GAIA::GVOID* pRes)
 		{
-			GPCHR_TRUE_RETURN(pSrc == GNIL, GAIA::False);
-			GPCHR_TRUE_RETURN(sSrcLen <= 0, GAIA::False);
-			GPCHR_TRUE_RETURN(pKey == GNIL, GAIA::False);
-			GPCHR_TRUE_RETURN(sKeyLen <= 0, GAIA::False);
-			GPCHR_TRUE_RETURN(pRes == GNIL, GAIA::False);
+			GPCHR_TRUE_RET(pSrc == GNIL, GAIA::False);
+			GPCHR_TRUE_RET(sSrcLen <= 0, GAIA::False);
+			GPCHR_TRUE_RET(pKey == GNIL, GAIA::False);
+			GPCHR_TRUE_RET(sKeyLen <= 0, GAIA::False);
+			GPCHR_TRUE_RET(pRes == GNIL, GAIA::False);
 			const GAIA::U8* pSrcPrac = (const GAIA::U8*)pSrc;
 			const GAIA::U8* pKeyPrac = (const GAIA::U8*)pKey;
 			GAIA::U8* res = (GAIA::U8*)pRes;
