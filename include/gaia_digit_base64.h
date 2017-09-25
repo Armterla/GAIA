@@ -57,7 +57,7 @@ namespace GAIA
 				GAST(dstlen >= ((srclen + 2) / 3) * 4);
 				if(dstlen < ((srclen + 2) / 3) * 4)
 					return GINVALID;
-				for(GAIA::N32 i = srclen; i > 0; i -= 3)
+				for(GAIA::N32 i = (GAIA::N32)srclen; i > 0; i -= 3)
 				{
 					GAIA::U8 b0, b1, b2;
 					if(i >= 3)

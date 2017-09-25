@@ -619,7 +619,7 @@ namespace GAIA
 				GAIA::U8 dig[20];
 				GAIA::DIGIT::hmacsha1(res.fptr(), res.size(), aoa.chsPrivateKey.fptr(), aoa.chsPrivateKey.size(), dig);
 				GAIA::CH digbase64[128];
-				GAIA::NUM sLength = GAIA::DIGIT::base64encode(digbase64, sizeof(digbase64), dig, sizeof(dig));
+				GAIA::NUM sLength = GAIA::DIGIT::base64encode(digbase64, (GAIA::NUM)sizeof(digbase64), dig, (GAIA::NUM)sizeof(dig));
 				digbase64[sLength] = '\0';
 
 				res = "OSS ";
