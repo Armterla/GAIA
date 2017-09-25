@@ -230,6 +230,7 @@
 #include	"gaia_network_httpbase.h"
 #include	"gaia_network_httpserver.h"
 #include	"gaia_network_http.h"
+#include	"gaia_network_alioss.h"
 
 #include	"gaia_locale_language.h"
 

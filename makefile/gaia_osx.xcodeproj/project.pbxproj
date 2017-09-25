@@ -319,6 +319,7 @@
 		1A4CE2A91EB7829A007AFD08 /* t_pattern_stringindex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A4CE2A81EB7829A007AFD08 /* t_pattern_stringindex.cpp */; };
 		1A4CE2AB1EB78331007AFD08 /* t_pattern_textindex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A4CE2AA1EB78331007AFD08 /* t_pattern_textindex.cpp */; };
 		1A80BD411F780E1100AA3AF8 /* t_digit_hmac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A80BD401F780E1100AA3AF8 /* t_digit_hmac.cpp */; };
+		3B0505C61F78EED50088DEBE /* t_network_alioss.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B0505C51F78EED40088DEBE /* t_network_alioss.cpp */; };
 		3B3119D81E6D36CD009462C1 /* libiconv.2.4.0.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B3119D71E6D36CD009462C1 /* libiconv.2.4.0.tbd */; };
 		3B3C9F281EC408490045E8D5 /* t_digit_crc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B3C9F271EC408490045E8D5 /* t_digit_crc.cpp */; };
 		3B6B9C991E9FBA6E008CF1A0 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B6B9C981E9FBA6E008CF1A0 /* main.cpp */; };
@@ -661,6 +662,7 @@
 		1A4CE2A81EB7829A007AFD08 /* t_pattern_stringindex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_pattern_stringindex.cpp; path = ../test/t_pattern_stringindex.cpp; sourceTree = SOURCE_ROOT; };
 		1A4CE2AA1EB78331007AFD08 /* t_pattern_textindex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_pattern_textindex.cpp; path = ../test/t_pattern_textindex.cpp; sourceTree = SOURCE_ROOT; };
 		1A80BD401F780E1100AA3AF8 /* t_digit_hmac.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_digit_hmac.cpp; sourceTree = "<group>"; };
+		3B0505C51F78EED40088DEBE /* t_network_alioss.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = t_network_alioss.cpp; sourceTree = "<group>"; };
 		3B31161E1E6D3538009462C1 /* gaia_osx */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = gaia_osx; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3119D71E6D36CD009462C1 /* libiconv.2.4.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.2.4.0.tbd; path = usr/lib/libiconv.2.4.0.tbd; sourceTree = SDKROOT; };
 		3B3C9F271EC408490045E8D5 /* t_digit_crc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = t_digit_crc.cpp; path = ../test/t_digit_crc.cpp; sourceTree = SOURCE_ROOT; };
@@ -987,6 +989,7 @@
 				1A4CE1561EB7810A007AFD08 /* t_misc_cmdparam.cpp */,
 				1A4CE1571EB7810A007AFD08 /* t_namespace.cpp */,
 				1A4CE1581EB7810A007AFD08 /* t_network_asyncsocket.cpp */,
+				3B0505C51F78EED40088DEBE /* t_network_alioss.cpp */,
 				1A4CE1591EB7810A007AFD08 /* t_network_base.cpp */,
 				1A4CE15A1EB7810A007AFD08 /* t_network_http.cpp */,
 				1A4CE15B1EB7810A007AFD08 /* t_network_httpbase.cpp */,
@@ -1318,6 +1321,7 @@
 				1A4CE1E21EB7810A007AFD08 /* pcre16_xclass.c in Sources */,
 				1A4CE29D1EB7810A007AFD08 /* t_time_timer.cpp in Sources */,
 				1A4CE27A1EB7810A007AFD08 /* t_math_aabr.cpp in Sources */,
+				3B0505C61F78EED50088DEBE /* t_network_alioss.cpp in Sources */,
 				1A4CE2341EB7810A007AFD08 /* t_ctn_book.cpp in Sources */,
 				1A4CE1B21EB7810A007AFD08 /* hpdf_image.c in Sources */,
 				1A4CE2391EB7810A007AFD08 /* t_ctn_chars.cpp in Sources */,
