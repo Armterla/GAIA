@@ -21,7 +21,6 @@ namespace TEST
 			GAIA::NETWORK::AliOSS oss(http);
 			
 			// Sync mode
-			if(false)
 			{
 				// Upload data test.
 				oss.UploadData("oss-cn-hangzhou.aliyuncs.com", "com-t2j-pub", "Test/helloworld.txt", "0123456789", 10, aoa);
