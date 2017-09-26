@@ -3,6 +3,7 @@
 
 #include "gaia_type.h"
 #include "gaia_assert.h"
+#include "gaia_algo_string.h"
 #include "gaia_ctn_buffer.h"
 #include "gaia_ctn_chars.h"
 #include "gaia_ctn_string.h"
@@ -38,6 +39,23 @@ namespace GAIA
 			GAIA::CTN::AChars chsPrivateKey;
 		};
 		
+		class AliOSSObjInfo : public GAIA::Base
+		{
+		public:
+			GINL GAIA::GVOID reset()
+			{
+				tLastModified.reset();
+				md5.clear();
+				lSize = GINVALID;
+			}
+			
+		public:
+			GAIA::CTN::ACharsString strName;
+			GAIA::TIME::Time tLastModified;
+			GAIA::X128 md5;
+			GAIA::N64 lSize;
+		};
+		
 		class AliOSS : public GAIA::Base
 		{
 		public:
@@ -55,7 +73,65 @@ namespace GAIA
 				}
 				GINL ~HttpRequestForAliOSS(){}
 				GINL virtual GAIA::GVOID OnBegin(){}
-				GINL virtual GAIA::GVOID OnEnd(GAIA::BL bCanceled){}
+				GINL virtual GAIA::GVOID OnEnd(GAIA::BL bCanceled)
+				{
+					if(file.IsOpen() && (file.GetOpenType() & GAIA::FSYS::File::OPEN_TYPE_WRITE))
+						file.Flush();
+					if(pListResult != GNIL && pDownloadBuf != GNIL && pDownloadBuf->write_size() > 0)
+					{
+						GAIA::CTN::AString s;
+						GAIA::CTN::AString v;
+						s.assign(pDownloadBuf->fptr(), pDownloadBuf->write_size());
+						GAIA::NUM sCursor = 0;
+						GAIA::CH szTime[128];
+						
+						while(this->XmlMoveCursor(s, sCursor, "<Contents>"))
+						{
+							GAIA::NETWORK::AliOSSObjInfo oi;
+							
+							this->XmlMoveCursor(s, sCursor, "<Key>", &v);
+							oi.strName = v.fptr();
+							
+							this->XmlMoveCursor(s, sCursor, "<LastModified>", &v);
+							v.replace("T", "_");
+							v.replace(".", "_");
+							v.resize(v.size() - 1);
+							GAIA::TIME::timermaux(v.fptr(), szTime);
+							oi.tLastModified.from(szTime);
+							
+							this->XmlMoveCursor(s, sCursor, "<ETag>", &v);
+							v.resize(v.size() - 1);
+							oi.md5.fromstring(v.fptr() + 1);
+							
+							this->XmlMoveCursor(s, sCursor, "<Size>", &v);
+							oi.lSize = v;
+							
+							pListResult->push_back(oi);
+						}
+					}
+				}
+				GINL GAIA::BL XmlMoveCursor(const GAIA::CTN::AString& s, GAIA::NUM& sCursor, const GAIA::CH* pszTag, GAIA::CTN::AString* pResult = GNIL)
+				{
+					GAIA::NUM sFinded = s.find(pszTag, sCursor);
+					if(sFinded == GINVALID)
+						return GAIA::False;
+					
+					sCursor = sFinded + GAIA::ALGO::gstrlen(pszTag);
+					
+					if(pResult != GNIL)
+					{
+						sFinded = s.find("</", sCursor);
+						if(sFinded == GINVALID)
+							return GAIA::False;
+						
+						if(sFinded > sCursor)
+							pResult->assign(s.fptr() + sCursor, sFinded - sCursor);
+						else
+							pResult->clear();
+					}
+					
+					return GAIA::True;
+				}
 				GINL virtual GAIA::GVOID OnState(GAIA::NETWORK::HTTP_REQUEST_STATE newstate){}
 				GINL virtual GAIA::GVOID OnPause(){}
 				GINL virtual GAIA::GVOID OnResume(){}
@@ -71,7 +147,7 @@ namespace GAIA
 				{
 					if(pDownloadBuf != GNIL)
 						pDownloadBuf->write(pData, sDataSize);
-					if(!file.IsOpen())
+					if(file.IsOpen())
 						file.Write(pData, sDataSize);
 				}
 				GINL virtual GAIA::N64 OnRequestBodyData(GAIA::N64 lOffset, GAIA::GVOID* pData, GAIA::NUM sMaxDataSize)
@@ -83,6 +159,7 @@ namespace GAIA
 						GAIA::N64 lReaded = file.Read(pData, sMaxDataSize);
 						if(lReaded < 0)
 							lReaded = 0;
+						return lReaded;
 					}
 					return 0;
 				}
@@ -93,6 +170,7 @@ namespace GAIA
 				GAIA::CTN::ACharsString strURL;
 				GAIA::CTN::Buffer bufUpload;
 				GAIA::CTN::ACharsString strPrefix;
+				GAIA::CTN::ACharsString strDelimiter;
 				GAIA::N64 lStart;
 				GAIA::N64 lCount;
 				AliOSSAccess aoa;
@@ -101,8 +179,8 @@ namespace GAIA
 				GAIA::NETWORK::HttpHead resphead;
 				GAIA::CTN::Buffer bufDownload;
 				GAIA::CTN::Buffer* pDownloadBuf;
-				GAIA::CTN::Vector<GAIA::CTN::ACharsString> listResult;
-				GAIA::CTN::Vector<GAIA::CTN::ACharsString>* pListResult;
+				GAIA::CTN::Vector<GAIA::NETWORK::AliOSSObjInfo> listResult;
+				GAIA::CTN::Vector<GAIA::NETWORK::AliOSSObjInfo>* pListResult;
 				
 				// Request and response common.
 				GAIA::CTN::ACharsString strFileName;
@@ -444,16 +522,16 @@ namespace GAIA
 				}
 			}
 			
-			GINL GAIA::GVOID Collect(const GAIA::CH* pszDomain, const GAIA::CH* pszBucket, const GAIA::CH* pszURL, const GAIA::CH* pszPrefix, GAIA::N64 lStart, GAIA::N64 lCount, GAIA::CTN::Vector<GAIA::CTN::ACharsString>& listResult, const AliOSSAccess& aoa, HttpRequestForAliOSS* pUserRequest = GNIL)
+			GINL GAIA::GVOID Collect(const GAIA::CH* pszDomain, const GAIA::CH* pszBucket, const GAIA::CH* pszPrefix, const GAIA::CH* pszDelimiter, GAIA::N64 lStart, GAIA::N64 lCount, GAIA::CTN::Vector<GAIA::NETWORK::AliOSSObjInfo>& listResult, const AliOSSAccess& aoa, HttpRequestForAliOSS* pUserRequest = GNIL)
 			{
 				// Checkup parameters.
 				if(GAIA::ALGO::gstremp(pszDomain))
 					GTHROW(InvalidParam);
 				if(GAIA::ALGO::gstremp(pszBucket))
 					GTHROW(InvalidParam);
-				if(GAIA::ALGO::gstremp(pszURL))
+				if(pszPrefix == GNIL)
 					GTHROW(InvalidParam);
-				if(GAIA::ALGO::gstremp(pszPrefix))
+				if(pszDelimiter == GNIL)
 					GTHROW(InvalidParam);
 				if(lStart < 0)
 					GTHROW(InvalidParam);
@@ -480,7 +558,7 @@ namespace GAIA
 				// Set parameters.
 				pRequest->strDomain = pszDomain;
 				pRequest->strBucket = pszBucket;
-				pRequest->strURL = pszURL;
+				pRequest->strDelimiter = pszDelimiter;
 				pRequest->strPrefix = pszPrefix;
 				pRequest->lStart = lStart;
 				pRequest->lCount = lCount;
@@ -491,9 +569,11 @@ namespace GAIA
 				this->CombineURL(pszDomain, pszBucket, "", strCombineURL);
 				strCombineURL += "?prefix=";
 				strCombineURL += pszPrefix;
+				strCombineURL += "&delimiter=";
+				strCombineURL += pszDelimiter;
 				strCombineURL += "&marker=";
 				strCombineURL += lStart;
-				strCombineURL += "&delimiter=/&max-keys=";
+				strCombineURL += "&max-keys=";
 				strCombineURL += lCount;
 				GAIA::NETWORK::HttpURL url;
 				url.FromString(strCombineURL.fptr());
@@ -510,7 +590,7 @@ namespace GAIA
 				
 				// Calculate signature.
 				GAIA::CTN::ACharsString strSignature;
-				this->Signature(GAIA::NETWORK::HTTP_METHOD_GET, strDate.fptr(), pszBucket, pszURL, aoa, strSignature);
+				this->Signature(GAIA::NETWORK::HTTP_METHOD_GET, strDate.fptr(), pszBucket, "", aoa, strSignature);
 				
 				// Initialize head.
 				GAIA::NETWORK::HttpHead head;
