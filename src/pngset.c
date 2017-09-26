@@ -16,6 +16,11 @@
  * info struct and allows us to change the structure in the future.
  */
 
+#ifdef __APPLE__
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored"-Wcomma"
+#endif
+
 #include "pngpriv.h"
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
@@ -1609,3 +1614,7 @@ png_set_check_for_invalid_index(png_structrp png_ptr, int allowed)
 }
 #endif
 #endif /* READ || WRITE */
+
+#ifdef __APPLE__
+#	pragma clang diagnostic pop
+#endif

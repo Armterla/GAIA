@@ -49,6 +49,11 @@
 
 /* @(#) $Id$ */
 
+#ifdef __APPLE__
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored"-Wcomma"
+#endif
+
 #include "zconf_internal.h"
 #include "deflate.h"
 
@@ -1966,3 +1971,7 @@ local block_state deflate_huff(s, flush)
         FLUSH_BLOCK(s, 0);
     return block_done;
 }
+
+#ifdef __APPLE__
+#	pragma clang diagnostic pop
+#endif

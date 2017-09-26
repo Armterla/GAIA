@@ -16,6 +16,11 @@
  * in pngtrans.c.
  */
 
+#ifdef __APPLE__
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored"-Wcomma"
+#endif
+
 #include "pngpriv.h"
 
 #ifdef PNG_READ_SUPPORTED
@@ -4992,3 +4997,7 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
 
 #endif /* READ_TRANSFORMS */
 #endif /* READ */
+
+#ifdef __APPLE__
+#	pragma clang diagnostic pop
+#endif

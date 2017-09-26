@@ -15,6 +15,11 @@
  *
  */
 
+#ifdef __APPLE__
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored"-Wcomma"
+#endif
+
 #include "hpdf_conf.h"
 #include "hpdf_utils.h"
 #include "hpdf.h"
@@ -795,3 +800,7 @@ HPDF_Image_LoadRaw1BitImageFromMem  (HPDF_Doc           pdf,
 
     return image;
 }
+
+#ifdef __APPLE__
+#	pragma clang diagnostic pop
+#endif

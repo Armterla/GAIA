@@ -14,6 +14,11 @@
  * libpng itself during the course of reading an image.
  */
 
+#ifdef __APPLE__
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored"-Wcomma"
+#endif
+
 #include "pngpriv.h"
 
 #ifdef PNG_READ_SUPPORTED
@@ -4472,3 +4477,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    png_ptr->flags |= PNG_FLAG_ROW_INIT;
 }
 #endif /* READ */
+
+#ifdef __APPLE__
+#	pragma clang diagnostic pop
+#endif

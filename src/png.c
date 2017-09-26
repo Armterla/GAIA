@@ -1,3 +1,7 @@
+#ifdef __APPLE__
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored"-Wcomma"
+#endif
 
 /* png.c - location for general purpose libpng functions
  *
@@ -4458,3 +4462,7 @@ png_image_error(png_imagep image, png_const_charp error_message)
 
 #endif /* SIMPLIFIED READ/WRITE */
 #endif /* READ || WRITE */
+	
+#ifdef __APPLE__
+#	pragma clang diagnostic pop
+#endif
