@@ -49,46 +49,20 @@ namespace GAIA
 				{
 					pDownloadBuf = GNIL;
 					pListResult = GNIL;
+					lStart = GINVALID;
+					lCount = GINVALID;
+					aoa.reset();
 				}
-				GINL ~HttpRequestForAliOSS()
-				{
-				}
-				GINL virtual GAIA::GVOID OnBegin()
-				{
-					
-				}
-				GINL virtual GAIA::GVOID OnEnd(GAIA::BL bCanceled)
-				{
-					
-				}
-				GINL virtual GAIA::GVOID OnState(GAIA::NETWORK::HTTP_REQUEST_STATE newstate)
-				{
-					
-				}
-				GINL virtual GAIA::GVOID OnPause()
-				{
-					
-				}
-				GINL virtual GAIA::GVOID OnResume()
-				{
-					
-				}
-				GINL virtual GAIA::GVOID OnSent(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize)
-				{
-					
-				}
-				GINL virtual GAIA::GVOID OnRecved(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize)
-				{
-					
-				}
-				GINL virtual GAIA::GVOID OnSentHead(const GAIA::CH* pszHttpVersion, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& head)
-				{
-					
-				}
-				GINL virtual GAIA::GVOID OnSentBody(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize)
-				{
-					
-				}
+				GINL ~HttpRequestForAliOSS(){}
+				GINL virtual GAIA::GVOID OnBegin(){}
+				GINL virtual GAIA::GVOID OnEnd(GAIA::BL bCanceled){}
+				GINL virtual GAIA::GVOID OnState(GAIA::NETWORK::HTTP_REQUEST_STATE newstate){}
+				GINL virtual GAIA::GVOID OnPause(){}
+				GINL virtual GAIA::GVOID OnResume(){}
+				GINL virtual GAIA::GVOID OnSent(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){}
+				GINL virtual GAIA::GVOID OnRecved(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){}
+				GINL virtual GAIA::GVOID OnSentHead(const GAIA::CH* pszHttpVersion, GAIA::NETWORK::HTTP_METHOD method, const GAIA::NETWORK::HttpURL& url, const GAIA::NETWORK::HttpHead& head){}
+				GINL virtual GAIA::GVOID OnSentBody(GAIA::N64 lOffset, const GAIA::GVOID* pData, GAIA::NUM sDataSize){}
 				GINL virtual GAIA::GVOID OnRecvedHead(const GAIA::CH* pszHttpVersion, const GAIA::CH* pszHttpCode, const GAIA::CH* pszHttpCodeDesc, const GAIA::NETWORK::HttpHead& head)
 				{
 					resphead = head;
@@ -102,16 +76,37 @@ namespace GAIA
 				}
 				GINL virtual GAIA::N64 OnRequestBodyData(GAIA::N64 lOffset, GAIA::GVOID* pData, GAIA::NUM sMaxDataSize)
 				{
+					if(file.IsOpen())
+					{
+						if(file.Tell() != lOffset)
+							file.Seek(lOffset);
+						GAIA::N64 lReaded = file.Read(pData, sMaxDataSize);
+						if(lReaded < 0)
+							lReaded = 0;
+					}
 					return 0;
 				}
 			public:
+				// Request parameters.
+				GAIA::CTN::ACharsString strDomain;
+				GAIA::CTN::ACharsString strBucket;
+				GAIA::CTN::ACharsString strURL;
+				GAIA::CTN::Buffer bufUpload;
+				GAIA::CTN::ACharsString strPrefix;
+				GAIA::N64 lStart;
+				GAIA::N64 lCount;
+				AliOSSAccess aoa;
+				
+				// Response result.
 				GAIA::NETWORK::HttpHead resphead;
 				GAIA::CTN::Buffer bufDownload;
 				GAIA::CTN::Buffer* pDownloadBuf;
-				GAIA::CTN::ACharsString strFileName;
-				GAIA::FSYS::File file;
 				GAIA::CTN::Vector<GAIA::CTN::ACharsString> listResult;
 				GAIA::CTN::Vector<GAIA::CTN::ACharsString>* pListResult;
+				
+				// Request and response common.
+				GAIA::CTN::ACharsString strFileName;
+				GAIA::FSYS::File file;
 			};
 			
 		public:
@@ -154,6 +149,13 @@ namespace GAIA
 					pRequest = gnew HttpRequestForAliOSS(*m_pHttp);
 				else
 					pRequest = pUserRequest;
+				
+				// Set parameters.
+				pRequest->strDomain = pszDomain;
+				pRequest->strBucket = pszBucket;
+				pRequest->strURL = pszURL;
+				pRequest->bufUpload.assign(pData, sSize);
+				pRequest->aoa = aoa;
 				
 				// Calculate URL.
 				GAIA::CTN::ACharsString strCombineURL;
@@ -230,6 +232,12 @@ namespace GAIA
 					pRequest->pDownloadBuf = &pRequest->bufDownload;
 				}
 				
+				// Set parameters.
+				pRequest->strDomain = pszDomain;
+				pRequest->strBucket = pszBucket;
+				pRequest->strURL = pszURL;
+				pRequest->aoa = aoa;
+				
 				// Calculate URL.
 				GAIA::CTN::ACharsString strCombineURL;
 				this->CombineURL(pszDomain, pszBucket, pszURL, strCombineURL);
@@ -293,9 +301,15 @@ namespace GAIA
 					pRequest = gnew HttpRequestForAliOSS(*m_pHttp);
 				else
 					pRequest = pUserRequest;
-				pRequest->strFileName = pszFile;
+
+				// Set parameters.
+				pRequest->strDomain = pszDomain;
+				pRequest->strBucket = pszBucket;
+				pRequest->strURL = pszURL;
+				pRequest->aoa = aoa;
 				
 				// Open file.
+				pRequest->strFileName = pszFile;
 				if(!pRequest->file.Open(pszFile, GAIA::FSYS::File::OPEN_TYPE_READ))
 				{
 					pRequest->drop_ref();
@@ -371,9 +385,15 @@ namespace GAIA
 					pRequest = gnew HttpRequestForAliOSS(*m_pHttp);
 				else
 					pRequest = pUserRequest;
-				pRequest->strFileName = pszFile;
+				
+				// Set parameters.
+				pRequest->strDomain = pszDomain;
+				pRequest->strBucket = pszBucket;
+				pRequest->strURL = pszURL;
+				pRequest->aoa = aoa;
 				
 				// Open file.
+				pRequest->strFileName = pszFile;
 				if(!pRequest->file.Open(pszFile, GAIA::FSYS::File::OPEN_TYPE_WRITE | GAIA::FSYS::File::OPEN_TYPE_CREATEALWAYS))
 				{
 					pRequest->drop_ref();
@@ -455,6 +475,16 @@ namespace GAIA
 					pRequest = pUserRequest;
 					pRequest->pListResult = &pRequest->listResult;
 				}
+				pRequest->pDownloadBuf = &pRequest->bufDownload;
+				
+				// Set parameters.
+				pRequest->strDomain = pszDomain;
+				pRequest->strBucket = pszBucket;
+				pRequest->strURL = pszURL;
+				pRequest->strPrefix = pszPrefix;
+				pRequest->lStart = lStart;
+				pRequest->lCount = lCount;
+				pRequest->aoa = aoa;
 				
 				// Calculate URL.
 				GAIA::CTN::ACharsString strCombineURL;
@@ -523,6 +553,12 @@ namespace GAIA
 					pRequest = gnew HttpRequestForAliOSS(*m_pHttp);
 				else
 					pRequest = pUserRequest;
+				
+				// Set parameters.
+				pRequest->strDomain = pszDomain;
+				pRequest->strBucket = pszBucket;
+				pRequest->strURL = pszURL;
+				pRequest->aoa = aoa;
 				
 				// Calculate URL.
 				GAIA::CTN::ACharsString strCombineURL;
