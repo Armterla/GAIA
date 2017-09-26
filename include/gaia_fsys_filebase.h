@@ -4,6 +4,7 @@
 #include "gaia_type.h"
 #include "gaia_assert.h"
 #include "gaia_algo_string.h"
+#include "gaia_ctn_buffer.h"
 
 namespace GAIA
 {
@@ -219,6 +220,46 @@ namespace GAIA
 					return GAIA::False;
 				if(this->Write(&obj, sizeof(obj)) != sizeof(obj))
 					return GAIA::False;
+				return GAIA::True;
+			}
+			
+			/*!
+				@brief Read all remain data to a buffer object.
+			 
+				@param buf [out] Used for save the result data.
+			 
+				@return If success return GAIA::True, or will return GAIA::False.
+			 
+				@remarks If the file remain size is above 1Gbytes, this function will return GAIA::False.
+			 		After this function call and return true, the parameter buf will be filled by the remain data, and the buf's writer pointer will move to the end of the data.
+		 			After this function call and return true, the file pointer will move to the end of file.
+			 		After this function call and return false, the file pointer will not be moved.
+		 	*/
+			GAIA::BL ReadRemainAll(GAIA::CTN::Buffer& buf)
+			{
+				GAST(!!this->IsOpen());
+				if(!this->IsOpen())
+					return GAIA::False;
+				GAIA::FSYS::FileBase::__FileSizeType oldseek = this->Tell();
+				GAIA::FSYS::FileBase::__FileSizeType r = this->Size() - oldseek;
+				if(r > 1024 * 1024 * 1024)
+					return GAIA::False;
+				buf.resize((GAIA::NUM)r);
+				GAIA::FSYS::FileBase::__FileSizeType t = 0;
+				while(r > 0)
+				{
+					GAIA::FSYS::FileBase::__FileSizeType step = r;
+					if(step > 1024 * 1024 * 16)
+						step = 1024 * 1024 * 16;
+					GAIA::FSYS::FileBase::__FileSizeType readed = this->Read(buf.fptr() + t, (GAIA::NUM)step);
+					if(readed <= 0)
+					{
+						this->Seek(oldseek);
+						return GAIA::False;
+					}
+					r -= readed;
+					t += readed;
+				}
 				return GAIA::True;
 			}
 

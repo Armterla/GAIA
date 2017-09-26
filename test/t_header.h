@@ -135,6 +135,7 @@ namespace TEST
 	extern GAIA::GVOID t_digit_crc(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_md5(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_sha1(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_digit_hmac(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_diff(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_zip(GAIA::LOG::Log& logobj);
 
@@ -148,6 +149,7 @@ namespace TEST
 	extern GAIA::GVOID t_network_httpbase(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_network_httpserver(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_network_http(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_network_alioss(GAIA::LOG::Log& logobj);
 
 	extern GAIA::GVOID t_locale(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_locale_language(GAIA::LOG::Log& logobj);
@@ -312,6 +314,7 @@ namespace TEST
 			TITEM("Digit: CRC test begin!"); t_digit_crc(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: MD5 test begin!"); t_digit_md5(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: SHA1 test begin!"); t_digit_sha1(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Digit: HMAC test begin!"); t_digit_hmac(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: Diff test begin!"); t_digit_diff(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: Zip test begin!"); t_digit_zip(logobj); TITEM("End"); TTEXT("\t");
 
@@ -325,6 +328,7 @@ namespace TEST
 			TITEM("Network: Network http base test begin!"); t_network_httpbase(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Network: Network http server test begin!"); t_network_httpserver(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Network: Network http test begin!"); t_network_http(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Network: Network alioss test begin!"); t_network_alioss(logobj); TITEM("End"); TTEXT("\t");
 
 			TITEM("Locale: test begin!"); t_locale(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Locale: Language test begin!"); t_locale_language(logobj); TITEM("End"); TTEXT("\t");

@@ -11,6 +11,11 @@
  * and license in png.h
  */
 
+#ifdef __APPLE__
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored"-Wcomma"
+#endif
+
 #include "pngpriv.h"
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
@@ -847,3 +852,7 @@ png_get_current_pass_number(png_const_structrp png_ptr)
 #endif /* USER_TRANSFORM_INFO */
 #endif /* READ_USER_TRANSFORM || WRITE_USER_TRANSFORM */
 #endif /* READ || WRITE */
+
+#ifdef __APPLE__
+#	pragma clang diagnostic pop
+#endif

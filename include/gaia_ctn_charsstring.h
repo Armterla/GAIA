@@ -362,8 +362,10 @@ namespace GAIA
 				m_string.destroy();
 			}
 			GINL GAIA::U32 type() const{if(m_string.capacity() != 0) return m_string.type(); return m_chars.type();}
-			template<typename _ParamDataType> __MyType& assign(const _ParamDataType* p, const _SizeType& size)
+			template<typename _ParamDataType> __MyType& assign(const _ParamDataType* p, _SizeType size = GINVALID)
 			{
+				if(size < 0)
+					size = GAIA::ALGO::gstrlen(p);
 				if(p == GNIL || size == 0)
 				{
 					this->clear();
@@ -374,6 +376,22 @@ namespace GAIA
 				else
 				{
 					m_chars.assign(p, size);
+					m_string.destroy();
+				}
+				return *this;
+			}
+			template<typename _ParamDataType> __MyType& append(const _ParamDataType* p, _SizeType size = GINVALID)
+			{
+				if(p == GNIL || size == 0)
+				{
+					this->clear();
+					return *this;
+				}
+				if(size > m_chars.capacity())
+					m_string.append(p, size);
+				else
+				{
+					m_chars.append(p, size);
 					m_string.destroy();
 				}
 				return *this;
