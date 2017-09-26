@@ -270,7 +270,7 @@ namespace GAIA
 				pRequest->SetMethod(GAIA::NETWORK::HTTP_METHOD_PUT);
 				pRequest->SetURL(url);
 				pRequest->SetHead(head);
-				pRequest->BindRequestBuffer(pData, sSize);
+				pRequest->BindRequestBuffer(pRequest->bufUpload.fptr(), sSize);
 				
 				// Request.
 				pRequest->Request();
