@@ -961,6 +961,12 @@
     <ClCompile Include="..\test\t_digit_crc.cpp">
       <Filter>GAIA\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\t_digit_hmac.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\test\t_network_alioss.cpp">
+      <Filter>GAIA\test</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\test\preheader.h">

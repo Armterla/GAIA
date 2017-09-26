@@ -1340,6 +1340,7 @@
     <ClCompile Include="..\test\t_digit_base64.cpp" />
     <ClCompile Include="..\test\t_digit_crc.cpp" />
     <ClCompile Include="..\test\t_digit_diff.cpp" />
+    <ClCompile Include="..\test\t_digit_hmac.cpp" />
     <ClCompile Include="..\test\t_digit_md5.cpp" />
     <ClCompile Include="..\test\t_digit_percentage.cpp" />
     <ClCompile Include="..\test\t_digit_rc4.cpp" />
@@ -1382,6 +1383,7 @@
     <ClCompile Include="..\test\t_misc_cmdline.cpp" />
     <ClCompile Include="..\test\t_misc_cmdparam.cpp" />
     <ClCompile Include="..\test\t_namespace.cpp" />
+    <ClCompile Include="..\test\t_network_alioss.cpp" />
     <ClCompile Include="..\test\t_network_asyncsocket.cpp" />
     <ClCompile Include="..\test\t_network_base.cpp" />
     <ClCompile Include="..\test\t_network_http.cpp" />
