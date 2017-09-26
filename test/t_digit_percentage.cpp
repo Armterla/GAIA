@@ -45,7 +45,7 @@ namespace TEST
 
 			GAIA::CTN::AString strUtf8;
 			GAIA::FSYS::File f;
-			if(f.Open(_T("../testres/LOCALE/iamgaia.txt"), GAIA::FSYS::FileBase::OPEN_TYPE_READ))
+			if(f.Open("../testres/LOCALE/iamgaia.txt", GAIA::FSYS::FileBase::OPEN_TYPE_READ))
 			{
 				strUtf8.resize((GAIA::N32)f.Size());
 				f.Read(strUtf8.fptr(), (GAIA::N32)f.Size());

@@ -4,6 +4,7 @@
 #include "gaia_type.h"
 #include "gaia_assert.h"
 #include "gaia_algo_string.h"
+#include "gaia_algo_hash.h"
 #include "gaia_global_decl.h"
 
 #if GAIA_OS == GAIA_OS_WINDOWS
@@ -61,6 +62,7 @@ namespace GAIA
 		uuid_generate(*GRCAST(uuid_t*)(u8));
 	#endif
 	}
+	GAIA::U64 X128::hash() const{return GAIA::ALGO::hash(u64_0 + u64_1);}
 	template<typename _ParamDataType> GAIA::BL X128::check(const _ParamDataType* psz) const
 	{
 		if(psz == GNIL)

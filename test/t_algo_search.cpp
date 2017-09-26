@@ -3,6 +3,27 @@
 
 namespace TEST
 {
+	class NodeForSearch : public GAIA::Base
+	{
+	public:
+		NodeForSearch(){}
+		GINL GAIA::GVOID SetValue(GAIA::NUM s){m_s = s;}
+		GINL GAIA::NUM GetValue() const{return m_s;} 
+	private:
+		GAIA::NUM m_s;
+	};
+	
+	GINL GAIA::N32 NodeCmpor(const GAIA::GVOID* t, const GAIA::GVOID* k)
+	{
+		NodeForSearch* pT = (NodeForSearch*)t;
+		GAIA::NUM* pK = (GAIA::NUM*)k;
+		if(pT->GetValue() < *pK)
+			return -1;
+		else if(pT->GetValue() > *pK)
+			return +1;
+		return 0;
+	}
+	
 	extern GAIA::GVOID t_algo_search(GAIA::LOG::Log& logobj)
 	{
 		GAIA::NUM list[10];
@@ -81,6 +102,90 @@ namespace TEST
 				TERROR;
 				break;
 			}
+		}
+		
+		static const GAIA::NUM SAMPLE_COUNT = 100;
+		GAIA::CTN::Vector<NodeForSearch> listNode;
+		GAIA::CTN::Array<NodeForSearch, SAMPLE_COUNT> arrNode;
+		GAIA::CTN::ArrayVector<NodeForSearch, SAMPLE_COUNT> arrvecNode;
+		for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
+		{
+			NodeForSearch n;
+			n.SetValue(x);
+			listNode.push_back(n);
+			arrNode.push_back(n);
+			arrvecNode.push_back(n);
+		}
+		for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
+		{
+			const NodeForSearch* pFinded = GAIA::ALGO::gbinary_search(listNode.fptr(), listNode.bptr(), x, NodeCmpor);
+			if(pFinded == GNIL)
+				TERROR;
+			if(pFinded->GetValue() != x)
+				TERROR;
+			pFinded = GAIA::ALGO::glinear_search(listNode.fptr(), listNode.bptr(), x, NodeCmpor);
+			if(pFinded == GNIL)
+				TERROR;
+			if(pFinded->GetValue() != x)
+				TERROR;
+			pFinded = GAIA::ALGO::lower_equal(listNode.fptr(), listNode.bptr(), x, NodeCmpor);
+			if(pFinded == GNIL)
+				TERROR;
+			if(pFinded->GetValue() != x)
+				TERROR;
+			pFinded = GAIA::ALGO::upper_equal(listNode.fptr(), listNode.bptr(), x, NodeCmpor);
+			if(pFinded == GNIL)
+				TERROR;
+			if(pFinded->GetValue() != x)
+				TERROR;
+			
+			if(listNode.binary_search(x, NodeCmpor) != x)
+				TERROR;
+			if(arrNode.binary_search(x, NodeCmpor) != x)
+				TERROR;
+			if(arrvecNode.binary_search(x, NodeCmpor) != x)
+				TERROR;
+			
+			if(listNode.binary_searchit(x, NodeCmpor) - listNode.frontit() != x)
+				TERROR;
+			if(arrNode.binary_searchit(x, NodeCmpor) - arrNode.frontit() != x)
+				TERROR;
+			if(arrvecNode.binary_searchit(x, NodeCmpor) - arrvecNode.frontit() != x)
+				TERROR;
+			
+			if(listNode.const_binary_searchit(x, NodeCmpor) - listNode.const_frontit() != x)
+				TERROR;
+			if(arrNode.const_binary_searchit(x, NodeCmpor) - arrNode.const_frontit() != x)
+				TERROR;
+			if(arrvecNode.const_binary_searchit(x, NodeCmpor) - arrvecNode.const_frontit() != x)
+				TERROR;
+			
+			if(listNode.lower_equal(x, NodeCmpor).empty())
+				TERROR;
+			if(listNode.upper_equal(x, NodeCmpor).empty())
+				TERROR;
+			if((*(const GAIA::CTN::Vector<NodeForSearch>*)&listNode).lower_equal(x, NodeCmpor).empty())
+				TERROR;
+			if((*(const GAIA::CTN::Vector<NodeForSearch>*)&listNode).upper_equal(x, NodeCmpor).empty())
+				TERROR;
+			
+			if(arrNode.lower_equal(x, NodeCmpor).empty())
+				TERROR;
+			if(arrNode.upper_equal(x, NodeCmpor).empty())
+				TERROR;
+			if((*(const GAIA::CTN::Array<NodeForSearch, SAMPLE_COUNT>*)&arrNode).lower_equal(x, NodeCmpor).empty())
+				TERROR;
+			if((*(const GAIA::CTN::Array<NodeForSearch, SAMPLE_COUNT>*)&arrNode).upper_equal(x, NodeCmpor).empty())
+				TERROR;
+			
+			if(arrvecNode.lower_equal(x, NodeCmpor).empty())
+				TERROR;
+			if(arrvecNode.upper_equal(x, NodeCmpor).empty())
+				TERROR;
+			if((*(const GAIA::CTN::ArrayVector<NodeForSearch, SAMPLE_COUNT>*)&arrvecNode).lower_equal(x, NodeCmpor).empty())
+				TERROR;
+			if((*(const GAIA::CTN::ArrayVector<NodeForSearch, SAMPLE_COUNT>*)&arrvecNode).upper_equal(x, NodeCmpor).empty())
+				TERROR;
 		}
 	}
 }

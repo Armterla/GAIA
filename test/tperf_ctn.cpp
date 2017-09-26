@@ -35,25 +35,33 @@ namespace TEST
 
 			static const GAIA::NUM SAMPLE_COUNT = 10000;
 
-			GAIA::CTN::Map<GAIA::N32, GAIA::N32> m;
-			GAIA::CTN::HashMap<GAIA::N32, GAIA::N32> hm;
+			GAIA::CTN::Vector<GAIA::X128> listUUID;
+			for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
+			{
+				GAIA::X128 uid;
+				uid.uuid();
+				listUUID.push_back(uid);
+			}
+			
+			GAIA::CTN::Map<GAIA::X128, GAIA::N32> m;
+			GAIA::CTN::HashMap<GAIA::X128, GAIA::N32> hm;
 
 			GAIA::U64 uMapStartTime = GAIA::TIME::tick_time();
 			for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
-				m.insert(x, -x);
+				m.insert(listUUID[x], -x);
 			for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
-				m.find(x);
+				m.find(listUUID[x]);
 			for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
-				m.erase(x);
+				m.erase(listUUID[x]);
 			GAIA::U64 uMapEndTime = GAIA::TIME::tick_time();
 
 			GAIA::U64 uHashMapStartTime = GAIA::TIME::tick_time();
 			for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
-				hm.insert(x, -x);
+				hm.insert(listUUID[x], -x);
 			for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
-				hm.find(x);
+				hm.find(listUUID[x]);
 			for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
-				hm.erase(x);
+				hm.erase(listUUID[x]);
 			GAIA::U64 uHashMapEndTime = GAIA::TIME::tick_time();
 
 			logobj << "\t\tMap Time = " << uMapEndTime - uMapStartTime << "(us)" << logobj.End();
@@ -66,26 +74,34 @@ namespace TEST
 			logobj << "\t\tBegin compare Map and STLMap..." << logobj.End();
 
 			static const GAIA::NUM SAMPLE_COUNT = 10000;
+			
+			GAIA::CTN::Vector<GAIA::X128> listUUID;
+			for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
+			{
+				GAIA::X128 uid;
+				uid.uuid();
+				listUUID.push_back(uid);
+			}
 
-			GAIA::CTN::Map<GAIA::N32, GAIA::N32> m;
-			std::map<GAIA::N32, GAIA::N32, std::less<GAIA::N32>, STLAllocator<GAIA::N32> > stdm;
+			GAIA::CTN::Map<GAIA::X128, GAIA::N32> m;
+			std::map<GAIA::X128, GAIA::N32, std::less<GAIA::X128>, STLAllocator<std::pair<const GAIA::X128, GAIA::N32> > > stdm;
 
 			GAIA::U64 uMapStartTime = GAIA::TIME::tick_time();
 			for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
-				m.insert(x, -x);
+				m.insert(listUUID[x], -x);
 			for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
-				m.find(x);
+				m.find(listUUID[x]);
 			for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
-				m.erase(x);
+				m.erase(listUUID[x]);
 			GAIA::U64 uMapEndTime = GAIA::TIME::tick_time();
 
 			GAIA::U64 uSTDMapStartTime = GAIA::TIME::tick_time();
 			for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
-				stdm.insert(std::pair<int, int>(x, -x));
+				stdm.insert(std::pair<GAIA::X128, int>(listUUID[x], -x));
 			for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
-				stdm.find(x);
+				stdm.find(listUUID[x]);
 			for(GAIA::NUM x = 0; x < SAMPLE_COUNT; ++x)
-				stdm.erase(x);
+				stdm.erase(listUUID[x]);
 			GAIA::U64 uSTDMapEndTime = GAIA::TIME::tick_time();
 
 			logobj << "\t\tMap Time = " << uMapEndTime - uMapStartTime << "(us)" << logobj.End();

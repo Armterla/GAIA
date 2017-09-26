@@ -5,6 +5,7 @@
 #include "gaia_assert.h"
 #include "gaia_algo_compare.h"
 #include "gaia_algo_string.h"
+#include "gaia_algo_hash.h"
 
 namespace GAIA
 {
@@ -20,19 +21,55 @@ namespace GAIA
 			GINL GAIA::BL check() const{return GAIA::ALGO::cmpk(us, 0, 4) != 0;}
 			template<typename _ParamDataType> GAIA::BL fromstring(const _ParamDataType* psz)
 			{
-				const _ParamDataType* p = psz;
-				GAIA::U32 uDotCnt = GAIA::ALGO::gstrcnt(psz, '.');
-				if(uDotCnt == 3)
+				// Check parameter.
+				GAIA::U32 uDigitCount = 0;
+				GAIA::U32 uDotCnt = 0;
+				GAIA::U32 uSectionDigitCount = 0;
+				const _ParamDataType* pszTemp = psz;
+				while(*pszTemp != '\0')
 				{
-					for(GAIA::N32 x = 0; x < 3; ++x)
+					if(*pszTemp >= '0' && *pszTemp <= '9')
 					{
-						p = GAIA::ALGO::str2int(p, us[3 - x]);
-						++p;
+						if(uSectionDigitCount == 3)
+							return GAIA::False;
+						uSectionDigitCount++;
+						uDigitCount++;
 					}
-					GAIA::ALGO::str2int(p, us[0]);
-					return GAIA::True;
+					else if(*pszTemp == '.')
+					{
+						if(uSectionDigitCount == 0)
+							return GAIA::False;
+						uDotCnt++;
+						uSectionDigitCount = 0;
+					}
+					else if(*pszTemp == ':')
+						break;
+					else
+						return GAIA::False;
+					pszTemp++;
 				}
-				return GAIA::False;
+				if(uDigitCount < 4 || uDigitCount > 12)
+					return GAIA::False;
+				if(uDotCnt != 3)
+					return GAIA::False;
+				
+				// Convert.
+				const _ParamDataType* p = psz;
+				for(GAIA::N32 x = 0; x < 3; ++x)
+				{
+					GAIA::NUM s;
+					p = GAIA::ALGO::str2int(p, s);
+					if(s >= 0xFF)
+						return GAIA::False;
+					us[3 - x] = (GAIA::U8)s;
+					++p;
+				}
+				GAIA::NUM s;
+				GAIA::ALGO::str2int(p, s);
+				if(s >= 0xFF)
+					return GAIA::False;
+				us[0] = (GAIA::U8)s;
+				return GAIA::True;
 			}
 			template<typename _ParamDataType> _ParamDataType* tostring(_ParamDataType* psz) const
 			{
@@ -45,6 +82,7 @@ namespace GAIA
 				*(p - 1) = 0;
 				return psz;
 			}
+			GINL GAIA::U64 hash() const{return GAIA::ALGO::hash(u);}
 			GINL IP& operator = (const IP& src){GAST(&src != this); u = src.u; return *this;}
 			template<typename _ParamDataType> IP& operator = (const _ParamDataType* psz){this->fromstring(psz); return *this;}
 			GINL IP operator + (const IP& src) const{IP ret; ret.u = u + src.u; return ret;}

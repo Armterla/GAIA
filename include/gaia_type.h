@@ -158,6 +158,7 @@ namespace GAIA
 		GINL GAIA::BL empty() const{return u64_0 == 0 && u64_1 == 0;}
 		GINL GAIA::GVOID clear(){u64_0 = u64_1 = 0;}
 		GINL GAIA::GVOID uuid();
+		GINL GAIA::U64 hash() const;
 		template<typename _ParamDataType> GAIA::BL check(const _ParamDataType* psz) const;
 		template<typename _ParamDataType> GAIA::GVOID fromstring(const _ParamDataType* psz);
 		template<typename _ParamDataType> _ParamDataType* tostring(_ParamDataType* psz) const;
@@ -301,7 +302,7 @@ namespace GAIA
 	{
 	public:
 	#if defined(GAIA_HEAP)
-	#	if GAIA_OS == GAIA_OS_OSX
+	#	if GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_LINUX
 			GAIA::GVOID* operator new(GAIA::UM size GAIA_NEW_INFO);
 			GAIA::GVOID* operator new[](GAIA::UM size GAIA_NEW_INFO);
 	#	else
@@ -904,7 +905,7 @@ extern GAIA::MSYS::HeapESG g_gaia_globalmsys;
 #endif
 
 #if defined(GAIA_HEAP)
-#	if GAIA_OS == GAIA_OS_OSX
+#	if GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS || GAIA_OS == GAIA_OS_LINUX
 		extern GAIA::GVOID* operator new(GAIA::UM size GAIA_NEW_INFO);
 		extern GAIA::GVOID* operator new[](GAIA::UM size GAIA_NEW_INFO);
 #	else

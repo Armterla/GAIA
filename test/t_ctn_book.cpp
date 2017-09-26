@@ -58,6 +58,11 @@ namespace TEST
 				TERROR;
 				break;
 			}
+			if(!bt.exist(x))
+			{
+				TERROR;
+				break;
+			}
 		}
 		bt1 = bt;
 		if(bt.capacity() < bt.size())

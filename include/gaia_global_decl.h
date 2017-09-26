@@ -88,7 +88,7 @@ public:
 		if(m_pFile == GNIL)
 		{
 			m_pFile = gnew GAIA::FSYS::File;
-			GAIA::TCH szFileName[GAIA::MAXPL];
+			GAIA::CH szFileName[GAIA::MAXPL];
 			if(m_strLogFilePathName.empty() || m_strLogFilePathName.size() >= GAIA::MAXPL)
 			{
 				GAIA::ALGO::gstrcpy(szFileName, g_gaia_appdocdir);

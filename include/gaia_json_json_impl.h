@@ -30,7 +30,7 @@ namespace GAIA
 				m_root.m_pszName = GNIL;
 			m_root.Reset();
 		}
-		GINL GAIA::BL Json::LoadFromFile(const GAIA::TCH* pszFileName)
+		GINL GAIA::BL Json::LoadFromFile(const GAIA::CH* pszFileName)
 		{
 			GAST(!GAIA::ALGO::gstremp(pszFileName));
 			if(GAIA::ALGO::gstremp(pszFileName))
@@ -129,7 +129,7 @@ namespace GAIA
 
 			return GAIA::True;
 		}
-		GINL GAIA::BL Json::SaveToFile(const GAIA::TCH* pszFileName, GAIA::JSON::JSON_SAVE st)
+		GINL GAIA::BL Json::SaveToFile(const GAIA::CH* pszFileName, GAIA::JSON::JSON_SAVE st)
 		{
 			GAST(!GAIA::ALGO::gstremp(pszFileName));
 			if(GAIA::ALGO::gstremp(pszFileName))

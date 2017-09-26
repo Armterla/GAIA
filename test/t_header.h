@@ -1,4 +1,4 @@
-﻿#ifndef		__T_GAIA_HEADER_H__
+#ifndef		__T_GAIA_HEADER_H__
 #define		__T_GAIA_HEADER_H__
 
 #include "gaia_type.h"
@@ -54,7 +54,7 @@ namespace TEST
 	extern GAIA::GVOID t_ctn_bufferrw(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_ctn_stackbuffer(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_ctn_msg(GAIA::LOG::Log& logobj);
-	extern GAIA::GVOID t_ctn_ptr(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_ctn_pter(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_ctn_ref(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_ctn_array(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_ctn_vector(GAIA::LOG::Log& logobj);
@@ -135,6 +135,7 @@ namespace TEST
 	extern GAIA::GVOID t_digit_crc(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_md5(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_sha1(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_digit_hmac(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_diff(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_digit_zip(GAIA::LOG::Log& logobj);
 
@@ -148,6 +149,7 @@ namespace TEST
 	extern GAIA::GVOID t_network_httpbase(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_network_httpserver(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_network_http(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID t_network_alioss(GAIA::LOG::Log& logobj);
 
 	extern GAIA::GVOID t_locale(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_locale_language(GAIA::LOG::Log& logobj);
@@ -167,6 +169,12 @@ namespace TEST
 
 	extern GAIA::GVOID t_misc_cmdparam(GAIA::LOG::Log& logobj);
 	extern GAIA::GVOID t_misc_cmdline(GAIA::LOG::Log& logobj);
+	
+	// GAIA performance test proc.
+	extern GAIA::GVOID tperf_msys_heapesg(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID tperf_ctn(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID tperf_ctn_avltree(GAIA::LOG::Log& logobj);
+	extern GAIA::GVOID tperf_ctn_dmpgraph(GAIA::LOG::Log& logobj);
 
 	GINL GAIA::GVOID t_all(GAIA::LOG::Log& logobj)
 	{
@@ -229,7 +237,7 @@ namespace TEST
 			TITEM("Container: BufferRW test begin!"); t_ctn_bufferrw(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Container: StackBuffer test begin!"); t_ctn_stackbuffer(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Container: Msg test begin!"); t_ctn_msg(logobj); TITEM("End"); TTEXT("\t");
-			TITEM("Container: Ptr test begin!"); t_ctn_ptr(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Container: Pter test begin!"); t_ctn_pter(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Container: Ref test begin!"); t_ctn_ref(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Container: Array test begin!"); t_ctn_array(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Container: Vector test begin!"); t_ctn_vector(logobj); TITEM("End"); TTEXT("\t");
@@ -306,6 +314,7 @@ namespace TEST
 			TITEM("Digit: CRC test begin!"); t_digit_crc(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: MD5 test begin!"); t_digit_md5(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: SHA1 test begin!"); t_digit_sha1(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Digit: HMAC test begin!"); t_digit_hmac(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: Diff test begin!"); t_digit_diff(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Digit: Zip test begin!"); t_digit_zip(logobj); TITEM("End"); TTEXT("\t");
 
@@ -319,6 +328,7 @@ namespace TEST
 			TITEM("Network: Network http base test begin!"); t_network_httpbase(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Network: Network http server test begin!"); t_network_httpserver(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Network: Network http test begin!"); t_network_http(logobj); TITEM("End"); TTEXT("\t");
+			TITEM("Network: Network alioss test begin!"); t_network_alioss(logobj); TITEM("End"); TTEXT("\t");
 
 			TITEM("Locale: test begin!"); t_locale(logobj); TITEM("End"); TTEXT("\t");
 			TITEM("Locale: Language test begin!"); t_locale_language(logobj); TITEM("End"); TTEXT("\t");
@@ -341,12 +351,6 @@ namespace TEST
 		}
 		TTEXT("[GAIA UNIT TEST END]");
 	}
-
-	// GAIA performance test proc.
-	extern GAIA::GVOID tperf_msys_heapesg(GAIA::LOG::Log& logobj);
-	extern GAIA::GVOID tperf_ctn(GAIA::LOG::Log& logobj);
-	extern GAIA::GVOID tperf_ctn_avltree(GAIA::LOG::Log& logobj);
-	extern GAIA::GVOID tperf_ctn_dmpgraph(GAIA::LOG::Log& logobj);
 
 	GINL GAIA::GVOID t_all_perf(GAIA::LOG::Log& logobj)
 	{
@@ -371,7 +375,7 @@ namespace TEST
 		GINL TestLogCallBack()
 		{
 			this->Reset();
-			m_file.Open(_T("test_result.txt"), GAIA::FSYS::File::OPEN_TYPE_WRITE | GAIA::FSYS::File::OPEN_TYPE_CREATEALWAYS);
+			m_file.Open("test_result.txt", GAIA::FSYS::File::OPEN_TYPE_WRITE | GAIA::FSYS::File::OPEN_TYPE_CREATEALWAYS);
 		}
 
 		GINL GAIA::GVOID Reset()

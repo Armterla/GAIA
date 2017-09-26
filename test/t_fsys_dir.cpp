@@ -11,9 +11,9 @@ namespace TEST
 		__FileType tfile;
 		__DirType dir;
 
-		GAIA::TCH TEST_DIR[GAIA::MAXPL];
-		GAIA::TCH TEST_DIR_CHILD[GAIA::MAXPL];
-		GAIA::TCH TEST_DIR_CHILD_CHILD[GAIA::MAXPL];
+		GAIA::CH TEST_DIR[GAIA::MAXPL];
+		GAIA::CH TEST_DIR_CHILD[GAIA::MAXPL];
+		GAIA::CH TEST_DIR_CHILD_CHILD[GAIA::MAXPL];
 		if(GAIA::ALGO::gstremp(g_gaia_appdocdir))
 		{
 			GAIA::ALGO::gstrcpy(TEST_DIR, "../testres/TestDir/");

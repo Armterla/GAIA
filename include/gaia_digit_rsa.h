@@ -82,6 +82,7 @@ namespace GAIA
 			GINL GAIA::BL build_key(GAIA::NUM sBitCount = DEFAULT_BIT_COUNT, GAIA::NUM sExp = 65537, GAIA::U32 uRandomSeed = (GAIA::U32)(GAIA::TIME::tick_time() % 10000))
 			{
 				m_sBitCount = sBitCount;
+				m_lcg.seed(uRandomSeed);
 				return rsa_gen_key(&m_rsa, rsa_rand, &m_lcg, sBitCount, sExp) == 0;
 			}
 

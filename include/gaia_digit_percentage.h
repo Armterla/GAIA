@@ -185,7 +185,7 @@ namespace GAIA
 		*/
 		GINL GAIA::NUM percentage_encode(GAIA::CH ch, GAIA::CH* pszPercentage, GAIA::NUM sMaxPercentageLen)
 		{
-			if(((GAIA::U8)ch) < 128 && !ascii_need_percentage[ch])
+			if(((GAIA::U8)ch) < 128 && !ascii_need_percentage[(GAIA::U8)ch])
 			{
 				if(pszPercentage != GNIL)
 				{
@@ -349,7 +349,7 @@ namespace GAIA
 				{
 					if(((GAIA::U8)pszLocal[x]) < 128)
 					{
-						if(!ascii_need_percentage[pszLocal[x]])
+						if(!ascii_need_percentage[(GAIA::U8)pszLocal[x]])
 							sRet++;
 						else if(pszLocal[x] == ' ')
 							sRet++;

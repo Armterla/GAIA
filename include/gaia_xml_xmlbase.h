@@ -384,7 +384,7 @@ namespace GAIA
 						const _DataType* p = pszNodeName;
 						while(*p != '\0')
 						{
-							if(*p >= sizeof(ascii_xml_validnamechar) || !ascii_xml_validnamechar[*p])
+							if(*p >= sizeof(ascii_xml_validnamechar) || !ascii_xml_validnamechar[(GAIA::U8)*p])
 								return GAIA::False;
 							++p;
 						}
@@ -393,7 +393,7 @@ namespace GAIA
 					{
 						for(GAIA::NUM x = 0; x < sLen; ++x)
 						{
-							if(pszNodeName[x] >= sizeof(ascii_xml_validnamechar) || !ascii_xml_validnamechar[pszNodeName[x]])
+							if(pszNodeName[x] >= sizeof(ascii_xml_validnamechar) || !ascii_xml_validnamechar[(GAIA::U8)pszNodeName[x]])
 								return GAIA::False;
 						}
 					}

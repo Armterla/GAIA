@@ -39,6 +39,7 @@ namespace GAIA
 				*(p - 1) = 0;
 				return psz;
 			}
+			GINL GAIA::U64 hash() const{return GAIA::ALGO::hash((((GAIA::U64)uPort << 32) & 0x0000FFFF00000000) | ip.u);}
 			GINL Addr& operator = (const Addr& src){GAST(&src != this); ip = src.ip; uPort = src.uPort; return *this;}
 			template<typename _ParamDataType> Addr& operator = (const _ParamDataType* psz){this->fromstring(psz); return *this;}
 			GINL GAIA::N32 compare(const GAIA::NETWORK::Addr& src) const

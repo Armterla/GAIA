@@ -85,6 +85,14 @@ namespace GAIA
 					If not call SetBuffer with a buffer pointer, will return GNIL, and parameter size be filled by 0.
 			*/
 			GINL GAIA::GVOID* GetBuffer(_SizeType& size) const{size = m_size; return m_pFront;}
+			
+			/*!
+			 	@brief Get the buffer which used for JsonWriter write to.
+			 
+			 	@return Return the buffer which had be set.
+			 		If not call SetBuffer with a buffer pointer, will return GNIL.
+			*/
+			GINL const GAIA::GVOID* GetBuffer() const{return m_pFront;}
 
 			/*!
 				@brief Get the buffer's size in bytes which had be set to current JsonWriter.
@@ -435,6 +443,32 @@ namespace GAIA
 			*/
 			GAIA::GVOID Write(GAIA::JSON::JSON_NODE nt, const GAIA::F64& v){GAIA::CH szTemp[64]; GAIA::ALGO::castv(v, szTemp, sizeof(szTemp)); this->Write(nt, szTemp, GINVALID, GAIA::False);}
 
+			/*!
+			 	@brief Write a sub json string to current json.
+			 
+				@exception GAIA::ECT::InvalidParam
+					If parameter p is NULL or "", throw it.
+			 
+			 	@exception GAIA::ECT::InvalidParam
+			 		If parameter size is not GINVALID, and it below equal zero, throw it.
+			 
+			 	@exception GAIA::ECT::BufNotEnough
+			 		If the buffer is not enough for write, throw it
+			 
+			 	@remarks
+			 		Becareful, this method could make the json format broken. 
+			*/
+			template<typename _ParamDataType> GAIA::GVOID WriteSubJson(const _ParamDataType* p, _SizeType size = GINVALID)
+			{
+				if(GAIA::ALGO::gstremp(p))
+					GTHROW(InvalidParam);
+				if(size == GINVALID)
+					size = GAIA::ALGO::gstrlen(p);
+				if(size <= 0)
+					GTHROW(InvalidParam);
+				this->write(p, size);
+			}
+			
 			/*!
 				@brief Another method to call JsonWriter::Write member function will simpler form.
 

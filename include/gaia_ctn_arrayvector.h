@@ -1,10 +1,11 @@
-﻿#ifndef		__GAIA_CTN_ARRAYVECTOR_H__
+#ifndef		__GAIA_CTN_ARRAYVECTOR_H__
 #define		__GAIA_CTN_ARRAYVECTOR_H__
 
 #include "gaia_type.h"
 #include "gaia_assert.h"
 #include "gaia_iterator.h"
 #include "gaia_algo_extend.h"
+#include "gaia_algo_hash.h"
 #include "gaia_ctn.h"
 #include "gaia_ctn_array.h"
 #include "gaia_ctn_vector.h"
@@ -511,6 +512,10 @@ namespace GAIA
 				else
 					return m_arr.rfind(t, index);
 			}
+			GINL GAIA::BL exist(const _DataType& t) const
+			{
+				return this->find(t) != GINVALID;
+			}
 			GINL _SizeType replace(const _DataType& tOld, const _DataType& tNew)
 			{
 				if(m_vec.capacity() != 0)
@@ -560,6 +565,13 @@ namespace GAIA
 				else
 					return m_arr.binary_search(t);
 			}
+			template<typename _ParamKeyType> _SizeType binary_search(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k)) const
+			{
+				if(m_vec.capacity() != 0)
+					return m_vec.binary_search(k, cmpor);
+				else
+					return m_arr.binary_search(k, cmpor);
+			}
 			GINL it binary_searchit(const _DataType& t)
 			{
 				it ret;
@@ -577,6 +589,23 @@ namespace GAIA
 				}
 				return ret;
 			}
+			template<typename _ParamKeyType> it binary_searchit(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k))
+			{
+				it ret;
+				if(m_vec.capacity() != 0)
+				{
+					typename __VectorType::it ittemp = m_vec.binary_searchit(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_vec.frontit();
+				}
+				else
+				{
+					typename __ArrayType::it ittemp = m_arr.binary_searchit(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_arr.frontit();
+				}
+				return ret;
+			}
 			GINL const_it const_binary_searchit(const _DataType& t) const
 			{
 				const_it ret;
@@ -589,6 +618,23 @@ namespace GAIA
 				else
 				{
 					typename __ArrayType::const_it ittemp = m_arr.const_binary_searchit(t);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_arr.const_frontit();
+				}
+				return ret;
+			}
+			template<typename _ParamKeyType> const_it const_binary_searchit(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k)) const
+			{
+				const_it ret;
+				if(m_vec.capacity() != 0)
+				{
+					typename __VectorType::const_it ittemp = m_vec.const_binary_searchit(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_vec.const_frontit();
+				}
+				else
+				{
+					typename __ArrayType::const_it ittemp = m_arr.const_binary_searchit(k, cmpor);
 					ret.m_pContainer = this;
 					ret.m_index = ittemp - m_arr.const_frontit();
 				}
@@ -710,6 +756,74 @@ namespace GAIA
 				}
 				return ret;
 			}
+			template<typename _ParamKeyType> it upper_equal(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k))
+			{
+				it ret;
+				if(m_vec.capacity() != 0)
+				{
+					typename __VectorType::it ittemp = m_vec.upper_equal(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_vec.frontit();
+				}
+				else
+				{
+					typename __ArrayType::it ittemp = m_arr.upper_equal(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_arr.frontit();
+				}
+				return ret;
+			}
+			template<typename _ParamKeyType> const_it upper_equal(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k)) const
+			{
+				const_it ret;
+				if(m_vec.capacity() != 0)
+				{
+					typename __VectorType::const_it ittemp = m_vec.upper_equal(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_vec.const_frontit();
+				}
+				else
+				{
+					typename __ArrayType::const_it ittemp = m_arr.upper_equal(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_arr.const_frontit();
+				}
+				return ret;
+			}
+			template<typename _ParamKeyType> it lower_equal(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k))
+			{
+				it ret;
+				if(m_vec.capacity() != 0)
+				{
+					typename __VectorType::it ittemp = m_vec.lower_equal(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_vec.frontit();
+				}
+				else
+				{
+					typename __ArrayType::it ittemp = m_arr.lower_equal(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_arr.frontit();
+				}
+				return ret;
+			}
+			template<typename _ParamKeyType> const_it lower_equal(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k)) const
+			{
+				const_it ret;
+				if(m_vec.capacity() != 0)
+				{
+					typename __VectorType::const_it ittemp = m_vec.lower_equal(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_vec.const_frontit();
+				}
+				else
+				{
+					typename __ArrayType::const_it ittemp = m_arr.lower_equal(k, cmpor);
+					ret.m_pContainer = this;
+					ret.m_index = ittemp - m_arr.const_frontit();
+				}
+				return ret;
+			}
 			GINL __MyType& operator += (const __MyType& src)
 			{
 				this->reserve_keep(this->size() + src.size());
@@ -806,6 +920,12 @@ namespace GAIA
 					ret.m_index = this->size() - 1;
 				}
 				return ret;
+			}
+			GINL GAIA::U64 hash() const
+			{
+				if(this->empty())
+					return 0;
+				return GAIA::ALGO::hash((const GAIA::GVOID*)this->fptr(), this->datasize());
 			}
 		private:
 			__ArrayType m_arr;

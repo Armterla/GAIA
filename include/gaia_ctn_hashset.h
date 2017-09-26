@@ -299,39 +299,10 @@ namespace GAIA
 			}
 			GINL GAIA::BL erase(const _DataType& t)
 			{
-				_HashType h = (_HashType)GAIA::ALGO::hash(t);
-				_SizeType hm = h % m_groups.size();
-				Group& g = m_groups[hm];
-				Node* pNode = g.pLocalFront;
-				GAIA::BL bExist = GAIA::False;
-				while(pNode != GNIL)
-				{
-					if(pNode->t == t)
-					{
-						bExist = GAIA::True;
-						if(pNode->pLocalPrev != GNIL)
-							pNode->pLocalPrev->pLocalNext = pNode->pLocalNext;
-						else
-							g.pLocalFront = pNode->pLocalNext;
-						if(pNode->pLocalNext != GNIL)
-							pNode->pLocalNext->pLocalPrev = pNode->pLocalPrev;
-						if(pNode->pGlobalPrev != GNIL)
-							pNode->pGlobalPrev->pGlobalNext = pNode->pGlobalNext;
-						else
-							m_pFront = pNode->pGlobalNext;
-						if(pNode->pGlobalNext != GNIL)
-							pNode->pGlobalNext->pGlobalPrev = pNode->pGlobalPrev;
-						else
-							m_pBack = pNode->pGlobalPrev;
-						m_nodepool.release(pNode);
-						bExist = GAIA::True;
-						break;
-					}
-					pNode = pNode->pLocalNext;
-				}
-				if(!bExist)
+				Node* pNode = this->findnode(t);
+				if(pNode == GNIL)
 					return GAIA::False;
-				this->optimize(this->size());
+				this->erasenode(pNode);
 				return GAIA::True;
 			}
 			GINL GAIA::BL erase(it& iter)
@@ -340,24 +311,7 @@ namespace GAIA
 					return GAIA::False;
 				Node* pNode = iter.m_pNode;
 				iter.m_pNode = pNode->pGlobalNext;
-				_HashType h = (_HashType)GAIA::ALGO::hash(pNode->t);
-				_SizeType hm = h % m_groups.size();
-				Group& g = m_groups[hm];
-				if(pNode->pLocalPrev != GNIL)
-					pNode->pLocalPrev->pLocalNext = pNode->pLocalNext;
-				else
-					g.pLocalFront = pNode->pLocalNext;
-				if(pNode->pLocalNext != GNIL)
-					pNode->pLocalNext->pLocalPrev = pNode->pLocalPrev;
-				if(pNode->pGlobalPrev != GNIL)
-					pNode->pGlobalPrev->pGlobalNext = pNode->pGlobalNext;
-				else
-					m_pFront = pNode->pGlobalNext;
-				if(pNode->pGlobalNext != GNIL)
-					pNode->pGlobalNext->pGlobalPrev = pNode->pGlobalPrev;
-				else
-					m_pBack = pNode->pGlobalPrev;
-				m_nodepool.release(pNode);
+				this->erasenode(pNode);
 				return GAIA::True;
 			}
 			GINL _DataType* find(const _DataType& t)
@@ -370,6 +324,10 @@ namespace GAIA
 			GINL const _DataType* find(const _DataType& t) const
 			{
 				return GCCAST(__MyType*)(this)->find(t);
+			}
+			GINL GAIA::BL exist(const _DataType& t) const
+			{
+				return this->find(t) != GNIL;
 			}
 			GINL it findit(const _DataType& t)
 			{
@@ -438,6 +396,28 @@ namespace GAIA
 				}
 				return GNIL;
 			}
+			GINL GAIA::GVOID erasenode(Node* pNode)
+			{
+				_HashType h = (_HashType)GAIA::ALGO::hash(pNode->t);
+				_SizeType hm = h % m_groups.size();
+				Group& g = m_groups[hm];
+				if(pNode->pLocalPrev != GNIL)
+					pNode->pLocalPrev->pLocalNext = pNode->pLocalNext;
+				else
+					g.pLocalFront = pNode->pLocalNext;
+				if(pNode->pLocalNext != GNIL)
+					pNode->pLocalNext->pLocalPrev = pNode->pLocalPrev;
+				if(pNode->pGlobalPrev != GNIL)
+					pNode->pGlobalPrev->pGlobalNext = pNode->pGlobalNext;
+				else
+					m_pFront = pNode->pGlobalNext;
+				if(pNode->pGlobalNext != GNIL)
+					pNode->pGlobalNext->pGlobalPrev = pNode->pGlobalPrev;
+				else
+					m_pBack = pNode->pGlobalPrev;
+				m_nodepool.release(pNode);
+				this->optimize(this->size());
+			}
 			GINL GAIA::GVOID optimize(const _SizeType& targetsize)
 			{
 				if(targetsize == this->size())
@@ -475,6 +455,7 @@ namespace GAIA
 						GAST(m_groups.size() > 0);
 						_SizeType hm = pNode->h % m_groups.size();
 						Group& gdst = m_groups[hm];
+						pNode->pLocalPrev = GNIL;
 						pNode->pLocalNext = gdst.pLocalFront;
 						if(gdst.pLocalFront != GNIL)
 							gdst.pLocalFront->pLocalPrev = pNode;

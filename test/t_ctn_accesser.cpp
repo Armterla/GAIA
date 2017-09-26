@@ -131,7 +131,7 @@ namespace TEST
 			//	acc.expandable(GAIA::True);
 			//	acc.bindmem(GNIL, 0, __AccType::ACCESS_TYPE_READ | __AccType::ACCESS_TYPE_WRITE);
 			//	for(GAIA::NUM x = 0; x < 100; ++x)
-			//		acc[x] = GAIA::MATH::xrandom();
+			//		acc[x] = GAIA::MATH::grand();
 			//	GAIA::ALGO::bsort(acc, acc + 99);
 			//	if(!GAIA::ALGO::issorted(acc, acc + 99))
 			//	{
@@ -251,8 +251,8 @@ namespace TEST
 
 		/* File based accesser test. */
 		{
-			GAIA::CTN::TString strFileName = g_gaia_appdocdir;
-			strFileName += _T("accesser_file");
+			GAIA::CTN::AString strFileName = g_gaia_appdocdir;
+			strFileName += "accesser_file";
 
 			/* Accesser pointer operator test. */
 			{
@@ -370,7 +370,7 @@ namespace TEST
 				typedef GAIA::CTN::Accesser<GAIA::NUM, GAIA::NUM, GAIA::ALGO::ExtendGold<GAIA::NUM> > __AccType;
 				__AccType acc;
 				acc.expandable(GAIA::True);
-				GAIA::TCH szNewFileName[GAIA::MAXPL];
+				GAIA::CH szNewFileName[GAIA::MAXPL];
 				TAST(acc.bindfile(GNIL, __AccType::ACCESS_TYPE_READ | __AccType::ACCESS_TYPE_WRITE, szNewFileName, sizeof(szNewFileName)));
 				for(GAIA::NUM x = 0; x < ACCESS_ELEMENT_COUNT; ++x)
 					acc[x] = x;
@@ -395,7 +395,7 @@ namespace TEST
 			//	GAIA::TCH szNewFileName[GAIA::MAXPL];
 			//	TAST(acc.bindfile(GNIL, __AccType::ACCESS_TYPE_READ | __AccType::ACCESS_TYPE_WRITE, szNewFileName, sizeof(szNewFileName)));
 			//	for(GAIA::NUM x = 0; x < 100; ++x)
-			//		acc[x] = GAIA::MATH::xrandom();
+			//		acc[x] = GAIA::MATH::grand();
 			//	GAIA::ALGO::bsort(acc, acc + 99);
 			//	if(!GAIA::ALGO::issorted(acc, acc + 99))
 			//		TERROR;
@@ -506,7 +506,7 @@ namespace TEST
 			{
 				typedef GAIA::CTN::Accesser<GAIA::NUM, GAIA::NUM, GAIA::ALGO::ExtendGold<GAIA::NUM> > __AccType;
 				__AccType acc;
-				GAIA::TCH szNewFileName[GAIA::MAXPL];
+				GAIA::CH szNewFileName[GAIA::MAXPL];
 				TAST(acc.bindfile(GNIL, __AccType::ACCESS_TYPE_READ | __AccType::ACCESS_TYPE_WRITE, szNewFileName, sizeof(szNewFileName)));
 				for(GAIA::NUM x = 0; x < ACCESS_ELEMENT_COUNT; ++x)
 				{

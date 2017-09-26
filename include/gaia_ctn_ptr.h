@@ -8,16 +8,16 @@ namespace GAIA
 {
 	namespace CTN
 	{
-		template<typename _DataType> class Ptr : public GAIA::Base
+		template<typename _DataType> class Pter : public GAIA::Base
 		{
 		public:
 			typedef _DataType _datatype;
 		public:
-			typedef Ptr<_DataType> __MyType;
+			typedef Pter<_DataType> __MyType;
 		public:
-			GINL Ptr(){this->init();}
-			GINL Ptr(const __MyType& src){this->init(); this->operator = (src);}
-			GINL Ptr(_DataType* p){this->init(); this->operator = (p);}
+			GINL Pter(){this->init();}
+			GINL Pter(const __MyType& src){this->init(); this->operator = (src);}
+			GINL Pter(_DataType* p){this->init(); this->operator = (p);}
 			GINL GAIA::BL empty() const{return m_p == GNIL;}
 			GINL __MyType& operator = (const __MyType& src){GAST(&src != this); m_p = src.m_p; return *this;}
 			GINL __MyType& operator = (_DataType* p){m_p = p; return *this;}

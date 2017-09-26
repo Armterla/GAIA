@@ -34,6 +34,11 @@
 
 /* #define GEN_TREES_H */
 
+#ifdef __APPLE__
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored"-Wcomma"
+#endif
+
 #include "zconf_internal.h"
 #include "deflate.h"
 
@@ -1225,3 +1230,7 @@ local void copy_block(s, buf, len, header)
         put_byte(s, *buf++);
     }
 }
+	
+#ifdef __APPLE__
+#	pragma clang diagnostic pop
+#endif

@@ -8,6 +8,8 @@
 #	include <winsock2.h>
 #	include <ws2tcpip.h>
 #	include <windows.h>
+#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
+#	include <dispatch/dispatch.h>
 #else
 #	include <pthread.h>
 #	include <sys/time.h>
@@ -25,6 +27,8 @@ namespace GAIA
 			{
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				m_hSem = ::CreateSemaphore(GNIL, 0, 0x7FFFFFFF, GNIL);
+			#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
+				m_sem = dispatch_semaphore_create(0);
 			#else
 				pthread_mutex_init(&m_mutex, GNIL);
 				pthread_cond_init(&m_cond, GNIL);
@@ -35,6 +39,14 @@ namespace GAIA
 			{
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				::CloseHandle(m_hSem);
+			#elif GAIA_OS == GAIA_OS_OSX
+			#	if !__has_feature(objc_arc)
+					dispatch_release(m_sem);
+			#	endif
+			#elif GAIA_OS == GAIA_OS_IOS
+			#	if !__has_feature(objc_arc)
+					dispatch_release(m_sem);
+			#	endif
 			#else
 				pthread_mutex_destroy(&m_mutex);
 				pthread_cond_destroy(&m_cond);
@@ -44,6 +56,8 @@ namespace GAIA
 			{
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				::ReleaseSemaphore(m_hSem, 1, GNIL);
+			#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
+				dispatch_semaphore_signal(m_sem);
 			#else
 				pthread_mutex_lock(&m_mutex);
 				{
@@ -58,6 +72,14 @@ namespace GAIA
 			{
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				return ::WaitForSingleObject(m_hSem, uMilliSeconds) == WAIT_OBJECT_0;
+			#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
+				if(uMilliSeconds == GINVALID)
+					return dispatch_semaphore_wait(m_sem, DISPATCH_TIME_FOREVER) == 0;
+				else
+				{
+					dispatch_time_t waittime = dispatch_time(DISPATCH_TIME_NOW, (GAIA::U64)uMilliSeconds * 1000L * 1000L);
+					return dispatch_semaphore_wait(m_sem, waittime) == 0;
+				}
 			#else
 				GAIA::BL ret = GAIA::False;
 				pthread_mutex_lock(&m_mutex);
@@ -98,6 +120,8 @@ namespace GAIA
 		private:
 		#if GAIA_OS == GAIA_OS_WINDOWS
 			HANDLE m_hSem;
+		#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
+			dispatch_semaphore_t m_sem;
 		#else
 			pthread_mutex_t m_mutex;
 			pthread_cond_t m_cond;

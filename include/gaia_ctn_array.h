@@ -1,4 +1,4 @@
-﻿#ifndef		__GAIA_CTN_ARRAY_H__
+#ifndef		__GAIA_CTN_ARRAY_H__
 #define		__GAIA_CTN_ARRAY_H__
 
 #include "gaia_type.h"
@@ -8,6 +8,7 @@
 #include "gaia_algo_sort.h"
 #include "gaia_algo_unique.h"
 #include "gaia_algo_replace.h"
+#include "gaia_algo_hash.h"
 #include "gaia_iterator.h"
 
 namespace GAIA
@@ -261,6 +262,15 @@ namespace GAIA
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
 			}
+			template<typename _ParamKeyType> _SizeType binary_search(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k)) const
+			{
+				if(this->size() <= 0)
+					return (_SizeType)GINVALID;
+				const _DataType* pFinded = GAIA::ALGO::gbinary_search(m_pFront, &m_pFront[this->size() - 1], k, cmpor);
+				if(pFinded == GNIL)
+					return (_SizeType)GINVALID;
+				return (_SizeType)(pFinded - m_pFront);
+			}
 			GINL it binary_searchit(const _DataType& t)
 			{
 				it iter;
@@ -271,10 +281,30 @@ namespace GAIA
 				iter.m_index = findedidx;
 				return iter;
 			}
+			template<typename _ParamKeyType> it binary_searchit(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k))
+			{
+				it iter;
+				_SizeType findedidx = this->binary_search(k, cmpor);
+				if(findedidx == GINVALID)
+					return iter;
+				iter.m_pContainer = this;
+				iter.m_index = findedidx;
+				return iter;
+			}
 			GINL const_it const_binary_searchit(const _DataType& t) const
 			{
 				const_it iter;
 				_SizeType findedidx = this->binary_search(t);
+				if(findedidx == GINVALID)
+					return iter;
+				iter.m_pContainer = this;
+				iter.m_index = findedidx;
+				return iter;
+			}
+			template<typename _ParamKeyType> const_it const_binary_searchit(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k)) const
+			{
+				const_it iter;
+				_SizeType findedidx = this->binary_search(k, cmpor);
 				if(findedidx == GINVALID)
 					return iter;
 				iter.m_pContainer = this;
@@ -326,6 +356,10 @@ namespace GAIA
 				if(pFinded == GNIL)
 					return (_SizeType)GINVALID;
 				return (_SizeType)(pFinded - m_pFront);
+			}
+			GINL GAIA::BL exist(const _DataType& t) const
+			{
+				return this->find(t) != GINVALID;
 			}
 			GINL _SizeType replace(const _DataType& tOld, const _DataType& tNew)
 			{
@@ -544,6 +578,62 @@ namespace GAIA
 				}
 				return iter;
 			}
+			template<typename _ParamKeyType> it upper_equal(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k))
+			{
+				it iter;
+				if(!this->empty())
+				{
+					_DataType* p = GAIA::ALGO::upper_equal(this->fptr(), this->bptr(), k, cmpor);
+					if(p != GNIL)
+					{
+						iter.m_pContainer = this;
+						iter.m_index = GSCAST(_SizeType)(p - this->fptr());
+					}
+				}
+				return iter;
+			}
+			template<typename _ParamKeyType> const_it upper_equal(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k)) const
+			{
+				const_it iter;
+				if(!this->empty())
+				{
+					const _DataType* p = GAIA::ALGO::upper_equal(this->fptr(), this->bptr(), k, cmpor);
+					if(p != GNIL)
+					{
+						iter.m_pContainer = this;
+						iter.m_index = GSCAST(_SizeType)(p - this->fptr());
+					}
+				}
+				return iter;
+			}
+			template<typename _ParamKeyType> it lower_equal(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k))
+			{
+				it iter;
+				if(!this->empty())
+				{
+					_DataType* p = GAIA::ALGO::lower_equal(this->fptr(), this->bptr(), k, cmpor);
+					if(p != GNIL)
+					{
+						iter.m_pContainer = this;
+						iter.m_index = GSCAST(_SizeType)(p - this->fptr());
+					}
+				}
+				return iter;
+			}
+			template<typename _ParamKeyType> const_it lower_equal(const _ParamKeyType& k, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k)) const
+			{
+				const_it iter;
+				if(!this->empty())
+				{
+					const _DataType* p = GAIA::ALGO::lower_equal(this->fptr(), this->bptr(), k, cmpor);
+					if(p != GNIL)
+					{
+						iter.m_pContainer = this;
+						iter.m_index = GSCAST(_SizeType)(p - this->fptr());
+					}
+				}
+				return iter;
+			}
 			GINL it frontit()
 			{
 				it ret;
@@ -603,6 +693,12 @@ namespace GAIA
 					ret.m_pContainer = this;
 				}
 				return ret;
+			}
+			GINL GAIA::U64 hash() const
+			{
+				if(this->empty())
+					return 0;
+				return GAIA::ALGO::hash((const GAIA::GVOID*)this->fptr(), this->datasize());
 			}
 			GINL __MyType& operator += (const __MyType& src)
 			{

@@ -14,25 +14,25 @@ namespace GAIA
 		{
 		public:
 			class ServerDesc;
-			class ProtocalDesc;
+			class ProtocolDesc;
 			class CallBack;
 			class Link;
-			class Protocal;
+			class Protocol;
 
 		public:
-			GAIA_ENUM_BEGIN(PROTOCAL_TYPE)
-				PROTOCAL_TYPE_TCP,
-				PROTOCAL_TYPE_UDP,
-				PROTOCAL_TYPE_SUDP,
-				PROTOCAL_TYPE_HTTP,
-			GAIA_ENUM_END(PROTOCAL_TYPE)
+			GAIA_ENUM_BEGIN(PROTOCOL_TYPE)
+				PROTOCOL_TYPE_TCP,
+				PROTOCOL_TYPE_UDP,
+				PROTOCOL_TYPE_SUDP,
+				PROTOCOL_TYPE_HTTP,
+			GAIA_ENUM_END(PROTOCOL_TYPE)
 
 			class ServerDesc : public GAIA::Base
 			{
 			public:
 			};
 
-			class ProtocalDesc : public GAIA::Base
+			class ProtocolDesc : public GAIA::Base
 			{
 			public:
 				const GAIA::CH* pszName;
@@ -55,16 +55,16 @@ namespace GAIA
 				~Link();
 			};
 
-			class Protocal : public GAIA::Base
+			class Protocol : public GAIA::Base
 			{
 			public:
-				Protocal();
-				~Protocal();
+				Protocol();
+				~Protocol();
 
-				GAIA::BL Create(const ProtocalDesc& desc);
+				GAIA::BL Create(const ProtocolDesc& desc);
 				GAIA::BL Destroy();
 				GAIA::BL IsCreated() const;
-				const ProtocalDesc& GetDesc() const;
+				const ProtocolDesc& GetDesc() const;
 
 				GAIA::BL AddServiceAddr(const GAIA::NETWORK::Addr& addr);
 				GAIA::BL RemoveServiceAddr(const GAIA::NETWORK::Addr& addr);
@@ -97,12 +97,12 @@ namespace GAIA
 			GAIA::BL Shutdown();
 			GAIA::BL IsStartuped() const;
 
-			GAIA::BL AddProtocal(Protocal& proto);
-			GAIA::BL RemoveProtocal(Protocal& proto);
-			GAIA::BL RemoveProtocalAll();
-			GAIA::BL IsExistProtocal(Protocal& proto);
-			GAIA::NUM GetProtocalCount() const;
-			Protocal* GetProtocal(GAIA::NUM sIndex) const;
+			GAIA::BL AddProtocol(Protocol& proto);
+			GAIA::BL RemoveProtocol(Protocol& proto);
+			GAIA::BL RemoveProtocolAll();
+			GAIA::BL IsExistProtocol(Protocol& proto);
+			GAIA::NUM GetProtocolCount() const;
+			Protocol* GetProtocol(GAIA::NUM sIndex) const;
 		};
 	}
 }

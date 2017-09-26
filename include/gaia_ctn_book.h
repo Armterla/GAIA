@@ -308,6 +308,10 @@ namespace GAIA
 				}
 				return GINVALID;
 			}
+			GINL GAIA::BL exist(const _DataType& t) const
+			{
+				return this->find(t) != GINVALID;
+			}
 			GINL const _DataType& operator[](const _SizeType& usedindex) const
 			{
 				_SizeType fixedindex = this->fixedindex(usedindex);

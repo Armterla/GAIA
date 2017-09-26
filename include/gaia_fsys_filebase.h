@@ -4,15 +4,16 @@
 #include "gaia_type.h"
 #include "gaia_assert.h"
 #include "gaia_algo_string.h"
+#include "gaia_ctn_buffer.h"
 
 namespace GAIA
 {
 	namespace FSYS
 	{
 		/*!
-			@brief File information class.
+			@brief File description class.
 		*/
-		class FileInfo : public GAIA::Base
+		class FileDesc : public GAIA::Base
 		{
 		public:
 			/*!
@@ -43,7 +44,7 @@ namespace GAIA
 			/*!
 				@brief Specify the file's name.
 			*/
-			const GAIA::TCH* pszName;
+			const GAIA::CH* pszName;
 
 			/*!
 				@brief Specify the file's create time.
@@ -64,7 +65,6 @@ namespace GAIA
 				@brief Specify the file is a directory or not.
 			*/
 			GAIA::BL bDirectory : 1;
-
 		};
 
 		/*!
@@ -92,7 +92,7 @@ namespace GAIA
 			 
 				@return If open file successfully, return GAIA::True, or will return GAIA::False.
 			*/
-			virtual GAIA::BL Open(const GAIA::TCH* fileurl, const GAIA::UM& opentype) = 0;
+			virtual GAIA::BL Open(const GAIA::CH* fileurl, const GAIA::UM& opentype) = 0;
 
 			/*!
 				@brief Close the file.
@@ -113,7 +113,7 @@ namespace GAIA
 			 
 				@return Return file url.
 			*/
-			virtual const GAIA::TCH* GetFileUrl() const = 0;
+			virtual const GAIA::CH* GetFileUrl() const = 0;
 
 			/*!
 				@brief Get file's open type.
@@ -129,36 +129,64 @@ namespace GAIA
 
 			/*!
 				@brief Resize the file.
+			 
+			 	@param size [in] Specify the new file size.
+			 
+			 	@return If resize file successfully, return GAIA::True, or return GAIA::False.
 			*/
 			virtual GAIA::BL Resize(const GAIA::FSYS::FileBase::__FileSizeType& size) = 0;
 
 			/*!
 				@brief Read data from file.
+			 
+			 	@param pDst [in] Used for save the readed result.
+			 
+			 	@param size [in] Specify the buffer size of parameter pDst in bytes.
+			 
+			 	@return Return the practice read size.
 			*/
 			virtual GAIA::N32 Read(GAIA::GVOID* pDst, GAIA::N32 size) = 0;
 
 			/*!
 				@brief Write data to file.
+			 
+			 	@param pSrc [in] Specify the buffer which will be write to file.
+			 
+			 	@param size [in] Specify the buffer size of parameter pSrc in bytes.
+			 
+			 	@return Return the practice write size.
 			*/
 			virtual GAIA::N32 Write(const GAIA::GVOID* pSrc, GAIA::N32 size) = 0;
 
 			/*!
 				@brief Seek file pointer.
+			 
+			 	@param offset [in] Specify the size of seek offset in bytes.
+			 
+			 	@param seektype [in] Specify the seek mode.
+			 
+			 	@return If seek successfully, return GAIA::True, or will return GAIA::False.
 			*/
 			virtual GAIA::BL Seek(const GAIA::FSYS::FileBase::__FileSizeType& offset, GAIA::SEEK_TYPE seektype = GAIA::SEEK_TYPE_BEGIN) = 0;
 
 			/*!
 				@brief Retrieve the file pointer.
+			 
+			 	@return Return current location of file pointer.
 			*/
 			virtual GAIA::FSYS::FileBase::__FileSizeType Tell() const = 0;
 
 			/*!
 				@brief Flush the file's write buffer.
+			 
+			 	@return If flush success, return GAIA::True, or will return GAIA::False.
 			*/
 			virtual GAIA::BL Flush() = 0;
 
 			/*!
 				@brief Read a object from file.
+			 
+			 	@return If read object successfully, return GAIA::True, or will return GAIA::False.
 			 
 				@remarks The object must be a base c data type, or a struct with all c data type member variables,\n
 					c data type is char, short, int, long long, float, double, bool.\n
@@ -179,6 +207,8 @@ namespace GAIA
 			/*!
 				@brief Write a object to file.
 			 
+			 	@return If write object successfully, return GAIA::True, or will return GAIA::False.
+			 
 				@remarks The object must be a base c data type, or a struct with all c data type member variables,\n
 					c data type is char, short, int, long long, float, double, bool.\n
 					The integer type support "unsigned" indicator.\n
@@ -192,9 +222,51 @@ namespace GAIA
 					return GAIA::False;
 				return GAIA::True;
 			}
+			
+			/*!
+				@brief Read all remain data to a buffer object.
+			 
+				@param buf [out] Used for save the result data.
+			 
+				@return If success return GAIA::True, or will return GAIA::False.
+			 
+				@remarks If the file remain size is above 1Gbytes, this function will return GAIA::False.
+			 		After this function call and return true, the parameter buf will be filled by the remain data, and the buf's writer pointer will move to the end of the data.
+		 			After this function call and return true, the file pointer will move to the end of file.
+			 		After this function call and return false, the file pointer will not be moved.
+		 	*/
+			GAIA::BL ReadRemainAll(GAIA::CTN::Buffer& buf)
+			{
+				GAST(!!this->IsOpen());
+				if(!this->IsOpen())
+					return GAIA::False;
+				GAIA::FSYS::FileBase::__FileSizeType oldseek = this->Tell();
+				GAIA::FSYS::FileBase::__FileSizeType r = this->Size() - oldseek;
+				if(r > 1024 * 1024 * 1024)
+					return GAIA::False;
+				buf.resize((GAIA::NUM)r);
+				GAIA::FSYS::FileBase::__FileSizeType t = 0;
+				while(r > 0)
+				{
+					GAIA::FSYS::FileBase::__FileSizeType step = r;
+					if(step > 1024 * 1024 * 16)
+						step = 1024 * 1024 * 16;
+					GAIA::FSYS::FileBase::__FileSizeType readed = this->Read(buf.fptr() + t, (GAIA::NUM)step);
+					if(readed <= 0)
+					{
+						this->Seek(oldseek);
+						return GAIA::False;
+					}
+					r -= readed;
+					t += readed;
+				}
+				return GAIA::True;
+			}
 
 			/*!
 				@brief Write a string to file.
+			 
+			 	@return If write string successfully, return GAIA::True, or will return GAIA::False.
 			 
 				@remarks This method write a integer(int) type for string length first, and then write the string without '\0'.
 			*/
@@ -216,6 +288,8 @@ namespace GAIA
 
 			/*!
 				@brief Read a string from file.
+			 
+			 	@return If read a string successfully, return GAIA::True, or will return GAIA::False.
 			 
 				@remarks This method read a integer(int) type from file for string length first, and then read the string without '\0'.\n
 					But '\0' will be filled to the last location of parameter pszString.
@@ -244,6 +318,8 @@ namespace GAIA
 			/*!
 				@brief Write a text string to the file.
 			 
+			 	@return If write text successfully, return GAIA::True, or will return GAIA::False.
+			 
 				@remarks This method write the string without '\0'.
 			*/
 			template<typename _ParamType> GAIA::BL WriteText(const _ParamType* pszText)
@@ -259,6 +335,8 @@ namespace GAIA
 			/*!
 				@brief Stream operator for read object.
 			 
+			 	@return Return current object.
+			 
 				@remarks The object must be a base c data type, or a struct with all c data type member variables,\n
 					c data type is char, short, int, long long, float, double, bool.\n
 					The integer type support "unsigned" indicator.\n
@@ -267,6 +345,8 @@ namespace GAIA
 
 			/*!
 				@brief Stream operator for write object.
+			 
+			 	@return Return current object.
 			 
 				@remarks The object must be a base c data type, or a struct with all c data type member variables,\n
 					c data type is char, short, int, long long, float, double, bool.\n

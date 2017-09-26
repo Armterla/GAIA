@@ -87,6 +87,14 @@ namespace GAIA
 					If not call SetBuffer with a buffer pointer, will return GNIL, and parameter size be filled by 0.
 			*/
 			GINL const GAIA::GVOID* GetBuffer(_SizeType& size) const{size = m_size; return m_pFront;}
+			
+			/*!
+			 	@brief Get the buffer which used for JsonReader read from.
+			 
+			 	@return Return the buffer which had be set.
+			 		If not call SetBuffer with a buffer pointer, will return GNIL.
+			*/
+			GINL const GAIA::GVOID* GetBuffer() const{return m_pFront;}
 
 			/*!
 				@brief Get the buffer's size in bytes which had be set to current JsonReader.
@@ -495,6 +503,9 @@ namespace GAIA
 				@param p [out] Used for saving name node's name.
 
 				@param maxlen [in] Specify the parameter p's buffer size in characters.
+			 
+			 	@param pResultLen [out] Used for saving the result length in characters.
+			 		This parameter could be GNIL. Default is GNIL.
 
 				@return If success return parameter p.
 
@@ -510,7 +521,7 @@ namespace GAIA
 				@exception GAIA::ECT::EctBufNotEnough
 					If parameter maxlen is not GINVALID and buffer is not enough for save the name node's name, throw it.
 			*/
-			template<typename _ParamDataType> _ParamDataType* ReadName(_ParamDataType* p, _SizeType maxlen = GINVALID)
+			template<typename _ParamDataType> _ParamDataType* ReadName(_ParamDataType* p, _SizeType maxlen = GINVALID, _SizeType* pResultLen = GNIL)
 			{
 				if(p == GNIL)
 					GTHROW_RET(InvalidParam, GNIL);
@@ -529,6 +540,8 @@ namespace GAIA
 						if(maxlen != GINVALID && nodenamelen >= maxlen)
 							GTHROW_RET(BufNotEnough, GNIL);
 						GAIA::ALGO::gstrcpy(p, pRet, nodenamelen);
+						if(pResultLen != GNIL)
+							*pResultLen = nodenamelen;
 					}
 					break;
 				case GAIA::JSON::JSON_NODE_VALUE:
@@ -540,6 +553,116 @@ namespace GAIA
 				m_pCursor = pNext;
 				return p;
 			}
+			
+			/*!
+				@brief Read a name node and it's name must match the parameter.
+			 
+				@param p [in] Used for match the next name node's name.
+					It could be GNIL if not need match the name string.
+			 
+				@exception GAIA::ECT::EctIllegal
+					If can't read a name node's name, throw it.
+
+				@exception GAIA::ECT::EctIllegal
+					If the node is not a name node, throw it.
+
+				@exception GAIA::ECT::DataError
+					If the next name node's name not match parameter p, throw it.
+			 */
+			template<typename _ParamDataType> GAIA::GVOID ReadNameByName(const _ParamDataType* p = GNIL)
+			{
+				GAIA::JSON::JSON_NODE nt;
+				_SizeType nodenamelen;
+				const _DataType* pNext;
+				const _DataType* pRet = this->Peek(nt, nodenamelen, &pNext);
+				if(pRet == GNIL)
+					GTHROW(Illegal);
+				switch(nt)
+				{
+					case GAIA::JSON::JSON_NODE_NAME:
+						{
+							if(!GAIA::ALGO::gstremp(p))
+							{
+								if(!GAIA::ALGO::gstrequal(p, pRet, nodenamelen) || p[nodenamelen] != '\0')
+									GTHROW(DataError);
+							}
+						}
+						break;
+					case GAIA::JSON::JSON_NODE_VALUE:
+						GTHROW(Illegal);
+					default:
+						GTHROW(Illegal);
+				}
+				GAST(nodenamelen != 0);
+				m_pCursor = pNext;
+			}
+			
+			/*!
+			 	@brief Read a name but ignore the read result.
+			 
+				@exception GAIA::ECT::EctIllegal
+					If can't read a name node's name, throw it.
+
+				@exception GAIA::ECT::EctIllegal
+					If the node is not a name node, throw it.
+			*/
+			GINL GAIA::GVOID ReadName()
+			{
+				GAIA::JSON::JSON_NODE nt;
+				_SizeType nodenamelen;
+				const _DataType* pNext;
+				const _DataType* pRet = this->Peek(nt, nodenamelen, &pNext);
+				if(pRet == GNIL)
+					GTHROW(Illegal);
+				switch(nt)
+				{
+					case GAIA::JSON::JSON_NODE_NAME:
+						break;
+					case GAIA::JSON::JSON_NODE_VALUE:
+						GTHROW(Illegal);
+					default:
+						GTHROW(Illegal);
+				}
+				GAST(nodenamelen != 0);
+				m_pCursor = pNext;
+			}
+			
+			/*!
+				@brief Try to read a name node or a value node.
+
+				@param nodenamelen [out] Used for saving the value node's name's length in characters.
+
+				@param pValueIsString [out] Used for saving the value is a string or not.\n
+					If node is not a value node, this parameter is ignored.\n
+					This parameter could be GNIL means ignored.\n
+
+				@return Return the value node's name without '\0'.
+
+				@exception GAIA::ECT::EctIllegal
+					If can't read a value node's name, throw it.
+
+				@exception GAIA::ECT::EctDataError
+					If the source json's format exist error, and can't read, throw it.
+			*/
+			GINL const _DataType* ReadValueEx(_SizeType& nodenamelen, GAIA::BL* pValueIsString = GNIL)
+			{
+				GAIA::JSON::JSON_NODE nt;
+				const _DataType* pNext;
+				const _DataType* pRet = this->Peek(nt, nodenamelen, &pNext, pValueIsString);
+				if(pRet == GNIL)
+					GTHROW_RET(Illegal, GNIL);
+				switch(nt)
+				{
+				case GAIA::JSON::JSON_NODE_NAME:
+					GTHROW_RET(Illegal, GNIL);
+				case GAIA::JSON::JSON_NODE_VALUE:
+					break;
+				default:
+					GTHROW_RET(Illegal, GNIL);
+				}
+				m_pCursor = pNext;
+				return pRet;
+			}
 
 			/*!
 				@brief Read a value node's name.
@@ -547,6 +670,9 @@ namespace GAIA
 				@param p [out] Used for saving value node's name.
 
 				@param maxlen [in] Specify the parameter p's buffer size in characters.
+			 
+				@param pResultLen [out] Used for saving the result length in characters.
+			 		This parameter could be GNIL. Default is GNIL.
 
 				@return If success return parameter p.
 
@@ -562,7 +688,7 @@ namespace GAIA
 				@exception GAIA::ECT::EctBufNotEnough
 					If parameter maxlen is not GINVALID and buffer is not enough for save the value node's name, throw it.
 			*/
-			template<typename _ParamDataType> _ParamDataType* ReadValue(_ParamDataType* p, _SizeType maxlen = GINVALID)
+			template<typename _ParamDataType> _ParamDataType* ReadValue(_ParamDataType* p, _SizeType maxlen = GINVALID, _SizeType* pResultLen = GNIL)
 			{
 				if(p == GNIL)
 					GTHROW_RET(InvalidParam, GNIL);
@@ -583,6 +709,8 @@ namespace GAIA
 						if(maxlen != GINVALID && nodenamelen >= maxlen)
 							GTHROW_RET(BufNotEnough, GNIL);
 						GAIA::ALGO::gstrcpy(p, pRet, nodenamelen);
+						if(pResultLen != GNIL)
+							*pResultLen = nodenamelen;
 					}
 					break;
 				default:
@@ -591,6 +719,36 @@ namespace GAIA
 				GAST(nodenamelen != 0);
 				m_pCursor = pNext;
 				return p;
+			}
+			
+			/*!
+			 	@brief Read a value but ignore the read result.
+			 
+			 	@exception GAIA::ECT::EctIllegal
+					If can't read a value node's name, throw it.
+
+				@exception GAIA::ECT::EctIllegal
+					If the node is not a value node, throw it.
+			*/
+			GINL GAIA::GVOID ReadValue()
+			{
+				GAIA::JSON::JSON_NODE nt;
+				_SizeType nodenamelen;
+				const _DataType* pNext;
+				const _DataType* pRet = this->Peek(nt, nodenamelen, &pNext);
+				if(pRet == GNIL)
+					GTHROW_RET(Illegal, GNIL);
+				switch(nt)
+				{
+				case GAIA::JSON::JSON_NODE_NAME:
+					GTHROW_RET(Illegal, GNIL);
+				case GAIA::JSON::JSON_NODE_VALUE:
+					break;
+				default:
+					GTHROW_RET(Illegal, GNIL);
+				}
+				GAST(nodenamelen != 0);
+				m_pCursor = pNext;
 			}
 
 			/*!
@@ -859,7 +1017,7 @@ namespace GAIA
 			{
 				while(p <= m_pBack)
 				{
-					if(*p >= sizeof(ascii_json_validchar) || ascii_json_validchar[*p])
+					if(*p >= sizeof(ascii_json_validchar) || ascii_json_validchar[(GAIA::U8)*p])
 						return p;
 					++p;
 				}

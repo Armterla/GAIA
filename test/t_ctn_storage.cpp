@@ -48,7 +48,7 @@ namespace TEST
 		static const GAIA::N32 SAMPLE_COUNT = 100;
 		for(GAIA::N32 x = 0; x < SAMPLE_COUNT; ++x)
 		{
-			GAIA::N32 nSize = GAIA::MATH::xrandom() % 256 + 1;
+			GAIA::N32 nSize = GAIA::MATH::grand() % 256 + 1;
 			if(!st.insert(nSize, n))
 			{
 				TERROR;

@@ -30,7 +30,7 @@ namespace GAIA
 				m_root.m_pszName = GNIL;
 			m_root.Reset();
 		}
-		GINL GAIA::BL Html::LoadFromFile(const GAIA::TCH* pszFileName)
+		GINL GAIA::BL Html::LoadFromFile(const GAIA::CH* pszFileName)
 		{
 			GAST(!GAIA::ALGO::gstremp(pszFileName));
 			if(GAIA::ALGO::gstremp(pszFileName))
@@ -136,7 +136,7 @@ namespace GAIA
 
 			return GAIA::True;
 		}
-		GINL GAIA::BL Html::SaveToFile(const GAIA::TCH* pszFileName, GAIA::HTML::HTML_SAVE st)
+		GINL GAIA::BL Html::SaveToFile(const GAIA::CH* pszFileName, GAIA::HTML::HTML_SAVE st)
 		{
 			GAST(!GAIA::ALGO::gstremp(pszFileName));
 			if(GAIA::ALGO::gstremp(pszFileName))

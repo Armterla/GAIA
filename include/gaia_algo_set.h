@@ -21,8 +21,8 @@ namespace GAIA
 			{
 				for(_SizeType x = 0; x < times; ++x)
 				{
-					GAIA::U8 u1 = GAIA::MATH::xrandom_u8() % uLen;
-					GAIA::U8 u2 = GAIA::MATH::xrandom_u8() % uLen;
+					GAIA::U8 u1 = GAIA::MATH::grand_u8() % uLen;
+					GAIA::U8 u2 = GAIA::MATH::grand_u8() % uLen;
 					GAIA::ALGO::swap(pBegin[u1], pBegin[u2]);
 				}
 			}
@@ -30,8 +30,8 @@ namespace GAIA
 			{
 				for(_SizeType x = 0; x < times; ++x)
 				{
-					GAIA::U16 u1 = GAIA::MATH::xrandom_u16() % uLen;
-					GAIA::U16 u2 = GAIA::MATH::xrandom_u16() % uLen;
+					GAIA::U16 u1 = GAIA::MATH::grand_u16() % uLen;
+					GAIA::U16 u2 = GAIA::MATH::grand_u16() % uLen;
 					GAIA::ALGO::swap(pBegin[u1], pBegin[u2]);
 				}
 			}
@@ -39,8 +39,8 @@ namespace GAIA
 			{
 				for(_SizeType x = 0; x < times; ++x)
 				{
-					GAIA::U32 u1 = GAIA::MATH::xrandom_u32() % uLen;
-					GAIA::U32 u2 = GAIA::MATH::xrandom_u32() % uLen;
+					GAIA::U32 u1 = GAIA::MATH::grand_u32() % uLen;
+					GAIA::U32 u2 = GAIA::MATH::grand_u32() % uLen;
 					GAIA::ALGO::swap(pBegin[u1], pBegin[u2]);
 				}
 			}
@@ -48,8 +48,8 @@ namespace GAIA
 			{
 				for(_SizeType x = 0; x < times; ++x)
 				{
-					GAIA::U64 u1 = GAIA::MATH::xrandom_u64() % uLen;
-					GAIA::U64 u2 = GAIA::MATH::xrandom_u64() % uLen;
+					GAIA::U64 u1 = GAIA::MATH::grand_u64() % uLen;
+					GAIA::U64 u2 = GAIA::MATH::grand_u64() % uLen;
 					GAIA::ALGO::swap(pBegin[u1], pBegin[u2]);
 				}
 			}

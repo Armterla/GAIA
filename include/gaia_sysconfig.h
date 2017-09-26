@@ -1,4 +1,4 @@
-﻿#ifndef		__GAIA_SYS_CONFIG_H__
+#ifndef		__GAIA_SYS_CONFIG_H__
 #define		__GAIA_SYS_CONFIG_H__
 
 #define GINL inline
@@ -52,9 +52,38 @@
 #		define GAIA_OS GAIA_OS_WINDOWS
 #	elif defined(__linux__)
 #		define GAIA_OS GAIA_OS_LINUX
+#	elif defined(TARGET_OS_MAC)
+#		if TARGET_OS_OSX
+#			define GAIA_OS GAIA_OS_OSX
+#		elif TARGET_OS_IOS
+#			define GAIA_OS GAIA_OS_IOS
+#		endif
 #	else
 #		define GAIA_OS GAIA_OS_OSX
 #	endif
+#endif
+
+/* OS can't support features(TEMP USAGE). */
+#if GAIA_OS == GAIA_OS_IOS
+#	define __GAIA_NO_HEAP__
+#	define __GAIA_NO_DEBUG_MEMORYLEAK__
+#endif
+
+/* Simulator. */
+#define GAIA_SIMULATOR_DISABLE 0
+#define GAIA_SIMULATOR_ENABLE 1
+#if GAIA_OS_IOS
+#	if defined(TARGET_OS_SIMULATOR)
+#		if TARGET_OS_SIMULATOR
+#			define GAIA_SIMULATOR GAIA_SIMULATOR_ENABLE
+#		else
+#			define GAIA_SIMULATOR GAIA_SIMULATOR_DISABLE
+#		endif
+#	else
+#		define GAIA_SIMULATOR GAIA_SIMULATOR_DISABLE
+#	endif
+#else
+#	define GAIA_SIMULATOR GAIA_SIMULATOR_DISABLE
 #endif
 
 /* Compiler profile. */

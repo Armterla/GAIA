@@ -1,4 +1,4 @@
-﻿#include "preheader.h"
+#include "preheader.h"
 #include "t_common.h"
 
 namespace TEST
@@ -551,18 +551,56 @@ namespace TEST
 			TERROR;
 		if(str.rfind((__StrType)_T("rr"), str.size() - 1) != GINVALID)
 			TERROR;
+		if(str.rfindi('L', str.size() - 1) != 18)
+			TERROR;
+		if(str.rfindi('D', str.size() - 1) != 19)
+			TERROR;
+		if(str.rfindi('h', str.size() - 1) != 10)
+			TERROR;
+		if(str.rfindi('X', str.size() - 1) != GINVALID)
+			TERROR;
+		if(str.rfindi(_T("hello"), str.size() - 1) != 10)
+			TERROR;
+		if(str.rfindi(_T("Ld"), str.size() - 1) != 18)
+			TERROR;
+		if(str.rfindi(_T("helloworldH"), str.size() - 1) != 0)
+			TERROR;
+		if(str.rfindi(_T("RR"), str.size() - 1) != GINVALID)
+			TERROR;
+		if(str.rfindi((__StrType)_T("R"), str.size() - 1) != 17)
+			TERROR;
+		if(str.rfindi((__StrType)_T("Rl"), str.size() - 1) != 17)
+			TERROR;
+		if(str.rfindi((__StrType)_T("lD"), str.size() - 1) != 18)
+			TERROR;
+		if(str.rfindi((__StrType)_T("HelloWorldH"), str.size() - 1) != 0)
+			TERROR;
+		if(str.rfindi((__StrType)_T("rR"), str.size() - 1) != GINVALID)
+			TERROR;
 		str = _T("HelloWorld");
-		if(!str.contains("Hello"))
+		if(!str.exist("Hello"))
 			TERROR;
-		if(!str.contains("World"))
+		if(!str.exist("World"))
 			TERROR;
-		if(!str.contains("oW"))
+		if(!str.exist("oW"))
 			TERROR;
-		if(!str.contains('W'))
+		if(!str.exist('W'))
 			TERROR;
-		if(str.contains('A'))
+		if(str.exist('A'))
 			TERROR;
-		if(!str.contains(str))
+		if(!str.exist(str))
+			TERROR;
+		if(!str.existi("hello"))
+			TERROR;
+		if(!str.existi("world"))
+			TERROR;
+		if(!str.existi("ow"))
+			TERROR;
+		if(!str.existi('w'))
+			TERROR;
+		if(str.existi('a'))
+			TERROR;
+		if(!str.existi(str))
 			TERROR;
 		str = _T("HelloWorld");
 		if(str.compare("HelloWorld") != 0)
@@ -740,6 +778,8 @@ namespace TEST
 		str.resize_keep(20);
 		if(str.find("HelloWorld", 0) != 0)
 			TERROR;
+		if(str.findi("helloworld", 0) != 0)
+			TERROR;
 		if(str.capacity() < 20)
 			TERROR;
 		str.resize_keep(5);
@@ -812,6 +852,19 @@ namespace TEST
 		if(str != "-11-11-11-11-11-1.0-1.011012345678123456781234567812345678")
 			TERROR;
 
+		str.assign("Hello World");
+		if(str != "Hello World")
+			TERROR;
+		str.append("Hello Kitty");
+		if(str != "Hello WorldHello Kitty")
+			TERROR;
+		str.assign("Hello World", 5);
+		if(str != "Hello")
+			TERROR;
+		str.append("Hello Kitty", 5);
+		if(str != "HelloHello")
+			TERROR;
+		
 		str = (const GAIA::TCH*)GNIL;
 		if((const GAIA::TCH*)str == GNIL)
 			TERROR;
@@ -831,5 +884,128 @@ namespace TEST
 		GAIA::CTN::WString strLocale2(strLocale1.fptr(), "UTF-8");
 		if(strLocale2 != strLocale)
 			TERROR;
+		
+		str = "HelloWorld!";
+		TAST(str.hash() != 0);
+		
+		{
+			str = "c:\\user/abc/1.txt";
+			GAIA::CH szTemp[GAIA::MAXPL];
+			GAIA::NUM sResultSize;
+			if(str.fbigname((GAIA::CH*)GNIL, GINVALID, &sResultSize) != GNIL)
+				TERROR;
+			if(sResultSize != 1)
+				TERROR;
+			if(str.fbigname(szTemp, sizeof(szTemp), &sResultSize) == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szTemp, "1"))
+				TERROR;
+			if(sResultSize != 1)
+				TERROR;
+			if(str.fbigname() != "1")
+				TERROR;
+			if(str.fbigname(str1) != "1")
+				TERROR;
+			if(str1 != "1")
+				TERROR;
+			if(str.tofbigname() != "1")
+				TERROR;
+		}
+		
+		{
+			str = "c:\\user/abc/1.txt";
+			GAIA::CH szTemp[GAIA::MAXPL];
+			GAIA::NUM sResultSize;
+			if(str.fextname((GAIA::CH*)GNIL, GINVALID, &sResultSize) != GNIL)
+				TERROR;
+			if(sResultSize != 3)
+				TERROR;
+			if(str.fextname(szTemp, sizeof(szTemp), &sResultSize) == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szTemp, "txt"))
+				TERROR;
+			if(sResultSize != 3)
+				TERROR;
+			if(str.fextname() != "txt")
+				TERROR;
+			if(str.fextname(str1) != "txt")
+				TERROR;
+			if(str1 != "txt")
+				TERROR;
+			if(str.tofextname() != "txt")
+				TERROR;
+		}
+		
+		{
+			str = "c:\\user/abc/1.txt";
+			GAIA::CH szTemp[GAIA::MAXPL];
+			GAIA::NUM sResultSize;
+			if(str.fname((GAIA::CH*)GNIL, GINVALID, &sResultSize) != GNIL)
+				TERROR;
+			if(sResultSize != 5)
+				TERROR;
+			if(str.fname(szTemp, sizeof(szTemp), &sResultSize) == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szTemp, "1.txt"))
+				TERROR;
+			if(sResultSize != 5)
+				TERROR;
+			if(str.fname() != "1.txt")
+				TERROR;
+			if(str.fname(str1) != "1.txt")
+				TERROR;
+			if(str1 != "1.txt")
+				TERROR;
+			if(str.tofname() != "1.txt")
+				TERROR;
+		}
+		
+		{
+			str = "c:\\user/abc/1.txt";
+			GAIA::CH szTemp[GAIA::MAXPL];
+			GAIA::NUM sResultSize;
+			if(str.fpath((GAIA::CH*)GNIL, GINVALID, &sResultSize) != GNIL)
+				TERROR;
+			if(sResultSize != 12)
+				TERROR;
+			if(str.fpath(szTemp, sizeof(szTemp), &sResultSize) == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szTemp, "c:\\user/abc/"))
+				TERROR;
+			if(sResultSize != 12)
+				TERROR;
+			if(str.fpath() != "c:\\user/abc/")
+				TERROR;
+			if(str.fpath(str1) != "c:\\user/abc/")
+				TERROR;
+			if(str1 != "c:\\user/abc/")
+				TERROR;
+			if(str.tofpath() != "c:\\user/abc/")
+				TERROR;
+		}
+		
+		{
+			str = "c:\\user/abc/1.txt";
+			GAIA::CH szTemp[GAIA::MAXPL];
+			GAIA::NUM sResultSize;
+			if(str.fpathbigname((GAIA::CH*)GNIL, GINVALID, &sResultSize) != GNIL)
+				TERROR;
+			if(sResultSize != 13)
+				TERROR;
+			if(str.fpathbigname(szTemp, sizeof(szTemp), &sResultSize) == GNIL)
+				TERROR;
+			if(!GAIA::ALGO::gstrequal(szTemp, "c:\\user/abc/1"))
+				TERROR;
+			if(sResultSize != 13)
+				TERROR;
+			if(str.fpathbigname() != "c:\\user/abc/1")
+				TERROR;
+			if(str.fpathbigname(str1) != "c:\\user/abc/1")
+				TERROR;
+			if(str1 != "c:\\user/abc/1")
+				TERROR;
+			if(str.tofpathbigname() != "c:\\user/abc/1")
+				TERROR;
+		}
 	}
 }

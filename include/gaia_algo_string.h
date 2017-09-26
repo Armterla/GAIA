@@ -133,6 +133,76 @@ namespace GAIA
 			}
 			return GNIL;
 		}
+		template<typename _DataType1, typename _SizeType, typename _DataType2> _DataType1 gstrrch(_DataType1 p, _SizeType size, const _DataType2& c)
+		{
+			if(size <= 0)
+				return GNIL;
+			size--;
+			for(;;)
+			{
+				if(p[size] == c)
+					return p + size;
+				if(size == 0)
+					break;
+				size--;
+			}
+			return GNIL;
+		}
+		template<typename _DataType1, typename _SizeType, typename _DataType2> _DataType1 gstrirch(_DataType1 p, _SizeType size, const _DataType2& c)
+		{
+			if(size <= 0)
+				return GNIL;
+			size--;
+			for(;;)
+			{
+				if(GAIA::ALGO::tolower(p[size]) == GAIA::ALGO::tolower(c))
+					return p + size;
+				if(size == 0)
+					break;
+				size--;
+			}
+			return GNIL;
+		}
+		template<typename _DataType1, typename _SizeType, typename _DataType2> _DataType1 gstrrchs(_DataType1 p, _SizeType size, _DataType2 key)
+		{
+			if(size <= 0)
+				return GNIL;
+			size--;
+			for(;;)
+			{
+				_DataType2 k = key;
+				while(*k != '\0')
+				{
+					if(p[size] == *k)
+						return p + size;
+					++k;
+				}
+				if(size == 0)
+					break;
+				size--;
+			}
+			return GNIL;
+		}
+		template<typename _DataType1, typename _SizeType, typename _DataType2> _DataType1 gstrirchs(_DataType1 p, _SizeType size, _DataType2 key)
+		{
+			if(size <= 0)
+				return GNIL;
+			size--;
+			for(;;)
+			{
+				_DataType2 k = key;
+				while(*k != '\0')
+				{
+					if(GAIA::ALGO::tolower(p[size]) == GAIA::ALGO::tolower(*k))
+						return p + size;
+					++k;
+				}
+				if(size == 0)
+					break;
+				size--;
+			}
+			return GNIL;
+		}
 		template<typename _DataType1, typename _DataType2> GAIA::BL gstrstartwith(_DataType1 p1, _DataType2 p2)
 		{
 			while(*p2 != '\0')
@@ -504,6 +574,42 @@ namespace GAIA
 				if(p - p2 == p2size)
 					return p1;
 				++p1;
+			}
+			return GNIL;
+		}
+		template<typename _DataType1, typename _SizeType, typename _DataType2>
+		_DataType1 gstrrstr(_DataType1 p1, _DataType2 p2, _SizeType size)
+		{
+			GAST(!!p1);
+			GAST(!!p2);
+			GAST(size >= 0);
+			_SizeType p2size = GAIA::ALGO::gstrlen(p2);
+			if(p2size > size)
+				return GNIL;
+			_DataType1 p = p1 + size - p2size;
+			while(p >= p1)
+			{
+				if(GAIA::ALGO::gstrcmp(p, p2, p2size) == 0)
+					return p;
+				--p;
+			}
+			return GNIL;
+		}
+		template<typename _DataType1, typename _SizeType, typename _DataType2>
+		_DataType1 gstrirstr(_DataType1 p1, _DataType2 p2, _SizeType size)
+		{
+			GAST(!!p1);
+			GAST(!!p2);
+			GAST(size >= 0);
+			_SizeType p2size = GAIA::ALGO::gstrlen(p2);
+			if(p2size > size)
+				return GNIL;
+			_DataType1 p = p1 + size - p2size;
+			while(p >= p1)
+			{
+				if(GAIA::ALGO::gstricmp(p, p2, p2size) == 0)
+					return p;
+				--p;
 			}
 			return GNIL;
 		}
@@ -1256,17 +1362,27 @@ namespace GAIA
 		_DataType1 gstrbycapacity(_DataType1 dst, _DataType2 storagesize)
 		{
 			GAIA::CH szUnit[32];
-			if(storagesize >= 1024 * 1024 * 1024)
+			if(storagesize >= 1024LL * 1024LL * 1024LL * 1024LL * 1024LL)
+			{
+				storagesize = storagesize / 1024 / 1024 / 1024 / 1024 * 1000 / 1024;
+				GAIA::ALGO::gstrcpy(szUnit, "(PB)");
+			}
+			else if(storagesize >= 1024LL * 1024LL * 1024LL * 1024LL)
+			{
+				storagesize = storagesize / 1024 / 1024 / 1024 * 1000 / 1024;
+				GAIA::ALGO::gstrcpy(szUnit, "(TB)");
+			}
+			else if(storagesize >= 1024LL * 1024LL * 1024LL)
 			{
 				storagesize = storagesize / 1024 / 1024 * 1000 / 1024;
 				GAIA::ALGO::gstrcpy(szUnit, "(GB)");
 			}
-			else if(storagesize >= 1024 * 1024)
+			else if(storagesize >= 1024LL * 1024LL)
 			{
 				storagesize = storagesize / 1024 * 100 / 1024;
 				GAIA::ALGO::gstrcpy(szUnit, "(MB)");
 			}
-			else if(storagesize >= 1024)
+			else if(storagesize >= 1024LL)
 			{
 				storagesize = storagesize * 10 / 1024;
 				GAIA::ALGO::gstrcpy(szUnit, "(KB)");
@@ -1275,7 +1391,17 @@ namespace GAIA
 				GAIA::ALGO::gstrcpy(szUnit, "(Bytes)");
 			GAIA::ALGO::castv(storagesize, dst, 32);
 			GAIA::NUM sLen = GAIA::ALGO::gstrlen(dst);
-			if(szUnit[1] == 'G')
+			if(szUnit[1] == 'P')
+			{
+				insert(dst, sLen, '.', sLen - 3);
+				++sLen;
+			}
+			else if(szUnit[1] == 'T')
+			{
+				insert(dst, sLen, '.', sLen - 3);
+				++sLen;
+			}
+			else if(szUnit[1] == 'G')
 			{
 				insert(dst, sLen, '.', sLen - 3);
 				++sLen;

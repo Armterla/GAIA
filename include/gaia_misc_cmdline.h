@@ -1,4 +1,4 @@
-﻿#ifndef		__GAIA_MISC_CMDLINE_H__
+#ifndef		__GAIA_MISC_CMDLINE_H__
 #define		__GAIA_MISC_CMDLINE_H__
 
 #include "gaia_type.h"
@@ -467,6 +467,8 @@ namespace GAIA
 				for(GAIA::NUM x = 0; x < m_decls.size(); ++x)
 				{
 					const Decl& d = m_decls[x];
+					if(sections.empty())
+						break;
 					GAIA::BL bCmdEqual = d.strCmd.equals(sections[0]);
 					if(bCmdEqual)
 						bExistCmd = GAIA::True;

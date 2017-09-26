@@ -40,66 +40,27 @@ namespace GAIA
 				GAIA::ChangeInstanceCount(GAIA::INSTANCE_COUNT_FILE, -1);
 			#endif
 			}
-			GINL virtual GAIA::BL Open(const GAIA::TCH* fileurl, const GAIA::UM& opentype)
+			GINL virtual GAIA::BL Open(const GAIA::CH* fileurl, const GAIA::UM& opentype)
 			{
 				if(this->IsOpen())
 					this->Close();
 				GAST(!!fileurl);
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				if(opentype & OPEN_TYPE_CREATEALWAYS)
-			#	if GAIA_CHARSET == GAIA_CHARSET_ANSI
 					m_pFile = (GAIA::GVOID*)fopen(fileurl, "wb+"); // Create for read and write.
-			#	elif GAIA_CHARSET == GAIA_CHARSET_UNICODE
-					m_pFile = (GAIA::GVOID*)_wfopen(fileurl, _T("wb+"));
-			#	endif
 				else if(opentype & OPEN_TYPE_WRITE)
-			#	if GAIA_CHARSET == GAIA_CHARSET_ANSI
 					m_pFile = (GAIA::GVOID*)fopen(fileurl, "rb+"); // Open for read and write.
-			#	elif GAIA_CHARSET == GAIA_CHARSET_UNICODE
-					m_pFile = (GAIA::GVOID*)_wfopen(fileurl, _T("rb+"));
-			#	endif
 				else if(opentype == OPEN_TYPE_READ)
-			#	if GAIA_CHARSET == GAIA_CHARSET_ANSI
 					m_pFile = (GAIA::GVOID*)fopen(fileurl, "rb"); // Open for read.
-			#	elif GAIA_CHARSET == GAIA_CHARSET_UNICODE
-					m_pFile = (GAIA::GVOID*)_wfopen(fileurl, _T("rb"));
-			#	endif
 				else
 					return GAIA::False;
 			#else
 				if(opentype & OPEN_TYPE_CREATEALWAYS)
-			#	if GAIA_CHARSET == GAIA_CHARSET_ANSI
 					m_pFile = (GAIA::GVOID*)fopen(fileurl, "wb+"); // Create for read and write.
-			#	elif GAIA_CHARSET == GAIA_CHARSET_UNICODE
-				{
-					GAIA::CH szTempFileUrl[GAIA::MAXPL];
-					GAIA::NUM sLen = GAIA::LOCALE::w2m(fileurl, GINVALID, szTempFileUrl, GAIA::MAXPL, GAIA::CHARSET_TYPE_ASCII);
-					szTempFileUrl[sLen] = '\0';
-					m_pFile = (GAIA::GVOID*)fopen(szTempFileUrl, "wb+");
-				}
-			#	endif
 				else if(opentype & OPEN_TYPE_WRITE)
-			#	if GAIA_CHARSET == GAIA_CHARSET_ANSI
 					m_pFile = (GAIA::GVOID*)fopen(fileurl, "rb+"); // Open for read and write.
-			#	elif GAIA_CHARSET == GAIA_CHARSET_UNICODE
-				{
-					GAIA::CH szTempFileUrl[GAIA::MAXPL];
-					GAIA::NUM sLen = GAIA::LOCALE::w2m(fileurl, GINVALID, szTempFileUrl, GAIA::MAXPL, GAIA::CHARSET_TYPE_ASCII);
-					szTempFileUrl[sLen] = '\0';
-					m_pFile = (GAIA::GVOID*)fopen(szTempFileUrl, "rb+");
-				}
-			#	endif
 				else if(opentype == OPEN_TYPE_READ)
-			#	if GAIA_CHARSET == GAIA_CHARSET_ANSI
 					m_pFile = (GAIA::GVOID*)fopen(fileurl, "rb"); // Open for read.
-			#	elif GAIA_CHARSET == GAIA_CHARSET_UNICODE
-				{
-					GAIA::CH szTempFileUrl[GAIA::MAXPL];
-					GAIA::NUM sLen = GAIA::LOCALE::w2m(fileurl, GINVALID, szTempFileUrl, GAIA::MAXPL, GAIA::CHARSET_TYPE_ASCII);
-					szTempFileUrl[sLen] = '\0';
-					m_pFile = (GAIA::GVOID*)fopen(szTempFileUrl, "rb");
-				}
-			#	endif
 				else
 					return GAIA::False;
 			#endif
@@ -108,7 +69,7 @@ namespace GAIA
 				m_offset = 0;
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				if(_fseeki64((FILE*)m_pFile, 0, SEEK_END) != 0)
-			#elif GAIA_OS == GAIA_OS_OSX
+			#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 				if(fseeko((FILE*)m_pFile, 0, SEEK_END) != 0)
 			#else
 				if(fseeko64((FILE*)m_pFile, 0, SEEK_END) != 0)
@@ -119,7 +80,7 @@ namespace GAIA
 				}
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				m_size = _ftelli64((FILE*)m_pFile);
-			#elif GAIA_OS == GAIA_OS_OSX
+			#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 				m_size = ftello((FILE*)m_pFile);
 			#else
 				m_size = ftello64((FILE*)m_pFile);
@@ -132,7 +93,7 @@ namespace GAIA
 				}
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				if(_fseeki64((FILE*)m_pFile, 0, SEEK_SET) != 0)
-			#elif GAIA_OS == GAIA_OS_OSX
+			#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 				if(fseeko((FILE*)m_pFile, 0, SEEK_SET) != 0)
 			#else
 				if(fseeko64((FILE*)m_pFile, 0, SEEK_SET) != 0)
@@ -165,7 +126,7 @@ namespace GAIA
 				return GAIA::False;
 			}
 			GINL virtual GAIA::BL IsOpen() const{return m_pFile != GNIL;}
-			GINL virtual const GAIA::TCH* GetFileUrl() const{return m_strFileUrl.fptr();}
+			GINL virtual const GAIA::CH* GetFileUrl() const{return m_strFileUrl.fptr();}
 			GINL virtual GAIA::UM GetOpenType() const{return m_fileopentype;}
 			GINL virtual GAIA::FSYS::FileBase::__FileSizeType Size() const{return m_size;}
 			GINL virtual GAIA::BL Resize(const GAIA::FSYS::FileBase::__FileSizeType& size)
@@ -180,7 +141,7 @@ namespace GAIA
 					#if GAIA_OS == GAIA_OS_WINDOWS
 						if(_chsize_s(fileno((FILE*)m_pFile), size) != 0)
 							return GAIA::False;
-					#elif GAIA_OS == GAIA_OS_OSX
+					#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 						if(ftruncate(fileno((FILE*)m_pFile), size) != 0)
 					#else
 						if(ftruncate64(fileno((FILE*)m_pFile), size) != 0)
@@ -192,7 +153,7 @@ namespace GAIA
 					{
 					#if GAIA_OS == GAIA_OS_WINDOWS
 						GAIA::FSYS::FileBase::__FileSizeType cur = _ftelli64((FILE*)m_pFile);
-					#elif GAIA_OS == GAIA_OS_OSX
+					#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 						GAIA::FSYS::FileBase::__FileSizeType cur = ftello((FILE*)m_pFile);
 					#else
 						GAIA::FSYS::FileBase::__FileSizeType cur = ftello64((FILE*)m_pFile);
@@ -202,7 +163,7 @@ namespace GAIA
 							return GAIA::False;
 					#if GAIA_OS == GAIA_OS_WINDOWS
 						if(_fseeki64((FILE*)m_pFile, size - 1, SEEK_SET) != 0)
-					#elif GAIA_OS == GAIA_OS_OSX
+					#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 						if(fseeko((FILE*)m_pFile, size - 1, SEEK_SET) != 0)
 					#else
 						if(fseeko64((FILE*)m_pFile, size - 1, SEEK_SET) != 0)
@@ -215,7 +176,7 @@ namespace GAIA
 							return GAIA::False;
 					#if GAIA_OS == GAIA_OS_WINDOWS
 						if(_fseeki64((FILE*)m_pFile, cur, SEEK_SET) != 0)
-					#elif GAIA_OS == GAIA_OS_OSX
+					#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 						if(fseeko((FILE*)m_pFile, cur, SEEK_SET) != 0)
 					#else
 						if(fseeko64((FILE*)m_pFile, cur, SEEK_SET) != 0)
@@ -286,7 +247,7 @@ namespace GAIA
 					return GAIA::True;
 			#if GAIA_OS == GAIA_OS_WINDOWS
 				if(_fseeki64((FILE*)m_pFile, toffset, SEEK_SET) == 0)
-			#elif GAIA_OS == GAIA_OS_OSX
+			#elif GAIA_OS == GAIA_OS_OSX || GAIA_OS == GAIA_OS_IOS
 				if(fseeko((FILE*)m_pFile, toffset, SEEK_SET) == 0)
 			#else
 				if(fseeko64((FILE*)m_pFile, toffset, SEEK_SET) == 0)
@@ -307,7 +268,7 @@ namespace GAIA
 				return GAIA::False;
 			}
 		private:
-			GAIA::CTN::TCharsString m_strFileUrl;
+			GAIA::CTN::ACharsString m_strFileUrl;
 			GAIA::UM m_fileopentype;
 			GAIA::FSYS::FileBase::__FileSizeType m_size;
 			GAIA::FSYS::FileBase::__FileSizeType m_offset;

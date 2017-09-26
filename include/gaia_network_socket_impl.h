@@ -292,6 +292,8 @@ namespace GAIA
 
 		GINL GAIA::GVOID Socket::Shutdown(GAIA::N32 nShutdownFlag)
 		{
+			if(nShutdownFlag & (~(GAIA::NETWORK::Socket::SSDF_SEND | GAIA::NETWORK::Socket::SSDF_RECV)))
+				GTHROW(InvalidParam);
 			if(!this->IsCreated())
 				GTHROW(Illegal);
 			GAIA::N32 nFlag = 0;
@@ -724,6 +726,8 @@ namespace GAIA
 				GTHROW(InvalidParam);
 			if(nSize <= 0)
 				GTHROW(InvalidParam);
+			if(nSendFlag & (~(GAIA::NETWORK::Socket::SSF_OOB | GAIA::NETWORK::Socket::SSF_DONTROUTE)))
+				GTHROW(InvalidParam);
 
 			if(!this->IsCreated())
 				GTHROW(Illegal);
@@ -764,6 +768,8 @@ namespace GAIA
 				GTHROW(InvalidParam);
 			if(nSize <= 0)
 				GTHROW(InvalidParam);
+			if(nRecvFlag & (~(GAIA::NETWORK::Socket::SRF_OOB | GAIA::NETWORK::Socket::SRF_PEEK)))
+				GTHROW(InvalidParam);
 
 			if(!this->IsCreated())
 				GTHROW(Illegal);
@@ -801,6 +807,8 @@ namespace GAIA
 			if(p == GNIL)
 				GTHROW(InvalidParam);
 			if(nSize <= 0)
+				GTHROW(InvalidParam);
+			if(nSendFlag & (~(GAIA::NETWORK::Socket::SSF_OOB | GAIA::NETWORK::Socket::SSF_DONTROUTE)))
 				GTHROW(InvalidParam);
 
 			if(!this->IsCreated())
@@ -845,6 +853,8 @@ namespace GAIA
 			if(p == GNIL)
 				GTHROW(InvalidParam);
 			if(nSize <= 0)
+				GTHROW(InvalidParam);
+			if(nRecvFlag & (~(GAIA::NETWORK::Socket::SRF_OOB | GAIA::NETWORK::Socket::SRF_PEEK)))
 				GTHROW(InvalidParam);
 
 			if(!this->IsCreated())
@@ -893,7 +903,7 @@ namespace GAIA
 
 		GINL GAIA::BL Socket::GetBindedAddress(GAIA::NETWORK::Addr& addr)
 		{
-			if(!m_addrBinded.check())
+			if(m_addrBinded.uPort == 0)
 				return GAIA::False;
 			addr = m_addrBinded;
 			return GAIA::True;

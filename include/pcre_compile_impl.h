@@ -42,7 +42,8 @@ POSSIBILITY OF SUCH DAMAGE.
 supporting internal functions that are not used by other modules. */
 
 #ifdef __APPLE__
-#pragma clang diagnostic ignored"-Wconditional-uninitialized"
+#	pragma clang diagnostic ignored"-Wconditional-uninitialized"
+#	pragma clang diagnostic ignored"-Wcomma"
 #endif
 
 #define HAVE_CONFIG_H
@@ -9595,6 +9596,8 @@ return (pcre16 *)re;
 return (pcre32 *)re;
 #endif
 }
-
+#ifdef __APPLE__
+#	pragma clang diagnostic pop
+#endif
 /* End of pcre_compile.c */
 

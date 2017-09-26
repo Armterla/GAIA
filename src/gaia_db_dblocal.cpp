@@ -6,6 +6,7 @@
 
 #include <gaia_type.h>
 #include <gaia_assert.h>
+#include <gaia_sync_lockfree.h>
 #include <gaia_ctn_string.h>
 #include <gaia_ctn_charsstring.h>
 #include <gaia_db_dblocal.h>
@@ -74,7 +75,7 @@ namespace GAIA
 			GAIA::CTN::AString strDBName;
 			GAIA::DB::DB_SYNC_MODE syncmode;
 			GAIA::NUM sCacheSize;
-			GAIA::SYNC::Lock lrTransaction;
+			GAIA::SYNC::LockFree lrTransaction;
 			GAIA::N64 nTransactionRefCount;
 			GAIA::NUM sTransactionMethod;
 		};
@@ -699,7 +700,7 @@ namespace GAIA
 			{
 				m_ctx->sTransactionMethod = 0; // 0 means not init, 1 means commit, 2 means rollback.
 			#ifdef GAIA_FEATURE_SQLITE
-				if(sqlite3_exec(m_ctx->pSqliteDB, "BEGIN IMMEDIATE TRANSACTION", GNIL, GNIL, GNIL) != SQLITE_OK)
+				if(sqlite3_exec(m_ctx->pSqliteDB, "BEGIN IMMEDIATE TRANSACTION;", GNIL, GNIL, GNIL) != SQLITE_OK)
 				{
 					m_ctx->lrTransaction.Leave();
 					return GAIA::False;
@@ -735,7 +736,7 @@ namespace GAIA
 				if(bRollBack)
 				{
 				#ifdef GAIA_FEATURE_SQLITE
-					if(sqlite3_exec(m_ctx->pSqliteDB, "ROLLBACK TRANSACTION", GNIL, GNIL, GNIL) != SQLITE_OK)
+					if(sqlite3_exec(m_ctx->pSqliteDB, "ROLLBACK TRANSACTION;", GNIL, GNIL, GNIL) != SQLITE_OK)
 					{
 						m_ctx->lrTransaction.Leave();
 						return GAIA::False;
@@ -747,7 +748,7 @@ namespace GAIA
 				else
 				{
 				#ifdef GAIA_FEATURE_SQLITE
-					if(sqlite3_exec(m_ctx->pSqliteDB, "COMMIT TRANSACTION", GNIL, GNIL, GNIL) != SQLITE_OK)
+					if(sqlite3_exec(m_ctx->pSqliteDB, "COMMIT TRANSACTION;", GNIL, GNIL, GNIL) != SQLITE_OK)
 					{
 						m_ctx->lrTransaction.Leave();
 						return GAIA::False;

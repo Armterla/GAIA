@@ -588,7 +588,7 @@ namespace GAIA
 			GINL const GAIA::U64& GetAcceptTime() const{return m_uAcceptTime;}
 
 			/*!
-				@brief Response peer by http protocal.
+				@brief Response peer by http protocol.
 
 				@param httpcode [in] Specify the http code.
 					If success, return HTTP_CODE_OK, if failed by resource not found, return HTTP_CODE_NOTFOUND.
@@ -863,7 +863,7 @@ namespace GAIA
 
 			@remarks HttpServer is a thread-safe class.
 		*/
-		class HttpServer : public GAIA::Base
+		class HttpServer : public GAIA::Entity
 		{
 			friend class HttpServerLink;
 			friend class HttpServerWorkThread;
@@ -890,7 +890,8 @@ namespace GAIA
 				@return If success, return GAIA::True, or return GAIA::False.
 
 				@remarks
-					Regist a same object twice will cause failed.
+					Regist a same object twice will cause failed.\n
+			 		First registed callback will first callbacked. FIFO.
 			*/
 			GAIA::BL RegistCallBack(GAIA::NETWORK::HttpServerCallBack& cb);
 

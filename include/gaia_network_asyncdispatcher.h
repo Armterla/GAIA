@@ -118,7 +118,7 @@ namespace GAIA
 		/*!
 			@brief TCP async socket dispatcher.
 		*/
-		class AsyncDispatcher : public GAIA::Base
+		class AsyncDispatcher : public GAIA::Entity
 		{
 			friend class AsyncSocket;
 			friend class AsyncDispatcherThread;

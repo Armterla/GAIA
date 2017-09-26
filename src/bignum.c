@@ -30,6 +30,11 @@
  *  http://math.libtomcrypt.com/files/tommath.pdf
  */
 
+#ifdef __APPLE__
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored"-Wcomma"
+#endif
+
 #include "polarssl_config.h"
 
 #if defined(POLARSSL_BIGNUM_C)
@@ -2048,4 +2053,8 @@ cleanup:
 
 #endif
 
+#endif
+
+#ifdef __APPLE__
+#	pragma clang diagnostic pop
 #endif

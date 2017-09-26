@@ -1,4 +1,4 @@
-﻿#ifndef		__GAIA_CTN_CHARSSTRING_H__
+#ifndef		__GAIA_CTN_CHARSSTRING_H__
 #define		__GAIA_CTN_CHARSSTRING_H__
 
 #include "gaia_type.h"
@@ -362,19 +362,36 @@ namespace GAIA
 				m_string.destroy();
 			}
 			GINL GAIA::U32 type() const{if(m_string.capacity() != 0) return m_string.type(); return m_chars.type();}
-			template<typename _ParamDataType> __MyType& assign(const _ParamDataType* p, const _SizeType& size)
+			template<typename _ParamDataType> __MyType& assign(const _ParamDataType* p, _SizeType size = GINVALID)
+			{
+				if(size < 0)
+					size = GAIA::ALGO::gstrlen(p);
+				if(p == GNIL || size == 0)
+				{
+					this->clear();
+					return *this;
+				}
+				if(size > m_chars.capacity())
+					m_string.assign(p, size);
+				else
+				{
+					m_chars.assign(p, size);
+					m_string.destroy();
+				}
+				return *this;
+			}
+			template<typename _ParamDataType> __MyType& append(const _ParamDataType* p, _SizeType size = GINVALID)
 			{
 				if(p == GNIL || size == 0)
 				{
 					this->clear();
 					return *this;
 				}
-				this->clear();
 				if(size > m_chars.capacity())
-					m_string.assign(p, size);
+					m_string.append(p, size);
 				else
 				{
-					m_chars.assign(p, size);
+					m_chars.append(p, size);
 					m_string.destroy();
 				}
 				return *this;
@@ -592,17 +609,65 @@ namespace GAIA
 					return m_string.rfind(src.fptr(), index);
 				return m_chars.rfind(src.fptr(), index);
 			}
-			template<typename _ParamDataType> GAIA::BL contains(const _ParamDataType& t) const
+			template<typename _ParamDataType> GAIA::BL exist(const _ParamDataType& t) const
 			{
 				return this->find(t, 0) != GINVALID;
 			}
-			template<typename _ParamDataType> GAIA::BL contains(const _ParamDataType* p) const
+			template<typename _ParamDataType> GAIA::BL exist(const _ParamDataType* p) const
 			{
 				return this->find(p, 0) != GINVALID;
 			}
-			GINL GAIA::BL contains(const __MyType& src) const
+			GINL GAIA::BL exist(const __MyType& src) const
 			{
 				return this->find(src.fptr(), 0) != GINVALID;
+			}
+			template<typename _ParamDataType> _SizeType findi(const _ParamDataType& t, const _SizeType& index = 0) const
+			{
+				if(m_string.capacity() != 0)
+					return m_string.findi(t, index);
+				return m_chars.findi(t, index);
+			}
+			template<typename _ParamDataType> _SizeType findi(const _ParamDataType* p, const _SizeType& index = 0) const
+			{
+				if(m_string.capacity() != 0)
+					return m_string.findi(p, index);
+				return m_chars.findi(p, index);
+			}
+			GINL _SizeType findi(const __MyType& src, const _SizeType& index = 0) const
+			{
+				if(m_string.capacity() != 0)
+					return m_string.findi(src, index);
+				return m_chars.findi(src, index);
+			}
+			template<typename _ParamDataType> _SizeType rfindi(const _ParamDataType& t, _SizeType index = GINVALID) const
+			{
+				if(m_string.capacity() != 0)
+					return m_string.rfindi(t, index);
+				return m_chars.rfindi(t, index);
+			}
+			template<typename _ParamDataType> _SizeType rfindi(const _ParamDataType* p, _SizeType index = GINVALID) const
+			{
+				if(m_string.capacity() != 0)
+					return m_string.rfindi(p, index);
+				return m_chars.rfindi(p, index);
+			}
+			GINL _SizeType rfindi(const __MyType& src, _SizeType index = GINVALID) const
+			{
+				if(m_string.capacity() != 0)
+					return m_string.rfindi(src.fptr(), index);
+				return m_chars.rfindi(src.fptr(), index);
+			}
+			template<typename _ParamDataType> GAIA::BL existi(const _ParamDataType& t) const
+			{
+				return this->findi(t, 0) != GINVALID;
+			}
+			template<typename _ParamDataType> GAIA::BL existi(const _ParamDataType* p) const
+			{
+				return this->findi(p, 0) != GINVALID;
+			}
+			GINL GAIA::BL existi(const __MyType& src) const
+			{
+				return this->findi(src.fptr(), 0) != GINVALID;
 			}
 			template<typename _ParamDataType> GAIA::BL startwith(const _ParamDataType& t) const
 			{
@@ -1476,6 +1541,420 @@ namespace GAIA
 					GASTFALSE;
 				return ret;
 			}
+			GINL GAIA::U64 hash() const
+			{
+				if(this->empty())
+					return 0;
+				return GAIA::ALGO::hash(this->fptr());
+			}
+			template<typename _ParamDataType, typename _ParamMaxSizeType, typename _ParamSizeType> _ParamDataType* fbigname(_ParamDataType* p, _ParamMaxSizeType maxsize = GINVALID, _ParamSizeType* pResultSize = GNIL) const
+			{
+				_SizeType idx;
+				_SizeType ressize;
+				this->fbignameidxsize(idx, ressize);
+				if(p == GNIL)
+				{
+					GAST(maxsize == GINVALID);
+					GAST(pResultSize != GNIL);
+					*pResultSize = ressize;
+				}
+				else
+				{
+					if(pResultSize != GNIL)
+						*pResultSize = ressize;
+					if(maxsize != GINVALID && ressize >= maxsize)
+						return GNIL;
+					if(ressize > 0)
+						GAIA::ALGO::gstrcpy(p, this->fptr() + idx, ressize);
+					else
+						p[0] = '\0';
+				}
+				return p;
+			}
+			template<typename _ParamDataType, typename _ParamMaxSizeType, typename _ParamSizeType> _ParamDataType* fextname(_ParamDataType* p, _ParamMaxSizeType maxsize = GINVALID, _ParamSizeType* pResultSize = GNIL) const
+			{
+				_SizeType idx;
+				_SizeType ressize;
+				this->fextnameidxsize(idx, ressize);
+				if(p == GNIL)
+				{
+					GAST(maxsize == GINVALID);
+					GAST(pResultSize != GNIL);
+					*pResultSize = ressize;
+				}
+				else
+				{
+					if(pResultSize != GNIL)
+						*pResultSize = ressize;
+					if(maxsize != GINVALID && ressize >= maxsize)
+						return GNIL;
+					if(ressize > 0)
+						GAIA::ALGO::gstrcpy(p, this->fptr() + idx, ressize);
+					else
+						p[0] = '\0';
+				}
+				return p;
+			}
+			template<typename _ParamDataType, typename _ParamMaxSizeType, typename _ParamSizeType> _ParamDataType* fname(_ParamDataType* p, _ParamMaxSizeType maxsize = GINVALID, _ParamSizeType* pResultSize = GNIL) const
+			{
+				_SizeType idx;
+				_SizeType ressize;
+				this->fnameidxsize(idx, ressize);
+				if(p == GNIL)
+				{
+					GAST(maxsize == GINVALID);
+					GAST(pResultSize != GNIL);
+					*pResultSize = ressize;
+				}
+				else
+				{
+					if(pResultSize != GNIL)
+						*pResultSize = ressize;
+					if(maxsize != GINVALID && ressize >= maxsize)
+						return GNIL;
+					if(ressize > 0)
+						GAIA::ALGO::gstrcpy(p, this->fptr() + idx, ressize);
+					else
+						p[0] = '\0';
+				}
+				return p;
+			}
+			template<typename _ParamDataType, typename _ParamMaxSizeType, typename _ParamSizeType> _ParamDataType* fpath(_ParamDataType* p, _ParamMaxSizeType maxsize = GINVALID, _ParamSizeType* pResultSize = GNIL) const
+			{
+				_SizeType idx;
+				_SizeType ressize;
+				this->fpathidxsize(idx, ressize);
+				if(p == GNIL)
+				{
+					GAST(maxsize == GINVALID);
+					GAST(pResultSize != GNIL);
+					*pResultSize = ressize;
+				}
+				else
+				{
+					if(pResultSize != GNIL)
+						*pResultSize = ressize;
+					if(maxsize != GINVALID && ressize >= maxsize)
+						return GNIL;
+					if(ressize > 0)
+						GAIA::ALGO::gstrcpy(p, this->fptr() + idx, ressize);
+					else
+						p[0] = '\0';
+				}
+				return p;
+			}
+			template<typename _ParamDataType, typename _ParamMaxSizeType, typename _ParamSizeType> _ParamDataType* fpathbigname(_ParamDataType* p, _ParamMaxSizeType maxsize = GINVALID, _ParamSizeType* pResultSize = GNIL) const
+			{
+				_SizeType idx = 0;
+				_SizeType ressize;
+				this->fpathbignameidxsize(idx, ressize);
+				if(p == GNIL)
+				{
+					GAST(maxsize == GINVALID);
+					GAST(pResultSize != GNIL);
+					*pResultSize = ressize;
+				}
+				else
+				{
+					if(pResultSize != GNIL)
+						*pResultSize = ressize;
+					if(maxsize != GINVALID && ressize >= maxsize)
+						return GNIL;
+					if(ressize > 0)
+						GAIA::ALGO::gstrcpy(p, this->fptr() + idx, ressize);
+					else
+						p[0] = '\0';
+				}
+				return p;
+			}
+			GINL __MyType fbigname() const
+			{
+				__MyType ret;
+				this->fbigname(ret);
+				return ret;
+			}
+			GINL __MyType fextname() const
+			{
+				__MyType ret;
+				this->fextname(ret);
+				return ret;
+			}
+			GINL __MyType fname() const
+			{
+				__MyType ret;
+				this->fname(ret);
+				return ret;
+			}
+			GINL __MyType fpath() const
+			{
+				__MyType ret;
+				this->fpath(ret);
+				return ret;
+			}
+			GINL __MyType fpathbigname() const
+			{
+				__MyType ret;
+				this->fpathbigname(ret);
+				return ret;
+			}
+			GINL __MyType& fbigname(__MyType& res) const
+			{
+				_SizeType idx = 0;
+				_SizeType ressize;
+				this->fbignameidxsize(idx, ressize);
+				res.assign(this->fptr() + idx, ressize);
+				return res;
+			}
+			GINL __MyType& fextname(__MyType& res) const
+			{
+				_SizeType idx = 0;
+				_SizeType ressize;
+				this->fextnameidxsize(idx, ressize);
+				res.assign(this->fptr() + idx, ressize);
+				return res;
+			}
+			GINL __MyType& fname(__MyType& res) const
+			{
+				_SizeType idx = 0;
+				_SizeType ressize;
+				this->fnameidxsize(idx, ressize);
+				res.assign(this->fptr() + idx, ressize);
+				return res;
+			}
+			GINL __MyType& fpath(__MyType& res) const
+			{
+				_SizeType idx = 0;
+				_SizeType ressize;
+				this->fpathidxsize(idx, ressize);
+				res.assign(this->fptr() + idx, ressize);
+				return res;
+			}
+			GINL __MyType& fpathbigname(__MyType& res) const
+			{
+				_SizeType idx = 0;
+				_SizeType ressize;
+				this->fpathbignameidxsize(idx, ressize);
+				res.assign(this->fptr() + idx, ressize);
+				return res;
+			}
+			GINL __MyType& tofbigname()
+			{
+				_SizeType idx = 0;
+				_SizeType ressize;
+				this->fbignameidxsize(idx, ressize);
+				this->assign(this->fptr() + idx, ressize);
+				return *this;
+			}
+			GINL __MyType& tofextname()
+			{
+				_SizeType idx = 0;
+				_SizeType ressize;
+				this->fextnameidxsize(idx, ressize);
+				this->assign(this->fptr() + idx, ressize);
+				return *this;
+			}
+			GINL __MyType& tofname()
+			{
+				_SizeType idx = 0;
+				_SizeType ressize;
+				this->fnameidxsize(idx, ressize);
+				this->assign(this->fptr() + idx, ressize);
+				return *this;
+			}
+			GINL __MyType& tofpath()
+			{
+				_SizeType idx = 0;
+				_SizeType ressize;
+				this->fpathidxsize(idx, ressize);
+				this->assign(this->fptr() + idx, ressize);
+				return *this;
+			}
+			GINL __MyType& tofpathbigname()
+			{
+				_SizeType idx = 0;
+				_SizeType ressize;
+				this->fpathbignameidxsize(idx, ressize);
+				this->assign(this->fptr() + idx, ressize);
+				return *this;
+			}
+			GINL GAIA::GVOID fbignameidxsize(_SizeType& idx, _SizeType& ressize) const
+			{
+				_SizeType lastdot = GINVALID;
+				_SizeType lastslash = GINVALID;
+				if(this->size() > 0)
+				{
+					const _DataType* p = this->bptr();
+					while(p >= this->fptr())
+					{
+						if(*p == '.' && lastdot == GINVALID)
+							lastdot = (_SizeType)(p - this->fptr());
+						if(*p == '/' || *p == '\\')
+						{
+							lastslash = (_SizeType)(p - this->fptr());
+							break;
+						}
+						--p;
+					}
+				}
+				if(lastslash == GINVALID)
+				{
+					idx = 0;
+					if(lastdot == GINVALID)
+						ressize = this->size();
+					else
+						ressize = lastdot;
+				}
+				else
+				{
+					idx = lastslash + 1;
+					if(lastdot == GINVALID || lastdot <= lastslash)
+						ressize = this->size() - lastslash - 1;
+					else
+						ressize = lastdot - lastslash - 1;
+				}
+			}
+			GINL GAIA::GVOID fextnameidxsize(_SizeType& idx, _SizeType& ressize) const
+			{
+				_SizeType lastdot = GINVALID;
+				_SizeType lastslash = GINVALID;
+				if(this->size() > 0)
+				{
+					const _DataType* p = this->bptr();
+					while(p >= this->fptr())
+					{
+						if(*p == '.' && lastdot == GINVALID)
+							lastdot = (_SizeType)(p - this->fptr());
+						if(*p == '/' || *p == '\\')
+						{
+							lastslash = (_SizeType)(p - this->fptr());
+							break;
+						}
+						--p;
+					}
+				}
+				if(lastslash == GINVALID)
+				{
+					if(lastdot == GINVALID)
+					{
+						idx = GINVALID;
+						ressize = 0;
+					}
+					else
+					{
+						idx = lastdot + 1;
+						ressize = this->size() - idx;
+					}
+				}
+				else
+				{
+					if(lastdot == GINVALID)
+					{
+						idx = GINVALID;
+						ressize = 0;
+					}
+					else
+					{
+						if(lastdot <= lastslash)
+						{
+							idx = GINVALID;
+							ressize = 0;
+						}
+						else
+						{
+							idx = lastdot + 1;
+							ressize = this->size() - idx;
+						}
+					}
+				}
+			}
+			GINL GAIA::GVOID fnameidxsize(_SizeType& idx, _SizeType& ressize) const
+			{
+				_SizeType lastslash = GINVALID;
+				if(this->size() > 0)
+				{
+					const _DataType* p = this->bptr();
+					while(p >= this->fptr())
+					{
+						if(*p == '/' || *p == '\\')
+						{
+							lastslash = (_SizeType)(p - this->fptr());
+							break;
+						}
+						--p;
+					}
+				}
+				if(lastslash == GINVALID)
+				{
+					idx = 0;
+					ressize = this->size();
+				}
+				else
+				{
+					idx = lastslash + 1;
+					ressize = this->size() - idx;
+				}
+			}
+			GINL GAIA::GVOID fpathidxsize(_SizeType& idx, _SizeType& ressize) const
+			{
+				_SizeType lastslash = GINVALID;
+				if(this->size() > 0)
+				{
+					const _DataType* p = this->bptr();
+					while(p >= this->fptr())
+					{
+						if(*p == '/' || *p == '\\')
+						{
+							lastslash = (_SizeType)(p - this->fptr());
+							break;
+						}
+						--p;
+					}
+				}
+				idx = 0;
+				if(lastslash == GINVALID)
+					ressize = this->size();
+				else
+					ressize = lastslash + 1;
+			}
+			GINL GAIA::GVOID fpathbignameidxsize(_SizeType& idx, _SizeType& ressize) const
+			{
+				_SizeType lastdot = GINVALID;
+				_SizeType lastslash = GINVALID;
+				if(this->size() > 0)
+				{
+					const _DataType* p = this->bptr();
+					while(p >= this->fptr())
+					{
+						if(*p == '.' && lastdot == GINVALID)
+							lastdot = (_SizeType)(p - this->fptr());
+						if(*p == '/' || *p == '\\')
+						{
+							lastslash = (_SizeType)(p - this->fptr());
+							break;
+						}
+						--p;
+					}
+				}
+				if(lastslash == GINVALID)
+				{
+					if(lastdot == GINVALID)
+						ressize = this->size();
+					else
+						ressize = lastdot;
+				}
+				else
+				{
+					if(lastdot == GINVALID)
+						ressize = this->size();
+					else
+					{
+						if(lastdot <= lastslash)
+							ressize = this->size();
+						else
+							ressize = lastdot;
+					}
+				}
+			}
 		private:
 			GAIA::CTN::BasicChars<_DataType, _SizeType, _Size> m_chars;
 			GAIA::CTN::BasicString<_DataType, _SizeType> m_string;
@@ -1499,9 +1978,21 @@ namespace GAIA
 		typedef GAIA::CTN::BasicCharsString<GAIA::CH, GAIA::NUM, 64> ACharsString64;
 		typedef GAIA::CTN::BasicCharsString<GAIA::WCH, GAIA::NUM, 64> WCharsString64;
 		typedef GAIA::CTN::BasicCharsString<GAIA::TCH, GAIA::NUM, 64> TCharsString64;
+		typedef GAIA::CTN::BasicCharsString<GAIA::CH, GAIA::NUM, 96> ACharsString96;
+		typedef GAIA::CTN::BasicCharsString<GAIA::WCH, GAIA::NUM, 96> WCharsString96;
+		typedef GAIA::CTN::BasicCharsString<GAIA::TCH, GAIA::NUM, 96> TCharsString96;
 		typedef GAIA::CTN::BasicCharsString<GAIA::CH, GAIA::NUM, 128> ACharsString128;
 		typedef GAIA::CTN::BasicCharsString<GAIA::WCH, GAIA::NUM, 128> WCharsString128;
 		typedef GAIA::CTN::BasicCharsString<GAIA::TCH, GAIA::NUM, 128> TCharsString128;
+		typedef GAIA::CTN::BasicCharsString<GAIA::CH, GAIA::NUM, 512> ACharsString512;
+		typedef GAIA::CTN::BasicCharsString<GAIA::WCH, GAIA::NUM, 512> WCharsString512;
+		typedef GAIA::CTN::BasicCharsString<GAIA::TCH, GAIA::NUM, 512> TCharsString512;
+		typedef GAIA::CTN::BasicCharsString<GAIA::CH, GAIA::NUM, 1024> ACharsString1024;
+		typedef GAIA::CTN::BasicCharsString<GAIA::WCH, GAIA::NUM, 1024> WCharsString1024;
+		typedef GAIA::CTN::BasicCharsString<GAIA::TCH, GAIA::NUM, 1024> TCharsString1024;
+		typedef GAIA::CTN::BasicCharsString<GAIA::CH, GAIA::NUM, 2048> ACharsString2048;
+		typedef GAIA::CTN::BasicCharsString<GAIA::WCH, GAIA::NUM, 2048> WCharsString2048;
+		typedef GAIA::CTN::BasicCharsString<GAIA::TCH, GAIA::NUM, 2048> TCharsString2048;
 	}
 }
 

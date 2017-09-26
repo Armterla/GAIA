@@ -11,6 +11,11 @@
  * and license in png.h
  */
 
+#ifdef __APPLE__
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored"-Wcomma"
+#endif
+
 #include "pngpriv.h"
 
 #ifdef PNG_WRITE_SUPPORTED
@@ -3027,3 +3032,7 @@ png_write_filtered_row(png_structrp png_ptr, png_bytep filtered_row,
 #endif /* WRITE_FLUSH */
 }
 #endif /* WRITE */
+
+#ifdef __APPLE__
+#	pragma clang diagnostic pop
+#endif

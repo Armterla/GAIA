@@ -18,6 +18,33 @@ namespace GAIA
 {
 	namespace TIME
 	{
+		static const GAIA::CH* WEEKDAY_NAME[] =
+		{
+			"Sun",
+			"Mon",
+			"Tue",
+			"Wed",
+			"Thu",
+			"Fri",
+			"Sat",
+		};
+		
+		static const GAIA::CH* MONTH_NAME[] =
+		{
+			"Jan",
+			"Feb",
+			"Mar",
+			"Apr",
+			"May",
+			"Jun",
+			"Jul",
+			"Aug",
+			"Sep",
+			"Oct",
+			"Nov",
+			"Dec",
+		};
+		
 	#if GAIA_OS == GAIA_OS_WINDOWS
 		GINL GAIA::GVOID FileTimeToTime(const FILETIME& ft, GAIA::U64& t)
 		{
@@ -52,6 +79,23 @@ namespace GAIA
 					return DAYSALL[month] + 1;
 			}
 			return DAYSALL[month];
+		}
+		GINL GAIA::N32 weekday(GAIA::N32 nYear, GAIA::N32 nMonth, GAIA::N32 nDay)
+		{
+			if(nMonth == 1)
+			{
+				nMonth = 13;
+				nYear = nYear - 1;
+			}
+			else if(nMonth == 2)
+			{
+				nMonth = 14;
+				nYear = nYear - 1;
+			}
+			GAIA::N32 nCentury = (nYear / 100);
+			nYear = nYear % 100;
+			GAIA::N32 nWeekday = (nCentury / 4) - (2 * nCentury) + nYear + (nYear / 4) + (13 * (nMonth + 1) / 5) + nDay - 1;
+			return nWeekday % 7;
 		}
 		GINL GAIA::U64 local_time() // return value is micro second from 1970.1.1.
 		{

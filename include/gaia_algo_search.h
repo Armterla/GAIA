@@ -131,6 +131,23 @@ namespace GAIA
 			return GNIL;
 		}
 		template<typename _DataType, typename _KeyType>
+		_DataType glinear_search(_DataType pBegin, _DataType pEnd, const _KeyType& key, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k))
+		{
+			GAST(!!pBegin);
+			GAST(!!pEnd);
+			GAST(pBegin <= pEnd);
+			while(pBegin <= pEnd)
+			{
+				GAIA::N32 nCmp = cmpor(pBegin, &key);
+				if(nCmp == 0)
+					return pBegin;
+				else if(nCmp > 0)
+					break;
+				++pBegin;
+			}
+			return GNIL;
+		}
+		template<typename _DataType, typename _KeyType>
 		_DataType gbinary_search(_DataType pBegin, _DataType pEnd, const _KeyType& key)
 		{
 			GAST(!!pBegin);
@@ -152,6 +169,32 @@ namespace GAIA
 				return GAIA::ALGO::gbinary_search(pBegin, pMid, key);
 			else if(key > *pMid)
 				return GAIA::ALGO::gbinary_search(pMid + 1, pEnd, key);
+			return GNIL;
+		}
+		template<typename _DataType, typename _KeyType>
+		_DataType gbinary_search(_DataType pBegin, _DataType pEnd, const _KeyType& key, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k))
+		{
+			GAST(!!pBegin);
+			GAST(!!pEnd);
+			GAST(pBegin <= pEnd);
+			if(pBegin == pEnd)
+			{
+				GAIA::N32 nCmp = cmpor(pBegin, &key);
+				if(nCmp == 0)
+					return pBegin;
+				return GNIL;
+			}
+			else
+			{
+				if(pEnd - pBegin <= 16)
+					return GAIA::ALGO::glinear_search(pBegin, pEnd, key, cmpor);
+			}
+			_DataType pMid = pBegin + (pEnd - pBegin) / 2;
+			GAIA::N32 nCmp = cmpor(pMid, &key);
+			if(nCmp >= 0)
+				return GAIA::ALGO::gbinary_search(pBegin, pMid, key, cmpor);
+			else if(nCmp < 0)
+				return GAIA::ALGO::gbinary_search(pMid + 1, pEnd, key, cmpor);
 			return GNIL;
 		}
 		template<typename _DataType, typename _KeyType>
@@ -181,6 +224,34 @@ namespace GAIA
 			return GNIL;
 		}
 		template<typename _DataType, typename _KeyType>
+		_DataType upper_equal(_DataType pBegin, _DataType pEnd, const _KeyType& key, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k))
+		{
+			GAST(!!pBegin);
+			GAST(!!pEnd);
+			if(pBegin == pEnd)
+			{
+				GAIA::N32 nCmp = cmpor(pBegin, &key);
+				if(nCmp >= 0)
+					return pBegin;
+				return GNIL;
+			}
+			_DataType pMid = pBegin + (pEnd - pBegin) / 2;
+			GAIA::N32 nCmp = cmpor(pMid, &key);
+			if(nCmp >= 0)
+			{
+				_DataType pRet = GAIA::ALGO::upper_equal(pBegin, pMid, key, cmpor);
+				if(pRet != GNIL)
+					return pRet;
+			}
+			else if(nCmp < 0)
+			{
+				_DataType pRet = GAIA::ALGO::upper_equal(pMid + 1, pEnd, key, cmpor);
+				if(pRet != GNIL)
+					return pRet;
+			}
+			return GNIL;
+		}
+		template<typename _DataType, typename _KeyType>
 		_DataType lower_equal(_DataType pBegin, _DataType pEnd, const _KeyType& key)
 		{
 			GAST(!!pBegin);
@@ -203,6 +274,36 @@ namespace GAIA
 			else if(key < *pMid)
 			{
 				_DataType pRet = GAIA::ALGO::lower_equal(pBegin, pMid - 1, key);
+				if(pRet != GNIL)
+					return pRet;
+			}
+			return GNIL;
+		}
+		template<typename _DataType, typename _KeyType>
+		_DataType lower_equal(_DataType pBegin, _DataType pEnd, const _KeyType& key, GAIA::N32 (*cmpor)(const GAIA::GVOID* t, const GAIA::GVOID* k))
+		{
+			GAST(!!pBegin);
+			GAST(!!pEnd);
+			if(pBegin == pEnd)
+			{
+				GAIA::N32 nCmp = cmpor(pEnd, &key);
+				if(nCmp <= 0)
+					return pEnd;
+				return GNIL;
+			}
+			_DataType pMid = pBegin + (pEnd - pBegin) / 2;
+			if((pEnd - pBegin) % 2 != 0)
+				++pMid;
+			GAIA::N32 nCmp = cmpor(pMid, &key);
+			if(nCmp <= 0)
+			{
+				_DataType pRet = GAIA::ALGO::lower_equal(pMid, pEnd, key, cmpor);
+				if(pRet != GNIL)
+					return pRet;
+			}
+			else if(nCmp > 0)
+			{
+				_DataType pRet = GAIA::ALGO::lower_equal(pBegin, pMid - 1, key, cmpor);
 				if(pRet != GNIL)
 					return pRet;
 			}

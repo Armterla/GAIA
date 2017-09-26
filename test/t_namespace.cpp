@@ -10,7 +10,7 @@ namespace TEST
 		{
 			N32* p = gnew N32[1024];
 			for(N32 x = 0; x < 1024; ++x)
-				p[x] = xrandom();
+				p[x] = grand();
 			qsort(p, p + 1024 - 1);
 			unique_order(p, p + 1024 - 1);
 			gmemset(p, (N8)17, sizeof(N32) * 1024);

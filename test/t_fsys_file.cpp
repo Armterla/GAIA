@@ -8,7 +8,7 @@ namespace TEST
 		typedef GAIA::FSYS::File __FileType;
 		typedef GAIA::FSYS::Dir __DirType;
 
-		GAIA::TCH TEST_FILE_NAME[GAIA::MAXPL];
+		GAIA::CH TEST_FILE_NAME[GAIA::MAXPL];
 		if(GAIA::ALGO::gstremp(g_gaia_appdocdir))
 			GAIA::ALGO::gstrcpy(TEST_FILE_NAME, "../testres/filetest.txt");
 		else
@@ -77,6 +77,19 @@ namespace TEST
 			TERROR;
 		if(tfile.GetOpenType() != GAIA::FSYS::FileBase::OPEN_TYPE_INVALID)
 			TERROR;
+		TAST(tfile.Open(TEST_FILE_NAME, __FileType::OPEN_TYPE_READ));
+		TAST(tfile.IsOpen());
+		GAIA::CTN::Buffer buf;
+		TAST(tfile.ReadRemainAll(buf));
+		if(buf.write_size() != GAIA::ALGO::gstrlen("Hello World") + sizeof(GAIA::U32) + GAIA::ALGO::gstrlen("Hello Kitty"))
+			TERROR;
+		if(GAIA::ALGO::gstrcmp(buf.fptr(), "Hello World", GAIA::ALGO::gstrlen("Hello World")) != 0)
+			TERROR;
+		if(*(GAIA::U32*)(buf.fptr() + GAIA::ALGO::gstrlen("Hello World")) != uData)
+			TERROR;
+		if(GAIA::ALGO::gstrcmp(buf.fptr() + GAIA::ALGO::gstrlen("Hello World") + sizeof(GAIA::U32), "Hello Kitty", GAIA::ALGO::gstrlen("Hello Kitty")) != 0)
+			TERROR;
+		TAST(tfile.Close());
 		TAST(dir.RemoveFile(TEST_FILE_NAME));
 	}
 }
