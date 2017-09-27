@@ -212,26 +212,28 @@ namespace GAIA
 			 		The length of this parameter must above equal 20 bytes.
 			*/
 			GINL GAIA::GVOID result(GAIA::U8 res[20])
-			{
-				if(m_ctx.msgbufsize == 0)
-					GAIA::ALGO::gmemcpy(res, m_ctx.res, sizeof(m_ctx.res));
-				else
-				{
-					// Backup.
-					Context old_ctx = m_ctx;
+			{				
+				// Backup.
+				Context old_ctx = m_ctx;
 
-					// Calculate msgbuf data.
+				// Calculate msgbuf data.
+				if(m_ctx.msgbufsize > 0)
 					GAIA::ALGO::gmemcpy(m_ctx.msg, m_ctx.msgbuf, m_ctx.msgbufsize);
+				if(sizeof(m_ctx.msg) - m_ctx.msgbufsize > 0)
 					GAIA::ALGO::gmemset(m_ctx.msg + m_ctx.msgbufsize, 0, sizeof(m_ctx.msg) - m_ctx.msgbufsize);
-					this->update_msg_size(m_ctx.msgbufsize);
-					this->pad_msg();
+				this->update_msg_size(m_ctx.msgbufsize);
+				this->pad_msg();
 
-					// Copy result.
-					GAIA::ALGO::gmemcpy(res, m_ctx.res, sizeof(m_ctx.res));
-
-					// Restore.
-					m_ctx = old_ctx;
+				// Copy result.
+				GAIA::ALGO::gmemcpy(res, m_ctx.res, sizeof(m_ctx.res));
+				for(GAIA::NUM x = 0; x < 20; x += 4)
+				{
+					GAIA::ALGO::swap(res[x + 0], res[x + 3]);
+					GAIA::ALGO::swap(res[x + 1], res[x + 2]);
 				}
+
+				// Restore.
+				m_ctx = old_ctx;
 			}
 		private:
 			GINL GAIA::GVOID update_msg_size(GAIA::U32 size)
@@ -306,6 +308,8 @@ namespace GAIA
 				m_ctx.res[2] = (m_ctx.res[2] + C) & 0xFFFFFFFF;
 				m_ctx.res[3] = (m_ctx.res[3] + D) & 0xFFFFFFFF;
 				m_ctx.res[4] = (m_ctx.res[4] + E) & 0xFFFFFFFF;
+				
+				m_ctx.msgsize = 0;
 			}
 			GINL GAIA::GVOID pad_msg()
 			{
