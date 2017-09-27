@@ -42,56 +42,37 @@ namespace GAIA
 			const GAIA::U8* pSrcPrac = (const GAIA::U8*)pSrc;
 			const GAIA::U8* pKeyPrac = (const GAIA::U8*)pKey;
 			GAIA::U8* res = (GAIA::U8*)pRes;
-			GAIA::U8 kipad[65];
-			GAIA::U8 kopad[65];
-			GAIA::U8 tk[20];
-			GAIA::U8* temp;
-			if(sKeyLen > 64)
+			
+			static const GAIA::NUM BLOCK_SIZE = 64;
+			
+			GAIA::U8 innerpad[BLOCK_SIZE];
+			GAIA::U8 outerpad[BLOCK_SIZE];
+			
+			GAIA::ALGO::gmemset(innerpad, 0x36, sizeof(innerpad));
+			GAIA::ALGO::gmemset(outerpad, 0x5C, sizeof(outerpad));
+			
+			for(GAIA::NUM x = 0; x < sKeyLen; ++x)
 			{
-				GAIA::DIGIT::SHA1 sha1t;
-				sha1t.update(pKeyPrac, sKeyLen);
-				sha1t.result(tk);
-				pKeyPrac = tk;
-				sKeyLen = 20;
+				innerpad[x] = innerpad[x] ^ pKeyPrac[x];
+				outerpad[x] = outerpad[x] ^ pKeyPrac[x];
 			}
-
-			zeromems(kipad);
-			zeromems(kopad);
-			GAIA::ALGO::gmemcpy(kipad, pKeyPrac, sKeyLen);
-			GAIA::ALGO::gmemcpy(kopad, pKeyPrac, sKeyLen);
-
-			for(GAIA::NUM i = 0; i < 64; i++)
+			
+			GAIA::U8 sha1res[20];
+			
+			// Inner padding.
 			{
-				kipad[i] ^= 0x36;
-				kopad[i] ^= 0x5c;
+				GAIA::DIGIT::SHA1 sha1;
+				sha1.update(innerpad, sizeof(innerpad));
+				sha1.update(pSrcPrac, sSrcLen);
+				sha1.result(sha1res);
 			}
-			temp = gnew GAIA::U8[65 + sSrcLen];
-			GAIA::ALGO::gmemset(temp, 0, 65 + sSrcLen);
-			GAIA::ALGO::gmemcpy(temp, kipad, 64);
-			GAIA::ALGO::gmemcpy(temp + 64, pSrcPrac, sSrcLen);
-
-			GAIA::DIGIT::SHA1 sha1;
-			sha1.update(temp, 64 + sSrcLen);
-			sha1.result(res);
-			for(GAIA::NUM x = 0; x < 20; x += 4)
+			
+			// Outer padding.
 			{
-				GAIA::ALGO::swap(res[x + 0], res[x + 3]);
-				GAIA::ALGO::swap(res[x + 1], res[x + 2]);
-			}
-			gdel[] temp;
-
-			GAIA::U8 buf2[65 + 20];
-			temp = buf2;
-			GAIA::ALGO::gmemset(temp, 0, 65 + 20);
-			GAIA::ALGO::gmemcpy(temp, kopad, 64);
-			GAIA::ALGO::gmemcpy(temp + 64, res, 20);
-			sha1.reset();
-			sha1.update(temp, 64 + 20);
-			sha1.result(res);
-			for(GAIA::NUM x = 0; x < 20; x += 4)
-			{
-				GAIA::ALGO::swap(res[x + 0], res[x + 3]);
-				GAIA::ALGO::swap(res[x + 1], res[x + 2]);
+				GAIA::DIGIT::SHA1 sha1;
+				sha1.update(outerpad, sizeof(outerpad));
+				sha1.update(sha1res, sizeof(sha1res));
+				sha1.result(res);
 			}
 			
 			return GAIA::True;
