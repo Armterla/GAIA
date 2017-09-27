@@ -40,9 +40,10 @@ namespace TEST
 		sha1.reset();
 		sha1.update((const GAIA::U8*)"abcdefghijklmnopqrstuvwxyz", 26);
 		sha1.result(sha1res1);
+		GAIA::ALGO::inverse(sha1res1, sha1res1 + sizeof(sha1res1) - 1);
 		GAIA::CH szSHA1Res[41];
 		GAIA::ALGO::hex2str(sha1res1, 20, szSHA1Res);
-		if(GAIA::ALGO::gstrcmp(szSHA1Res, "240D3A89F2A19D84CA04CE378CF9657032D10C7B") != 0)
+		if(GAIA::ALGO::gstrcmp(szSHA1Res, "32D10C7B8CF96570CA04CE37F2A19D84240D3A89") != 0)
 			TERROR;
 	}
 }
